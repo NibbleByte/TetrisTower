@@ -9,8 +9,10 @@ namespace TetrisTower.Levels
 		public BlocksShape NextShape;
 		public BlocksShape FallingShape;
 
-		public GridCoords FallingCoords;
-		public float FallSpeed = 2f;
+
+		public int FallingColumn;		// The first (leftest) column that the shape is falling at the moment.
+		public float FallDistance = 0f;	// Distance passed while falling.
+		public float FallSpeed = 2f;	// Speed of falling.
 
 		public GridShapeTemplate[] ShapeTemplates;
 
