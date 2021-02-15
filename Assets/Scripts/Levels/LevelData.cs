@@ -8,7 +8,9 @@ namespace TetrisTower.Levels
 	{
 		public BlocksShape NextShape;
 		public BlocksShape FallingShape;
-		public int FallingColumn;
+
+		public GridCoords FallingCoords;
+		public float FallSpeed = 2f;
 
 		public GridShapeTemplate[] ShapeTemplates;
 

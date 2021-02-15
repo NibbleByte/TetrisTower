@@ -10,6 +10,7 @@ namespace TetrisTower.Visuals
 		[Serializable]
 		public class VisualsShape : GridShape<GameObject>
 		{
+			public Transform Parent;
 		}
 
 		public VisualsGrid VisualsGrid;
@@ -46,10 +47,16 @@ namespace TetrisTower.Visuals
 
 			FallingVisualsShape = m_DebugFallingVisualsShape = new VisualsShape();
 
-			var placedCoords = new GridCoords(VisualsGrid.Rows, LevelController.LevelData.FallingColumn);
+			var placedCoords = LevelController.LevelData.FallingCoords;
+
+			FallingVisualsShape.Parent = new GameObject("-- Falling-Piece --").transform;
+			FallingVisualsShape.Parent.parent = transform;
+			FallingVisualsShape.Parent.SetAsFirstSibling();
+			FallingVisualsShape.Parent.position = VisualsGrid.GridToWorld(placedCoords);
+
 
 			foreach (var bind in blocksShape.ShapeCoords) {
-				var visualBlock = GameObject.Instantiate(bind.Value.Prefab, transform);
+				var visualBlock = GameObject.Instantiate(bind.Value.Prefab, FallingVisualsShape.Parent);
 				FallingVisualsShape.ShapeCoords.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
 
 				visualBlock.transform.position = VisualsGrid.GridToWorld(placedCoords + bind.Coords);
@@ -61,11 +68,20 @@ namespace TetrisTower.Visuals
 			if (FallingVisualsShape == null)
 				return;
 
-			foreach(var bind in FallingVisualsShape.ShapeCoords) {
-				GameObject.Destroy(bind.Value);
-			}
+			GameObject.Destroy(FallingVisualsShape.Parent.gameObject);
 
 			FallingVisualsShape = m_DebugFallingVisualsShape = null;
+		}
+
+		void Update()
+		{
+			if (FallingVisualsShape != null) {
+				var move = Vector3.down * Time.deltaTime * LevelController.LevelData.FallSpeed;
+				var position = FallingVisualsShape.Parent.position + move;
+				FallingVisualsShape.Parent.position = position;
+
+				LevelController.LevelData.FallingCoords = VisualsGrid.WorldToGrid(position);
+			}
 		}
 	}
 

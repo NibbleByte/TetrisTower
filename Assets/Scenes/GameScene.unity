@@ -294,6 +294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   VisualsGrid: {fileID: 956372779}
   LevelController: {fileID: 956372780}
+  FallSpeed: 2
   m_DebugFallingVisualsShape:
     id: 0
   references:
@@ -377,7 +378,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 6, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -430,22 +431,87 @@ MonoBehaviour:
           Row: 2
           Column: 0
         Value: {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
-    FallingColumn: 1
+    FallingCoords:
+      Row: 12
+      Column: 0
     ShapeTemplates:
     - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
     Grid:
-      m_Rows: 3
-      m_Columns: 3
+      m_Rows: 12
+      m_Columns: 6
       m_Blocks:
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 0}
-      - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+      - {fileID: 0}
+      - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
 --- !u!4 &1177382887
 Transform:
   m_ObjectHideFlags: 0

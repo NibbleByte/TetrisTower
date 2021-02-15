@@ -44,6 +44,7 @@ namespace TetrisTower.Visuals
 		}
 
 		public Vector3 GridToWorld(GridCoords coords) => new Vector3(coords.Column, coords.Row);
+		public GridCoords WorldToGrid(Vector3 worldPos) => new GridCoords((int) worldPos.y, (int) worldPos.x);
 
 		private void DestroyInstances()
 		{

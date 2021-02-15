@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,10 +6,11 @@ using System.Collections.Generic;
 namespace TetrisTower.Logic
 {
 	[Serializable]
-    public struct GridCoords
-    {
-        public int Row;
-        public int Column;
+	[JsonObject(MemberSerialization.Fields)]
+	public struct GridCoords
+	{
+		public int Row;
+		public int Column;
 
 		public GridCoords(int row, int column) { Row = row; Column = column; }
 
@@ -28,17 +30,17 @@ namespace TetrisTower.Logic
 		public static int GetColumn(GridCoords coords) => coords.Column;
 	}
 
-    public interface GameGrid
-    {
+	public interface GameGrid
+	{
 		int Rows { get; }
 		int Columns { get; }
 
-        void PlaceCells(IReadOnlyCollection<KeyValuePair<GridCoords, BlockType>> placeCells);
+		void PlaceCells(IReadOnlyCollection<KeyValuePair<GridCoords, BlockType>> placeCells);
 
 		IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords);
 
 		IEnumerator MoveCells(IReadOnlyCollection<KeyValuePair<GridCoords, GridCoords>> movedCells);
-    }
+	}
 
 	public interface GridAction
 	{
