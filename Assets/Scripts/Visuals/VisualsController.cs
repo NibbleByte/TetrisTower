@@ -48,7 +48,7 @@ namespace TetrisTower.Visuals
 
 			FallingVisualsShape = m_DebugFallingVisualsShape = new VisualsShape();
 
-			float fallDistance = LevelData.FallDistance;
+			float fallDistance = LevelData.FallDistanceNormalized * VisualsGrid.BlockSize.y;
 
 			var startCoords = new GridCoords(LevelData.Grid.Rows, LevelData.FallingColumn);
 			var placedPosition = VisualsGrid.GridToWorld(startCoords) + Vector3.down * fallDistance;
@@ -80,8 +80,10 @@ namespace TetrisTower.Visuals
 		void Update()
 		{
 			if (FallingVisualsShape != null) {
+				float fallDistance = LevelData.FallDistanceNormalized * VisualsGrid.BlockSize.y;
+
 				var startCoords = new GridCoords(LevelData.Grid.Rows, LevelData.FallingColumn);
-				var placedPosition = VisualsGrid.GridToWorld(startCoords) + Vector3.down * LevelData.FallDistance;
+				var placedPosition = VisualsGrid.GridToWorld(startCoords) + Vector3.down * fallDistance;
 
 				FallingVisualsShape.Parent.position = placedPosition;
 			}

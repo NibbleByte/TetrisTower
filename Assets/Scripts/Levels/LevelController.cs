@@ -45,7 +45,7 @@ namespace TetrisTower.Levels
 
 		private void Update()
 		{
-			LevelData.FallDistance += Time.deltaTime * LevelData.FallSpeed;
+			LevelData.FallDistanceNormalized += Time.deltaTime * LevelData.FallSpeedNormalized;
 		}
 	}
 }

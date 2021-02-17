@@ -9,6 +9,7 @@ namespace TetrisTower.Visuals
 	public class VisualsGrid : MonoBehaviour, GameGrid, GridActionsTransformer
 	{
 		public float BlockMoveSpeed = 1f;
+		public Vector2 BlockSize = Vector2.one;
 
 		public int Rows => m_Blocks.GetLength(0);
 		public int Columns => m_Blocks.GetLength(1);
@@ -43,8 +44,8 @@ namespace TetrisTower.Visuals
 			}
 		}
 
-		public Vector3 GridToWorld(GridCoords coords) => new Vector3(coords.Column, coords.Row);
-		public GridCoords WorldToGrid(Vector3 worldPos) => new GridCoords((int) worldPos.y, (int) worldPos.x);
+		public Vector3 GridToWorld(GridCoords coords) => new Vector3(coords.Column * BlockSize.x, coords.Row * BlockSize.y);
+		public GridCoords WorldToGrid(Vector3 worldPos) => new GridCoords((int) (worldPos.y / BlockSize.y), (int) (worldPos.x / BlockSize.x));
 
 		private void DestroyInstances()
 		{
@@ -91,8 +92,8 @@ namespace TetrisTower.Visuals
 						float distance = GridCoords.Distance(pair.Key, pair.Value);
 						float timeNeeded = distance / BlockMoveSpeed;
 
-						var startPos = new Vector3(pair.Key.Column, pair.Key.Row);
-						var endPos = new Vector3(pair.Value.Column, pair.Value.Row);
+						var startPos = GridToWorld(pair.Key);
+						var endPos = GridToWorld(pair.Value);
 
 						var pos = Vector3.Lerp(startPos, endPos, Mathf.Clamp01(timePassed / timeNeeded));
 
