@@ -30,20 +30,26 @@ namespace TetrisTower.Levels
 			LevelFallingShapeChanged?.Invoke();
 		}
 
-		public IEnumerator RunActions(IEnumerable<GridAction> actions)
+		public IEnumerator RunActions(IList<GridAction> actions)
 		{
-			foreach(var grid in Grids) {
+			while (actions.Count > 0) {
 
-				var transformedActions = actions;
-				if (grid is GridActionsTransformer transformer) {
-					transformedActions = transformer.Transform(actions);
+				foreach (var grid in Grids) {
+
+					IEnumerable<GridAction> transformedActions = actions;
+					if (grid is GridActionsTransformer transformer) {
+						transformedActions = transformer.Transform(actions);
+					}
+
+					foreach (var action in transformedActions) {
+						yield return action.Apply(grid);
+					}
 				}
 
-				foreach(var action in transformedActions) {
-					yield return action.Apply(grid);
-				}
+				actions = GameGridEvaluation.Evaluate(LevelData.Grid, LevelData.Rules);
 			}
 		}
+
 
 		private IEnumerator PlaceFallingShape(GridCoords placeCoords, BlocksShape placedShape)
 		{
@@ -51,11 +57,7 @@ namespace TetrisTower.Levels
 				new PlaceAction() { PlaceCoords = placeCoords, PlacedShape = placedShape }
 			};
 
-			while (actions.Count > 0) {
-				yield return RunActions(actions);
-
-				actions = GameGridEvaluation.Evaluate(LevelData.Grid, LevelData.Rules);
-			}
+			yield return RunActions(actions);
 
 			LevelData.FallingShape = LevelData.NextShape;
 			LevelData.FallDistanceNormalized = 0f;
@@ -86,6 +88,8 @@ namespace TetrisTower.Levels
 			if (LevelData.FallingShape != null) {
 				UpdateFallShape();
 			}
+
+			DebugClearRow();
 		}
 
 		private void UpdateFallShape()
@@ -105,7 +109,7 @@ namespace TetrisTower.Levels
 					PlacingFallingShape?.Invoke();
 
 					// The current coords are taken so move back one tile up where it should be free.
-					fallCoords.Row++;}
+					fallCoords.Row++;
 
 					var fallShape = LevelData.FallingShape;
 					LevelData.FallingShape = null;
@@ -114,6 +118,27 @@ namespace TetrisTower.Levels
 					break;
 				}
 			}
+		}
+
+		private void DebugClearRow()
+		{
+#if UNITY_EDITOR
+			for (KeyCode key = KeyCode.Alpha0; key <= KeyCode.Alpha9; ++key) {
+				if (Input.GetKeyDown(key) && key - KeyCode.Alpha0 < LevelData.Grid.Rows) {
+
+					List<GridCoords> clearCoords = new List<GridCoords>();
+					for (int column = 0; column < LevelData.Grid.Columns; ++column) {
+						var coords = new GridCoords(key - KeyCode.Alpha0, column);
+						if (LevelData.Grid[coords]) {
+							clearCoords.Add(coords);
+						}
+					}
+
+					var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
+					StartCoroutine(RunActions(actions));
+				}
+			}
+#endif
 		}
 	}
 }

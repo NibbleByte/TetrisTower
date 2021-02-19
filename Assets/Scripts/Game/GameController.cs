@@ -64,15 +64,6 @@ namespace TetrisTower.Game
 			if (Input.GetKeyDown(KeyCode.F6)) {
 				Deserialize();
 			}
-
-			if (Input.GetKeyDown(KeyCode.F3)) {
-				var rules = new GridRules() {
-					MatchHorizontalLines = 3,
-				};
-
-				var actions = GameGridEvaluation.Evaluate(LevelController.LevelData.Grid, rules);
-				StartCoroutine(LevelController.RunActions(actions));
-			}
 		}
 
 		string m_DebugSave;

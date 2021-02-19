@@ -159,6 +159,77 @@ namespace TetrisTower.Visuals
 				yield return new MoveCellsAction() { MovedCells = mergedMoves.ToArray() };
 			}
 		}
+
+#if UNITY_EDITOR
+		private GUIStyle m_GizmoCoordsStyle;
+		[SerializeField]
+		private bool m_GizmoShowGrid = true;
+		[SerializeField]
+		private bool m_GizmoShowGridHeader = true;
+		private bool m_GizmoPressed = false;
+
+		void OnDrawGizmos()
+		{
+			// Because Input.GetKeyDown() doesn't work here :(
+			if (!m_GizmoPressed && Input.GetKey(KeyCode.G)) {
+				m_GizmoShowGrid = !m_GizmoShowGrid;
+				m_GizmoPressed = true;
+			}
+			if (!m_GizmoPressed && Input.GetKey(KeyCode.H)) {
+				m_GizmoShowGridHeader = !m_GizmoShowGridHeader;
+				m_GizmoPressed = true;
+			}
+			if (m_GizmoPressed && !Input.GetKey(KeyCode.G) && !Input.GetKey(KeyCode.H)) {
+				m_GizmoPressed = false;
+			}
+
+			if (m_GizmoCoordsStyle == null || true) {
+				m_GizmoCoordsStyle = new GUIStyle(GUI.skin.label);
+				m_GizmoCoordsStyle.alignment = TextAnchor.MiddleCenter;
+				m_GizmoCoordsStyle.padding = new RectOffset();
+				m_GizmoCoordsStyle.margin = new RectOffset();
+				m_GizmoCoordsStyle.contentOffset = new Vector2(-6, -5);
+				m_GizmoCoordsStyle.normal.textColor = new Color(0f, 1f, 0f, 0.6f);
+			}
+
+			int rows = m_Blocks != null ? Rows : 10;
+			int columns = m_Blocks != null ? Rows : 10;
+
+			var coords = new GridCoords();
+			var blockHalfSize = new Vector3(BlockSize.x, BlockSize.y) * 0.5f;
+
+			if (m_GizmoShowGridHeader) {
+				coords.Column = -1;
+				for (coords.Row = 0; coords.Row < rows; ++coords.Row) {
+					var position = GridToWorld(coords);
+
+					UnityEditor.Handles.Label(position + blockHalfSize, coords.Row.ToString(), m_GizmoCoordsStyle);
+				}
+
+				coords.Row = -1;
+				for (coords.Column = 0; coords.Column < columns; ++coords.Column) {
+					var position = GridToWorld(coords);
+
+					UnityEditor.Handles.Label(position + blockHalfSize, coords.Column.ToString(), m_GizmoCoordsStyle);
+				}
+			}
+
+			if (m_GizmoShowGrid) {
+				for (coords.Row = 0; coords.Row < rows; ++coords.Row) {
+					for (coords.Column = 0; coords.Column < columns; ++coords.Column) {
+						var position = GridToWorld(coords);
+
+						UnityEditor.Handles.color = new Color(0, 0, 0, 0.4f);
+						UnityEditor.Handles.DrawWireCube(position + blockHalfSize, BlockSize);
+
+						//UnityEditor.Handles.Label(position + blockHalfSize, coords.ToString(), m_GizmoCoordsStyle);
+
+					}
+				}
+			}
+		}
+#endif
+
 	}
 
 }
