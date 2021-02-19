@@ -19,6 +19,9 @@ namespace TetrisTower.Levels
 		public event System.Action PlacingFallingShape;
 		public event System.Action FallingShapeSelected;
 
+		private int m_NextRunId = 0;
+		private int m_FinishedRuns = 0;
+
 		public void Init(LevelData data)
 		{
 			LevelData = m_DebugLevelData = data;
@@ -32,6 +35,13 @@ namespace TetrisTower.Levels
 
 		public IEnumerator RunActions(IList<GridAction> actions)
 		{
+			var currentRunId = m_NextRunId;
+			m_NextRunId++;
+
+			while (m_FinishedRuns < currentRunId)
+				yield return null;
+
+
 			while (actions.Count > 0) {
 
 				foreach (var grid in Grids) {
@@ -48,6 +58,8 @@ namespace TetrisTower.Levels
 
 				actions = GameGridEvaluation.Evaluate(LevelData.Grid, LevelData.Rules);
 			}
+
+			m_FinishedRuns++;
 		}
 
 
@@ -104,7 +116,7 @@ namespace TetrisTower.Levels
 				if (coords.Row >= LevelData.Grid.Rows)
 					continue;
 
-				if (LevelData.Grid[coords]) {
+				if (coords.Row < 0 || LevelData.Grid[coords]) {
 
 					PlacingFallingShape?.Invoke();
 
@@ -134,8 +146,10 @@ namespace TetrisTower.Levels
 						}
 					}
 
-					var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
-					StartCoroutine(RunActions(actions));
+					if (clearCoords.Count > 0) {
+						var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
+						StartCoroutine(RunActions(actions));
+					}
 				}
 			}
 #endif
