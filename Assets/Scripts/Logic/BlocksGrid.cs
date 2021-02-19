@@ -34,13 +34,17 @@ namespace TetrisTower.Logic
 			m_Blocks = new BlockType[rows * columns];
 		}
 
-		public void PlaceCells(IReadOnlyCollection<KeyValuePair<GridCoords, BlockType>> placeCells)
+		public IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape)
 		{
-			foreach (var pair in placeCells) {
-				UnityEngine.Debug.Assert(this[pair.Key] == null);
+			foreach (var pair in placedShape.ShapeCoords) {
+				var coords = placedCoords + pair.Coords;
 
-				this[pair.Key] = pair.Value;
+				UnityEngine.Debug.Assert(this[coords] == null);
+
+				this[coords] = pair.Value;
 			}
+
+			yield break;
 		}
 
 		public IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords)

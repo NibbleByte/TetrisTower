@@ -58,11 +58,14 @@ namespace TetrisTower.Visuals
 			}
 		}
 
-		public void PlaceCells(IReadOnlyCollection<KeyValuePair<GridCoords, BlockType>> placeCells)
+		public IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape)
 		{
-			foreach (var pair in placeCells) {
-				CreateInstanceAt(pair.Key, pair.Value);
+			foreach (var pair in placedShape.ShapeCoords) {
+				var coords = placedCoords + pair.Coords;
+				CreateInstanceAt(coords, pair.Value);
 			}
+
+			yield break;
 		}
 
 		public IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords)

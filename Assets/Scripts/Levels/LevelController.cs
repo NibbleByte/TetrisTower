@@ -16,6 +16,8 @@ namespace TetrisTower.Levels
 
 		public event System.Action LevelInitialized;
 		public event System.Action LevelFallingShapeChanged;
+		public event System.Action PlacingFallingShape;
+		public event System.Action FallingShapeSelected;
 
 		public void Init(LevelData data)
 		{
@@ -43,9 +45,75 @@ namespace TetrisTower.Levels
 			}
 		}
 
-		private void Update()
+		private IEnumerator PlaceFallingShape(GridCoords placeCoords, BlocksShape placedShape)
+		{
+			var actions = new List<GridAction>() {
+				new PlaceAction() { PlaceCoords = placeCoords, PlacedShape = placedShape }
+			};
+
+			while (actions.Count > 0) {
+				yield return RunActions(actions);
+
+				actions = GameGridEvaluation.Evaluate(LevelData.Grid, LevelData.Rules);
+			}
+
+			LevelData.FallingShape = LevelData.NextShape;
+			LevelData.FallDistanceNormalized = 0f;
+
+			GridShapeTemplate template = LevelData.ShapeTemplates[Random.Range(0, LevelData.ShapeTemplates.Length)];
+			LevelData.NextShape = GenerateShape(template, LevelData.SpawnedBlocks);
+
+			FallingShapeSelected?.Invoke();
+		}
+
+		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] spawnBlocks)
+		{
+			var shapeCoords = new List<BlocksShape.ShapeBind>();
+			foreach(var coords in template.ShapeTemplate) {
+				var blockType = spawnBlocks[Random.Range(0, spawnBlocks.Length)];
+
+				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
+					Coords = coords,
+					Value = blockType,
+				});
+			}
+
+			return new BlocksShape() { ShapeCoords = shapeCoords };
+		}
+
+		void Update()
+		{
+			if (LevelData.FallingShape != null) {
+				UpdateFallShape();
+			}
+		}
+
+		private void UpdateFallShape()
 		{
 			LevelData.FallDistanceNormalized += Time.deltaTime * LevelData.FallSpeedNormalized;
+
+			var fallCoords = LevelData.FallShapeCoords;
+
+			foreach (var pair in LevelData.FallingShape.ShapeCoords) {
+				var coords = fallCoords + pair.Coords;
+
+				if (coords.Row >= LevelData.Grid.Rows)
+					continue;
+
+				if (LevelData.Grid[coords]) {
+
+					PlacingFallingShape?.Invoke();
+
+					// The current coords are taken so move back one tile up where it should be free.
+					fallCoords.Row++;}
+
+					var fallShape = LevelData.FallingShape;
+					LevelData.FallingShape = null;
+
+					StartCoroutine(PlaceFallingShape(fallCoords, fallShape));
+					break;
+				}
+			}
 		}
 	}
 }

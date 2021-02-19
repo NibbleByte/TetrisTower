@@ -378,7 +378,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 6, z: -25}
+  m_LocalPosition: {x: 0, y: 12, z: -30}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -416,7 +416,19 @@ MonoBehaviour:
   AssetsRepository: {fileID: 11400000, guid: 0a11aa83a595115449c23a7cbdd52e0c, type: 2}
   StartData:
     NextShape:
-      ShapeCoords: []
+      ShapeCoords:
+      - Coords:
+          Row: 0
+          Column: 0
+        Value: {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+      - Coords:
+          Row: 1
+          Column: 0
+        Value: {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+      - Coords:
+          Row: 2
+          Column: 0
+        Value: {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
     FallingShape:
       ShapeCoords:
       - Coords:
@@ -436,6 +448,9 @@ MonoBehaviour:
     FallSpeedNormalized: 2
     ShapeTemplates:
     - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
+    SpawnedBlocks:
+    - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+    - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
     Grid:
       m_Rows: 12
       m_Columns: 6

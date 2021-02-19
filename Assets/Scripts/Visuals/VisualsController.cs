@@ -25,6 +25,8 @@ namespace TetrisTower.Visuals
 		{
 			LevelController.LevelInitialized += OnLevelInitialized;
 			LevelController.LevelFallingShapeChanged += ReplaceFallingVisuals;
+			LevelController.PlacingFallingShape += OnPlacingFallingShape;
+			LevelController.FallingShapeSelected += OnFallingShapeSelected;
 		}
 
 		private void OnLevelInitialized()
@@ -40,6 +42,16 @@ namespace TetrisTower.Visuals
 			if (LevelData.FallingShape != null) {
 				CreateFallingVisuals();
 			}
+		}
+
+		private void OnPlacingFallingShape()
+		{
+			DestroyFallingVisuals();
+		}
+
+		private void OnFallingShapeSelected()
+		{
+			CreateFallingVisuals();
 		}
 
 		private void CreateFallingVisuals()

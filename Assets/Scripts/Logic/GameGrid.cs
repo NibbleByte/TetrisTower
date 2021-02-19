@@ -35,7 +35,7 @@ namespace TetrisTower.Logic
 		int Rows { get; }
 		int Columns { get; }
 
-		void PlaceCells(IReadOnlyCollection<KeyValuePair<GridCoords, BlockType>> placeCells);
+		IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape);
 
 		IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords);
 
@@ -53,6 +53,14 @@ namespace TetrisTower.Logic
 		IEnumerable<GridAction> Transform(IEnumerable<GridAction> actions);
 	}
 
+
+	public class PlaceAction : GridAction
+	{
+		public GridCoords PlaceCoords;
+		public BlocksShape PlacedShape;
+
+		public IEnumerator Apply(GameGrid grid) { yield return grid.PlaceShape(PlaceCoords, PlacedShape); }
+	}
 
 	public class ClearMatchedAction : GridAction
 	{

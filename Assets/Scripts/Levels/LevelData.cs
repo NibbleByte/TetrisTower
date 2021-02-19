@@ -1,9 +1,11 @@
+using Newtonsoft.Json;
 using System;
 using TetrisTower.Logic;
 
 namespace TetrisTower.Levels
 {
 	[Serializable]
+	[JsonObject(MemberSerialization.Fields)]
 	public class LevelData
 	{
 		public BlocksShape NextShape;
@@ -15,7 +17,11 @@ namespace TetrisTower.Levels
 		public float FallSpeedNormalized = 2f;		// Speed of falling.
 
 		public GridShapeTemplate[] ShapeTemplates;
+		public BlockType[] SpawnedBlocks;
 
+		public GridRules Rules;
 		public BlocksGrid Grid;
+
+		public GridCoords FallShapeCoords => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), FallingColumn);
 	}
 }
