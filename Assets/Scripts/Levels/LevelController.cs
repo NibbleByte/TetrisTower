@@ -76,6 +76,10 @@ namespace TetrisTower.Levels
 			GridShapeTemplate template = LevelData.ShapeTemplates[Random.Range(0, LevelData.ShapeTemplates.Length)];
 			LevelData.NextShape = GenerateShape(template, LevelData.SpawnedBlocks);
 
+			if (!LevelData.Rules.WrapSidesOnMove && LevelData.FallingColumn + LevelData.FallingShape.Columns > Grid.Columns) {
+				LevelData.FallingColumn = Grid.Columns - LevelData.FallingShape.Columns;
+			}
+
 			FallingShapeSelected?.Invoke();
 		}
 
