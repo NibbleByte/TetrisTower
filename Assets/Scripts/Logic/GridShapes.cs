@@ -60,7 +60,7 @@ namespace TetrisTower.Logic
 				if (selector(pair.Coords) > max) max = selector(pair.Coords);
 			}
 
-			return max - min;
+			return max - min + 1;
 		}
 	}
 }

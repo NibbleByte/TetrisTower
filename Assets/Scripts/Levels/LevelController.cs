@@ -23,6 +23,8 @@ namespace TetrisTower.Levels
 		private int m_NextRunId = 0;
 		private int m_FinishedRuns = 0;
 
+		public bool AreGridActionsRunning => m_FinishedRuns != m_NextRunId;
+
 		public void Init(LevelData data)
 		{
 			LevelData = m_DebugLevelData = data;
@@ -73,9 +75,10 @@ namespace TetrisTower.Levels
 			yield return RunActions(actions);
 
 			// Limit was reached, game over.
-			if (placeCoords.Row + placedShape.Rows < LevelData.Grid.Rows) {
+			if (placeCoords.Row + placedShape.Rows - 1 < LevelData.Grid.Rows) {
 				SelectFallingShape();
 			} else {
+				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the grid ({LevelData.Grid.Rows}, {LevelData.Grid.Columns}). It will be trimmed!");
 				PlacedOutsideGrid?.Invoke();
 			}
 		}
@@ -110,6 +113,9 @@ namespace TetrisTower.Levels
 		{
 			if (LevelData.HasFallingShape) {
 				UpdateFallShape();
+
+			} else if (!AreGridActionsRunning && LevelData.Grid[LevelData.Grid.Rows - 1, LevelData.FallingColumn] == null) {
+				SelectFallingShape();
 			}
 
 			DebugClearRow();

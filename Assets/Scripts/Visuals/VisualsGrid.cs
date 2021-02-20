@@ -136,20 +136,20 @@ namespace TetrisTower.Visuals
 
 		private void CreateInstanceAt(GridCoords coords, BlockType blockType, GameObject reuseVisuals = null)
 		{
-
 			if (reuseVisuals) {
 				reuseVisuals.transform.SetParent(transform);
 			} else {
 				reuseVisuals = GameObject.Instantiate(blockType.Prefab, transform);
 			}
 
-			// Hitting the limit, still visualized but won't be stored.
+			// Hitting the limit, won't be stored.
 			if (coords.Row < Rows) {
 				Debug.Assert(this[coords] == null);
 				this[coords] = reuseVisuals;
+				reuseVisuals.transform.position = GridToWorld(coords);
+			} else {
+				GameObject.Destroy(reuseVisuals);
 			}
-
-			reuseVisuals.transform.position = GridToWorld(coords);
 		}
 
 		/// <summary>
