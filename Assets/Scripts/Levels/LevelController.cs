@@ -65,6 +65,41 @@ namespace TetrisTower.Levels
 			m_FinishedRuns++;
 		}
 
+		public void SelectFallingShape()
+		{
+			LevelData.FallingShape = LevelData.NextShape;
+			LevelData.FallDistanceNormalized = 0f;
+
+			GridShapeTemplate template = LevelData.ShapeTemplates[Random.Range(0, LevelData.ShapeTemplates.Length)];
+			LevelData.NextShape = GenerateShape(template, LevelData.SpawnedBlocks);
+
+			FallingShapeSelected?.Invoke();
+		}
+
+		public bool RequestFallingShapeOffset(int offsetColumns)
+		{
+			if (!LevelData.HasFallingShape)
+				return false;
+
+			int requestedColumn = Mathf.Clamp(LevelData.FallingColumn + offsetColumns, 0, LevelData.Grid.Columns - LevelData.FallingShape.Columns);
+
+			// NOTE: This won't check in-between cells and jump over occupied ones.
+			var fallCoords = LevelData.CalcFallShapeCoordsAt(requestedColumn);
+
+			foreach (var pair in LevelData.FallingShape.ShapeCoords) {
+				var coords = fallCoords + pair.Coords;
+
+				if (coords.Row < 0 || coords.Row >= LevelData.Grid.Rows)
+					continue;
+
+				if (LevelData.Grid[coords])
+					return false;
+			}
+
+			LevelData.FallingColumn = requestedColumn;
+
+			return true;
+		}
 
 		private IEnumerator PlaceFallingShape(GridCoords placeCoords, BlocksShape placedShape)
 		{
@@ -81,17 +116,6 @@ namespace TetrisTower.Levels
 				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the grid ({LevelData.Grid.Rows}, {LevelData.Grid.Columns}). It will be trimmed!");
 				PlacedOutsideGrid?.Invoke();
 			}
-		}
-
-		public void SelectFallingShape()
-		{
-			LevelData.FallingShape = LevelData.NextShape;
-			LevelData.FallDistanceNormalized = 0f;
-
-			GridShapeTemplate template = LevelData.ShapeTemplates[Random.Range(0, LevelData.ShapeTemplates.Length)];
-			LevelData.NextShape = GenerateShape(template, LevelData.SpawnedBlocks);
-
-			FallingShapeSelected?.Invoke();
 		}
 
 		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] spawnBlocks)

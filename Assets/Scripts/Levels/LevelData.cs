@@ -25,6 +25,7 @@ namespace TetrisTower.Levels
 		public GridRules Rules;
 		public BlocksGrid Grid;
 
-		public GridCoords FallShapeCoords => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), FallingColumn);
+		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), column);
+		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);
 	}
 }

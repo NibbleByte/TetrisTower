@@ -396,6 +396,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1177382887}
   - component: {fileID: 1177382886}
+  - component: {fileID: 1177382888}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -416,6 +417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AssetsRepository: {fileID: 11400000, guid: 0a11aa83a595115449c23a7cbdd52e0c, type: 2}
+  PlayerController: {fileID: 1177382888}
   StartData:
     NextShape:
       ShapeCoords:
@@ -543,3 +545,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1177382888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1177382885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974e7c409cc035842a8738214a3361cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

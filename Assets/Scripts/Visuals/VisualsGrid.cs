@@ -219,7 +219,7 @@ namespace TetrisTower.Visuals
 			}
 
 			int rows = m_Blocks != null ? Rows : 10;
-			int columns = m_Blocks != null ? Rows : 10;
+			int columns = m_Blocks != null ? Columns : 10;
 
 			var coords = new GridCoords();
 			var blockHalfSize = new Vector3(BlockSize.x, BlockSize.y) * 0.5f;

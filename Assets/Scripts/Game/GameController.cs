@@ -1,4 +1,5 @@
 using TetrisTower.Core;
+using TetrisTower.PlayerControls;
 using TetrisTower.Levels;
 using TetrisTower.Logic;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace TetrisTower.Game
 	public class GameController : MonoBehaviour
 	{
 		public AssetsRepository AssetsRepository;
+		public PlayerLevelController PlayerController;
 
 		// TODO: REMOVE
 		public LevelData StartData;
@@ -45,6 +47,7 @@ namespace TetrisTower.Game
 		{
 			LevelController = level;
 			LevelController.Init(data);
+			PlayerController.Init(LevelController);
 		}
 
 		private void OnDestroy()
