@@ -13,6 +13,7 @@ namespace TetrisTower.Levels
 
 
 		public List<GameGrid> Grids { get; private set; } = new List<GameGrid>();
+		public BlocksGrid Grid => LevelData?.Grid;
 
 		public event System.Action LevelInitialized;
 		public event System.Action LevelFallingShapeChanged;
@@ -61,7 +62,7 @@ namespace TetrisTower.Levels
 					}
 				}
 
-				actions = GameGridEvaluation.Evaluate(LevelData.Grid, LevelData.Rules);
+				actions = GameGridEvaluation.Evaluate(Grid, LevelData.Rules);
 			}
 
 			m_FinishedRuns++;
@@ -85,22 +86,20 @@ namespace TetrisTower.Levels
 
 			int requestedColumn = LevelData.FallingColumn + offsetColumns;
 			if (!LevelData.Rules.WrapSidesOnMove) {
-				requestedColumn = Mathf.Clamp(requestedColumn, 0, LevelData.Grid.Columns - LevelData.FallingShape.Columns);
+				requestedColumn = Mathf.Clamp(requestedColumn, 0, Grid.Columns - LevelData.FallingShape.Columns);
 			}
 
 			// NOTE: This won't check in-between cells and jump over occupied ones.
 			var fallCoords = LevelData.CalcFallShapeCoordsAt(requestedColumn);
-			fallCoords.WrapAround(LevelData.Grid);
+			fallCoords.WrapAround(Grid);
 
-			foreach (var pair in LevelData.FallingShape.ShapeCoords) {
-				var coords = fallCoords + pair.Coords;
-				coords.WrapColumn(LevelData.Grid);
+			foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
-				if (coords.Row < LevelData.Grid.Rows && LevelData.Grid[coords])
+				if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords])
 					return false;
 			}
 
-			LevelData.FallingColumn = GridCoords.Nfmod(requestedColumn, LevelData.Grid.Columns);
+			LevelData.FallingColumn = GridCoords.WrapValue(requestedColumn, Grid.Columns);
 
 			return true;
 		}
@@ -124,10 +123,10 @@ namespace TetrisTower.Levels
 			yield return RunActions(actions);
 
 			// Limit was reached, game over.
-			if (placeCoords.Row + placedShape.Rows - 1 < LevelData.Grid.Rows) {
+			if (placeCoords.Row + placedShape.Rows - 1 < Grid.Rows) {
 				SelectFallingShape();
 			} else {
-				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the grid ({LevelData.Grid.Rows}, {LevelData.Grid.Columns}). It will be trimmed!");
+				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the grid ({Grid.Rows}, {Grid.Columns}). It will be trimmed!");
 				PlacedOutsideGrid?.Invoke();
 			}
 		}
@@ -166,12 +165,12 @@ namespace TetrisTower.Levels
 				if (shapeCoords.Coords.Row == 0) {
 
 					var coords = new GridCoords() {
-						Row = LevelData.Grid.Rows - 1,
+						Row = Grid.Rows - 1,
 						Column = LevelData.FallingColumn + shapeCoords.Coords.Column
 					};
-					coords.WrapColumn(LevelData.Grid);
+					coords.WrapColumn(Grid);
 
-					if (LevelData.Grid[coords] != null) {
+					if (Grid[coords] != null) {
 						return false;
 					}
 				}
@@ -187,14 +186,12 @@ namespace TetrisTower.Levels
 
 			var fallCoords = LevelData.FallShapeCoords;
 
-			foreach (var pair in LevelData.FallingShape.ShapeCoords) {
-				var coords = fallCoords + pair.Coords;
-				coords.WrapColumn(LevelData.Grid);
+			foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
-				if (coords.Row >= LevelData.Grid.Rows)
+				if (pair.Coords.Row >= Grid.Rows)
 					continue;
 
-				if (coords.Row < 0 || LevelData.Grid[coords]) {
+				if (pair.Coords.Row < 0 || Grid[pair.Coords]) {
 
 					PlacingFallingShape?.Invoke();
 
@@ -216,12 +213,12 @@ namespace TetrisTower.Levels
 		{
 #if UNITY_EDITOR
 			for (KeyCode key = KeyCode.Alpha0; key <= KeyCode.Alpha9; ++key) {
-				if (Input.GetKeyDown(key) && key - KeyCode.Alpha0 < LevelData.Grid.Rows) {
+				if (Input.GetKeyDown(key) && key - KeyCode.Alpha0 < Grid.Rows) {
 
 					List<GridCoords> clearCoords = new List<GridCoords>();
-					for (int column = 0; column < LevelData.Grid.Columns; ++column) {
+					for (int column = 0; column < Grid.Columns; ++column) {
 						var coords = new GridCoords(key - KeyCode.Alpha0, column);
-						if (LevelData.Grid[coords]) {
+						if (Grid[coords]) {
 							clearCoords.Add(coords);
 						}
 					}

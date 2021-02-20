@@ -52,6 +52,18 @@ namespace TetrisTower.Logic
 		public int Rows => GetSize(GridCoords.GetRow);
 		public int Columns => GetSize(GridCoords.GetColumn);
 
+		public IEnumerable<ShapeBind> AddToCoordsWrapped(GridCoords addedCoords, GameGrid grid)
+		{
+			foreach(var shapeCoords in ShapeCoords) {
+				var resultBind = shapeCoords;
+
+				resultBind.Coords += addedCoords;
+				resultBind.Coords.WrapColumn(grid);
+
+				yield return resultBind;
+			}
+		}
+
 		private int GetSize(Func<GridCoords, int> selector) {
 			int min = int.MaxValue;
 			int max = int.MinValue;

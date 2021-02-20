@@ -21,20 +21,20 @@ namespace TetrisTower.Logic
 
 		public void WrapAround(int rows, int columns)
 		{
-			Row = Nfmod(Row, rows);
-			Column = Nfmod(Column, columns);
+			Row = WrapValue(Row, rows);
+			Column = WrapValue(Column, columns);
 		}
 
 		public void WrapAround(GameGrid grid)
 		{
-			Row = Nfmod(Row, grid.Rows);
-			Column = Nfmod(Column, grid.Columns);
+			Row = WrapValue(Row, grid.Rows);
+			Column = WrapValue(Column, grid.Columns);
 		}
 
-		public void WrapRow(int rows) => Row = Nfmod(Row, rows);
-		public void WrapRow(GameGrid grid) => Row = Nfmod(Row, grid.Rows);
-		public void WrapColumn(int columns) => Column = Nfmod(Column, columns);
-		public void WrapColumn(GameGrid grid) => Column = Nfmod(Column, grid.Columns);
+		public void WrapRow(int rows) => Row = WrapValue(Row, rows);
+		public void WrapRow(GameGrid grid) => Row = WrapValue(Row, grid.Rows);
+		public void WrapColumn(int columns) => Column = WrapValue(Column, columns);
+		public void WrapColumn(GameGrid grid) => Column = WrapValue(Column, grid.Columns);
 
 		public static GridCoords WrapAround(GridCoords coords, int rows, int columns)
 		{
@@ -80,18 +80,18 @@ namespace TetrisTower.Logic
 		/// Module that supports negative values.
 		/// Thanks to PeterSvP via stackoverflow.com... :D
 		/// </summary>
-		public static double Nfmod(double a, double b)
+		public static double WrapValue(double value, double size)
 		{
-			return a - b * Math.Floor(a / b);
+			return value - size * Math.Floor(value / size);
 		}
 
 		/// <summary>
 		/// Module that supports negative values.
 		/// Thanks to PeterSvP via stackoverflow.com... :D
 		/// </summary>
-		public static int Nfmod(int a, int b)
+		public static int WrapValue(int value, int size)
 		{
-			return a - b * (int)Math.Floor((float)a / b);
+			return value - size * (int)Math.Floor((float)value / size);
 		}
 	}
 

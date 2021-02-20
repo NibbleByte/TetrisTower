@@ -36,17 +36,15 @@ namespace TetrisTower.Logic
 
 		public IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape)
 		{
-			foreach (var pair in placedShape.ShapeCoords) {
-				var coords = placedCoords + pair.Coords;
-				coords.WrapColumn(this);
+			foreach (var pair in placedShape.AddToCoordsWrapped(placedCoords, this)) {
 
 				// Hitting the limit, won't be stored.
-				if (coords.Row >= Rows)
+				if (pair.Coords.Row >= Rows)
 					continue;
 
-				UnityEngine.Debug.Assert(this[coords] == null);
+				UnityEngine.Debug.Assert(this[pair.Coords] == null);
 
-				this[coords] = pair.Value;
+				this[pair.Coords] = pair.Value;
 			}
 
 			yield break;

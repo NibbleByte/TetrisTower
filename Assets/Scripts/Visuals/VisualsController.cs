@@ -105,11 +105,8 @@ namespace TetrisTower.Visuals
 
 				var startCoords = new GridCoords(LevelData.Grid.Rows, LevelData.FallingColumn);
 
-				foreach (var shapeCoords in FallingVisualsShape.ShapeCoords) {
-					var coords = startCoords + shapeCoords.Coords;
-					coords.WrapColumn(LevelData.Grid);
-
-					shapeCoords.Value.transform.position = VisualsGrid.GridToWorld(coords) + Vector3.down * fallDistance;
+				foreach (var shapeCoords in FallingVisualsShape.AddToCoordsWrapped(startCoords, LevelData.Grid)) {
+					shapeCoords.Value.transform.position = VisualsGrid.GridToWorld(shapeCoords.Coords) + Vector3.down * fallDistance;
 				}
 			}
 		}
