@@ -17,6 +17,7 @@ namespace TetrisTower.Levels
 		public event System.Action LevelInitialized;
 		public event System.Action LevelFallingShapeChanged;
 		public event System.Action PlacingFallingShape;
+		public event System.Action PlacedOutsideGrid;
 		public event System.Action FallingShapeSelected;
 
 		private int m_NextRunId = 0;
@@ -71,6 +72,16 @@ namespace TetrisTower.Levels
 
 			yield return RunActions(actions);
 
+			// Limit was reached, game over.
+			if (placeCoords.Row + placedShape.Rows < LevelData.Grid.Rows) {
+				SelectFallingShape();
+			} else {
+				PlacedOutsideGrid?.Invoke();
+			}
+		}
+
+		public void SelectFallingShape()
+		{
 			LevelData.FallingShape = LevelData.NextShape;
 			LevelData.FallDistanceNormalized = 0f;
 
@@ -97,7 +108,7 @@ namespace TetrisTower.Levels
 
 		void Update()
 		{
-			if (LevelData.FallingShape != null) {
+			if (LevelData.HasFallingShape) {
 				UpdateFallShape();
 			}
 

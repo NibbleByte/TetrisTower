@@ -39,6 +39,10 @@ namespace TetrisTower.Logic
 			foreach (var pair in placedShape.ShapeCoords) {
 				var coords = placedCoords + pair.Coords;
 
+				// Hitting the limit, won't be stored.
+				if (coords.Row >= Rows)
+					continue;
+
 				UnityEngine.Debug.Assert(this[coords] == null);
 
 				this[coords] = pair.Value;

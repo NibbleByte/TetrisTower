@@ -136,7 +136,6 @@ namespace TetrisTower.Visuals
 
 		private void CreateInstanceAt(GridCoords coords, BlockType blockType, GameObject reuseVisuals = null)
 		{
-			Debug.Assert(this[coords] == null);
 
 			if (reuseVisuals) {
 				reuseVisuals.transform.SetParent(transform);
@@ -144,7 +143,11 @@ namespace TetrisTower.Visuals
 				reuseVisuals = GameObject.Instantiate(blockType.Prefab, transform);
 			}
 
-			this[coords] = reuseVisuals;
+			// Hitting the limit, still visualized but won't be stored.
+			if (coords.Row < Rows) {
+				Debug.Assert(this[coords] == null);
+				this[coords] = reuseVisuals;
+			}
 
 			reuseVisuals.transform.position = GridToWorld(coords);
 		}
