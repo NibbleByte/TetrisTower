@@ -83,22 +83,24 @@ namespace TetrisTower.Levels
 			if (!LevelData.HasFallingShape)
 				return false;
 
-			int requestedColumn = Mathf.Clamp(LevelData.FallingColumn + offsetColumns, 0, LevelData.Grid.Columns - LevelData.FallingShape.Columns);
+			int requestedColumn = LevelData.FallingColumn + offsetColumns;
+			if (!LevelData.Rules.WrapSidesOnMove) {
+				requestedColumn = Mathf.Clamp(requestedColumn, 0, LevelData.Grid.Columns - LevelData.FallingShape.Columns);
+			}
 
 			// NOTE: This won't check in-between cells and jump over occupied ones.
 			var fallCoords = LevelData.CalcFallShapeCoordsAt(requestedColumn);
+			fallCoords.WrapAround(LevelData.Grid);
 
 			foreach (var pair in LevelData.FallingShape.ShapeCoords) {
 				var coords = fallCoords + pair.Coords;
+				coords.WrapColumn(LevelData.Grid);
 
-				if (coords.Row < 0 || coords.Row >= LevelData.Grid.Rows)
-					continue;
-
-				if (LevelData.Grid[coords])
+				if (coords.Row < LevelData.Grid.Rows && LevelData.Grid[coords])
 					return false;
 			}
 
-			LevelData.FallingColumn = requestedColumn;
+			LevelData.FallingColumn = GridCoords.Nfmod(requestedColumn, LevelData.Grid.Columns);
 
 			return true;
 		}
@@ -150,11 +152,32 @@ namespace TetrisTower.Levels
 			if (LevelData.HasFallingShape) {
 				UpdateFallShape();
 
-			} else if (!AreGridActionsRunning && LevelData.Grid[LevelData.Grid.Rows - 1, LevelData.FallingColumn] == null) {
+			} else if (!AreGridActionsRunning && CanSelectNextShape()) {
 				SelectFallingShape();
 			}
 
 			DebugClearRow();
+		}
+
+		private bool CanSelectNextShape()
+		{
+			// Search if the bottom of the next shape can be spawned.
+			foreach (var shapeCoords in LevelData.NextShape.ShapeCoords) {
+				if (shapeCoords.Coords.Row == 0) {
+
+					var coords = new GridCoords() {
+						Row = LevelData.Grid.Rows - 1,
+						Column = LevelData.FallingColumn + shapeCoords.Coords.Column
+					};
+					coords.WrapColumn(LevelData.Grid);
+
+					if (LevelData.Grid[coords] != null) {
+						return false;
+					}
+				}
+			}
+
+			return true;
 		}
 
 		private void UpdateFallShape()
@@ -166,6 +189,7 @@ namespace TetrisTower.Levels
 
 			foreach (var pair in LevelData.FallingShape.ShapeCoords) {
 				var coords = fallCoords + pair.Coords;
+				coords.WrapColumn(LevelData.Grid);
 
 				if (coords.Row >= LevelData.Grid.Rows)
 					continue;

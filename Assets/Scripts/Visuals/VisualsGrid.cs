@@ -69,6 +69,8 @@ namespace TetrisTower.Visuals
 					.FirstOrDefault();
 
 				var coords = placedCoords + pair.Coords;
+				coords.WrapColumn(this);
+
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
 			}
 

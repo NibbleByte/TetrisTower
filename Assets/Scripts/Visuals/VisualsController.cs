@@ -27,10 +27,12 @@ namespace TetrisTower.Visuals
 			LevelController.LevelInitialized += OnLevelInitialized;
 			LevelController.LevelFallingShapeChanged += ReplaceFallingVisuals;
 			LevelController.PlacingFallingShape += OnPlacingFallingShape;
+			LevelController.PlacedOutsideGrid += DestroyFallingVisuals;
 			LevelController.FallingShapeSelected += OnFallingShapeSelected;
 
 			FallingVisualsContainer = new GameObject("-- Falling-Shape --").transform;
 			FallingVisualsContainer.SetParent(transform);
+			FallingVisualsContainer.localPosition = Vector3.zero;
 		}
 
 		private void OnLevelInitialized()
@@ -76,14 +78,14 @@ namespace TetrisTower.Visuals
 			var startCoords = new GridCoords(LevelData.Grid.Rows, LevelData.FallingColumn);
 			var placedPosition = VisualsGrid.GridToWorld(startCoords) + Vector3.down * fallDistance;
 
-			FallingVisualsContainer.position = placedPosition;
-
 
 			foreach (var bind in blocksShape.ShapeCoords) {
 				var visualBlock = GameObject.Instantiate(bind.Value.Prefab, FallingVisualsContainer);
 				FallingVisualsShape.ShapeCoords.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
+				var coords = startCoords + bind.Coords;
+				coords.WrapColumn(LevelData.Grid);
 
-				visualBlock.transform.position = VisualsGrid.GridToWorld(startCoords + bind.Coords) + Vector3.down * fallDistance;
+				visualBlock.transform.position = VisualsGrid.GridToWorld(coords) + Vector3.down * fallDistance;
 			}
 		}
 
@@ -98,13 +100,17 @@ namespace TetrisTower.Visuals
 
 		void Update()
 		{
-			if (FallingVisualsShape != null) {
+			if (FallingVisualsShape != null && !LevelController.AreGridActionsRunning) {
 				float fallDistance = LevelData.FallDistanceNormalized * VisualsGrid.BlockSize.y;
 
 				var startCoords = new GridCoords(LevelData.Grid.Rows, LevelData.FallingColumn);
-				var placedPosition = VisualsGrid.GridToWorld(startCoords) + Vector3.down * fallDistance;
 
-				FallingVisualsContainer.position = placedPosition;
+				foreach (var shapeCoords in FallingVisualsShape.ShapeCoords) {
+					var coords = startCoords + shapeCoords.Coords;
+					coords.WrapColumn(LevelData.Grid);
+
+					shapeCoords.Value.transform.position = VisualsGrid.GridToWorld(coords) + Vector3.down * fallDistance;
+				}
 			}
 		}
 	}

@@ -3,11 +3,16 @@ using System.Linq;
 
 namespace TetrisTower.Logic
 {
+	[System.Serializable]
 	public struct GridRules
 	{
 		public int MatchHorizontalLines;
 		public int MatchVerticalLines;
 		public int MatchDiagonalsLines;
+
+		// Will wrap around the first and last column when matching and moving.
+		public bool WrapSidesOnMatch;
+		public bool WrapSidesOnMove;
 	}
 
 	public static class GameGridEvaluation
@@ -33,6 +38,8 @@ namespace TetrisTower.Logic
 		{
 			List<GridCoords> matched = new List<GridCoords>();
 			BlockType lastMatched;
+
+			// TODO: use rules.WrapSidesOnMatch
 
 			if (rules.MatchHorizontalLines > 0) {
 

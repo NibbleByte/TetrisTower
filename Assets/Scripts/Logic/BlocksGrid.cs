@@ -38,6 +38,7 @@ namespace TetrisTower.Logic
 		{
 			foreach (var pair in placedShape.ShapeCoords) {
 				var coords = placedCoords + pair.Coords;
+				coords.WrapColumn(this);
 
 				// Hitting the limit, won't be stored.
 				if (coords.Row >= Rows)

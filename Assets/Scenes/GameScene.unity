@@ -247,7 +247,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0abb4319484ef145abc2f4f70e4e0dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockMoveSpeed: 3
+  BlockMoveSpeed: 5
   BlockSize: {x: 2, y: 2}
   m_GizmoShowGrid: 0
   m_GizmoShowGridHeader: 1
@@ -452,12 +452,19 @@ MonoBehaviour:
     FallSpeedNormalized: 2
     ShapeTemplates:
     - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
+    - {fileID: 11400000, guid: 5bf3b9fe867e0694db73cc6e9839dd37, type: 2}
     SpawnedBlocks:
     - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
     - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+    Rules:
+      MatchHorizontalLines: 0
+      MatchVerticalLines: 0
+      MatchDiagonalsLines: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
     Grid:
       m_Rows: 12
-      m_Columns: 6
+      m_Columns: 8
       m_Blocks:
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
@@ -465,15 +472,39 @@ MonoBehaviour:
       - {fileID: 0}
       - {fileID: 0}
       - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 0}
       - {fileID: 0}
       - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 0}
-      - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
       - {fileID: 0}
       - {fileID: 0}
       - {fileID: 0}
@@ -557,3 +588,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974e7c409cc035842a8738214a3361cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FallSpeedup: 40

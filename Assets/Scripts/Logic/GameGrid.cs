@@ -12,10 +12,43 @@ namespace TetrisTower.Logic
 		public int Row;
 		public int Column;
 
+		public GridCoords(GridCoords coords) { Row = coords.Row; Column = coords.Column; }
 		public GridCoords(int row, int column) { Row = row; Column = column; }
 
 		public static float Distance(GridCoords a, GridCoords b) =>
 			UnityEngine.Mathf.Sqrt((a.Row - b.Row) * (a.Row - b.Row) + (a.Column - b.Column) * (a.Column - b.Column));
+
+
+		public void WrapAround(int rows, int columns)
+		{
+			Row = Nfmod(Row, rows);
+			Column = Nfmod(Column, columns);
+		}
+
+		public void WrapAround(GameGrid grid)
+		{
+			Row = Nfmod(Row, grid.Rows);
+			Column = Nfmod(Column, grid.Columns);
+		}
+
+		public void WrapRow(int rows) => Row = Nfmod(Row, rows);
+		public void WrapRow(GameGrid grid) => Row = Nfmod(Row, grid.Rows);
+		public void WrapColumn(int columns) => Column = Nfmod(Column, columns);
+		public void WrapColumn(GameGrid grid) => Column = Nfmod(Column, grid.Columns);
+
+		public static GridCoords WrapAround(GridCoords coords, int rows, int columns)
+		{
+			var result = new GridCoords(coords);
+			result.WrapAround(rows, columns);
+			return result;
+		}
+
+		public static GridCoords WrapAround(GridCoords coords, GameGrid grid)
+		{
+			var result = new GridCoords(coords);
+			result.WrapAround(grid);
+			return result;
+		}
 
 		public static GridCoords operator +(GridCoords a, GridCoords b) => new GridCoords(a.Row + b.Row, a.Column + b.Column);
 		public static GridCoords operator -(GridCoords a, GridCoords b) => new GridCoords(a.Row - b.Row, a.Column - b.Column);
@@ -42,6 +75,24 @@ namespace TetrisTower.Logic
 		// Useful for algorithms.
 		public static int GetRow(GridCoords coords) => coords.Row;
 		public static int GetColumn(GridCoords coords) => coords.Column;
+
+		/// <summary>
+		/// Module that supports negative values.
+		/// Thanks to PeterSvP via stackoverflow.com... :D
+		/// </summary>
+		public static double Nfmod(double a, double b)
+		{
+			return a - b * Math.Floor(a / b);
+		}
+
+		/// <summary>
+		/// Module that supports negative values.
+		/// Thanks to PeterSvP via stackoverflow.com... :D
+		/// </summary>
+		public static int Nfmod(int a, int b)
+		{
+			return a - b * (int)Math.Floor((float)a / b);
+		}
 	}
 
 	public interface GameGrid
