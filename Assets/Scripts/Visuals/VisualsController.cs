@@ -46,7 +46,9 @@ namespace TetrisTower.Visuals
 
 		private void OnPlacingFallingShape()
 		{
-			DestroyFallingVisuals();
+			// Instead of destroying blocks now and re-creating them later, try reusing them.
+			//DestroyFallingVisuals();
+			VisualsGrid.SetPlacedShapeToBeReused(FallingVisualsShape);
 		}
 
 		private void OnFallingShapeSelected()

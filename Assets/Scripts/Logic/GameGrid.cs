@@ -7,7 +7,7 @@ namespace TetrisTower.Logic
 {
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public struct GridCoords
+	public struct GridCoords : IEquatable<GridCoords>
 	{
 		public int Row;
 		public int Column;
@@ -19,6 +19,20 @@ namespace TetrisTower.Logic
 
 		public static GridCoords operator +(GridCoords a, GridCoords b) => new GridCoords(a.Row + b.Row, a.Column + b.Column);
 		public static GridCoords operator -(GridCoords a, GridCoords b) => new GridCoords(a.Row - b.Row, a.Column - b.Column);
+		public static bool operator ==(GridCoords c1, GridCoords c2) => c1.Equals(c2);
+		public static bool operator !=(GridCoords c1, GridCoords c2) => !c1.Equals(c2);
+
+		public bool Equals(GridCoords other) => Row == other.Row && Column == other.Column;
+		public override int GetHashCode() => Row ^ Column;
+		public override bool Equals(object obj)
+		{
+			if (obj is GridCoords other) {
+				return Equals(other);
+			}
+			return false;
+		}
+
+
 
 		public override string ToString()
 		{

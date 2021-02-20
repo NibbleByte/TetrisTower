@@ -23,6 +23,7 @@ namespace TetrisTower.Visuals
 
 		private GameObject[,] m_Blocks;
 
+		private GridShape<GameObject> m_PlacedShapeToBeReused = null;
 
 		public void Init(BlocksGrid grid)
 		{
@@ -61,9 +62,17 @@ namespace TetrisTower.Visuals
 		public IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape)
 		{
 			foreach (var pair in placedShape.ShapeCoords) {
+
+				var reusedVisuals = m_PlacedShapeToBeReused?.ShapeCoords
+					.Where(sc => sc.Coords == pair.Coords)
+					.Select(sc => sc.Value)
+					.FirstOrDefault();
+
 				var coords = placedCoords + pair.Coords;
-				CreateInstanceAt(coords, pair.Value);
+				CreateInstanceAt(coords, pair.Value, reusedVisuals);
 			}
+
+			m_PlacedShapeToBeReused = null;
 
 			yield break;
 		}
@@ -125,14 +134,28 @@ namespace TetrisTower.Visuals
 			yield break;
 		}
 
-		private void CreateInstanceAt(GridCoords coords, BlockType blockType)
+		private void CreateInstanceAt(GridCoords coords, BlockType blockType, GameObject reuseVisuals = null)
 		{
 			Debug.Assert(this[coords] == null);
 
-			var instance = GameObject.Instantiate(blockType.Prefab, transform);
-			this[coords] = instance;
+			if (reuseVisuals) {
+				reuseVisuals.transform.SetParent(transform);
+			} else {
+				reuseVisuals = GameObject.Instantiate(blockType.Prefab, transform);
+			}
 
-			instance.transform.position = GridToWorld(coords);
+			this[coords] = reuseVisuals;
+
+			reuseVisuals.transform.position = GridToWorld(coords);
+		}
+
+		/// <summary>
+		/// Shape with GameObject blocks to be reused when placing, instead of creating them from scratch.
+		/// Usually placed shape is already visualized as it is falling. Improves performance.
+		/// </summary>
+		public void SetPlacedShapeToBeReused(GridShape<GameObject> shape)
+		{
+			m_PlacedShapeToBeReused = shape;
 		}
 
 		public IEnumerable<GridAction> Transform(IEnumerable<GridAction> actions)
