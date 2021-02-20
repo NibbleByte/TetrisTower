@@ -25,6 +25,8 @@ namespace TetrisTower.Levels
 
 		public bool AreGridActionsRunning => m_FinishedRuns != m_NextRunId;
 
+		private float m_FallingSpeedup = 0;
+
 		public void Init(LevelData data)
 		{
 			LevelData = m_DebugLevelData = data;
@@ -101,6 +103,16 @@ namespace TetrisTower.Levels
 			return true;
 		}
 
+		public bool RequestFallingSpeedUp(float speedUp)
+		{
+			if (!LevelData.HasFallingShape)
+				return false;
+
+			m_FallingSpeedup = speedUp;
+
+			return true;
+		}
+
 		private IEnumerator PlaceFallingShape(GridCoords placeCoords, BlocksShape placedShape)
 		{
 			var actions = new List<GridAction>() {
@@ -147,7 +159,8 @@ namespace TetrisTower.Levels
 
 		private void UpdateFallShape()
 		{
-			LevelData.FallDistanceNormalized += Time.deltaTime * LevelData.FallSpeedNormalized;
+			// Clamp to avoid skipping over a cell on hiccups.
+			LevelData.FallDistanceNormalized += Mathf.Clamp01(Time.deltaTime * (LevelData.FallSpeedNormalized + m_FallingSpeedup));
 
 			var fallCoords = LevelData.FallShapeCoords;
 
@@ -163,6 +176,8 @@ namespace TetrisTower.Levels
 
 					// The current coords are taken so move back one tile up where it should be free.
 					fallCoords.Row++;
+
+					m_FallingSpeedup = 0f;
 
 					var fallShape = LevelData.FallingShape;
 					LevelData.FallingShape = null;

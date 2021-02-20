@@ -10,6 +10,8 @@ namespace TetrisTower.PlayerControls
 		public LevelController LevelController { get; private set; }
 		public LevelData LevelData => LevelController?.LevelData;
 
+		public float FallSpeedup = 40f;
+
 		public void Init(LevelController levelController)
 		{
 			LevelController = levelController;
@@ -23,6 +25,10 @@ namespace TetrisTower.PlayerControls
 
 			if (offsetColumns != 0) {
 				LevelController.RequestFallingShapeOffset(offsetColumns);
+			}
+
+			if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)) {
+				LevelController.RequestFallingSpeedUp(FallSpeedup);
 			}
 		}
 	}
