@@ -32,6 +32,10 @@ namespace TetrisTower.Levels
 		{
 			LevelData = m_DebugLevelData = data;
 
+			if (LevelData.NextShape == null) {
+				LevelData.NextShape = GenerateShape();
+			}
+
 			Grids.Clear();
 			Grids.Add(LevelData.Grid);
 
@@ -70,11 +74,14 @@ namespace TetrisTower.Levels
 
 		public void SelectFallingShape()
 		{
+			if (LevelData.NextShape == null) {
+				LevelData.NextShape = GenerateShape();
+			}
+
 			LevelData.FallingShape = LevelData.NextShape;
 			LevelData.FallDistanceNormalized = 0f;
 
-			GridShapeTemplate template = LevelData.ShapeTemplates[Random.Range(0, LevelData.ShapeTemplates.Length)];
-			LevelData.NextShape = GenerateShape(template, LevelData.SpawnedBlocks);
+			LevelData.NextShape = GenerateShape();
 
 			if (!LevelData.Rules.WrapSidesOnMove && LevelData.FallingColumn + LevelData.FallingShape.Columns > Grid.Columns) {
 				LevelData.FallingColumn = Grid.Columns - LevelData.FallingShape.Columns;
@@ -85,7 +92,7 @@ namespace TetrisTower.Levels
 
 		public bool RequestFallingShapeOffset(int offsetColumns)
 		{
-			if (!LevelData.HasFallingShape)
+			if (LevelData.FallingShape == null)
 				return false;
 
 			int requestedColumn = LevelData.FallingColumn + offsetColumns;
@@ -110,7 +117,7 @@ namespace TetrisTower.Levels
 
 		public bool RequestFallingSpeedUp(float speedUp)
 		{
-			if (!LevelData.HasFallingShape)
+			if (LevelData.FallingShape == null)
 				return false;
 
 			m_FallingSpeedup = speedUp;
@@ -135,6 +142,12 @@ namespace TetrisTower.Levels
 			}
 		}
 
+		public BlocksShape GenerateShape()
+		{
+			GridShapeTemplate template = LevelData.ShapeTemplates[Random.Range(0, LevelData.ShapeTemplates.Length)];
+			return GenerateShape(template, LevelData.SpawnedBlocks);
+		}
+
 		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] spawnBlocks)
 		{
 			var shapeCoords = new List<BlocksShape.ShapeBind>();
@@ -152,7 +165,7 @@ namespace TetrisTower.Levels
 
 		void Update()
 		{
-			if (LevelData.HasFallingShape) {
+			if (LevelData.FallingShape != null) {
 				UpdateFallShape();
 
 			} else if (!AreGridActionsRunning && CanSelectNextShape()) {
@@ -164,6 +177,9 @@ namespace TetrisTower.Levels
 
 		private bool CanSelectNextShape()
 		{
+			if (LevelData.NextShape == null)
+				return false;
+
 			// Search if the bottom of the next shape can be spawned.
 			foreach (var shapeCoords in LevelData.NextShape.ShapeCoords) {
 				if (shapeCoords.Coords.Row == 0) {

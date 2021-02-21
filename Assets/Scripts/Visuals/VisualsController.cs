@@ -48,7 +48,7 @@ namespace TetrisTower.Visuals
 		{
 			DestroyFallingVisuals();
 
-			if (LevelData.HasFallingShape) {
+			if (LevelData.FallingShape != null) {
 				CreateFallingVisuals();
 			}
 		}

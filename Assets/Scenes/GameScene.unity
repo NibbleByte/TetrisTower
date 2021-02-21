@@ -420,33 +420,9 @@ MonoBehaviour:
   PlayerController: {fileID: 1177382888}
   StartData:
     NextShape:
-      ShapeCoords:
-      - Coords:
-          Row: 0
-          Column: 0
-        Value: {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
-      - Coords:
-          Row: 1
-          Column: 0
-        Value: {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
-      - Coords:
-          Row: 2
-          Column: 0
-        Value: {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+      id: 0
     FallingShape:
-      ShapeCoords:
-      - Coords:
-          Row: 0
-          Column: 0
-        Value: {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
-      - Coords:
-          Row: 1
-          Column: 0
-        Value: {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
-      - Coords:
-          Row: 2
-          Column: 0
-        Value: {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+      id: 0
     FallingColumn: 0
     FallDistanceNormalized: 0
     FallSpeedNormalized: 2
@@ -562,6 +538,10 @@ MonoBehaviour:
       - {fileID: 0}
       - {fileID: 0}
       - {fileID: 0}
+  references:
+    version: 1
+    00000000:
+      type: {class: , ns: , asm: }
 --- !u!4 &1177382887
 Transform:
   m_ObjectHideFlags: 0

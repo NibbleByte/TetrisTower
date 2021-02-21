@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using TetrisTower.Logic;
+using UnityEngine;
 
 namespace TetrisTower.Levels
 {
@@ -8,11 +9,8 @@ namespace TetrisTower.Levels
 	[JsonObject(MemberSerialization.Fields)]
 	public class LevelData
 	{
-		public BlocksShape NextShape;
-		public BlocksShape FallingShape;
-
-		// Because of Unity serialization, FallingShape may never be null :(
-		public bool HasFallingShape => FallingShape != null && FallingShape.ShapeCoords.Count > 0;
+		[SerializeReference] public BlocksShape NextShape;
+		[SerializeReference] public BlocksShape FallingShape;
 
 
 		public int FallingColumn;					// The first (leftest) column that the shape is falling at the moment.

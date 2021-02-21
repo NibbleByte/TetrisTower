@@ -15,6 +15,13 @@ namespace TetrisTower.Logic
 	{
 	}
 
+#if UNITY_EDITOR
+	[UnityEditor.CustomPropertyDrawer(typeof(BlocksShape))]
+	public class BlocksShapeDrawer : Tools.SerializeReferenceCreatorDrawer<BlocksShape>
+	{
+	}
+#endif
+
 	public class BlockTypeConverter : SerializableAssetConverter<BlockType>
 	{
 		public BlockTypeConverter(AssetsRepository repository) : base(repository) { }
