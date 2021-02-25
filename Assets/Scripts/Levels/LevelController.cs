@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TetrisTower.Core;
 using TetrisTower.Logic;
 using UnityEngine;
 
@@ -20,6 +21,9 @@ namespace TetrisTower.Levels
 		public event System.Action PlacingFallingShape;
 		public event System.Action PlacedOutsideGrid;
 		public event System.Action FallingShapeSelected;
+
+		public event System.Action FallingShapeMoved;
+		public event System.Action FallingShapeRotated;
 
 		private int m_NextRunId = 0;
 		private int m_FinishedRuns = 0;
@@ -90,7 +94,7 @@ namespace TetrisTower.Levels
 			FallingShapeSelected?.Invoke();
 		}
 
-		public bool RequestFallingShapeOffset(int offsetColumns)
+		public bool RequestFallingShapeMove(int offsetColumns)
 		{
 			if (LevelData.FallingShape == null)
 				return false;
@@ -110,7 +114,9 @@ namespace TetrisTower.Levels
 					return false;
 			}
 
-			LevelData.FallingColumn = GridCoords.WrapValue(requestedColumn, Grid.Columns);
+			LevelData.FallingColumn = MathUtils.WrapValue(requestedColumn, Grid.Columns);
+
+			FallingShapeMoved?.Invoke();
 
 			return true;
 		}
@@ -121,6 +127,23 @@ namespace TetrisTower.Levels
 				return false;
 
 			m_FallingSpeedup = speedUp;
+
+			return true;
+		}
+
+		public bool RequestFallingShapeRotate(int rotate)
+		{
+			if (LevelData.FallingShape == null)
+				return false;
+
+			int fallingRows = LevelData.FallingShape.Rows;
+
+			for (int i = 0; i < LevelData.FallingShape.ShapeCoords.Length; ++i) {
+				ref var shapeBind = ref LevelData.FallingShape.ShapeCoords[i];
+				shapeBind.Coords.Row = MathUtils.WrapValue(shapeBind.Coords.Row + rotate, fallingRows);
+			}
+
+			FallingShapeRotated?.Invoke();
 
 			return true;
 		}
@@ -160,7 +183,7 @@ namespace TetrisTower.Levels
 				});
 			}
 
-			return new BlocksShape() { ShapeCoords = shapeCoords };
+			return new BlocksShape() { ShapeCoords = shapeCoords.ToArray() };
 		}
 
 		void Update()

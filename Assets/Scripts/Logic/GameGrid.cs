@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TetrisTower.Core;
 
 namespace TetrisTower.Logic
 {
@@ -21,20 +22,20 @@ namespace TetrisTower.Logic
 
 		public void WrapAround(int rows, int columns)
 		{
-			Row = WrapValue(Row, rows);
-			Column = WrapValue(Column, columns);
+			Row = MathUtils.WrapValue(Row, rows);
+			Column = MathUtils.WrapValue(Column, columns);
 		}
 
 		public void WrapAround(GameGrid grid)
 		{
-			Row = WrapValue(Row, grid.Rows);
-			Column = WrapValue(Column, grid.Columns);
+			Row = MathUtils.WrapValue(Row, grid.Rows);
+			Column = MathUtils.WrapValue(Column, grid.Columns);
 		}
 
-		public void WrapRow(int rows) => Row = WrapValue(Row, rows);
-		public void WrapRow(GameGrid grid) => Row = WrapValue(Row, grid.Rows);
-		public void WrapColumn(int columns) => Column = WrapValue(Column, columns);
-		public void WrapColumn(GameGrid grid) => Column = WrapValue(Column, grid.Columns);
+		public void WrapRow(int rows) => Row = MathUtils.WrapValue(Row, rows);
+		public void WrapRow(GameGrid grid) => Row = MathUtils.WrapValue(Row, grid.Rows);
+		public void WrapColumn(int columns) => Column = MathUtils.WrapValue(Column, columns);
+		public void WrapColumn(GameGrid grid) => Column = MathUtils.WrapValue(Column, grid.Columns);
 
 		public static GridCoords WrapAround(GridCoords coords, int rows, int columns)
 		{
@@ -75,24 +76,6 @@ namespace TetrisTower.Logic
 		// Useful for algorithms.
 		public static int GetRow(GridCoords coords) => coords.Row;
 		public static int GetColumn(GridCoords coords) => coords.Column;
-
-		/// <summary>
-		/// Module that supports negative values.
-		/// Thanks to PeterSvP via stackoverflow.com... :D
-		/// </summary>
-		public static double WrapValue(double value, double size)
-		{
-			return value - size * Math.Floor(value / size);
-		}
-
-		/// <summary>
-		/// Module that supports negative values.
-		/// Thanks to PeterSvP via stackoverflow.com... :D
-		/// </summary>
-		public static int WrapValue(int value, int size)
-		{
-			return value - size * (int)Math.Floor((float)value / size);
-		}
 	}
 
 	public interface GameGrid

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TetrisTower.Levels;
 using TetrisTower.Logic;
 using UnityEngine;
@@ -29,6 +30,8 @@ namespace TetrisTower.Visuals
 			LevelController.PlacingFallingShape += OnPlacingFallingShape;
 			LevelController.PlacedOutsideGrid += DestroyFallingVisuals;
 			LevelController.FallingShapeSelected += OnFallingShapeSelected;
+
+			LevelController.FallingShapeRotated += OnFallingShapeRotated;
 
 			FallingVisualsContainer = new GameObject("-- Falling-Shape --").transform;
 			FallingVisualsContainer.SetParent(transform);
@@ -76,17 +79,19 @@ namespace TetrisTower.Visuals
 			float fallDistance = LevelData.FallDistanceNormalized * VisualsGrid.BlockSize.y;
 
 			var startCoords = new GridCoords(LevelData.Grid.Rows, LevelData.FallingColumn);
-			var placedPosition = VisualsGrid.GridToWorld(startCoords) + Vector3.down * fallDistance;
 
+			var visualbinds = new List<GridShape<GameObject>.ShapeBind>();
 
 			foreach (var bind in blocksShape.ShapeCoords) {
 				var visualBlock = GameObject.Instantiate(bind.Value.Prefab, FallingVisualsContainer);
-				FallingVisualsShape.ShapeCoords.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
+				visualbinds.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
 				var coords = startCoords + bind.Coords;
 				coords.WrapColumn(LevelData.Grid);
 
 				visualBlock.transform.position = VisualsGrid.GridToWorld(coords) + Vector3.down * fallDistance;
 			}
+
+			FallingVisualsShape.ShapeCoords = visualbinds.ToArray();
 		}
 
 		private void DestroyFallingVisuals()
@@ -96,6 +101,15 @@ namespace TetrisTower.Visuals
 			}
 
 			FallingVisualsShape = m_DebugFallingVisualsShape = null;
+		}
+
+		private void OnFallingShapeRotated()
+		{
+			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == LevelData.FallingShape.ShapeCoords.Length);
+
+			for(int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
+				FallingVisualsShape.ShapeCoords[i].Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
+			}
 		}
 
 		void Update()

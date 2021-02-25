@@ -24,7 +24,15 @@ namespace TetrisTower.PlayerControls
 			if (Input.GetKeyDown("right")) offsetColumns++;
 
 			if (offsetColumns != 0) {
-				LevelController.RequestFallingShapeOffset(offsetColumns);
+				LevelController.RequestFallingShapeMove(offsetColumns);
+			}
+
+			int rotate = 0;
+			if (Input.GetKeyDown("up")) rotate++;
+			if (Input.GetKeyDown("down")) rotate--;
+
+			if (rotate != 0) {
+				LevelController.RequestFallingShapeRotate(rotate);
 			}
 
 			if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)) {

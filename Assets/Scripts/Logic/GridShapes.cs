@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace TetrisTower.Logic
@@ -47,7 +48,7 @@ namespace TetrisTower.Logic
 		}
 		public static ShapeBind Bind(GridCoords coords, T value) => new ShapeBind() { Coords = coords, Value = value };
 
-		public List<ShapeBind> ShapeCoords = new List<ShapeBind>();
+		public ShapeBind[] ShapeCoords = new ShapeBind[0];
 
 		public int Rows => GetSize(GridCoords.GetRow);
 		public int Columns => GetSize(GridCoords.GetColumn);
@@ -65,6 +66,15 @@ namespace TetrisTower.Logic
 		}
 
 		private int GetSize(Func<GridCoords, int> selector) {
+			int max = int.MinValue;
+			foreach(var pair in ShapeCoords) {
+				if (selector(pair.Coords) > max) max = selector(pair.Coords);
+			}
+
+			return max + 1;
+		}
+
+		private int GetUsedSize(Func<GridCoords, int> selector) {
 			int min = int.MaxValue;
 			int max = int.MinValue;
 			foreach(var pair in ShapeCoords) {
