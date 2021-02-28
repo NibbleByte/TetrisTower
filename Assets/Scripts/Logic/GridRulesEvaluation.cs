@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TetrisTower.Core;
 
 namespace TetrisTower.Logic
 {
@@ -36,42 +37,87 @@ namespace TetrisTower.Logic
 
 		private static void EvaluateMatches(BlocksGrid grid, GridRules rules, List<GridAction> actions)
 		{
-			List<GridCoords> matched = new List<GridCoords>();
-			BlockType lastMatched;
-
-			// TODO: use rules.WrapSidesOnMatch
-
 			if (rules.MatchHorizontalLines > 0) {
+				EvaluateMatchesAlong(new GridCoords(0, 1), grid, rules.MatchHorizontalLines, rules.WrapSidesOnMatch, actions);
+			}
+			if (rules.MatchVerticalLines > 0) {
+				EvaluateMatchesAlong(new GridCoords(1, 0), grid, rules.MatchVerticalLines, false, actions);
+			}
+		}
 
-				for (int row = 0; row < grid.Rows; ++row) {
-					matched.Clear();
-					lastMatched = grid[row, 0];
+		private static void EvaluateMatchesAlong(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, List<GridAction> actions)
+		{
+			GridCoords coords = new GridCoords(0, 0);
+			List<GridCoords> matched = new List<GridCoords>();
+			BlockType lastMatched = null;
 
-					for (int column = 0; column < grid.Columns; ++column) {
-						BlockType currentType = grid[row, column];
+			bool wrapMatchPending = false;
+			List<GridCoords> toBeWrappedMatch = new List<GridCoords>();
 
-						if (currentType == lastMatched && currentType != null) {
-							matched.Add(new GridCoords(row, column));
+			int totalBlocks = grid.Rows * grid.Columns;
 
-						} else {
+			for (int i = 0; i < totalBlocks; ++i) {
+				BlockType currentType = grid[coords];
 
-							if (matched.Count >= rules.MatchHorizontalLines) {
-								var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
-								actions.Add(action);
-							}
+				if (currentType == lastMatched && currentType != null) {
+					matched.Add(coords);
 
-							matched.Clear();
-							if (currentType != null) {
-								matched.Add(new GridCoords(row, column));
-							}
-							lastMatched = currentType;
+				} else {
+
+					if (!wrapMatchPending) {
+						if (matched.Count >= matchCount) {
+							var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
+							actions.Add(action);
 						}
+					} else {
+						// These will be added to the match at the end of the row.
+						toBeWrappedMatch.AddRange(matched);
 					}
+					wrapMatchPending = false;
 
-					if (matched.Count >= rules.MatchHorizontalLines) {
-						var action = new ClearMatchedAction() { Coords = matched.ToArray() };
+					matched.Clear();
+					if (currentType != null) {
+						matched.Add(coords);
+					}
+					lastMatched = currentType;
+
+					// Don't match sequence if it will be matched by wrapping the end of the row.
+					if (wrapColumns && coords.Column == 0 && currentType != null && grid[coords.Row, grid.Columns - 1] == currentType) {
+						wrapMatchPending = true;
+					}
+				}
+
+
+				coords += direction;
+
+
+				bool matchInterrupted = false;
+
+				if (coords.Row >= grid.Rows) {
+					coords.Row = 0;
+					coords.Column++;
+					matchInterrupted = true;
+				}
+				if (coords.Column >= grid.Columns) {
+					coords.Column = 0;
+					coords.Row++;
+					matchInterrupted = true;
+				}
+
+
+				if (matchInterrupted) {
+
+					matched.AddRange(toBeWrappedMatch);
+					toBeWrappedMatch.Clear();
+					wrapMatchPending = false;
+
+					if (matched.Count >= matchCount) {
+						var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
 						actions.Add(action);
 					}
+
+					matched.Clear();
+					lastMatched = null;
 				}
 			}
 		}
