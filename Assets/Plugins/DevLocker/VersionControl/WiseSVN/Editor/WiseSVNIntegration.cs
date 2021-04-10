@@ -146,6 +146,8 @@ namespace DevLocker.VersionControl.WiseSVN
 		[NonSerialized]
 		private static string m_LastDisplayedError = string.Empty;
 
+		private static HashSet<string> m_PendingErrorMessages = new HashSet<string>();
+
 		#region Logging
 
 		// Used to track the shell commands output for errors and log them on Dispose().
@@ -207,8 +209,7 @@ namespace DevLocker.VersionControl.WiseSVN
 					if (m_HasErrors) {
 						Debug.LogError(output);
 						if (!m_Silent) {
-							EditorUtility.DisplayDialog("SVN Error",
-								"SVN error happened while processing the assets. Check the logs.", "I will!");
+							DisplayError("SVN error happened while processing the assets. Check the logs.");
 						}
 					} else if (m_LogOutput && m_HasCommand) {
 						Debug.Log(output);
@@ -308,7 +309,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (!string.IsNullOrEmpty(displayMessage) && !Silent && m_LastDisplayedError != displayMessage) {
 					Debug.LogError($"{displayMessage}\n\n{result.Error}");
 					m_LastDisplayedError = displayMessage;
-					EditorUtility.DisplayDialog("SVN Error", displayMessage, "I will!");
+					DisplayError(displayMessage);
 				}
 
 				if (isCritical) {
@@ -451,7 +452,7 @@ namespace DevLocker.VersionControl.WiseSVN
 					if (m_LastDisplayedError != displayMessage) {
 						Debug.LogError($"{displayMessage}\n\n{result.Error}");
 						m_LastDisplayedError = displayMessage;
-						EditorUtility.DisplayDialog("SVN Error", displayMessage, "I will!");
+						DisplayError(displayMessage);
 					}
 
 
@@ -482,7 +483,7 @@ namespace DevLocker.VersionControl.WiseSVN
 					if (m_LastDisplayedError != displayMessage) {
 						Debug.LogError($"{displayMessage}\n\n{result.Error}");
 						m_LastDisplayedError = displayMessage;
-						EditorUtility.DisplayDialog("SVN Error", displayMessage, "I will!");
+						DisplayError(displayMessage);
 					}
 
 					return lockDetails;
@@ -562,7 +563,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				return LockOperationResult.LockedByOther;
 
 			if (!string.IsNullOrEmpty(result.Error)) {
-				
+
 				// User needs to log in using normal SVN client and save their authentication.
 				// svn: E170013: Unable to connect to a repository at URL '...'
 				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
@@ -658,7 +659,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				// Authentication failed
 				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
 					return LockOperationResult.AuthenticationFailed;
-				
+
 				// Unable to connect to repository indicating some network or server problems.
 				// svn: E170013: Unable to connect to a repository at URL '...'
 				// svn: E731001: No such host is known.
@@ -738,7 +739,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				// Authentication failed
 				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
 					return UpdateOperationResult.AuthenticationFailed;
-				
+
 				// Unable to connect to repository indicating some network or server problems.
 				// svn: E170013: Unable to connect to a repository at URL '...'
 				// svn: E731001: No such host is known.
@@ -856,7 +857,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				// svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output: ...
 				if (result.Error.Contains("E165001"))
 					return CommitOperationResult.PrecommitHookError;
-				
+
 				// User needs to log in using normal SVN client and save their authentication.
 				// svn: E170013: Unable to connect to a repository at URL '...'
 				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
@@ -892,6 +893,58 @@ namespace DevLocker.VersionControl.WiseSVN
 		{
 			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();	// Not thread safe - call in main thread only.
 			return SVNAsyncOperation<CommitOperationResult>.Start(op => Commit(assetPaths, includeMeta, recursive, message, encoding, keepLocks, targetsFileToUse, timeout, op));
+		}
+
+		/// <summary>
+		/// Revert files to SVN directly (without GUI).
+		/// This is an offline operation, but it still can take time, since it will copy from the original files.
+		/// RemoveAdded will remove added files from disk.
+		/// Recursive won't restore deleted files. You have to specify them manually. Weird.
+		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		/// </summary>
+		public static RevertOperationResult Revert(
+			IEnumerable<string> assetPaths,
+			bool includeMeta,
+			bool recursive,
+			bool removeAdded,
+			string targetsFileToUse = "",
+			int timeout = -1,
+			IShellMonitor shellMonitor = null
+			)
+		{
+			targetsFileToUse = string.IsNullOrEmpty(targetsFileToUse) ? FileUtil.GetUniqueTempPathInProject() : targetsFileToUse;
+			if (includeMeta) {
+				assetPaths = assetPaths.Select(path => path + ".meta").Concat(assetPaths);
+			}
+			File.WriteAllLines(targetsFileToUse, assetPaths.Select(SVNFormatPath));
+
+
+			var depth = recursive ? "infinity" : "empty";
+			var removeAddedArg = removeAdded ? "--remove-added" : "";
+
+			var result = ShellUtils.ExecuteCommand(SVN_Command, $"revert --targets \"{targetsFileToUse}\" --depth {depth} {removeAddedArg}", timeout, shellMonitor);
+			if (result.HasErrors) {
+				return RevertOperationResult.UnknownError;
+			}
+
+			return RevertOperationResult.Success;
+		}
+
+		/// <summary>
+		/// Revert files to SVN directly (without GUI).
+		/// This is an offline operation, but it still can take time, since it will copy from the original files.
+		/// RemoveAdded will remove added files from disk.
+		/// Recursive won't restore deleted files. You have to specify them manually. Weird.
+		/// </summary>
+		public static SVNAsyncOperation<RevertOperationResult> RevertAsync(
+			IEnumerable<string> assetPaths,
+			bool includeMeta, bool recursive,
+			bool removeAdded,
+			int timeout = -1
+			)
+		{
+			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
+			return SVNAsyncOperation<RevertOperationResult>.Start(op => Revert(assetPaths, includeMeta, recursive, removeAdded, targetsFileToUse, timeout, op));
 		}
 
 
@@ -952,7 +1005,8 @@ namespace DevLocker.VersionControl.WiseSVN
 					"Conflicted files",
 					$"Failed to move the files to \n\"{directory}\"\nbecause it has conflicts. Resolve them first!",
 					"Check changes",
-					"Cancel")) {
+					"Cancel"
+					)) {
 					ShowChangesUI?.Invoke();
 				}
 
@@ -967,7 +1021,12 @@ namespace DevLocker.VersionControl.WiseSVN
 					$"The target directory:\n\"{directory}\"\nis not under SVN control. Should it be added?",
 					"Add it!",
 					"Cancel"
+#if UNITY_2019_4_OR_NEWER
+					, DialogOptOutDecisionType.ForThisSession, "WiseSVN.AddUnversionedFolder"
 				))
+#else
+				))
+#endif
 					return false;
 
 				if (!AddParentFolders(directory, shellMonitor))
@@ -1021,7 +1080,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				bool isCritical = IsCriticalError(result.Error, out displayMessage);
 
 				if (!string.IsNullOrEmpty(displayMessage) && !Silent) {
-					EditorUtility.DisplayDialog("SVN Error", displayMessage, "I will!");
+					DisplayError(displayMessage);
 				}
 
 				if (isCritical) {
@@ -1047,7 +1106,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			var result = ShellUtils.ExecuteCommand(SVN_Command, $"list --depth {depth} \"{SVNFormatPath(url)}\"", timeout, shellMonitor);
 
 			if (!string.IsNullOrEmpty(result.Error)) {
-				
+
 				// User needs to log in using normal SVN client and save their authentication.
 				// svn: E170013: Unable to connect to a repository at URL '...'
 				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
@@ -1130,7 +1189,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			var relativeURL = AssetPathToRelativeURL(assetPathOrUrl);
 
 			if (!string.IsNullOrEmpty(result.Error)) {
-				
+
 				// User needs to log in using normal SVN client and save their authentication.
 				// svn: E170013: Unable to connect to a repository at URL '...'
 				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
@@ -1414,7 +1473,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (!isMeta && !Silent) {
 					EditorUtility.DisplayDialog(
 						"Deleted file",
-						$"The desired location\n\"{path}\"\nis marked as deleted in SVN. The file will be replaced in SVN with the new one.\n\nIf this is an automated change, consider adding this file to the exclusion list in the project preferences:\n\"{WiseSVNProjectPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\n...or change your tool to silence the integration.",
+						$"The desired location\n\"{path}\"\nis marked as deleted in SVN. The file will be replaced in SVN with the new one.\n\nIf this is an automated change, consider adding this file to the exclusion list in the project preferences:\n\"{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\n...or change your tool to silence the integration.",
 						"Replace");
 				}
 
@@ -1466,7 +1525,13 @@ namespace DevLocker.VersionControl.WiseSVN
 						"Deleted file",
 						$"The desired location\n\"{newPath}\"\nis marked as deleted in SVN. Are you trying to replace it with a new one?",
 						"Replace",
-						"Cancel")) {
+						"Cancel"
+#if UNITY_2019_4_OR_NEWER
+						, DialogOptOutDecisionType.ForThisSession, "WiseSVN.ReplaceFile"
+					)) {
+#else
+					)) {
+#endif
 
 						using (var reporter = CreateReporter()) {
 							if (SVNReplaceFile(oldPath, newPath, reporter)) {
@@ -1549,7 +1614,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			// This is allowed only if there isn't ProjectPreference specified CLI path.
 			if (error.Contains("0x80004005") && string.IsNullOrEmpty(m_ProjectPrefs.PlatformSvnCLIPath)) {
 				displayMessage = $"SVN CLI (Command Line Interface) not found. " +
-					$"Please install it or specify path to a valid svn.exe in the svn preferences at:\n{WiseSVNProjectPreferencesWindow.PROJECT_PREFERENCES_MENU}\n\n" +
+					$"Please install it or specify path to a valid svn.exe in the svn preferences at:\n{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}\n\n" +
 					$"You can also disable the SVN integration.";
 
 				return false;
@@ -1558,7 +1623,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			// Same as above but the specified svn.exe in the project preferences is missing.
 			if (error.Contains("0x80004005") && !string.IsNullOrEmpty(m_ProjectPrefs.PlatformSvnCLIPath)) {
 				displayMessage = $"Cannot find the specified in the svn project preferences svn.exe:\n{m_ProjectPrefs.PlatformSvnCLIPath}\n\n" +
-					$"You can reconfigure the svn preferences at:\n{WiseSVNProjectPreferencesWindow.PROJECT_PREFERENCES_MENU}\n\n" +
+					$"You can reconfigure the svn preferences at:\n{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}\n\n" +
 					$"You can also disable the SVN integration.";
 
 				return false;
@@ -1681,6 +1746,31 @@ namespace DevLocker.VersionControl.WiseSVN
 		private static IEnumerable<string> Enumerate(string str)
 		{
 			yield return str;
+		}
+
+		private static void DisplayError(string message)
+		{
+			EditorApplication.update -= DisplayPendingMessages;
+			EditorApplication.update += DisplayPendingMessages;
+
+			m_PendingErrorMessages.Add(message);
+		}
+
+		private static void DisplayPendingMessages()
+		{
+			EditorApplication.update -= DisplayPendingMessages;
+
+			var message = string.Join("\n-----\n", m_PendingErrorMessages);
+
+			if (message.Length > 1500) {
+				message = message.Substring(0, 1490) + "...";
+			}
+
+#if UNITY_2019_4_OR_NEWER
+			EditorUtility.DisplayDialog("SVN Error", message, "I will!", DialogOptOutDecisionType.ForThisSession, "WiseSVN.ErrorMessages");
+#else
+			EditorUtility.DisplayDialog("SVN Error", message, "I will!");
+#endif
 		}
 
 		// Use for debug.

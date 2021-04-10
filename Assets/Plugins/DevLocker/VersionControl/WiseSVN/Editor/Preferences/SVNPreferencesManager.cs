@@ -2,6 +2,7 @@ using DevLocker.VersionControl.WiseSVN.ContextMenus;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -67,6 +68,10 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 			[Tooltip(LockMessageHint)]
 			public string AutoLockMessage = "Auto-locked.";
 
+#if UNITY_2020_2_OR_NEWER
+			// Because we are rendering this list manually.
+			[NonReorderable]
+#endif
 			// Auto-locking parameters for when asset is modified.
 			public List<AutoLockingParameters> AutoLockingParameters = new List<AutoLockingParameters>();
 
@@ -74,12 +79,21 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 			// Enable svn branches database.
 			public bool EnableBranchesDatabase;
 
+#if UNITY_2020_2_OR_NEWER
+			[NonReorderable]
+#endif
 			// SVN parameters used for scanning branches in the SVN repo.
 			public List<BranchScanParameters> BranchesDatabaseScanParameters = new List<BranchScanParameters>();
 
+#if UNITY_2020_2_OR_NEWER
+			[NonReorderable]
+#endif
 			// Show these branches on top.
 			public List<string> PinnedBranches = new List<string>();
 
+#if UNITY_2020_2_OR_NEWER
+			[NonReorderable]
+#endif
 			public List<string> Exclude = new List<string>();
 
 			public ProjectPreferences Clone()
@@ -126,7 +140,7 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 				m_RetryTextures = false;
 
 				// If WiseSVN was just added to the project, Unity won't manage to load the textures the first time. Try again next frame.
-				if (FileStatusIcons[(int)VCFileStatus.Added].image == null) {
+				if (FileStatusIcons[(int)VCFileStatus.Modified].image == null) {
 
 					// We're using a flag as assembly reload may happen and update callback will be lost.
 					m_RetryTextures = true;
@@ -136,6 +150,10 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 						LoadTextures();
 						m_RetryTextures = false;
 						EditorApplication.update -= reloadTextures;
+
+						if (FileStatusIcons[(int)VCFileStatus.Modified].image == null) {
+							Debug.LogWarning("SVN overlay icons are missing.");
+						}
 					};
 
 					EditorApplication.update += reloadTextures;
@@ -144,7 +162,20 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 				Debug.Log($"Loaded WiseSVN Preferences. WiseSVN is turned {(PersonalPrefs.EnableCoreIntegration ? "on" : "off")}.");
 
 				if (PersonalPrefs.EnableCoreIntegration) {
-					var svnError = WiseSVNIntegration.CheckForSVNErrors();
+					var svnError = "";
+					try {
+						svnError = WiseSVNIntegration.CheckForSVNErrors();
+
+					} catch (Exception ex) {
+						PersonalPrefs.EnableCoreIntegration = false;
+
+						Debug.LogError($"Calling SVN CLI (Command Line Interface) caused fatal error!\nDisabling WiseSVN integration. Please fix the error and restart Unity.\n{ex}\n\n");
+#if UNITY_EDITOR_OSX
+						if (ex is IOException) {
+							Debug.LogError($"If you installed SVN via Brew or similar, you may need to add \"/usr/local/bin\" (or wherever svn binaries can be found) to your PATH environment variable. Example:\nsudo launchctl config user path /usr/local/bin\nAlternatively, you may add relative SVN CLI path in your WiseSVN preferences (\"Assets/SVN/SVN Preferences -> Project\")\n");
+						}
+#endif
+					}
 
 					// svn: warning: W155007: '...' is not a working copy!
 					// This can be returned when project is not a valid svn checkout. (Probably)
@@ -215,21 +246,34 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 		private void LoadTextures()
 		{
 			FileStatusIcons = new GUIContent[Enum.GetValues(typeof(VCFileStatus)).Length];
-			FileStatusIcons[(int)VCFileStatus.Normal] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/SVNNormalIcon"));
-			FileStatusIcons[(int)VCFileStatus.Added] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/SVNAddedIcon"));
-			FileStatusIcons[(int)VCFileStatus.Modified] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/SVNModifiedIcon"));
-			FileStatusIcons[(int)VCFileStatus.Replaced] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/SVNModifiedIcon"));
-			FileStatusIcons[(int)VCFileStatus.Deleted] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/SVNDeletedIcon"));
-			FileStatusIcons[(int)VCFileStatus.Conflicted] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/SVNConflictIcon"));
-			FileStatusIcons[(int)VCFileStatus.Unversioned] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/SVNUnversionedIcon"));
+			FileStatusIcons[(int)VCFileStatus.Normal] = LoadTexture("Editor/SVNOverlayIcons/SVNNormalIcon");
+			FileStatusIcons[(int)VCFileStatus.Added] = LoadTexture("Editor/SVNOverlayIcons/SVNAddedIcon");
+			FileStatusIcons[(int)VCFileStatus.Modified] = LoadTexture("Editor/SVNOverlayIcons/SVNModifiedIcon");
+			FileStatusIcons[(int)VCFileStatus.Replaced] = LoadTexture("Editor/SVNOverlayIcons/SVNModifiedIcon");
+			FileStatusIcons[(int)VCFileStatus.Deleted] = LoadTexture("Editor/SVNOverlayIcons/SVNDeletedIcon");
+			FileStatusIcons[(int)VCFileStatus.Conflicted] = LoadTexture("Editor/SVNOverlayIcons/SVNConflictIcon");
+			FileStatusIcons[(int)VCFileStatus.Unversioned] = LoadTexture("Editor/SVNOverlayIcons/SVNUnversionedIcon");
 
 			LockStatusIcons = new GUIContent[Enum.GetValues(typeof(VCLockStatus)).Length];
-			LockStatusIcons[(int)VCLockStatus.LockedHere] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/Locks/SVNLockedHereIcon"), "You have locked this file.\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.BrokenLock] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon"), "You have a lock that is no longer valid (someone else stole it and released it).\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.LockedOther] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon"), "Someone else locked this file.\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.LockedButStolen] = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon"), "Your lock was stolen by someone else.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedHere] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedHereIcon", "You have locked this file.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.BrokenLock] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon", "You have a lock that is no longer valid (someone else stole it and released it).\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedOther] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon", "Someone else locked this file.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedButStolen] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon", "Your lock was stolen by someone else.\nClick for more details.");
 
-			RemoteStatusIcons = new GUIContent(Resources.Load<Texture2D>("Editor/SVNOverlayIcons/Others/SVNRemoteChangesIcon"));
+			RemoteStatusIcons = LoadTexture("Editor/SVNOverlayIcons/Others/SVNRemoteChangesIcon");
+		}
+
+		public static GUIContent LoadTexture(string path, string tooltip = null)
+		{
+			return new GUIContent(Resources.Load<Texture2D>(path), tooltip);
+
+			//var texture = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(path))
+			//	.Select(AssetDatabase.GUIDToAssetPath)
+			//	.Select(AssetDatabase.LoadAssetAtPath<Texture2D>)
+			//	.FirstOrDefault()
+			//	;
+			//
+			//return new GUIContent(texture, tooltip);
 		}
 
 
