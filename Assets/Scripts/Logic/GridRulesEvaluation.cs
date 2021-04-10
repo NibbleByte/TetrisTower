@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Core;
@@ -38,15 +39,21 @@ namespace TetrisTower.Logic
 		private static void EvaluateMatches(BlocksGrid grid, GridRules rules, List<GridAction> actions)
 		{
 			if (rules.MatchHorizontalLines > 0) {
-				EvaluateMatchesAlong(new GridCoords(0, 1), grid, rules.MatchHorizontalLines, rules.WrapSidesOnMatch, actions);
+				EvaluateMatchesAlongLine(new GridCoords(0, 1), grid, rules.MatchHorizontalLines, rules.WrapSidesOnMatch, actions);
 			}
 			if (rules.MatchVerticalLines > 0) {
-				EvaluateMatchesAlong(new GridCoords(1, 0), grid, rules.MatchVerticalLines, false, actions);
+				EvaluateMatchesAlongLine(new GridCoords(1, 0), grid, rules.MatchVerticalLines, false, actions);
+			}
+			if (rules.MatchDiagonalsLines > 0) {
+				EvaluateMatchesAlongDiagonal(new GridCoords(-1, -1), grid, rules.MatchDiagonalsLines, rules.WrapSidesOnMatch, actions);
+				EvaluateMatchesAlongDiagonal(new GridCoords(+1, -1), grid, rules.MatchDiagonalsLines, rules.WrapSidesOnMatch, actions);
 			}
 		}
 
-		private static void EvaluateMatchesAlong(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, List<GridAction> actions)
+		private static void EvaluateMatchesAlongLine(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, List<GridAction> actions)
 		{
+			UnityEngine.Debug.Assert(direction.Row == 0 || direction.Column == 0);
+
 			GridCoords coords = new GridCoords(0, 0);
 			List<GridCoords> matched = new List<GridCoords>();
 			BlockType lastMatched = null;
@@ -82,7 +89,7 @@ namespace TetrisTower.Logic
 					lastMatched = currentType;
 
 					// Don't match sequence if it will be matched by wrapping the end of the row.
-					if (wrapColumns && coords.Column == 0 && currentType != null && grid[coords.Row, grid.Columns - 1] == currentType) {
+					if (wrapColumns && coords.Column == 0 && currentType != null && grid[coords.Row - direction.Row, grid.Columns - 1] == currentType) {
 						wrapMatchPending = true;
 					}
 				}
@@ -91,21 +98,21 @@ namespace TetrisTower.Logic
 				coords += direction;
 
 
-				bool matchInterrupted = false;
+				bool endReached = false;
 
 				if (coords.Row >= grid.Rows) {
 					coords.Row = 0;
 					coords.Column++;
-					matchInterrupted = true;
+					endReached = true;
 				}
 				if (coords.Column >= grid.Columns) {
 					coords.Column = 0;
 					coords.Row++;
-					matchInterrupted = true;
+					endReached = true;
 				}
 
 
-				if (matchInterrupted) {
+				if (endReached) {
 
 					matched.AddRange(toBeWrappedMatch);
 					toBeWrappedMatch.Clear();
@@ -118,6 +125,93 @@ namespace TetrisTower.Logic
 
 					matched.Clear();
 					lastMatched = null;
+				}
+			}
+		}
+
+		private static void EvaluateMatchesAlongDiagonal(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, List<GridAction> actions)
+		{
+			UnityEngine.Debug.Assert(direction.Row !=0 && direction.Column != 0);
+
+			GridCoords coords;
+			List<GridCoords> matched = new List<GridCoords>();
+			BlockType lastMatched;
+
+			// Diagonal indexes move along the left and then the bottom edge, i.e. 0th column then 0th row.
+			// For each diagonal index, move along the diagonal direction and start matching.
+			int totalDiagonals = grid.Rows + grid.Columns - 1;
+
+			// If WrapColumns is true, moving along the diagonal will cover eventually the skipped indexes.
+			for (int diagonalIndex = wrapColumns ? grid.Rows - 1 : 0; diagonalIndex < totalDiagonals; ++diagonalIndex) {
+
+				matched.Clear();
+				lastMatched = null;
+
+				// Check the Documentation folder for more explanation.
+				if (direction.Row == +1 && direction.Column == +1) {
+					coords = new GridCoords(Math.Max(0, grid.Rows - diagonalIndex - 1), Math.Max(0, diagonalIndex + 1 - grid.Rows));
+
+				} else if (direction.Row == -1 && direction.Column == -1) {
+					coords = new GridCoords(Math.Min(grid.Rows - 1, diagonalIndex), Math.Min(grid.Columns - 1, grid.Columns - 2 - (diagonalIndex - grid.Rows)));
+
+				} else if (direction.Row == +1 && direction.Column == -1) {
+					coords = new GridCoords(Math.Max(0, grid.Rows - diagonalIndex - 1), Math.Min(grid.Columns - 1, grid.Columns - 2 - (diagonalIndex - grid.Rows)));
+
+				} else if (direction.Row == -1 && direction.Column == +1) {
+					coords = new GridCoords(Math.Min(grid.Rows - 1, diagonalIndex), Math.Max(0, diagonalIndex + 1 - grid.Rows));
+
+				} else {
+					throw new ArgumentException("Invalid direction " + direction);
+				}
+
+				while (coords.IsInside(grid)) {
+
+					BlockType currentType = grid[coords];
+
+					if (currentType == lastMatched && currentType != null) {
+						matched.Add(coords);
+
+					} else {
+
+						if (matched.Count >= matchCount) {
+							var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
+							actions.Add(action);
+						}
+
+						matched.Clear();
+						if (currentType != null) {
+							matched.Add(coords);
+						}
+						lastMatched = currentType;
+					}
+
+
+					coords += direction;
+
+
+					bool endReached = false;
+
+					if (coords.Row >= grid.Rows || coords.Row < 0) {
+						endReached = true;
+					}
+					if (coords.Column >= grid.Columns || coords.Column < 0) {
+						if (wrapColumns) {
+							coords.WrapColumn(grid);
+						} else {
+							endReached = true;
+						}
+					}
+
+
+					if (endReached) {
+						if (matched.Count >= matchCount) {
+							var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
+							actions.Add(action);
+						}
+
+						matched.Clear();
+						lastMatched = null;
+					}
 				}
 			}
 		}

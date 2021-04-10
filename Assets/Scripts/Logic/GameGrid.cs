@@ -51,6 +51,11 @@ namespace TetrisTower.Logic
 			return result;
 		}
 
+		public bool IsInside(GameGrid grid)
+		{
+			return 0 <= Row && Row < grid.Rows && 0 <= Column && Column < grid.Columns;
+		}
+
 		public static GridCoords operator +(GridCoords a, GridCoords b) => new GridCoords(a.Row + b.Row, a.Column + b.Column);
 		public static GridCoords operator -(GridCoords a, GridCoords b) => new GridCoords(a.Row - b.Row, a.Column - b.Column);
 		public static bool operator ==(GridCoords c1, GridCoords c2) => c1.Equals(c2);

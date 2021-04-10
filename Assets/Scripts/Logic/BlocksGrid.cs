@@ -53,7 +53,8 @@ namespace TetrisTower.Logic
 		public IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords)
 		{
 			foreach(var coord in coords) {
-				UnityEngine.Debug.Assert(this[coord] != null);
+				// This can happen if the same block is cleared in different matches.
+				//UnityEngine.Debug.Assert(this[coord] != null);
 
 				this[coord] = null;
 			}

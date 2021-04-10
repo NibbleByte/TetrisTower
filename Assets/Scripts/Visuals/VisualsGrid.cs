@@ -11,6 +11,9 @@ namespace TetrisTower.Visuals
 		public float BlockMoveSpeed = 1f;
 		public Vector2 BlockSize = Vector2.one;
 
+		public float MatchBlockDelay = 0.075f;
+		public float MatchActionDelay = 1.2f;
+
 		public int Rows => m_Blocks.GetLength(0);
 		public int Columns => m_Blocks.GetLength(1);
 
@@ -86,8 +89,10 @@ namespace TetrisTower.Visuals
 
 				GameObject.Destroy(this[coord]);
 				this[coord] = null;
+				yield return new WaitForSeconds(MatchBlockDelay);
 			}
 
+			yield return new WaitForSeconds(MatchActionDelay);
 			yield break;
 		}
 
@@ -165,7 +170,7 @@ namespace TetrisTower.Visuals
 
 		public IEnumerable<GridAction> Transform(IEnumerable<GridAction> actions)
 		{
-			List<KeyValuePair< GridCoords, GridCoords >> mergedMoves = new List<KeyValuePair<GridCoords, GridCoords>>();
+			List<KeyValuePair<GridCoords, GridCoords >> mergedMoves = new List<KeyValuePair<GridCoords, GridCoords>>();
 
 			foreach(var action in actions) {
 
