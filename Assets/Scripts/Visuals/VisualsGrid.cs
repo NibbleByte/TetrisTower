@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TetrisTower.Visuals
 {
-	public class VisualsGrid : MonoBehaviour, GameGrid, GridActionsTransformer
+	public class VisualsGrid : MonoBehaviour, GameGrid
 	{
 		public float BlockMoveSpeed = 1f;
 		public Vector2 BlockSize = Vector2.one;
@@ -62,16 +62,66 @@ namespace TetrisTower.Visuals
 			}
 		}
 
-		public IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape)
+		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
 		{
-			foreach (var pair in placedShape.ShapeCoords) {
+			foreach (var action in MergeActions(actions)) {
+				switch (action) {
+					case PlaceAction placeAction:
+						yield return PlaceShape(placeAction);
+						break;
+					case ClearMatchedAction clearAction:
+						yield return ClearMatchedCells(clearAction);
+						break;
+					case MoveCellsAction moveAction:
+						yield return MoveCells(moveAction);
+						break;
+				}
+			}
+		}
+
+		private IEnumerable<GridAction> MergeActions(IEnumerable<GridAction> actions)
+		{
+			List<GridCoords> clearedBlocks = new List<GridCoords>();
+			List<KeyValuePair<GridCoords, GridCoords>> mergedMoves = new List<KeyValuePair<GridCoords, GridCoords>>();
+
+			foreach (var action in actions) {
+
+				switch (action) {
+					case ClearMatchedAction clearAction:
+						clearedBlocks.AddRange(clearAction.Coords);
+						break;
+
+					case MoveCellsAction moveAction:
+						mergedMoves.AddRange(moveAction.MovedCells);
+						break;
+
+					default:
+						yield return action;
+						break;
+				}
+			}
+
+			// Merge sequences of clear actions so animations play together.
+			if (clearedBlocks.Count > 0) {
+				yield return new ClearMatchedAction() { Coords = clearedBlocks.ToArray() };
+			}
+
+			// Merge sequences of move actions so animations play together.
+			if (mergedMoves.Count > 0) {
+				yield return new MoveCellsAction() { MovedCells = mergedMoves.ToArray() };
+			}
+		}
+
+		private IEnumerator PlaceShape(PlaceAction action)
+		{
+			foreach (var pair in action.PlacedShape.ShapeCoords) {
 
 				var reusedVisuals = m_PlacedShapeToBeReused?.ShapeCoords
 					.Where(sc => sc.Coords == pair.Coords)
 					.Select(sc => sc.Value)
 					.FirstOrDefault();
 
-				var coords = placedCoords + pair.Coords;
+				var coords = action.PlaceCoords + pair.Coords;
 				coords.WrapColumn(this);
 
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
@@ -82,10 +132,13 @@ namespace TetrisTower.Visuals
 			yield break;
 		}
 
-		public IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords)
+		private IEnumerator ClearMatchedCells(ClearMatchedAction action)
 		{
-			foreach (var coord in coords) {
-				Debug.Assert(this[coord] != null);
+			foreach (var coord in action.Coords) {
+				// This can happen if the same block is cleared in different matches.
+				//Debug.Assert(this[coord] != null);
+				if (this[coord] == null)
+					continue;
 
 				GameObject.Destroy(this[coord]);
 				this[coord] = null;
@@ -96,7 +149,7 @@ namespace TetrisTower.Visuals
 			yield break;
 		}
 
-		public IEnumerator MoveCells(IReadOnlyCollection<KeyValuePair<GridCoords, GridCoords>> movedCells)
+		private IEnumerator MoveCells(MoveCellsAction action)
 		{
 			if (Application.isPlaying) {
 
@@ -107,7 +160,7 @@ namespace TetrisTower.Visuals
 
 					float timePassed = Time.time - startTime;
 
-					foreach (var pair in movedCells) {
+					foreach (var pair in action.MovedCells) {
 						float distance = GridCoords.Distance(pair.Key, pair.Value);
 						float timeNeeded = distance / BlockMoveSpeed;
 
@@ -128,7 +181,7 @@ namespace TetrisTower.Visuals
 			}
 
 
-			foreach (var movedPair in movedCells) {
+			foreach (var movedPair in action.MovedCells) {
 				Debug.Assert(this[movedPair.Key] != null);
 				Debug.Assert(this[movedPair.Value] == null);
 
@@ -166,31 +219,6 @@ namespace TetrisTower.Visuals
 		public void SetPlacedShapeToBeReused(GridShape<GameObject> shape)
 		{
 			m_PlacedShapeToBeReused = shape;
-		}
-
-		public IEnumerable<GridAction> Transform(IEnumerable<GridAction> actions)
-		{
-			List<KeyValuePair<GridCoords, GridCoords >> mergedMoves = new List<KeyValuePair<GridCoords, GridCoords>>();
-
-			foreach(var action in actions) {
-
-				if (action is MoveCellsAction moveAction) {
-					mergedMoves.AddRange(moveAction.MovedCells);
-
-				} else {
-					// Merge sequences of MoveActions so animations play together.
-					if (mergedMoves.Count > 0) {
-						yield return new MoveCellsAction() { MovedCells = mergedMoves.ToArray() };
-						mergedMoves.Clear();
-					}
-
-					yield return action;
-				}
-			}
-
-			if (mergedMoves.Count > 0) {
-				yield return new MoveCellsAction() { MovedCells = mergedMoves.ToArray() };
-			}
 		}
 
 #if UNITY_EDITOR

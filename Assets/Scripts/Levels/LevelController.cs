@@ -59,15 +59,7 @@ namespace TetrisTower.Levels
 			while (actions.Count > 0) {
 
 				foreach (var grid in Grids) {
-
-					IEnumerable<GridAction> transformedActions = actions;
-					if (grid is GridActionsTransformer transformer) {
-						transformedActions = transformer.Transform(actions);
-					}
-
-					foreach (var action in transformedActions) {
-						yield return action.Apply(grid);
-					}
+					yield return grid.ApplyActions(actions);
 				}
 
 				actions = GameGridEvaluation.Evaluate(Grid, LevelData.Rules);

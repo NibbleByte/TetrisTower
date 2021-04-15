@@ -88,22 +88,11 @@ namespace TetrisTower.Logic
 		int Rows { get; }
 		int Columns { get; }
 
-		IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape);
-
-		IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords);
-
-		IEnumerator MoveCells(IReadOnlyCollection<KeyValuePair<GridCoords, GridCoords>> movedCells);
+		IEnumerator ApplyActions(IEnumerable<GridAction> actions);
 	}
 
 	public interface GridAction
 	{
-		IEnumerator Apply(GameGrid grid);
-	}
-
-	// Implement this if you need to pre-process the actions in some way (for example: group them by type)
-	public interface GridActionsTransformer
-	{
-		IEnumerable<GridAction> Transform(IEnumerable<GridAction> actions);
 	}
 
 
@@ -111,21 +100,15 @@ namespace TetrisTower.Logic
 	{
 		public GridCoords PlaceCoords;
 		public BlocksShape PlacedShape;
-
-		public IEnumerator Apply(GameGrid grid) { yield return grid.PlaceShape(PlaceCoords, PlacedShape); }
 	}
 
 	public class ClearMatchedAction : GridAction
 	{
 		public IReadOnlyCollection<GridCoords> Coords;
-
-		public IEnumerator Apply(GameGrid grid) { yield return grid.ClearMatchedCells(Coords); }
 	}
 
 	public class MoveCellsAction : GridAction
 	{
 		public IReadOnlyCollection<KeyValuePair<GridCoords, GridCoords>> MovedCells;
-
-		public IEnumerator Apply(GameGrid grid) { yield return grid.MoveCells(MovedCells);}
 	}
 }

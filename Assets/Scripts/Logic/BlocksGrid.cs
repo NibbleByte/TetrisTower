@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TetrisTower.Logic
 {
@@ -34,9 +35,49 @@ namespace TetrisTower.Logic
 			m_Blocks = new BlockType[rows * columns];
 		}
 
-		public IEnumerator PlaceShape(GridCoords placedCoords, BlocksShape placedShape)
+		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
 		{
-			foreach (var pair in placedShape.AddToCoordsWrapped(placedCoords, this)) {
+			foreach (var action in MergeActions(actions)) {
+				switch(action) {
+					case PlaceAction placeAction:
+						yield return PlaceShape(placeAction);
+						break;
+					case ClearMatchedAction clearAction:
+						yield return ClearMatchedCells(clearAction);
+						break;
+					case MoveCellsAction moveAction:
+						yield return MoveCells(moveAction);
+						break;
+				}
+			}
+		}
+
+		private IEnumerable<GridAction> MergeActions(IEnumerable<GridAction> actions)
+		{
+			List<GridCoords> clearedBlocks = new List<GridCoords>();
+
+			foreach (var action in actions) {
+
+				switch (action) {
+					case ClearMatchedAction clearAction:
+						clearedBlocks.AddRange(clearAction.Coords);
+						break;
+
+					default:
+						yield return action;
+						break;
+				}
+			}
+
+			// No duplicate clears.
+			if (clearedBlocks.Count > 0) {
+				yield return new ClearMatchedAction() { Coords = clearedBlocks.Distinct().ToArray() };
+			}
+		}
+
+		private IEnumerator PlaceShape(PlaceAction action)
+		{
+			foreach (var pair in action.PlacedShape.AddToCoordsWrapped(action.PlaceCoords, this)) {
 
 				// Hitting the limit, won't be stored.
 				if (pair.Coords.Row >= Rows)
@@ -50,11 +91,10 @@ namespace TetrisTower.Logic
 			yield break;
 		}
 
-		public IEnumerator ClearMatchedCells(IReadOnlyCollection<GridCoords> coords)
+		private IEnumerator ClearMatchedCells(ClearMatchedAction action)
 		{
-			foreach(var coord in coords) {
-				// This can happen if the same block is cleared in different matches.
-				//UnityEngine.Debug.Assert(this[coord] != null);
+			foreach(var coord in action.Coords) {
+				UnityEngine.Debug.Assert(this[coord] != null);
 
 				this[coord] = null;
 			}
@@ -62,9 +102,9 @@ namespace TetrisTower.Logic
 			yield break;
 		}
 
-		public IEnumerator MoveCells(IReadOnlyCollection<KeyValuePair<GridCoords, GridCoords>> movedCells)
+		private IEnumerator MoveCells(MoveCellsAction action)
 		{
-			foreach(var movedCell in movedCells) {
+			foreach(var movedCell in action.MovedCells) {
 				UnityEngine.Debug.Assert(this[movedCell.Key] != null);
 				UnityEngine.Debug.Assert(this[movedCell.Value] == null);
 
