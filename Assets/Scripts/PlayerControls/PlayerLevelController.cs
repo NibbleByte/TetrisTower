@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.Levels;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TetrisTower.PlayerControls
 {
@@ -17,27 +18,27 @@ namespace TetrisTower.PlayerControls
 			LevelController = levelController;
 		}
 
-		void Update()
+		public void OnMoveShape(InputValue value)
 		{
-			int offsetColumns = 0;
-			if (Input.GetKeyDown("left")) offsetColumns--;
-			if (Input.GetKeyDown("right")) offsetColumns++;
+			var direction = value.Get<float>();
 
-			if (offsetColumns != 0) {
-				LevelController.RequestFallingShapeMove(offsetColumns);
+			if (direction != 0f) {
+				LevelController.RequestFallingShapeMove((int) direction);
 			}
+		}
 
-			int rotate = 0;
-			if (Input.GetKeyDown("up")) rotate++;
-			if (Input.GetKeyDown("down")) rotate--;
+		public void OnRotateShape(InputValue value)
+		{
+			var direction = value.Get<float>();
 
-			if (rotate != 0) {
-				LevelController.RequestFallingShapeRotate(rotate);
+			if (direction != 0) {
+				LevelController.RequestFallingShapeRotate((int) direction);
 			}
+		}
 
-			if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)) {
-				LevelController.RequestFallingSpeedUp(FallSpeedup);
-			}
+		public void OnFallSpeedUp()
+		{
+			LevelController.RequestFallingSpeedUp(FallSpeedup);
 		}
 	}
 }

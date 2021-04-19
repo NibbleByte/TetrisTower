@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Logic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TetrisTower.Visuals
 {
@@ -232,15 +233,15 @@ namespace TetrisTower.Visuals
 		void OnDrawGizmos()
 		{
 			// Because Input.GetKeyDown() doesn't work here :(
-			if (!m_GizmoPressed && Input.GetKey(KeyCode.G)) {
+			if (!m_GizmoPressed && Keyboard.current.gKey.isPressed) {
 				m_GizmoShowGrid = !m_GizmoShowGrid;
 				m_GizmoPressed = true;
 			}
-			if (!m_GizmoPressed && Input.GetKey(KeyCode.H)) {
+			if (!m_GizmoPressed && Keyboard.current.hKey.isPressed) {
 				m_GizmoShowGridHeader = !m_GizmoShowGridHeader;
 				m_GizmoPressed = true;
 			}
-			if (m_GizmoPressed && !Input.GetKey(KeyCode.G) && !Input.GetKey(KeyCode.H)) {
+			if (m_GizmoPressed && !Keyboard.current.gKey.isPressed && !Keyboard.current.hKey.isPressed) {
 				m_GizmoPressed = false;
 			}
 

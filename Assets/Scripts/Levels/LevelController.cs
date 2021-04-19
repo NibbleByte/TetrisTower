@@ -247,23 +247,24 @@ namespace TetrisTower.Levels
 		private void DebugClearRow()
 		{
 #if UNITY_EDITOR
-			for (KeyCode key = KeyCode.Alpha0; key <= KeyCode.Alpha9; ++key) {
-				if (Input.GetKeyDown(key) && key - KeyCode.Alpha0 < Grid.Rows) {
-
-					List<GridCoords> clearCoords = new List<GridCoords>();
-					for (int column = 0; column < Grid.Columns; ++column) {
-						var coords = new GridCoords(key - KeyCode.Alpha0, column);
-						if (Grid[coords]) {
-							clearCoords.Add(coords);
-						}
-					}
-
-					if (clearCoords.Count > 0) {
-						var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
-						StartCoroutine(RunActions(actions));
-					}
-				}
-			}
+			// Temporary disable.
+			//for (KeyCode key = KeyCode.Alpha0; key <= KeyCode.Alpha9; ++key) {
+			//	if (Input.GetKeyDown(key) && key - KeyCode.Alpha0 < Grid.Rows) {
+			//
+			//		List<GridCoords> clearCoords = new List<GridCoords>();
+			//		for (int column = 0; column < Grid.Columns; ++column) {
+			//			var coords = new GridCoords(key - KeyCode.Alpha0, column);
+			//			if (Grid[coords]) {
+			//				clearCoords.Add(coords);
+			//			}
+			//		}
+			//
+			//		if (clearCoords.Count > 0) {
+			//			var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
+			//			StartCoroutine(RunActions(actions));
+			//		}
+			//	}
+			//}
 #endif
 		}
 	}

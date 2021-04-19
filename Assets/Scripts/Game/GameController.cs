@@ -3,6 +3,7 @@ using TetrisTower.PlayerControls;
 using TetrisTower.Levels;
 using TetrisTower.Logic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TetrisTower.Game
 {
@@ -61,10 +62,10 @@ namespace TetrisTower.Game
 
 		private void Update()
 		{
-			if (Input.GetKeyDown(KeyCode.F5)) {
+			if (Keyboard.current.f5Key.wasPressedThisFrame) {
 				Serialize();
 			}
-			if (Input.GetKeyDown(KeyCode.F6)) {
+			if (Keyboard.current.f6Key.wasPressedThisFrame) {
 				Deserialize();
 			}
 		}
