@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TetrisTower.Core;
 using TetrisTower.Logic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TetrisTower.Levels
 {
@@ -247,24 +248,30 @@ namespace TetrisTower.Levels
 		private void DebugClearRow()
 		{
 #if UNITY_EDITOR
+			if (Keyboard.current == null)
+				return;
+
 			// Temporary disable.
-			//for (KeyCode key = KeyCode.Alpha0; key <= KeyCode.Alpha9; ++key) {
-			//	if (Input.GetKeyDown(key) && key - KeyCode.Alpha0 < Grid.Rows) {
-			//
-			//		List<GridCoords> clearCoords = new List<GridCoords>();
-			//		for (int column = 0; column < Grid.Columns; ++column) {
-			//			var coords = new GridCoords(key - KeyCode.Alpha0, column);
-			//			if (Grid[coords]) {
-			//				clearCoords.Add(coords);
-			//			}
-			//		}
-			//
-			//		if (clearCoords.Count > 0) {
-			//			var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
-			//			StartCoroutine(RunActions(actions));
-			//		}
-			//	}
-			//}
+			for (Key key = Key.Digit1; key <= Key.Digit0; ++key) {
+
+				int keyRow = (key - Key.Digit1 + 1) % 10;
+
+				if (Keyboard.current[key].wasPressedThisFrame && keyRow < Grid.Rows) {
+
+					List<GridCoords> clearCoords = new List<GridCoords>();
+					for (int column = 0; column < Grid.Columns; ++column) {
+						var coords = new GridCoords(keyRow, column);
+						if (Grid[coords]) {
+							clearCoords.Add(coords);
+						}
+					}
+
+					if (clearCoords.Count > 0) {
+						var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
+						StartCoroutine(RunActions(actions));
+					}
+				}
+			}
 #endif
 		}
 	}

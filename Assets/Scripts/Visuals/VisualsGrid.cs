@@ -232,6 +232,9 @@ namespace TetrisTower.Visuals
 
 		void OnDrawGizmos()
 		{
+			if (Keyboard.current == null)
+				return;
+
 			// Because Input.GetKeyDown() doesn't work here :(
 			if (!m_GizmoPressed && Keyboard.current.gKey.isPressed) {
 				m_GizmoShowGrid = !m_GizmoShowGrid;
