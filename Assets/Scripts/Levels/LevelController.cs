@@ -17,6 +17,8 @@ namespace TetrisTower.Levels
 		public List<GameGrid> Grids { get; private set; } = new List<GameGrid>();
 		public BlocksGrid Grid => LevelData?.Grid;
 
+		public bool IsPaused => !enabled;
+
 		public event System.Action LevelInitialized;
 		public event System.Action LevelFallingShapeChanged;
 		public event System.Action PlacingFallingShape;
@@ -177,6 +179,16 @@ namespace TetrisTower.Levels
 			}
 
 			return new BlocksShape() { ShapeCoords = shapeCoords.ToArray() };
+		}
+
+		public void PauseLevel()
+		{
+			enabled = false;
+		}
+
+		public void ResumeLevel()
+		{
+			enabled = true;
 		}
 
 		void Update()

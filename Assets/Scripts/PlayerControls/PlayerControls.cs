@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace TetrisTower.PlayerControls
+namespace TetrisTower.Input
 {
     public class @PlayerControls : IInputActionCollection, IDisposable
     {
@@ -17,11 +17,19 @@ namespace TetrisTower.PlayerControls
     ""name"": ""PlayerControls"",
     ""maps"": [
         {
-            ""name"": ""Game"",
+            ""name"": ""LevelGame"",
             ""id"": ""9cb11c57-6035-4442-b6b4-fb85c51dc04a"",
             ""actions"": [
                 {
-                    ""name"": ""MoveShape"",
+                    ""name"": ""MoveShapeLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""c42aaa47-96d2-4c31-b0c7-5be28c1a25df"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""MoveShapeRight"",
                     ""type"": ""Button"",
                     ""id"": ""5bdcd5dc-047d-4593-96a8-d27f7fd530e6"",
                     ""expectedControlType"": ""Button"",
@@ -29,7 +37,15 @@ namespace TetrisTower.PlayerControls
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""RotateShape"",
+                    ""name"": ""RotateShapeUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""12911e7a-7981-40c1-83b9-9342bd21583f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RotateShapeDown"",
                     ""type"": ""Button"",
                     ""id"": ""d2ca85d2-bb09-4e02-8dce-d151895698da"",
                     ""expectedControlType"": ""Button"",
@@ -43,20 +59,17 @@ namespace TetrisTower.PlayerControls
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""PauseLevel"",
+                    ""type"": ""Button"",
+                    ""id"": ""bc0699d6-02ca-4471-b043-9a42bfce440e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""143bb1cd-cc10-4eca-a2f0-a3664166fe91"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""FallSpeedUp"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
                 {
                     ""name"": """",
                     ""id"": ""05f6913d-c316-48b2-a6bb-e225f14c7960"",
@@ -81,223 +94,168 @@ namespace TetrisTower.PlayerControls
                 },
                 {
                     ""name"": """",
-                    ""id"": ""886e731e-7071-4ae4-95c0-e61739dad6fd"",
-                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
+                    ""id"": ""143bb1cd-cc10-4eca-a2f0-a3664166fe91"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Touch"",
+                    ""groups"": "";Gamepad"",
                     ""action"": ""FallSpeedUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""Keyboard"",
-                    ""id"": ""5c0acf13-5b50-4aea-82b0-b2340c42e8a8"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""29128cd2-b22f-4a8a-920a-79d1feff8587"",
-                    ""path"": ""<Keyboard>/a"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""fa70c108-7a77-4b00-bf2d-d3b86eeca0fb"",
+                    ""name"": """",
+                    ""id"": ""7f921f31-a271-4435-bee3-f8ebf3b5a101"",
                     ""path"": ""<Keyboard>/leftArrow"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShape"",
+                    ""action"": ""MoveShapeLeft"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""82917798-f1aa-4b57-82bc-8f2300a57ee4"",
-                    ""path"": ""<Keyboard>/d"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""0c169b55-5880-4a16-8e5e-0c177053c8e5"",
-                    ""path"": ""<Keyboard>/rightArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Gamepad"",
-                    ""id"": ""a9978251-19ae-4e7a-b733-3b2db1392986"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""negative"",
-                    ""id"": ""6078ef18-27ff-4734-b9ac-df481c65561d"",
+                    ""name"": """",
+                    ""id"": ""e90a1de5-f1aa-41be-a56b-90f4b7fa3c09"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""MoveShapeLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fccaa75c-6162-4e57-9452-308311e09c5b"",
                     ""path"": ""<Gamepad>/dpad/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""MoveShape"",
+                    ""action"": ""MoveShapeLeft"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""positive"",
-                    ""id"": ""fe6a91e4-f765-41ce-b00f-9be7061d08b2"",
+                    ""name"": """",
+                    ""id"": ""4c7376a0-a019-4e59-ab10-a13dda1bf8cd"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""MoveShapeRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4fab62e1-b2fa-4bb5-ad59-b25e6e31a04e"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""MoveShapeRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3bad19e9-17e9-4fb6-9728-219fb1d017e2"",
                     ""path"": ""<Gamepad>/dpad/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""MoveShape"",
+                    ""action"": ""MoveShapeRight"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Gamepad Stick"",
-                    ""id"": ""0710380d-332c-4db6-8300-4e9cdf21f03a"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""negative"",
-                    ""id"": ""c88ef83f-5dab-4d97-8ce5-d77daff9a926"",
-                    ""path"": ""<Gamepad>/leftStick/left"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""057110d9-7d16-4bbc-bc68-99ce0b72b163"",
-                    ""path"": ""<Gamepad>/leftStick/right"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""MoveShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Keyboard"",
-                    ""id"": ""89cd9d2f-64d2-4aed-af61-bff2be041e17"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RotateShape"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""1b057871-6086-408a-aa85-30cbcb3841d7"",
-                    ""path"": ""<Keyboard>/w"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""f52229be-98f5-4b9b-9f89-7816cb69ab44"",
+                    ""name"": """",
+                    ""id"": ""948d3740-9b93-40c0-97a5-0308b3036a65"",
                     ""path"": ""<Keyboard>/upArrow"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShape"",
+                    ""action"": ""RotateShapeUp"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""2e1def54-7d0d-42bc-abdf-f6eeb2a20341"",
-                    ""path"": ""<Keyboard>/s"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""ab13e2cb-8cd6-4e66-8b89-dfcec80e6b72"",
-                    ""path"": ""<Keyboard>/downArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShape"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Gamepad"",
-                    ""id"": ""8069b9fc-8002-435b-9748-1ec6f0919f01"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RotateShape"",
-                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""positive"",
-                    ""id"": ""e9edb79e-8b0f-4596-8eb1-1b3d7c458a44"",
+                    ""name"": """",
+                    ""id"": ""25a29330-7f1e-4e20-9ff9-442f497d7f3f"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""RotateShapeUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a2fb49a3-b61b-4942-8d6f-26fdb3e979a6"",
                     ""path"": ""<Gamepad>/dpad/up"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""RotateShape"",
+                    ""action"": ""RotateShapeUp"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""negative"",
-                    ""id"": ""d094dc90-0eaa-425e-b2dc-2d0952415f59"",
+                    ""name"": """",
+                    ""id"": ""ba3aa4a0-29fa-4d70-9fad-7a2c7cc5b260"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""RotateShapeDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8b02350e-fce8-4d19-85c7-80ccc43b7d3b"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""RotateShapeDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6b97bb9e-2c32-4ea2-9248-e04b2ac7fdbd"",
                     ""path"": ""<Gamepad>/dpad/down"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""RotateShape"",
+                    ""action"": ""RotateShapeDown"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8cd76047-212e-44a1-8142-51f9a2bacb03"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""PauseLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a215807c-70f5-4cc6-83c9-0d0ed9f9c241"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""PauseLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -307,7 +265,7 @@ namespace TetrisTower.PlayerControls
             ""actions"": [
                 {
                     ""name"": ""Navigate"",
-                    ""type"": ""Value"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""54525046-29d2-4cda-aaec-a9b82a378ec7"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -315,7 +273,7 @@ namespace TetrisTower.PlayerControls
                 },
                 {
                     ""name"": ""Submit"",
-                    ""type"": ""Button"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""279b44f2-1205-4c28-b887-362c4943c659"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -323,7 +281,7 @@ namespace TetrisTower.PlayerControls
                 },
                 {
                     ""name"": ""Cancel"",
-                    ""type"": ""Button"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""dcea39f7-1e91-4a47-9e1d-a65ca4cd0e06"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -382,6 +340,14 @@ namespace TetrisTower.PlayerControls
                     ""type"": ""PassThrough"",
                     ""id"": ""90d54a8c-9c4d-47ec-9510-e5322715eff2"",
                     ""expectedControlType"": ""Quaternion"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""ResumeLevel"",
+                    ""type"": ""Button"",
+                    ""id"": ""3c955259-d517-4b40-bc06-4fd6d537e518"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
                 }
@@ -727,6 +693,28 @@ namespace TetrisTower.PlayerControls
                     ""action"": ""RightClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b04e469b-df91-421d-a79f-6dcca460d404"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ResumeLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e637e39a-7e4f-4180-8073-bf5ec7ae365e"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ResumeLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -772,11 +760,14 @@ namespace TetrisTower.PlayerControls
         }
     ]
 }");
-            // Game
-            m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
-            m_Game_MoveShape = m_Game.FindAction("MoveShape", throwIfNotFound: true);
-            m_Game_RotateShape = m_Game.FindAction("RotateShape", throwIfNotFound: true);
-            m_Game_FallSpeedUp = m_Game.FindAction("FallSpeedUp", throwIfNotFound: true);
+            // LevelGame
+            m_LevelGame = asset.FindActionMap("LevelGame", throwIfNotFound: true);
+            m_LevelGame_MoveShapeLeft = m_LevelGame.FindAction("MoveShapeLeft", throwIfNotFound: true);
+            m_LevelGame_MoveShapeRight = m_LevelGame.FindAction("MoveShapeRight", throwIfNotFound: true);
+            m_LevelGame_RotateShapeUp = m_LevelGame.FindAction("RotateShapeUp", throwIfNotFound: true);
+            m_LevelGame_RotateShapeDown = m_LevelGame.FindAction("RotateShapeDown", throwIfNotFound: true);
+            m_LevelGame_FallSpeedUp = m_LevelGame.FindAction("FallSpeedUp", throwIfNotFound: true);
+            m_LevelGame_PauseLevel = m_LevelGame.FindAction("PauseLevel", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -789,6 +780,7 @@ namespace TetrisTower.PlayerControls
             m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
             m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
             m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+            m_UI_ResumeLevel = m_UI.FindAction("ResumeLevel", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -835,54 +827,78 @@ namespace TetrisTower.PlayerControls
             asset.Disable();
         }
 
-        // Game
-        private readonly InputActionMap m_Game;
-        private IGameActions m_GameActionsCallbackInterface;
-        private readonly InputAction m_Game_MoveShape;
-        private readonly InputAction m_Game_RotateShape;
-        private readonly InputAction m_Game_FallSpeedUp;
-        public struct GameActions
+        // LevelGame
+        private readonly InputActionMap m_LevelGame;
+        private ILevelGameActions m_LevelGameActionsCallbackInterface;
+        private readonly InputAction m_LevelGame_MoveShapeLeft;
+        private readonly InputAction m_LevelGame_MoveShapeRight;
+        private readonly InputAction m_LevelGame_RotateShapeUp;
+        private readonly InputAction m_LevelGame_RotateShapeDown;
+        private readonly InputAction m_LevelGame_FallSpeedUp;
+        private readonly InputAction m_LevelGame_PauseLevel;
+        public struct LevelGameActions
         {
             private @PlayerControls m_Wrapper;
-            public GameActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
-            public InputAction @MoveShape => m_Wrapper.m_Game_MoveShape;
-            public InputAction @RotateShape => m_Wrapper.m_Game_RotateShape;
-            public InputAction @FallSpeedUp => m_Wrapper.m_Game_FallSpeedUp;
-            public InputActionMap Get() { return m_Wrapper.m_Game; }
+            public LevelGameActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @MoveShapeLeft => m_Wrapper.m_LevelGame_MoveShapeLeft;
+            public InputAction @MoveShapeRight => m_Wrapper.m_LevelGame_MoveShapeRight;
+            public InputAction @RotateShapeUp => m_Wrapper.m_LevelGame_RotateShapeUp;
+            public InputAction @RotateShapeDown => m_Wrapper.m_LevelGame_RotateShapeDown;
+            public InputAction @FallSpeedUp => m_Wrapper.m_LevelGame_FallSpeedUp;
+            public InputAction @PauseLevel => m_Wrapper.m_LevelGame_PauseLevel;
+            public InputActionMap Get() { return m_Wrapper.m_LevelGame; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(GameActions set) { return set.Get(); }
-            public void SetCallbacks(IGameActions instance)
+            public static implicit operator InputActionMap(LevelGameActions set) { return set.Get(); }
+            public void SetCallbacks(ILevelGameActions instance)
             {
-                if (m_Wrapper.m_GameActionsCallbackInterface != null)
+                if (m_Wrapper.m_LevelGameActionsCallbackInterface != null)
                 {
-                    @MoveShape.started -= m_Wrapper.m_GameActionsCallbackInterface.OnMoveShape;
-                    @MoveShape.performed -= m_Wrapper.m_GameActionsCallbackInterface.OnMoveShape;
-                    @MoveShape.canceled -= m_Wrapper.m_GameActionsCallbackInterface.OnMoveShape;
-                    @RotateShape.started -= m_Wrapper.m_GameActionsCallbackInterface.OnRotateShape;
-                    @RotateShape.performed -= m_Wrapper.m_GameActionsCallbackInterface.OnRotateShape;
-                    @RotateShape.canceled -= m_Wrapper.m_GameActionsCallbackInterface.OnRotateShape;
-                    @FallSpeedUp.started -= m_Wrapper.m_GameActionsCallbackInterface.OnFallSpeedUp;
-                    @FallSpeedUp.performed -= m_Wrapper.m_GameActionsCallbackInterface.OnFallSpeedUp;
-                    @FallSpeedUp.canceled -= m_Wrapper.m_GameActionsCallbackInterface.OnFallSpeedUp;
+                    @MoveShapeLeft.started -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnMoveShapeLeft;
+                    @MoveShapeLeft.performed -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnMoveShapeLeft;
+                    @MoveShapeLeft.canceled -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnMoveShapeLeft;
+                    @MoveShapeRight.started -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnMoveShapeRight;
+                    @MoveShapeRight.performed -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnMoveShapeRight;
+                    @MoveShapeRight.canceled -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnMoveShapeRight;
+                    @RotateShapeUp.started -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnRotateShapeUp;
+                    @RotateShapeUp.performed -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnRotateShapeUp;
+                    @RotateShapeUp.canceled -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnRotateShapeUp;
+                    @RotateShapeDown.started -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnRotateShapeDown;
+                    @RotateShapeDown.performed -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnRotateShapeDown;
+                    @RotateShapeDown.canceled -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnRotateShapeDown;
+                    @FallSpeedUp.started -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnFallSpeedUp;
+                    @FallSpeedUp.performed -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnFallSpeedUp;
+                    @FallSpeedUp.canceled -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnFallSpeedUp;
+                    @PauseLevel.started -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnPauseLevel;
+                    @PauseLevel.performed -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnPauseLevel;
+                    @PauseLevel.canceled -= m_Wrapper.m_LevelGameActionsCallbackInterface.OnPauseLevel;
                 }
-                m_Wrapper.m_GameActionsCallbackInterface = instance;
+                m_Wrapper.m_LevelGameActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @MoveShape.started += instance.OnMoveShape;
-                    @MoveShape.performed += instance.OnMoveShape;
-                    @MoveShape.canceled += instance.OnMoveShape;
-                    @RotateShape.started += instance.OnRotateShape;
-                    @RotateShape.performed += instance.OnRotateShape;
-                    @RotateShape.canceled += instance.OnRotateShape;
+                    @MoveShapeLeft.started += instance.OnMoveShapeLeft;
+                    @MoveShapeLeft.performed += instance.OnMoveShapeLeft;
+                    @MoveShapeLeft.canceled += instance.OnMoveShapeLeft;
+                    @MoveShapeRight.started += instance.OnMoveShapeRight;
+                    @MoveShapeRight.performed += instance.OnMoveShapeRight;
+                    @MoveShapeRight.canceled += instance.OnMoveShapeRight;
+                    @RotateShapeUp.started += instance.OnRotateShapeUp;
+                    @RotateShapeUp.performed += instance.OnRotateShapeUp;
+                    @RotateShapeUp.canceled += instance.OnRotateShapeUp;
+                    @RotateShapeDown.started += instance.OnRotateShapeDown;
+                    @RotateShapeDown.performed += instance.OnRotateShapeDown;
+                    @RotateShapeDown.canceled += instance.OnRotateShapeDown;
                     @FallSpeedUp.started += instance.OnFallSpeedUp;
                     @FallSpeedUp.performed += instance.OnFallSpeedUp;
                     @FallSpeedUp.canceled += instance.OnFallSpeedUp;
+                    @PauseLevel.started += instance.OnPauseLevel;
+                    @PauseLevel.performed += instance.OnPauseLevel;
+                    @PauseLevel.canceled += instance.OnPauseLevel;
                 }
             }
         }
-        public GameActions @Game => new GameActions(this);
+        public LevelGameActions @LevelGame => new LevelGameActions(this);
 
         // UI
         private readonly InputActionMap m_UI;
@@ -897,6 +913,7 @@ namespace TetrisTower.PlayerControls
         private readonly InputAction m_UI_RightClick;
         private readonly InputAction m_UI_TrackedDevicePosition;
         private readonly InputAction m_UI_TrackedDeviceOrientation;
+        private readonly InputAction m_UI_ResumeLevel;
         public struct UIActions
         {
             private @PlayerControls m_Wrapper;
@@ -911,6 +928,7 @@ namespace TetrisTower.PlayerControls
             public InputAction @RightClick => m_Wrapper.m_UI_RightClick;
             public InputAction @TrackedDevicePosition => m_Wrapper.m_UI_TrackedDevicePosition;
             public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
+            public InputAction @ResumeLevel => m_Wrapper.m_UI_ResumeLevel;
             public InputActionMap Get() { return m_Wrapper.m_UI; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -950,6 +968,9 @@ namespace TetrisTower.PlayerControls
                     @TrackedDeviceOrientation.started -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDeviceOrientation;
                     @TrackedDeviceOrientation.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDeviceOrientation;
                     @TrackedDeviceOrientation.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnTrackedDeviceOrientation;
+                    @ResumeLevel.started -= m_Wrapper.m_UIActionsCallbackInterface.OnResumeLevel;
+                    @ResumeLevel.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnResumeLevel;
+                    @ResumeLevel.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnResumeLevel;
                 }
                 m_Wrapper.m_UIActionsCallbackInterface = instance;
                 if (instance != null)
@@ -984,6 +1005,9 @@ namespace TetrisTower.PlayerControls
                     @TrackedDeviceOrientation.started += instance.OnTrackedDeviceOrientation;
                     @TrackedDeviceOrientation.performed += instance.OnTrackedDeviceOrientation;
                     @TrackedDeviceOrientation.canceled += instance.OnTrackedDeviceOrientation;
+                    @ResumeLevel.started += instance.OnResumeLevel;
+                    @ResumeLevel.performed += instance.OnResumeLevel;
+                    @ResumeLevel.canceled += instance.OnResumeLevel;
                 }
             }
         }
@@ -1015,11 +1039,14 @@ namespace TetrisTower.PlayerControls
                 return asset.controlSchemes[m_TouchSchemeIndex];
             }
         }
-        public interface IGameActions
+        public interface ILevelGameActions
         {
-            void OnMoveShape(InputAction.CallbackContext context);
-            void OnRotateShape(InputAction.CallbackContext context);
+            void OnMoveShapeLeft(InputAction.CallbackContext context);
+            void OnMoveShapeRight(InputAction.CallbackContext context);
+            void OnRotateShapeUp(InputAction.CallbackContext context);
+            void OnRotateShapeDown(InputAction.CallbackContext context);
             void OnFallSpeedUp(InputAction.CallbackContext context);
+            void OnPauseLevel(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {
@@ -1033,6 +1060,7 @@ namespace TetrisTower.PlayerControls
             void OnRightClick(InputAction.CallbackContext context);
             void OnTrackedDevicePosition(InputAction.CallbackContext context);
             void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+            void OnResumeLevel(InputAction.CallbackContext context);
         }
     }
 }
