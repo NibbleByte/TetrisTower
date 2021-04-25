@@ -4,21 +4,6 @@ using UnityEngine;
 
 namespace TetrisTower.HomeScreen
 {
-	/*
-	public enum HomeScreenState
-	{
-		MainMenu = 0,
-
-		NewGame = 2,
-
-		Options = 6,
-
-		Highscores = 10,
-
-		Credits = 14,
-	}
-	*/
-
 	public class HomeScreenController : MonoBehaviour
 	{
 		[Serializable]

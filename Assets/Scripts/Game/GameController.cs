@@ -18,8 +18,7 @@ namespace TetrisTower.Game
 
 		public GameObject UI;
 
-		// TODO: REMOVE
-		public TowerLevelData StartData;
+		public TowerLevelData NewGameData;
 
 		public static GameController Instance { get; private set; }
 
@@ -35,6 +34,7 @@ namespace TetrisTower.Game
 			}
 
 			Instance = this;
+			DontDestroyOnLoad(gameObject);
 
 			Converters = new Newtonsoft.Json.JsonConverter[] {
 				new BlockTypeConverter(AssetsRepository),
@@ -58,7 +58,7 @@ namespace TetrisTower.Game
 			// For Debug
 			var towerLevel = FindObjectOfType<TowerLevelController>();
 			if (towerLevel) {
-				InitializeLevel(towerLevel, StartData);
+				InitializeLevel(towerLevel, NewGameData);
 			}
 		}
 
@@ -74,6 +74,11 @@ namespace TetrisTower.Game
 			//PlayerControls.Disable();
 			PlayerInput.DeactivateInput();
 			PlayerControls.UI.ResumeLevel.performed += TrySwitchToLevel;
+		}
+
+		public void StartNewGame(TowerLevelData levelData)
+		{
+			// TODO: Start new game.
 		}
 
 		private void InitializeLevel(TowerLevelController towerLevel, TowerLevelData data)
@@ -142,7 +147,7 @@ namespace TetrisTower.Game
 			if (string.IsNullOrEmpty(m_DebugSave))
 				return;
 
-			StartData = Newtonsoft.Json.JsonConvert.DeserializeObject<TowerLevelData>(m_DebugSave, Converters);
+			NewGameData = Newtonsoft.Json.JsonConvert.DeserializeObject<TowerLevelData>(m_DebugSave, Converters);
 			Start();
 		}
 
