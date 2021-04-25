@@ -1,6 +1,6 @@
 using TetrisTower.Core;
 using TetrisTower.Input;
-using TetrisTower.Levels;
+using TetrisTower.TowerLevels;
 using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,23 +14,24 @@ namespace TetrisTower.Game
 		public PlayerInput PlayerInput { get; private set; }
 
 		public AssetsRepository AssetsRepository;
-		public LevelInputController LevelInputController;
+		public TowerLevelInputController LevelInputController;
 
 		public GameObject UI;
 
 		// TODO: REMOVE
-		public LevelData StartData;
+		public TowerLevelData StartData;
 
 		public static GameController Instance { get; private set; }
 
-		public LevelController LevelController { get; private set; }
+		public TowerLevelController TowerLevel { get; private set; }
 
 		public Newtonsoft.Json.JsonConverter[] Converters { get; private set; }
 
 		void Awake()
 		{
 			if (Instance) {
-				gameObject.SetActive(false);
+				GameObject.DestroyImmediate(gameObject);
+				return;
 			}
 
 			Instance = this;
@@ -55,9 +56,9 @@ namespace TetrisTower.Game
 		void Start()
 		{
 			// For Debug
-			var levelController = FindObjectOfType<LevelController>();
-			if (levelController) {
-				InitializeLevel(levelController, StartData);
+			var towerLevel = FindObjectOfType<TowerLevelController>();
+			if (towerLevel) {
+				InitializeLevel(towerLevel, StartData);
 			}
 		}
 
@@ -75,19 +76,14 @@ namespace TetrisTower.Game
 			PlayerControls.UI.ResumeLevel.performed += TrySwitchToLevel;
 		}
 
-		private void InitializeLevel(LevelController level, LevelData data)
+		private void InitializeLevel(TowerLevelController towerLevel, TowerLevelData data)
 		{
-			if (LevelController) {
-				PlayerControls.LevelGame.SetCallbacks(null);
-				Destroy(LevelController.gameObject);
-			}
+			TowerLevel = towerLevel;
+			TowerLevel.Init(data);
 
-			LevelController = level;
-			LevelController.Init(data);
+			var levelInput = towerLevel.GetComponent<TowerLevelInputController>();
 
-			var levelInput = level.GetComponent<LevelInputController>();
-
-			levelInput.Init(LevelController, SwitchInputToUI);
+			levelInput.Init(TowerLevel, SwitchInputToUI);
 			PlayerControls.LevelGame.SetCallbacks(levelInput);
 			SwitchInputToLevelGame();
 		}
@@ -96,20 +92,20 @@ namespace TetrisTower.Game
 		public void SwitchInputToLevelGame()
 		{
 			PlayerInput.currentActionMap = PlayerControls.LevelGame.Get();
-			LevelController.ResumeLevel();
+			TowerLevel.ResumeLevel();
 			UI.SetActive(false);
 		}
 
 		public void SwitchInputToUI()
 		{
 			PlayerInput.currentActionMap = PlayerControls.UI.Get();
-			LevelController.PauseLevel();
+			TowerLevel.PauseLevel();
 			UI.SetActive(true);
 		}
 
 		private void TrySwitchToLevel(InputAction.CallbackContext obj)
 		{
-			if (LevelController) {
+			if (TowerLevel) {
 				SwitchInputToLevelGame();
 			}
 		}
@@ -137,7 +133,7 @@ namespace TetrisTower.Game
 		string m_DebugSave;
 		void Serialize()
 		{
-			m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(LevelController.LevelData, Converters);
+			m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(TowerLevel.LevelData, Converters);
 			Debug.Log(m_DebugSave);
 		}
 
@@ -146,7 +142,7 @@ namespace TetrisTower.Game
 			if (string.IsNullOrEmpty(m_DebugSave))
 				return;
 
-			StartData = Newtonsoft.Json.JsonConvert.DeserializeObject<LevelData>(m_DebugSave, Converters);
+			StartData = Newtonsoft.Json.JsonConvert.DeserializeObject<TowerLevelData>(m_DebugSave, Converters);
 			Start();
 		}
 

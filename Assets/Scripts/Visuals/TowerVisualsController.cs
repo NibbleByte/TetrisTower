@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using TetrisTower.Levels;
+using TetrisTower.TowerLevels;
 using TetrisTower.Logic;
 using UnityEngine;
 
 namespace TetrisTower.Visuals
 {
-	public class VisualsController : MonoBehaviour
+	public class TowerVisualsController : MonoBehaviour
 	{
 		[Serializable]
 		public class VisualsShape : GridShape<GameObject>
@@ -14,8 +14,8 @@ namespace TetrisTower.Visuals
 		}
 
 		public VisualsGrid VisualsGrid;
-		public LevelController LevelController;
-		public LevelData LevelData => LevelController.LevelData;
+		public TowerLevelController TowerLevel;
+		public TowerLevelData LevelData => TowerLevel.LevelData;
 
 		public VisualsShape FallingVisualsShape { get; private set; }
 		// For debug to be displayed by the Inspector!
@@ -25,13 +25,13 @@ namespace TetrisTower.Visuals
 
 		private void Awake()
 		{
-			LevelController.LevelInitialized += OnLevelInitialized;
-			LevelController.LevelFallingShapeChanged += ReplaceFallingVisuals;
-			LevelController.PlacingFallingShape += OnPlacingFallingShape;
-			LevelController.PlacedOutsideGrid += DestroyFallingVisuals;
-			LevelController.FallingShapeSelected += OnFallingShapeSelected;
+			TowerLevel.LevelInitialized += OnLevelInitialized;
+			TowerLevel.LevelFallingShapeChanged += ReplaceFallingVisuals;
+			TowerLevel.PlacingFallingShape += OnPlacingFallingShape;
+			TowerLevel.PlacedOutsideGrid += DestroyFallingVisuals;
+			TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
 
-			LevelController.FallingShapeRotated += OnFallingShapeRotated;
+			TowerLevel.FallingShapeRotated += OnFallingShapeRotated;
 
 			FallingVisualsContainer = new GameObject("-- Falling-Shape --").transform;
 			FallingVisualsContainer.SetParent(transform);
@@ -40,7 +40,7 @@ namespace TetrisTower.Visuals
 
 		private void OnLevelInitialized()
 		{
-			LevelController.Grids.Add(VisualsGrid);
+			TowerLevel.Grids.Add(VisualsGrid);
 			VisualsGrid.Init(LevelData.Grid);
 
 			DestroyFallingVisuals();
@@ -114,7 +114,7 @@ namespace TetrisTower.Visuals
 
 		void Update()
 		{
-			if (FallingVisualsShape != null && !LevelController.AreGridActionsRunning) {
+			if (FallingVisualsShape != null && !TowerLevel.AreGridActionsRunning) {
 				float fallDistance = LevelData.FallDistanceNormalized * VisualsGrid.BlockSize.y;
 
 				var startCoords = new GridCoords(LevelData.Grid.Rows, LevelData.FallingColumn);

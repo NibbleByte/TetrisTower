@@ -3,11 +3,11 @@ using System;
 using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.Levels
+namespace TetrisTower.TowerLevels
 {
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class LevelData
+	public class TowerLevelData
 	{
 		[SerializeReference] public BlocksShape NextShape;
 		[SerializeReference] public BlocksShape FallingShape;

@@ -5,13 +5,13 @@ using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace TetrisTower.Levels
+namespace TetrisTower.TowerLevels
 {
-	public class LevelController : MonoBehaviour
+	public class TowerLevelController : MonoBehaviour
 	{
-		public LevelData LevelData { get; private set; }
+		public TowerLevelData LevelData { get; private set; }
 		// For debug to be displayed by the Inspector!
-		[SerializeReference] private LevelData m_DebugLevelData;
+		[SerializeReference] private TowerLevelData m_DebugLevelData;
 
 
 		public List<GameGrid> Grids { get; private set; } = new List<GameGrid>();
@@ -35,7 +35,7 @@ namespace TetrisTower.Levels
 
 		private float m_FallingSpeedup = 0;
 
-		public void Init(LevelData data)
+		public void Init(TowerLevelData data)
 		{
 			LevelData = m_DebugLevelData = data;
 
