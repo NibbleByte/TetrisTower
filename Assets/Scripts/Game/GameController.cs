@@ -1,4 +1,3 @@
-using TetrisTower.Core;
 using TetrisTower.Input;
 using TetrisTower.TowerLevels;
 using TetrisTower.Logic;
@@ -13,14 +12,16 @@ namespace TetrisTower.Game
 		public PlayerControls PlayerControls { get; private set; }
 		public PlayerInput PlayerInput { get; private set; }
 
-		public AssetsRepository AssetsRepository;
+		public GameControllerConfig GameControllerConfig;
 		public TowerLevelInputController LevelInputController;
+
+		public PlaythroughData CurrentPlaythrough { get; private set; }
+		[SerializeReference] private PlaythroughData m_DebugPlaythroughData;
 
 		public GameObject UI;
 
-		public TowerLevelData NewGameData;
-
 		public static GameController Instance { get; private set; }
+		public static GameControllerConfig Config => Instance != null ? Instance.GameControllerConfig : null;
 
 		public TowerLevelController TowerLevel { get; private set; }
 
@@ -37,8 +38,8 @@ namespace TetrisTower.Game
 			DontDestroyOnLoad(gameObject);
 
 			Converters = new Newtonsoft.Json.JsonConverter[] {
-				new BlockTypeConverter(AssetsRepository),
-				new GridShapeTemplateConverter(AssetsRepository),
+				new BlockTypeConverter(GameControllerConfig.AssetsRepository),
+				new GridShapeTemplateConverter(GameControllerConfig.AssetsRepository),
 			};
 
 			PlayerControls = new PlayerControls();
@@ -55,10 +56,11 @@ namespace TetrisTower.Game
 
 		void Start()
 		{
+
 			// For Debug
 			var towerLevel = FindObjectOfType<TowerLevelController>();
 			if (towerLevel) {
-				InitializeLevel(towerLevel, NewGameData);
+				InitializeLevel(towerLevel, Config.NewGameData);
 			}
 		}
 
@@ -76,18 +78,21 @@ namespace TetrisTower.Game
 			PlayerControls.UI.ResumeLevel.performed += TrySwitchToLevel;
 		}
 
-		public void StartNewGame(TowerLevelData levelData)
+		public void StartNewGame(PlaythroughData playthroughData)
 		{
 			// TODO: Start new game.
 		}
 
-		private void InitializeLevel(TowerLevelController towerLevel, TowerLevelData data)
+		private void InitializeLevel(TowerLevelController towerLevel, PlaythroughData playthrough)
 		{
+			CurrentPlaythrough = m_DebugPlaythroughData = playthrough;
+
 			TowerLevel = towerLevel;
-			TowerLevel.Init(data);
+			TowerLevel.Init(playthrough.TowerLevel);
 
 			var levelInput = towerLevel.GetComponent<TowerLevelInputController>();
 
+			levelInput.FallSpeedup = Config.FallSpeedup;
 			levelInput.Init(TowerLevel, SwitchInputToUI);
 			PlayerControls.LevelGame.SetCallbacks(levelInput);
 			SwitchInputToLevelGame();
@@ -138,7 +143,7 @@ namespace TetrisTower.Game
 		string m_DebugSave;
 		void Serialize()
 		{
-			m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(TowerLevel.LevelData, Converters);
+			m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(CurrentPlaythrough, Converters);
 			Debug.Log(m_DebugSave);
 		}
 
@@ -147,8 +152,11 @@ namespace TetrisTower.Game
 			if (string.IsNullOrEmpty(m_DebugSave))
 				return;
 
-			NewGameData = Newtonsoft.Json.JsonConvert.DeserializeObject<TowerLevelData>(m_DebugSave, Converters);
-			Start();
+			var playthrough = m_DebugPlaythroughData = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(m_DebugSave, Converters);
+			var towerLevel = FindObjectOfType<TowerLevelController>();
+			if (towerLevel) {
+				InitializeLevel(towerLevel, playthrough);
+			}
 		}
 
 		#endregion

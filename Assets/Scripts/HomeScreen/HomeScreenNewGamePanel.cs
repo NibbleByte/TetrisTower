@@ -10,7 +10,7 @@ namespace TetrisTower.HomeScreen
 		public void StartNewGame()
 		{
 			if (GameController.Instance) {
-				GameController.Instance.StartNewGame(GameController.Instance.NewGameData);
+				GameController.Instance.StartNewGame(GameController.Config.NewGameData);
 			}
 		}
 	}

@@ -26,4 +26,11 @@ namespace TetrisTower.TowerLevels
 		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), column);
 		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);
 	}
+
+#if UNITY_EDITOR
+	[UnityEditor.CustomPropertyDrawer(typeof(TowerLevelData))]
+	public class TowerLevelDataDrawer : Tools.SerializeReferenceCreatorDrawer<TowerLevelData>
+	{
+	}
+#endif
 }
