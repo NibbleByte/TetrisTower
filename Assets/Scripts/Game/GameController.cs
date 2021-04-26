@@ -33,10 +33,6 @@ namespace TetrisTower.Game
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
 
-		}
-
-		void Start()
-		{
 			PlayerControls = new PlayerControls();
 
 			var gameInputObject = Instantiate(Config.GameInputPrefab, transform);
@@ -50,7 +46,15 @@ namespace TetrisTower.Game
 
 			UI.SetActive(true);
 
-			BootGameFromCurrentScene();
+		}
+
+		void Start()
+		{
+			// Boot game from current scene
+			var towerLevel = GameObject.FindGameObjectWithTag("TowerLevel");
+			if (towerLevel) {
+				InitializeLevel(towerLevel.GetComponent<TowerLevelController>(), Config.NewGameData);
+			}
 		}
 
 		void OnEnable()
@@ -65,14 +69,6 @@ namespace TetrisTower.Game
 			//PlayerControls.Disable();
 			PlayerInput.DeactivateInput();
 			PlayerControls.UI.ResumeLevel.performed += TrySwitchToLevel;
-		}
-
-		private void BootGameFromCurrentScene()
-		{
-			var towerLevel = GameObject.FindGameObjectWithTag("TowerLevel");
-			if (towerLevel) {
-				InitializeLevel(towerLevel.GetComponent<TowerLevelController>(), Config.NewGameData);
-			}
 		}
 
 		public void StartNewGame(PlaythroughData playthroughData)
