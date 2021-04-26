@@ -9,9 +9,16 @@ namespace TetrisTower.Game
 	{
 		public AssetsRepository AssetsRepository;
 
+		public GameObject GameInputPrefab;
+
 		public float FallSpeedup = 40f;
 
-		[SerializeField] private PlaythroughData m_NewGameData;
+		public Newtonsoft.Json.JsonConverter[] Converters => new Newtonsoft.Json.JsonConverter[] {
+				new BlockTypeConverter(AssetsRepository),
+				new GridShapeTemplateConverter(AssetsRepository),
+		};
+
+	[SerializeField] private PlaythroughData m_NewGameData;
 		public PlaythroughData NewGameData
 		{
 			get {

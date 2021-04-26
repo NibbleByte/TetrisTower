@@ -1,6 +1,5 @@
 using TetrisTower.Input;
 using TetrisTower.TowerLevels;
-using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
@@ -9,11 +8,10 @@ namespace TetrisTower.Game
 {
 	public class GameController : MonoBehaviour
 	{
+		public GameControllerConfig GameControllerConfig;
+
 		public PlayerControls PlayerControls { get; private set; }
 		public PlayerInput PlayerInput { get; private set; }
-
-		public GameControllerConfig GameControllerConfig;
-		public TowerLevelInputController LevelInputController;
 
 		public PlaythroughData CurrentPlaythrough { get; private set; }
 		[SerializeReference] private PlaythroughData m_DebugPlaythroughData;
@@ -25,8 +23,6 @@ namespace TetrisTower.Game
 
 		public TowerLevelController TowerLevel { get; private set; }
 
-		public Newtonsoft.Json.JsonConverter[] Converters { get; private set; }
-
 		void Awake()
 		{
 			if (Instance) {
@@ -37,31 +33,24 @@ namespace TetrisTower.Game
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
 
-			Converters = new Newtonsoft.Json.JsonConverter[] {
-				new BlockTypeConverter(GameControllerConfig.AssetsRepository),
-				new GridShapeTemplateConverter(GameControllerConfig.AssetsRepository),
-			};
-
-			PlayerControls = new PlayerControls();
-
-			// Use PlayerInput to properly assign input to users. Not useful at the moment but may be for future references.
-			PlayerInput = GetComponent<PlayerInput>();
-			PlayerInput.defaultActionMap = PlayerControls.UI.Get().name;
-			PlayerInput.actions = PlayerControls.asset;
-
-			PlayerInput.uiInputModule = FindObjectOfType<InputSystemUIInputModule>();
-
-			UI.SetActive(true);
 		}
 
 		void Start()
 		{
+			PlayerControls = new PlayerControls();
 
-			// For Debug
-			var towerLevel = FindObjectOfType<TowerLevelController>();
-			if (towerLevel) {
-				InitializeLevel(towerLevel, Config.NewGameData);
-			}
+			var gameInputObject = Instantiate(Config.GameInputPrefab, transform);
+
+			// Use PlayerInput to properly assign input to users. Not useful at the moment but may be for future references.
+			PlayerInput = gameInputObject.GetComponentInChildren<PlayerInput>();
+			PlayerInput.defaultActionMap = PlayerControls.UI.Get().name;
+			PlayerInput.actions = PlayerControls.asset;
+
+			PlayerInput.uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
+
+			UI.SetActive(true);
+
+			BootGameFromCurrentScene();
 		}
 
 		void OnEnable()
@@ -76,6 +65,14 @@ namespace TetrisTower.Game
 			//PlayerControls.Disable();
 			PlayerInput.DeactivateInput();
 			PlayerControls.UI.ResumeLevel.performed += TrySwitchToLevel;
+		}
+
+		private void BootGameFromCurrentScene()
+		{
+			var towerLevel = GameObject.FindGameObjectWithTag("TowerLevel");
+			if (towerLevel) {
+				InitializeLevel(towerLevel.GetComponent<TowerLevelController>(), Config.NewGameData);
+			}
 		}
 
 		public void StartNewGame(PlaythroughData playthroughData)
@@ -143,7 +140,7 @@ namespace TetrisTower.Game
 		string m_DebugSave;
 		void Serialize()
 		{
-			m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(CurrentPlaythrough, Converters);
+			m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(CurrentPlaythrough, Config.Converters);
 			Debug.Log(m_DebugSave);
 		}
 
@@ -152,7 +149,7 @@ namespace TetrisTower.Game
 			if (string.IsNullOrEmpty(m_DebugSave))
 				return;
 
-			var playthrough = m_DebugPlaythroughData = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(m_DebugSave, Converters);
+			var playthrough = m_DebugPlaythroughData = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(m_DebugSave, Config.Converters);
 			var towerLevel = FindObjectOfType<TowerLevelController>();
 			if (towerLevel) {
 				InitializeLevel(towerLevel, playthrough);
