@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TetrisTower.Core;
 using TetrisTower.Game;
 using UnityEngine;
 
@@ -9,10 +10,12 @@ namespace TetrisTower.HomeScreen
 	{
 		public void StartNewGame()
 		{
-			var supervisor = GetComponentInParent<LevelSupervisorComponent>().LevelSupervisor;
+			var supervisorComponent = GetComponentInParent<LevelSupervisorComponent>();
+			var gameContext = supervisorComponent.GetGameContext();
 
-			supervisor.GameContext.SetCurrentPlaythrough(supervisor.GameContext.GameConfig.NewGameData);
-			supervisor.SwitchLevel(new TowerLevels.TowerLevelSupervisor(supervisor.GameContext));
+			gameContext.SetCurrentPlaythrough(gameContext.GameConfig.NewGameData);
+
+			supervisorComponent.SwitchLevel(new TowerLevels.TowerLevelSupervisor(gameContext));
 		}
 	}
 

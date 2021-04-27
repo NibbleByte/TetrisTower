@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
+using TetrisTower.Core;
 using TetrisTower.Game;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace TetrisTower.HomeScreen
 {
-	public class HomeScreenLevelSupervisor : ILevelSupervisor
+	public class HomeScreenLevelSupervisor : ILevelSupervisor, IGameContextProvider
 	{
 		public GameContext GameContext { get; private set; }
 

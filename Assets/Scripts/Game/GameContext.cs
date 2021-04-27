@@ -7,6 +7,11 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.Game
 {
+	public interface IGameContextProvider
+	{
+		GameContext GameContext { get; }
+	}
+
 	[Serializable]
 	public class GameContext
 	{
@@ -16,7 +21,7 @@ namespace TetrisTower.Game
 			PlayerControls = controls;
 			PlayerInput = input;
 
-			m_CoroutineScheduler = coroutineScheduler;
+			CoroutineScheduler = coroutineScheduler;
 		}
 
 		public GameConfig GameConfig { get; }
@@ -27,7 +32,7 @@ namespace TetrisTower.Game
 		public PlaythroughData CurrentPlaythrough { get; private set; }
 		[SerializeReference] private PlaythroughData m_DebugPlaythroughData;
 
-		private readonly CoroutineScheduler m_CoroutineScheduler;
+		public CoroutineScheduler CoroutineScheduler { get; }
 
 		public void SetCurrentPlaythrough(PlaythroughData playthrough)
 		{
@@ -36,7 +41,15 @@ namespace TetrisTower.Game
 
 		public Coroutine StartCoroutine(IEnumerator routine)
 		{
-			return m_CoroutineScheduler.StartCoroutine(routine);
+			return CoroutineScheduler.StartCoroutine(routine);
+		}
+	}
+
+	public static class GameUtils
+	{
+		public static GameContext GetGameContext(this LevelSupervisorComponent supervisorComponent)
+		{
+			return supervisorComponent.CastSupervisor<IGameContextProvider>().GameContext;
 		}
 	}
 }

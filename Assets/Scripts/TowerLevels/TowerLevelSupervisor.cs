@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TetrisTower.Core;
 using TetrisTower.Game;
 using TetrisTower.Input;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerLevelSupervisor : ILevelSupervisor
+	public class TowerLevelSupervisor : ILevelSupervisor, IGameContextProvider
 	{
 		public GameContext GameContext { get; private set; }
 		private PlayerControls m_PlayerControls => GameContext.PlayerControls;
