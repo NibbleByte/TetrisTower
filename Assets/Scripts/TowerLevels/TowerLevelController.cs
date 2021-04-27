@@ -193,6 +193,10 @@ namespace TetrisTower.TowerLevels
 
 		void Update()
 		{
+			// Wait for level to be initialized.
+			if (LevelData == null)
+				return;
+
 			if (LevelData.FallingShape != null) {
 				UpdateFallShape();
 

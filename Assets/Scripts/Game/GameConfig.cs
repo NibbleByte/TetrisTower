@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TetrisTower.Game
 {
 	[CreateAssetMenu(fileName = "UnknownGameSettings", menuName = "Tetris Tower/Game Settings")]
-	public class GameControllerConfig : ScriptableObject
+	public class GameConfig : ScriptableObject
 	{
 		public AssetsRepository AssetsRepository;
 

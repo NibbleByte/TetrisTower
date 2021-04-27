@@ -9,9 +9,10 @@ namespace TetrisTower.HomeScreen
 	{
 		public void StartNewGame()
 		{
-			if (GameController.Instance) {
-				GameController.Instance.StartNewGame(GameController.Config.NewGameData);
-			}
+			var supervisor = GetComponentInParent<LevelSupervisorComponent>().LevelSupervisor;
+
+			supervisor.GameContext.SetCurrentPlaythrough(supervisor.GameContext.GameConfig.NewGameData);
+			supervisor.SwitchLevel(new TowerLevels.TowerLevelSupervisor(supervisor.GameContext));
 		}
 	}
 

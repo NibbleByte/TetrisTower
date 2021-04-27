@@ -435,7 +435,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &774594911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -806,7 +806,7 @@ GameObject:
   - component: {fileID: 1177382887}
   - component: {fileID: 1177382886}
   m_Layer: 0
-  m_Name: GameController
+  m_Name: GameStarter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -824,10 +824,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68b42f3555c31f34bbb2b4950c84bd40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameControllerConfig: {fileID: 11400000, guid: afd2790b73a91f8468fb087a28f729ac, type: 2}
-  m_DebugPlaythroughData:
+  GameConfig: {fileID: 11400000, guid: afd2790b73a91f8468fb087a28f729ac, type: 2}
+  GameContext:
     id: 0
-  UI: {fileID: 774594910}
   references:
     version: 1
     00000000:
