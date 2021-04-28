@@ -47,9 +47,9 @@ namespace TetrisTower.Game
 
 	public static class GameUtils
 	{
-		public static GameContext GetGameContext(this LevelSupervisorComponent supervisorComponent)
+		public static GameContext GetGameContext(this LevelSupervisorsManager supervisorsManager)
 		{
-			return supervisorComponent.CastSupervisor<IGameContextProvider>().GameContext;
+			return supervisorsManager.CastSupervisor<IGameContextProvider>().GameContext;
 		}
 	}
 }

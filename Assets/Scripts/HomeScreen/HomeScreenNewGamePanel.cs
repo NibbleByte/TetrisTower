@@ -10,12 +10,11 @@ namespace TetrisTower.HomeScreen
 	{
 		public void StartNewGame()
 		{
-			var supervisorComponent = GetComponentInParent<LevelSupervisorComponent>();
-			var gameContext = supervisorComponent.GetGameContext();
+			var gameContext = LevelSupervisorsManager.Instance.GetGameContext();
 
 			gameContext.SetCurrentPlaythrough(gameContext.GameConfig.NewGameData);
 
-			supervisorComponent.SwitchLevel(new TowerLevels.TowerLevelSupervisor(gameContext));
+			LevelSupervisorsManager.Instance.SwitchLevel(new TowerLevels.TowerLevelSupervisor(gameContext));
 		}
 	}
 

@@ -24,8 +24,6 @@ namespace TetrisTower.HomeScreen
 			if (homeScreenLevel == null) {
 				throw new Exception("Couldn't find level in the scene.");
 			}
-
-			LevelSupervisorComponent.AttachTo(homeScreenLevel, this);
 		}
 
 		public IEnumerator Unload()

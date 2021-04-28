@@ -1,5 +1,6 @@
 using System.Collections;
 using TetrisTower.Core;
+using TetrisTower.HomeScreen;
 using TetrisTower.Input;
 using TetrisTower.TowerLevels;
 using UnityEngine;
@@ -42,6 +43,8 @@ namespace TetrisTower.Game
 			var scheduler = gameObject.AddComponent<CoroutineScheduler>();
 
 			GameContext = new GameContext(GameConfig, playerControls, playerInput, scheduler);
+
+			gameObject.AddComponent<LevelSupervisorsManager>();
 		}
 
 		void Start()
@@ -50,14 +53,14 @@ namespace TetrisTower.Game
 			var towerLevel = GameObject.FindGameObjectWithTag("TowerLevel");
 			if (towerLevel) {
 				GameContext.SetCurrentPlaythrough(GameConfig.NewGameData);
-				GameContext.StartCoroutine(new TowerLevelSupervisor(GameContext).Load());
+				LevelSupervisorsManager.Instance.SwitchLevel(new TowerLevelSupervisor(GameContext));
 				return;
 			}
 
 			var homescreenLevel = GameObject.FindGameObjectWithTag("HomescreenLevel");
 			if (homescreenLevel) {
 				GameContext.SetCurrentPlaythrough(null);
-				GameContext.StartCoroutine(new TowerLevelSupervisor(GameContext).Load());
+				LevelSupervisorsManager.Instance.SwitchLevel(new HomeScreenLevelSupervisor(GameContext));
 				return;
 			}
 		}

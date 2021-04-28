@@ -25,14 +25,14 @@ namespace TetrisTower.TowerLevels
 
 		public IEnumerator Load()
 		{
-			yield return SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Single);
+			if (SceneManager.GetActiveScene().name != "GameScene") {
+				yield return SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Single);
+			}
 
 			var towerLevel = GameObject.FindGameObjectWithTag("TowerLevel");
 			if (towerLevel == null) {
 				throw new Exception("Couldn't find level in the scene.");
 			}
-
-			LevelSupervisorComponent.AttachTo(towerLevel, this);
 
 			m_TowerLevelController = towerLevel.GetComponent<TowerLevelController>();
 			m_TowerLevelController.Init(GameContext.CurrentPlaythrough.TowerLevel);
