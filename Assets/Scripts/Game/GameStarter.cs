@@ -50,8 +50,7 @@ namespace TetrisTower.Game
 		void Start()
 		{
 			// Boot game from current scene
-			var towerLevel = GameObject.FindGameObjectWithTag("TowerLevel");
-			if (towerLevel) {
+			if (GameObject.FindObjectOfType<TowerLevelController>()) {
 				GameContext.SetCurrentPlaythrough(GameConfig.NewGameData);
 				LevelSupervisorsManager.Instance.SwitchLevel(new TowerLevelSupervisor(GameContext));
 				return;

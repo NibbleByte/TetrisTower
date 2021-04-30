@@ -435,7 +435,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &774594911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -542,10 +542,9 @@ GameObject:
   - component: {fileID: 956372780}
   - component: {fileID: 956372779}
   - component: {fileID: 956372782}
-  - component: {fileID: 956372783}
   m_Layer: 0
   m_Name: LevelController
-  m_TagString: TowerLevel
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -620,19 +619,6 @@ MonoBehaviour:
     version: 1
     00000000:
       type: {class: , ns: , asm: }
---- !u!114 &956372783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 956372778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 974e7c409cc035842a8738214a3361cf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FallSpeedup: 40
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

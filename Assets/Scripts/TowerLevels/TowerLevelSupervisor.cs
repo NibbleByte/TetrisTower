@@ -2,21 +2,16 @@ using System;
 using System.Collections;
 using TetrisTower.Core;
 using TetrisTower.Game;
-using TetrisTower.Input;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace TetrisTower.TowerLevels
 {
 	public class TowerLevelSupervisor : ILevelSupervisor, IGameContextProvider
 	{
+		public LevelStateStack StatesStack { get; private set; }
+
 		public GameContext GameContext { get; private set; }
-		private PlayerControls m_PlayerControls => GameContext.PlayerControls;
-		private PlayerInput m_PlayerInput => GameContext.PlayerInput;
-
-		private TowerLevelController m_TowerLevelController;
-
 
 		public TowerLevelSupervisor(GameContext gameContext)
 		{
@@ -29,50 +24,25 @@ namespace TetrisTower.TowerLevels
 				yield return SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Single);
 			}
 
-			var towerLevel = GameObject.FindGameObjectWithTag("TowerLevel");
-			if (towerLevel == null) {
-				throw new Exception("Couldn't find level in the scene.");
-			}
+			var levelController = GameObject.FindObjectOfType<TowerLevelController>();
+			levelController.Init(GameContext.CurrentPlaythrough.TowerLevel);
 
-			m_TowerLevelController = towerLevel.GetComponent<TowerLevelController>();
-			m_TowerLevelController.Init(GameContext.CurrentPlaythrough.TowerLevel);
+			var uiController = GameObject.FindObjectOfType<TowerLevelUIController>(true);
+			uiController.SetPause(false);
 
-			var levelInput = towerLevel.GetComponent<TowerLevelInputController>();
+			StatesStack = new LevelStateStack(
+				GameContext.GameConfig,
+				GameContext.PlayerControls,
+				levelController,
+				uiController
+				);
 
-			levelInput.FallSpeedup = GameContext.GameConfig.FallSpeedup;
-			levelInput.Init(m_TowerLevelController, SwitchInputToUI);
-			m_PlayerControls.LevelGame.SetCallbacks(levelInput);
-
-			m_PlayerControls.UI.ResumeLevel.performed += OnResumeInputRequest;
-
-			SwitchInputToLevelGame();
+			StatesStack.SetState(new TowerPlayState());
 		}
 
 		public IEnumerator Unload()
 		{
-			m_PlayerControls.UI.ResumeLevel.performed -= OnResumeInputRequest;
-
 			yield break;
-		}
-
-
-		public void SwitchInputToLevelGame()
-		{
-			m_PlayerInput.currentActionMap = m_PlayerControls.LevelGame.Get();
-			m_TowerLevelController.ResumeLevel();
-			//UI.SetActive(false);
-		}
-
-		public void SwitchInputToUI()
-		{
-			m_PlayerInput.currentActionMap = m_PlayerControls.UI.Get();
-			m_TowerLevelController.PauseLevel();
-			//UI.SetActive(true);
-		}
-
-		private void OnResumeInputRequest(InputAction.CallbackContext obj)
-		{
-			SwitchInputToLevelGame();
 		}
 	}
 }

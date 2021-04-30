@@ -11,6 +11,7 @@ namespace TetrisTower.Core
 	public class LevelSupervisorsManager : MonoBehaviour
 	{
 		public ILevelSupervisor LevelSupervisor { get; private set; }
+		public LevelStateStack LevelStatesStack => LevelSupervisor?.StatesStack;
 
 		public T CastSupervisor<T>() => (T) LevelSupervisor;
 
@@ -19,7 +20,7 @@ namespace TetrisTower.Core
 		void Awake()
 		{
 			if (Instance) {
-				GameObject.DestroyImmediate(gameObject);
+				GameObject.DestroyImmediate(this);
 				return;
 			}
 

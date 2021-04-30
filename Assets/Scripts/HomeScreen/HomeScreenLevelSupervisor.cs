@@ -9,6 +9,8 @@ namespace TetrisTower.HomeScreen
 {
 	public class HomeScreenLevelSupervisor : ILevelSupervisor, IGameContextProvider
 	{
+		public LevelStateStack StatesStack { get; private set; }
+
 		public GameContext GameContext { get; private set; }
 
 		public HomeScreenLevelSupervisor(GameContext gameContext)
@@ -20,10 +22,10 @@ namespace TetrisTower.HomeScreen
 		{
 			yield return SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);
 
-			var homeScreenLevel = GameObject.FindGameObjectWithTag("HomeScreenLevel");
-			if (homeScreenLevel == null) {
-				throw new Exception("Couldn't find level in the scene.");
-			}
+			StatesStack = new LevelStateStack(
+				GameContext.GameConfig,
+				GameContext.PlayerControls
+				);
 		}
 
 		public IEnumerator Unload()

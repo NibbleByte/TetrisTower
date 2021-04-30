@@ -2,7 +2,7 @@
     "name": "PlayerControls",
     "maps": [
         {
-            "name": "LevelGame",
+            "name": "TowerLevelGame",
             "id": "9cb11c57-6035-4442-b6b4-fb85c51dc04a",
             "actions": [
                 {
@@ -245,6 +245,44 @@
             ]
         },
         {
+            "name": "TowerLevelUI",
+            "id": "8e96621b-511e-4f34-840f-669ae8e49f79",
+            "actions": [
+                {
+                    "name": "ResumeLevel",
+                    "type": "Button",
+                    "id": "c654e0ec-a54d-42a9-b103-e46668621b3f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "4daa4a06-6454-4861-a7f7-4de4c52d9482",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "ResumeLevel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c1c64fe5-de66-4689-ac6b-b441cae82cee",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "ResumeLevel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
             "name": "UI",
             "id": "36699a9d-0fc8-428a-941c-cd7c0d64be36",
             "actions": [
@@ -325,14 +363,6 @@
                     "type": "PassThrough",
                     "id": "90d54a8c-9c4d-47ec-9510-e5322715eff2",
                     "expectedControlType": "Quaternion",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "ResumeLevel",
-                    "type": "Button",
-                    "id": "3c955259-d517-4b40-bc06-4fd6d537e518",
-                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
                 }
@@ -676,28 +706,6 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "RightClick",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b04e469b-df91-421d-a79f-6dcca460d404",
-                    "path": "<Keyboard>/escape",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "ResumeLevel",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e637e39a-7e4f-4180-8073-bf5ec7ae365e",
-                    "path": "<Gamepad>/start",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "ResumeLevel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
