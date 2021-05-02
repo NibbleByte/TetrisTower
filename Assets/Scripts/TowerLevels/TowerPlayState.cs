@@ -1,3 +1,4 @@
+using System.Collections;
 using TetrisTower.Core;
 using TetrisTower.Game;
 using TetrisTower.Input;
@@ -11,7 +12,7 @@ namespace TetrisTower.TowerLevels
 		private GameConfig m_GameConfig;
 		private TowerLevelController m_LevelController;
 
-		public void EnterState(LevelStateContextReferences contextReferences)
+		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_PlayerControls);
 			contextReferences.SetByType(out m_LevelController);
@@ -19,12 +20,16 @@ namespace TetrisTower.TowerLevels
 
 			m_PlayerControls.TowerLevelGame.SetCallbacks(this);
 			m_PlayerControls.TowerLevelGame.Enable();
+
+			yield break;
 		}
 
-		public void ExitState()
+		public IEnumerator ExitState()
 		{
 			m_PlayerControls.TowerLevelGame.SetCallbacks(null);
 			m_PlayerControls.TowerLevelGame.Disable();
+
+			yield break;
 		}
 
 		public void OnMoveShapeLeft(InputAction.CallbackContext context)
@@ -65,7 +70,7 @@ namespace TetrisTower.TowerLevels
 		public void OnPauseLevel(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				LevelSupervisorsManager.Instance.LevelStatesStack.SetState(new TowerPausedState());
+				LevelSupervisorsManager.Instance.SetLevelState(new TowerPausedState());
 			}
 		}
 	}

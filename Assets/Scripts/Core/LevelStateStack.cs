@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace TetrisTower.Core
@@ -10,8 +11,8 @@ namespace TetrisTower.Core
 	/// </summary>
 	public interface ILevelState
 	{
-		void EnterState(LevelStateContextReferences contextReferences);
-		void ExitState();
+		IEnumerator EnterState(LevelStateContextReferences contextReferences);
+		IEnumerator ExitState();
 	}
 
 	public enum StackAction
@@ -70,63 +71,63 @@ namespace TetrisTower.Core
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
 		/// </summary>
-		public void PushState(ILevelState state)
+		public IEnumerator PushStateCrt(ILevelState state)
 		{
-			ChangeState(state, StackAction.Push);
+			yield return ChangeStateCrt(state, StackAction.Push);
 		}
 
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// </summary>
-		public void SetState(ILevelState state)
+		public IEnumerator SetStateCrt(ILevelState state)
 		{
-			ChangeState(state, StackAction.ClearAndPush);
+			yield return ChangeStateCrt(state, StackAction.ClearAndPush);
 		}
 
 		/// <summary>
 		/// Pop a single state from the state stack.
 		/// </summary>
-		public void PopState()
+		public IEnumerator PopStateCrt()
 		{
-			PopStates(1);
+			yield return PopStatesCrt(1);
 		}
 
 		/// <summary>
 		/// Pops multiple states from the state stack.
 		/// </summary>
-		public void PopStates(int count)
+		public IEnumerator PopStatesCrt(int count)
 		{
 			count = Math.Max(1, count);
 
 			if (StackedStatesCount < count) {
 				UnityEngine.Debug.LogError("Trying to pop states while there aren't any stacked ones.");
-				return;
+				yield break;
 			}
 
-			CurrentState.ExitState();
+			yield return CurrentState.ExitState();
 
 			for (int i = 0; i < count; ++i) {
 				m_StackedStates.Pop();
 			}
 
-			CurrentState?.EnterState(ContextReferences);
+			yield return CurrentState?.EnterState(ContextReferences);
 		}
 
 		/// <summary>
 		/// Pop and push back the state at the top. Will trigger changing state events.
 		/// </summary>
-		public void ReenterCurrentState()
+		public IEnumerator ReenterCurrentStateCrt()
 		{
 			// Re-insert the top state to trigger changing events.
-			ChangeState(CurrentState, StackAction.ReplaceTop);
+			yield return ChangeStateCrt(CurrentState, StackAction.ReplaceTop);
 		}
 
 		/// <summary>
 		/// Exits the state and leaves the stack empty.
 		/// </summary>
-		public void ClearStackAndState()
+		public IEnumerator ClearStackAndStateCrt()
 		{
-			PopStates(StackedStatesCount);
+			yield return PopStatesCrt(StackedStatesCount);
 		}
 
 		/// <summary>
@@ -134,7 +135,7 @@ namespace TetrisTower.Core
 		/// Will notify the state itself.
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// </summary>
-		public void ChangeState(ILevelState state, StackAction stackAction)
+		public IEnumerator ChangeStateCrt(ILevelState state, StackAction stackAction)
 		{
 			// Sanity check.
 			if (m_StackedStates.Count > 7 && stackAction == StackAction.Push) {
@@ -143,13 +144,17 @@ namespace TetrisTower.Core
 
 			if (m_ChangingStates) {
 				m_PendingStateChanges.Enqueue(new PendingStateArgs(state, stackAction));
-				return;
+
+				// Wait till all the state switching has finished. That means that you may end up in a state that is not the one you requested.
+				while(m_PendingStateChanges.Count > 0) {
+					yield return null;
+				}
 
 			} else {
 				m_ChangingStates = true;
 			}
 
-			CurrentState?.ExitState();
+			yield return CurrentState?.ExitState();
 
 			if (stackAction == StackAction.ClearAndPush) {
 				m_StackedStates.Clear();
@@ -161,7 +166,7 @@ namespace TetrisTower.Core
 
 			m_StackedStates.Push(state);
 
-			CurrentState.EnterState(ContextReferences);
+			yield return CurrentState.EnterState(ContextReferences);
 
 			m_ChangingStates = false;
 
@@ -169,7 +174,7 @@ namespace TetrisTower.Core
 			if (m_PendingStateChanges.Count > 0) {
 				var stateArgs = m_PendingStateChanges.Dequeue();
 
-				ChangeState(stateArgs.State, stateArgs.StackAction);
+				yield return ChangeStateCrt(stateArgs.State, stateArgs.StackAction);
 			}
 		}
 	}

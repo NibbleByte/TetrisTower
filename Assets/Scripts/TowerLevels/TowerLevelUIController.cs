@@ -16,7 +16,7 @@ namespace TetrisTower.TowerLevels
 
 		public void ResumeLevel()
 		{
-			LevelSupervisorsManager.Instance.LevelStatesStack.SetState(new TowerPlayState());
+			LevelSupervisorsManager.Instance.SetLevelState(new TowerPlayState());
 		}
 
 		public void ExitToHomeScreen()

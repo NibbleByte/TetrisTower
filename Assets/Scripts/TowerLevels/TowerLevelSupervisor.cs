@@ -34,7 +34,7 @@ namespace TetrisTower.TowerLevels
 				uiController
 				);
 
-			StatesStack.SetState(new TowerPlayState());
+			yield return StatesStack.SetStateCrt(new TowerPlayState());
 		}
 
 		public IEnumerator Unload()
