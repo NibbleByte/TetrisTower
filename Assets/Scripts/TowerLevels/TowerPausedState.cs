@@ -18,16 +18,18 @@ namespace TetrisTower.TowerLevels
 
 			m_PlayerControls.TowerLevelUI.SetCallbacks(this);
 			m_PlayerControls.TowerLevelUI.Enable();
-			m_UIController.SetPause(true);
+			m_PlayerControls.UI.Enable();
+			m_UIController.ShowPausedPanel(true);
 
 			m_LevelController.PauseLevel();
 		}
 
 		public void ExitState()
 		{
-			m_UIController.SetPause(false);
+			m_UIController.ShowPausedPanel(false);
 			m_PlayerControls.TowerLevelUI.SetCallbacks(null);
 			m_PlayerControls.TowerLevelUI.Disable();
+			m_PlayerControls.UI.Disable();
 
 			m_LevelController.ResumeLevel();
 		}

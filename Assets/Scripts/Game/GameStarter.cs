@@ -33,16 +33,26 @@ namespace TetrisTower.Game
 
 			var gameInputObject = Instantiate(GameConfig.GameInputPrefab, transform);
 
-			// Use PlayerInput to properly assign input to users. Not useful at the moment but may be for future references.
-			var playerInput = gameInputObject.GetComponentInChildren<PlayerInput>();
-			playerInput.defaultActionMap = playerControls.UI.Get().name;
-			playerInput.actions = playerControls.asset;
+			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
+			uiInputModule.actionsAsset = playerControls.asset;
 
-			playerInput.uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
+			uiInputModule.point = InputActionReference.Create(playerControls.UI.Point);
+			uiInputModule.leftClick = InputActionReference.Create(playerControls.UI.Click);
+			uiInputModule.middleClick = InputActionReference.Create(playerControls.UI.MiddleClick);
+			uiInputModule.rightClick = InputActionReference.Create(playerControls.UI.RightClick);
+			uiInputModule.scrollWheel = InputActionReference.Create(playerControls.UI.ScrollWheel);
+			uiInputModule.move = InputActionReference.Create(playerControls.UI.Navigate);
+			uiInputModule.submit = InputActionReference.Create(playerControls.UI.Submit);
+			uiInputModule.cancel = InputActionReference.Create(playerControls.UI.Cancel);
+			uiInputModule.trackedDevicePosition = InputActionReference.Create(playerControls.UI.TrackedDevicePosition);
+			uiInputModule.trackedDeviceOrientation = InputActionReference.Create(playerControls.UI.TrackedDeviceOrientation);
+
+			// Make sure no input is enabled when starting level (including UI).
+			playerControls.Disable();
 
 			var scheduler = gameObject.AddComponent<CoroutineScheduler>();
 
-			GameContext = new GameContext(GameConfig, playerControls, playerInput, scheduler);
+			GameContext = new GameContext(GameConfig, playerControls, scheduler);
 
 			gameObject.AddComponent<LevelSupervisorsManager>();
 		}
@@ -61,22 +71,6 @@ namespace TetrisTower.Game
 				GameContext.SetCurrentPlaythrough(null);
 				LevelSupervisorsManager.Instance.SwitchLevel(new HomeScreenLevelSupervisor(GameContext));
 				return;
-			}
-		}
-
-		void OnEnable()
-		{
-			if (GameContext != null) {
-				//PlayerControls.Enable();
-				GameContext.PlayerInput.ActivateInput();
-			}
-		}
-
-		private void OnDisable()
-		{
-			if (GameContext != null) {
-				//PlayerControls.Disable();
-				GameContext.PlayerInput.DeactivateInput();
 			}
 		}
 

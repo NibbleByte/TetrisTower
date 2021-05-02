@@ -772,7 +772,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: Resume
 --- !u!222 &1155687242
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -923,7 +923,7 @@ GameObject:
   - component: {fileID: 1612941645}
   - component: {fileID: 1612941644}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ResumeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -992,7 +992,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1612941645}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 774594915}
+        m_TargetAssemblyTypeName: TetrisTower.TowerLevels.TowerLevelUIController,
+          Assembly-CSharp
+        m_MethodName: ResumeLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1612941645
 MonoBehaviour:
   m_ObjectHideFlags: 0

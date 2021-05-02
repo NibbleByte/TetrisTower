@@ -15,11 +15,10 @@ namespace TetrisTower.Game
 	[Serializable]
 	public class GameContext
 	{
-		public GameContext(GameConfig config, PlayerControls controls, PlayerInput input, CoroutineScheduler coroutineScheduler)
+		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
 		{
 			GameConfig = config;
 			PlayerControls = controls;
-			PlayerInput = input;
 
 			CoroutineScheduler = coroutineScheduler;
 		}
@@ -27,7 +26,6 @@ namespace TetrisTower.Game
 		public GameConfig GameConfig { get; }
 
 		public PlayerControls PlayerControls { get; }
-		public PlayerInput PlayerInput { get; }
 
 		public PlaythroughData CurrentPlaythrough { get; private set; }
 		[SerializeReference] private PlaythroughData m_DebugPlaythroughData;

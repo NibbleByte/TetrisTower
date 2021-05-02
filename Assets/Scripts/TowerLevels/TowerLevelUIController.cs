@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TetrisTower.Core;
 using UnityEngine;
 
 namespace TetrisTower.TowerLevels
@@ -8,9 +9,14 @@ namespace TetrisTower.TowerLevels
 	{
 		public GameObject PausedPanel;
 
-		public void SetPause(bool pause)
+		public void ShowPausedPanel(bool pause)
 		{
 			PausedPanel.SetActive(pause);
+		}
+
+		public void ResumeLevel()
+		{
+			LevelSupervisorsManager.Instance.LevelStatesStack.SetState(new TowerPlayState());
 		}
 	}
 }
