@@ -18,5 +18,10 @@ namespace TetrisTower.TowerLevels
 		{
 			LevelSupervisorsManager.Instance.LevelStatesStack.SetState(new TowerPlayState());
 		}
+
+		public void ExitToHomeScreen()
+		{
+			LevelSupervisorsManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
+		}
 	}
 }

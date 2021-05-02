@@ -10,6 +10,8 @@ namespace TetrisTower.Core
 	/// </summary>
 	public class LevelSupervisorsManager : MonoBehaviour
 	{
+		public IGameContext GameContext { get; private set; }
+
 		public ILevelSupervisor LevelSupervisor { get; private set; }
 		public LevelStateStack LevelStatesStack => LevelSupervisor?.StatesStack;
 
@@ -35,6 +37,11 @@ namespace TetrisTower.Core
 			}
 		}
 
+		public void SetGameContext(IGameContext gameContext)
+		{
+			GameContext = gameContext;
+		}
+
 
 		public void SwitchLevel(ILevelSupervisor nextLevel)
 		{
@@ -44,6 +51,10 @@ namespace TetrisTower.Core
 		public IEnumerator SwitchLevelCrt(ILevelSupervisor nextLevel)
 		{
 			if (LevelSupervisor != null) {
+				if (!LevelStatesStack.IsEmpty) {
+					LevelStatesStack.ClearStackAndState();
+				}
+
 				Debug.Log($"Unloading level supervisor {LevelSupervisor}");
 				yield return LevelSupervisor.Unload();
 			}
@@ -51,7 +62,7 @@ namespace TetrisTower.Core
 			LevelSupervisor = nextLevel;
 
 			Debug.Log($"Loading level supervisor {nextLevel}");
-			yield return nextLevel.Load();
+			yield return nextLevel.Load(GameContext);
 		}
 	}
 }

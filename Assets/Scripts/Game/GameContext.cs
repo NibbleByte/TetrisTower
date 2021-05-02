@@ -7,13 +7,8 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.Game
 {
-	public interface IGameContextProvider
-	{
-		GameContext GameContext { get; }
-	}
-
 	[Serializable]
-	public class GameContext
+	public class GameContext : IGameContext
 	{
 		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
 		{
@@ -40,14 +35,6 @@ namespace TetrisTower.Game
 		public Coroutine StartCoroutine(IEnumerator routine)
 		{
 			return CoroutineScheduler.StartCoroutine(routine);
-		}
-	}
-
-	public static class GameUtils
-	{
-		public static GameContext GetGameContext(this LevelSupervisorsManager supervisorsManager)
-		{
-			return supervisorsManager.CastSupervisor<IGameContextProvider>().GameContext;
 		}
 	}
 }

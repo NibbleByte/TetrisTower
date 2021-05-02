@@ -7,19 +7,16 @@ using UnityEngine.SceneManagement;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerLevelSupervisor : ILevelSupervisor, IGameContextProvider
+	public class TowerLevelSupervisor : ILevelSupervisor
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
 		public GameContext GameContext { get; private set; }
 
-		public TowerLevelSupervisor(GameContext gameContext)
+		public IEnumerator Load(IGameContext gameContext)
 		{
-			GameContext = gameContext;
-		}
+			GameContext = (GameContext)gameContext;
 
-		public IEnumerator Load()
-		{
 			if (SceneManager.GetActiveScene().name != "GameScene") {
 				yield return SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Single);
 			}

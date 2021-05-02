@@ -7,29 +7,36 @@ using UnityEngine.SceneManagement;
 
 namespace TetrisTower.HomeScreen
 {
-	public class HomeScreenLevelSupervisor : ILevelSupervisor, IGameContextProvider
+	public class HomeScreenLevelSupervisor : ILevelSupervisor
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
 		public GameContext GameContext { get; private set; }
 
-		public HomeScreenLevelSupervisor(GameContext gameContext)
+		public IEnumerator Load(IGameContext gameContext)
 		{
-			GameContext = gameContext;
-		}
+			GameContext = (GameContext)gameContext;
 
-		public IEnumerator Load()
-		{
-			yield return SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);
+			if (SceneManager.GetActiveScene().name != "HomeScreenScene") {
+				yield return SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);
+			}
+
+			var levelController = GameObject.FindObjectOfType<HomeScreenController>();
 
 			StatesStack = new LevelStateStack(
 				GameContext.GameConfig,
-				GameContext.PlayerControls
+				GameContext.PlayerControls,
+				levelController
 				);
+
+			// The whole level is UI, so enable it for the whole level.
+			GameContext.PlayerControls.UI.Enable();
 		}
 
 		public IEnumerator Unload()
 		{
+			GameContext.PlayerControls.UI.Disable();
+
 			yield break;
 		}
 	}
