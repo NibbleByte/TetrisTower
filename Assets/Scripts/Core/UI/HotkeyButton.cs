@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace TetrisTower.Core
+namespace TetrisTower.Core.UI
 {
 	/// <summary>
 	/// Put next to or under a UI.Button component to get invoked on specified InputAction.
@@ -21,6 +21,12 @@ namespace TetrisTower.Core
 		{
 			var controls = (LevelSupervisorsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
 
+			if (controls == null) {
+				Debug.LogWarning($"{nameof(HotkeyButton)} button {name} can't be used if Unity Input System is not provided.", this);
+				enabled = false;
+				return;
+			}
+
 			controls.FindAction(m_InputAction.name).performed += OnInputAction;
 		}
 
@@ -32,6 +38,10 @@ namespace TetrisTower.Core
 
 			var controls = (LevelSupervisorsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
 
+			if (controls == null) {
+				return;
+			}
+
 			controls.FindAction(m_InputAction.name).performed -= OnInputAction;
 		}
 
@@ -41,7 +51,7 @@ namespace TetrisTower.Core
 				m_Button = GetComponentInParent<Button>();
 			}
 
-			m_Button.onClick?.Invoke();
+			m_Button.onClick.Invoke();
 		}
 
 		void OnValidate()
