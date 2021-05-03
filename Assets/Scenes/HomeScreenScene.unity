@@ -2682,6 +2682,7 @@ GameObject:
   - component: {fileID: 2087059638}
   - component: {fileID: 2087059637}
   - component: {fileID: 2087059636}
+  - component: {fileID: 2087059639}
   m_Layer: 5
   m_Name: StartGameButton
   m_TagString: Untagged
@@ -2804,3 +2805,16 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2087059634}
   m_CullTransparentMesh: 1
+--- !u!114 &2087059639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2087059634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InputAction: {fileID: -545284412596635738, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}

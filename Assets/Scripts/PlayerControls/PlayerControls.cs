@@ -684,6 +684,14 @@ namespace TetrisTower.Input
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Confirm"",
+                    ""type"": ""Button"",
+                    ""id"": ""dd40e659-2525-4a8c-a56d-9e5ce74051a1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -693,7 +701,18 @@ namespace TetrisTower.Input
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""46062f62-4509-4337-ab88-cafdae202cdf"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Back"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -704,8 +723,30 @@ namespace TetrisTower.Input
                     ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Gamepad"",
                     ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c9264633-0d18-4c29-a1ad-34bda9ec34fb"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""589d6359-788e-4ce2-bebd-99f58690a87b"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Confirm"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -777,6 +818,7 @@ namespace TetrisTower.Input
             // CommonHotkeys
             m_CommonHotkeys = asset.FindActionMap("CommonHotkeys", throwIfNotFound: true);
             m_CommonHotkeys_Back = m_CommonHotkeys.FindAction("Back", throwIfNotFound: true);
+            m_CommonHotkeys_Confirm = m_CommonHotkeys.FindAction("Confirm", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -1032,11 +1074,13 @@ namespace TetrisTower.Input
         private readonly InputActionMap m_CommonHotkeys;
         private ICommonHotkeysActions m_CommonHotkeysActionsCallbackInterface;
         private readonly InputAction m_CommonHotkeys_Back;
+        private readonly InputAction m_CommonHotkeys_Confirm;
         public struct CommonHotkeysActions
         {
             private @PlayerControls m_Wrapper;
             public CommonHotkeysActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
             public InputAction @Back => m_Wrapper.m_CommonHotkeys_Back;
+            public InputAction @Confirm => m_Wrapper.m_CommonHotkeys_Confirm;
             public InputActionMap Get() { return m_Wrapper.m_CommonHotkeys; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1049,6 +1093,9 @@ namespace TetrisTower.Input
                     @Back.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnBack;
                     @Back.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnBack;
                     @Back.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnBack;
+                    @Confirm.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnConfirm;
+                    @Confirm.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnConfirm;
+                    @Confirm.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnConfirm;
                 }
                 m_Wrapper.m_CommonHotkeysActionsCallbackInterface = instance;
                 if (instance != null)
@@ -1056,6 +1103,9 @@ namespace TetrisTower.Input
                     @Back.started += instance.OnBack;
                     @Back.performed += instance.OnBack;
                     @Back.canceled += instance.OnBack;
+                    @Confirm.started += instance.OnConfirm;
+                    @Confirm.performed += instance.OnConfirm;
+                    @Confirm.canceled += instance.OnConfirm;
                 }
             }
         }
@@ -1114,6 +1164,7 @@ namespace TetrisTower.Input
         public interface ICommonHotkeysActions
         {
             void OnBack(InputAction.CallbackContext context);
+            void OnConfirm(InputAction.CallbackContext context);
         }
     }
 }
