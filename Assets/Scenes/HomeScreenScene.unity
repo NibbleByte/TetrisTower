@@ -529,6 +529,7 @@ GameObject:
   - component: {fileID: 533048043}
   - component: {fileID: 533048045}
   - component: {fileID: 533048044}
+  - component: {fileID: 533048046}
   m_Layer: 5
   m_Name: MainMenuPanel
   m_TagString: Untagged
@@ -599,6 +600,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 533048042}
   m_CullTransparentMesh: 1
+--- !u!114 &533048046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 533048042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &540250531
 GameObject:
   m_ObjectHideFlags: 0
@@ -1364,6 +1377,7 @@ GameObject:
   - component: {fileID: 1221062999}
   - component: {fileID: 1221062998}
   - component: {fileID: 1221063000}
+  - component: {fileID: 1221063001}
   m_Layer: 5
   m_Name: NewGamePanel
   m_TagString: Untagged
@@ -1441,6 +1455,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f13b6d0f35b749043940d0c255ed6dff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1221063001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221062996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1263004218
@@ -1897,6 +1923,7 @@ GameObject:
   - component: {fileID: 1624517865}
   - component: {fileID: 1624517867}
   - component: {fileID: 1624517866}
+  - component: {fileID: 1624517868}
   m_Layer: 5
   m_Name: CreditsPanel
   m_TagString: Untagged
@@ -1964,6 +1991,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1624517864}
   m_CullTransparentMesh: 1
+--- !u!114 &1624517868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1624517864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1692576566
 GameObject:
   m_ObjectHideFlags: 0

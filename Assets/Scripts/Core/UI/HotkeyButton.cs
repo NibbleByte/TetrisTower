@@ -10,7 +10,7 @@ namespace TetrisTower.Core.UI
 	/// Put next to or under a UI.Button component to get invoked on specified InputAction.
 	/// Note that this action has to be enabled in order to be invoked.
 	/// </summary>
-	public class HotkeyButton : MonoBehaviour
+	public class HotkeyButton : MonoBehaviour, IHotkeyElement
 	{
 		[SerializeField]
 		private InputActionReference m_InputAction;

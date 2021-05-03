@@ -10,7 +10,7 @@ namespace TetrisTower.Core.UI
 	/// Calls UnityEvent on specified InputAction.
 	/// Note that this action has to be enabled in order to be invoked.
 	/// </summary>
-	public class HotkeyEvent : MonoBehaviour
+	public class HotkeyEvent : MonoBehaviour, IHotkeyElement
 	{
 		[SerializeField]
 		private InputActionReference m_InputAction;
