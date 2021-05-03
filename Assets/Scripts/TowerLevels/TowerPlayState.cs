@@ -21,6 +21,10 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelGame.SetCallbacks(this);
 			m_PlayerControls.TowerLevelGame.Enable();
 
+			// You don't want "Return" key to trigger selected buttons.
+			m_PlayerControls.UI.Submit.Disable();
+			m_PlayerControls.UI.Navigate.Disable();
+
 			yield break;
 		}
 
@@ -28,6 +32,10 @@ namespace TetrisTower.TowerLevels
 		{
 			m_PlayerControls.TowerLevelGame.SetCallbacks(null);
 			m_PlayerControls.TowerLevelGame.Disable();
+
+			// Restore it back to normal.
+			m_PlayerControls.UI.Submit.Enable();
+			m_PlayerControls.UI.Navigate.Enable();
 
 			yield break;
 		}
@@ -64,13 +72,6 @@ namespace TetrisTower.TowerLevels
 		{
 			if (context.phase == InputActionPhase.Performed) {
 				m_LevelController.RequestFallingSpeedUp(m_GameConfig.FallSpeedup);
-			}
-		}
-
-		public void OnPauseLevel(InputAction.CallbackContext context)
-		{
-			if (context.phase == InputActionPhase.Performed) {
-				LevelSupervisorsManager.Instance.SetLevelState(new TowerPausedState());
 			}
 		}
 	}

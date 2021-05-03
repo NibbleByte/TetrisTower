@@ -1455,8 +1455,9 @@ GameObject:
   - component: {fileID: 1263004222}
   - component: {fileID: 1263004221}
   - component: {fileID: 1263004220}
+  - component: {fileID: 1263004223}
   m_Layer: 5
-  m_Name: Button
+  m_Name: BackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1577,6 +1578,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1263004218}
   m_CullTransparentMesh: 1
+--- !u!114 &1263004223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263004218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1 &1297835251
 GameObject:
   m_ObjectHideFlags: 0
@@ -1589,6 +1603,7 @@ GameObject:
   - component: {fileID: 1297835255}
   - component: {fileID: 1297835254}
   - component: {fileID: 1297835253}
+  - component: {fileID: 1297835256}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -1710,6 +1725,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1297835251}
   m_CullTransparentMesh: 1
+--- !u!114 &1297835256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297835251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1 &1592478626
 GameObject:
   m_ObjectHideFlags: 0
@@ -1722,6 +1750,7 @@ GameObject:
   - component: {fileID: 1592478630}
   - component: {fileID: 1592478629}
   - component: {fileID: 1592478628}
+  - component: {fileID: 1592478631}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -1844,6 +1873,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1592478626}
   m_CullTransparentMesh: 1
+--- !u!114 &1592478631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1592478626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1 &1624517864
 GameObject:
   m_ObjectHideFlags: 0

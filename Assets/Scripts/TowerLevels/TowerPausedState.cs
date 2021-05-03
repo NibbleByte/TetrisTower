@@ -19,7 +19,6 @@ namespace TetrisTower.TowerLevels
 
 			m_PlayerControls.TowerLevelUI.SetCallbacks(this);
 			m_PlayerControls.TowerLevelUI.Enable();
-			m_PlayerControls.UI.Enable();
 			m_UIController.ShowPausedPanel(true);
 
 			m_LevelController.PauseLevel();
@@ -32,18 +31,10 @@ namespace TetrisTower.TowerLevels
 			m_UIController.ShowPausedPanel(false);
 			m_PlayerControls.TowerLevelUI.SetCallbacks(null);
 			m_PlayerControls.TowerLevelUI.Disable();
-			m_PlayerControls.UI.Disable();
 
 			m_LevelController.ResumeLevel();
 
 			yield break;
-		}
-
-		public void OnResumeLevel(InputAction.CallbackContext context)
-		{
-			if (context.phase == InputActionPhase.Performed) {
-				LevelSupervisorsManager.Instance.SetLevelState(new TowerPlayState());
-			}
 		}
 	}
 }

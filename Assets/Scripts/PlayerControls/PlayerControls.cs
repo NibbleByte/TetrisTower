@@ -68,14 +68,6 @@ namespace TetrisTower.Input
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
-                },
-                {
-                    ""name"": ""PauseLevel"",
-                    ""type"": ""Button"",
-                    ""id"": ""bc0699d6-02ca-4471-b043-9a42bfce440e"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -243,68 +235,14 @@ namespace TetrisTower.Input
                     ""action"": ""RotateShapeDown"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""8cd76047-212e-44a1-8142-51f9a2bacb03"",
-                    ""path"": ""<Keyboard>/escape"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""PauseLevel"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""a215807c-70f5-4cc6-83c9-0d0ed9f9c241"",
-                    ""path"": ""<Gamepad>/start"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""PauseLevel"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         },
         {
             ""name"": ""TowerLevelUI"",
             ""id"": ""8e96621b-511e-4f34-840f-669ae8e49f79"",
-            ""actions"": [
-                {
-                    ""name"": ""ResumeLevel"",
-                    ""type"": ""Button"",
-                    ""id"": ""c654e0ec-a54d-42a9-b103-e46668621b3f"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                }
-            ],
-            ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""4daa4a06-6454-4861-a7f7-4de4c52d9482"",
-                    ""path"": ""<Keyboard>/escape"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""ResumeLevel"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""c1c64fe5-de66-4689-ac6b-b441cae82cee"",
-                    ""path"": ""<Gamepad>/start"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""ResumeLevel"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                }
-            ]
+            ""actions"": [],
+            ""bindings"": []
         },
         {
             ""name"": ""UI"",
@@ -734,6 +672,44 @@ namespace TetrisTower.Input
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""CommonHotkeys"",
+            ""id"": ""c0dd4bb8-b434-48e5-bcd8-e3f6590ba5c9"",
+            ""actions"": [
+                {
+                    ""name"": ""Back"",
+                    ""type"": ""Button"",
+                    ""id"": ""3bbe5692-1874-443b-93f6-cb8a7eea718a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""11b0552b-44df-4cc7-acd5-bf6c669f5c22"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0e856c71-d343-443e-9761-dd29c3282071"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -784,10 +760,8 @@ namespace TetrisTower.Input
             m_TowerLevelGame_RotateShapeUp = m_TowerLevelGame.FindAction("RotateShapeUp", throwIfNotFound: true);
             m_TowerLevelGame_RotateShapeDown = m_TowerLevelGame.FindAction("RotateShapeDown", throwIfNotFound: true);
             m_TowerLevelGame_FallSpeedUp = m_TowerLevelGame.FindAction("FallSpeedUp", throwIfNotFound: true);
-            m_TowerLevelGame_PauseLevel = m_TowerLevelGame.FindAction("PauseLevel", throwIfNotFound: true);
             // TowerLevelUI
             m_TowerLevelUI = asset.FindActionMap("TowerLevelUI", throwIfNotFound: true);
-            m_TowerLevelUI_ResumeLevel = m_TowerLevelUI.FindAction("ResumeLevel", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -800,6 +774,9 @@ namespace TetrisTower.Input
             m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
             m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
             m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+            // CommonHotkeys
+            m_CommonHotkeys = asset.FindActionMap("CommonHotkeys", throwIfNotFound: true);
+            m_CommonHotkeys_Back = m_CommonHotkeys.FindAction("Back", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -864,7 +841,6 @@ namespace TetrisTower.Input
         private readonly InputAction m_TowerLevelGame_RotateShapeUp;
         private readonly InputAction m_TowerLevelGame_RotateShapeDown;
         private readonly InputAction m_TowerLevelGame_FallSpeedUp;
-        private readonly InputAction m_TowerLevelGame_PauseLevel;
         public struct TowerLevelGameActions
         {
             private @PlayerControls m_Wrapper;
@@ -874,7 +850,6 @@ namespace TetrisTower.Input
             public InputAction @RotateShapeUp => m_Wrapper.m_TowerLevelGame_RotateShapeUp;
             public InputAction @RotateShapeDown => m_Wrapper.m_TowerLevelGame_RotateShapeDown;
             public InputAction @FallSpeedUp => m_Wrapper.m_TowerLevelGame_FallSpeedUp;
-            public InputAction @PauseLevel => m_Wrapper.m_TowerLevelGame_PauseLevel;
             public InputActionMap Get() { return m_Wrapper.m_TowerLevelGame; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -899,9 +874,6 @@ namespace TetrisTower.Input
                     @FallSpeedUp.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
                     @FallSpeedUp.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
                     @FallSpeedUp.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
-                    @PauseLevel.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPauseLevel;
-                    @PauseLevel.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPauseLevel;
-                    @PauseLevel.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPauseLevel;
                 }
                 m_Wrapper.m_TowerLevelGameActionsCallbackInterface = instance;
                 if (instance != null)
@@ -921,9 +893,6 @@ namespace TetrisTower.Input
                     @FallSpeedUp.started += instance.OnFallSpeedUp;
                     @FallSpeedUp.performed += instance.OnFallSpeedUp;
                     @FallSpeedUp.canceled += instance.OnFallSpeedUp;
-                    @PauseLevel.started += instance.OnPauseLevel;
-                    @PauseLevel.performed += instance.OnPauseLevel;
-                    @PauseLevel.canceled += instance.OnPauseLevel;
                 }
             }
         }
@@ -932,12 +901,10 @@ namespace TetrisTower.Input
         // TowerLevelUI
         private readonly InputActionMap m_TowerLevelUI;
         private ITowerLevelUIActions m_TowerLevelUIActionsCallbackInterface;
-        private readonly InputAction m_TowerLevelUI_ResumeLevel;
         public struct TowerLevelUIActions
         {
             private @PlayerControls m_Wrapper;
             public TowerLevelUIActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
-            public InputAction @ResumeLevel => m_Wrapper.m_TowerLevelUI_ResumeLevel;
             public InputActionMap Get() { return m_Wrapper.m_TowerLevelUI; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -947,16 +914,10 @@ namespace TetrisTower.Input
             {
                 if (m_Wrapper.m_TowerLevelUIActionsCallbackInterface != null)
                 {
-                    @ResumeLevel.started -= m_Wrapper.m_TowerLevelUIActionsCallbackInterface.OnResumeLevel;
-                    @ResumeLevel.performed -= m_Wrapper.m_TowerLevelUIActionsCallbackInterface.OnResumeLevel;
-                    @ResumeLevel.canceled -= m_Wrapper.m_TowerLevelUIActionsCallbackInterface.OnResumeLevel;
                 }
                 m_Wrapper.m_TowerLevelUIActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @ResumeLevel.started += instance.OnResumeLevel;
-                    @ResumeLevel.performed += instance.OnResumeLevel;
-                    @ResumeLevel.canceled += instance.OnResumeLevel;
                 }
             }
         }
@@ -1066,6 +1027,39 @@ namespace TetrisTower.Input
             }
         }
         public UIActions @UI => new UIActions(this);
+
+        // CommonHotkeys
+        private readonly InputActionMap m_CommonHotkeys;
+        private ICommonHotkeysActions m_CommonHotkeysActionsCallbackInterface;
+        private readonly InputAction m_CommonHotkeys_Back;
+        public struct CommonHotkeysActions
+        {
+            private @PlayerControls m_Wrapper;
+            public CommonHotkeysActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Back => m_Wrapper.m_CommonHotkeys_Back;
+            public InputActionMap Get() { return m_Wrapper.m_CommonHotkeys; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(CommonHotkeysActions set) { return set.Get(); }
+            public void SetCallbacks(ICommonHotkeysActions instance)
+            {
+                if (m_Wrapper.m_CommonHotkeysActionsCallbackInterface != null)
+                {
+                    @Back.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnBack;
+                    @Back.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnBack;
+                    @Back.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnBack;
+                }
+                m_Wrapper.m_CommonHotkeysActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @Back.started += instance.OnBack;
+                    @Back.performed += instance.OnBack;
+                    @Back.canceled += instance.OnBack;
+                }
+            }
+        }
+        public CommonHotkeysActions @CommonHotkeys => new CommonHotkeysActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         public InputControlScheme KeyboardMouseScheme
         {
@@ -1100,11 +1094,9 @@ namespace TetrisTower.Input
             void OnRotateShapeUp(InputAction.CallbackContext context);
             void OnRotateShapeDown(InputAction.CallbackContext context);
             void OnFallSpeedUp(InputAction.CallbackContext context);
-            void OnPauseLevel(InputAction.CallbackContext context);
         }
         public interface ITowerLevelUIActions
         {
-            void OnResumeLevel(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {
@@ -1118,6 +1110,10 @@ namespace TetrisTower.Input
             void OnRightClick(InputAction.CallbackContext context);
             void OnTrackedDevicePosition(InputAction.CallbackContext context);
             void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+        }
+        public interface ICommonHotkeysActions
+        {
+            void OnBack(InputAction.CallbackContext context);
         }
     }
 }

@@ -31,11 +31,13 @@ namespace TetrisTower.HomeScreen
 
 			// The whole level is UI, so enable it for the whole level.
 			GameContext.PlayerControls.UI.Enable();
+			GameContext.PlayerControls.CommonHotkeys.Enable();
 		}
 
 		public IEnumerator Unload()
 		{
 			GameContext.PlayerControls.UI.Disable();
+			GameContext.PlayerControls.CommonHotkeys.Disable();
 
 			yield break;
 		}

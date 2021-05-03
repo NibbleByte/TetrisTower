@@ -7,11 +7,19 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerLevelUIController : MonoBehaviour
 	{
+		public GameObject PlayPanel;
 		public GameObject PausedPanel;
 
 		public void ShowPausedPanel(bool pause)
 		{
+			PlayPanel.SetActive(!pause);
 			PausedPanel.SetActive(pause);
+		}
+
+
+		public void PauseLevel()
+		{
+			LevelSupervisorsManager.Instance.SetLevelState(new TowerPausedState());
 		}
 
 		public void ResumeLevel()

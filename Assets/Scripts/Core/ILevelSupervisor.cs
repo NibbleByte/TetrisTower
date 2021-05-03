@@ -11,6 +11,14 @@ namespace TetrisTower.Core
 	}
 
 	/// <summary>
+	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
+	/// </summary>
+	public interface IInputActionsProvider
+	{
+		UnityEngine.InputSystem.IInputActionCollection2 Controls { get; }
+	}
+
+	/// <summary>
 	/// Controls the whole level: loading, unloading, switching states (via the StatesStack).
 	/// </summary>
 	public interface ILevelSupervisor

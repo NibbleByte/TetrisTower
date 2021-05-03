@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 namespace TetrisTower.Game
 {
 	[Serializable]
-	public class GameContext : IGameContext
+	public class GameContext : IGameContext, IInputActionsProvider
 	{
 		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
 		{
@@ -19,6 +19,8 @@ namespace TetrisTower.Game
 		}
 
 		public GameConfig GameConfig { get; }
+
+		public IInputActionCollection2 Controls => PlayerControls;
 
 		public PlayerControls PlayerControls { get; }
 
