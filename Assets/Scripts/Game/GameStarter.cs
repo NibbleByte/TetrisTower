@@ -83,6 +83,7 @@ namespace TetrisTower.Game
 
 		#region Debug Stuff
 
+#if UNITY_EDITOR
 		private void Update()
 		{
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {
@@ -91,7 +92,18 @@ namespace TetrisTower.Game
 			if (Keyboard.current.f6Key.wasPressedThisFrame) {
 				Deserialize();
 			}
+
+			if (Keyboard.current.f4Key.wasPressedThisFrame) {
+				if (!GameContext.Controls.devices.HasValue) {
+					Debug.LogWarning("Forcing pointer exclusive input!");
+					GameContext.Controls.devices = new InputDevice[] { (InputDevice)Touchscreen.current ?? Mouse.current};
+				} else {
+					Debug.LogWarning("All devices are processed.");
+					GameContext.Controls.devices = default;
+				}
+			}
 		}
+#endif
 
 		string m_DebugSave;
 		void Serialize()

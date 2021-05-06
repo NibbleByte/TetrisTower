@@ -13,6 +13,12 @@ namespace TetrisTower.Game
 
 		public float FallSpeedup = 40f;
 
+		public float SwipeMaxTime = 0.5f;
+		public float SwipeMinDistance = 100f;
+
+		[Range(0f, 1f)]
+		public float SwipeConformity = 0.9f;
+
 		public Newtonsoft.Json.JsonConverter[] Converters => new Newtonsoft.Json.JsonConverter[] {
 				new BlockTypeConverter(AssetsRepository),
 				new GridShapeTemplateConverter(AssetsRepository),

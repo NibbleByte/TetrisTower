@@ -68,6 +68,22 @@ namespace TetrisTower.Input
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Pointer-FallSpeedUp"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""262069d4-7042-4ac7-a47f-46cec272d1c9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Pointer-Press"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""1ea63dad-8fe3-4d3e-8e95-8ba8c2e56623"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -233,6 +249,28 @@ namespace TetrisTower.Input
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""RotateShapeDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1729467b-c02e-4277-b198-5fc6e0903220"",
+                    ""path"": ""<Pointer>/press"",
+                    ""interactions"": ""MultiTap"",
+                    ""processors"": """",
+                    ""groups"": ""Touch;Keyboard&Mouse"",
+                    ""action"": ""Pointer-FallSpeedUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b55cdccc-bc3a-4777-a170-e9934bbd406a"",
+                    ""path"": ""<Pointer>/press"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse;Touch"",
+                    ""action"": ""Pointer-Press"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -801,6 +839,8 @@ namespace TetrisTower.Input
             m_TowerLevelGame_RotateShapeUp = m_TowerLevelGame.FindAction("RotateShapeUp", throwIfNotFound: true);
             m_TowerLevelGame_RotateShapeDown = m_TowerLevelGame.FindAction("RotateShapeDown", throwIfNotFound: true);
             m_TowerLevelGame_FallSpeedUp = m_TowerLevelGame.FindAction("FallSpeedUp", throwIfNotFound: true);
+            m_TowerLevelGame_PointerFallSpeedUp = m_TowerLevelGame.FindAction("Pointer-FallSpeedUp", throwIfNotFound: true);
+            m_TowerLevelGame_PointerPress = m_TowerLevelGame.FindAction("Pointer-Press", throwIfNotFound: true);
             // TowerLevelUI
             m_TowerLevelUI = asset.FindActionMap("TowerLevelUI", throwIfNotFound: true);
             // UI
@@ -883,6 +923,8 @@ namespace TetrisTower.Input
         private readonly InputAction m_TowerLevelGame_RotateShapeUp;
         private readonly InputAction m_TowerLevelGame_RotateShapeDown;
         private readonly InputAction m_TowerLevelGame_FallSpeedUp;
+        private readonly InputAction m_TowerLevelGame_PointerFallSpeedUp;
+        private readonly InputAction m_TowerLevelGame_PointerPress;
         public struct TowerLevelGameActions
         {
             private @PlayerControls m_Wrapper;
@@ -892,6 +934,8 @@ namespace TetrisTower.Input
             public InputAction @RotateShapeUp => m_Wrapper.m_TowerLevelGame_RotateShapeUp;
             public InputAction @RotateShapeDown => m_Wrapper.m_TowerLevelGame_RotateShapeDown;
             public InputAction @FallSpeedUp => m_Wrapper.m_TowerLevelGame_FallSpeedUp;
+            public InputAction @PointerFallSpeedUp => m_Wrapper.m_TowerLevelGame_PointerFallSpeedUp;
+            public InputAction @PointerPress => m_Wrapper.m_TowerLevelGame_PointerPress;
             public InputActionMap Get() { return m_Wrapper.m_TowerLevelGame; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -916,6 +960,12 @@ namespace TetrisTower.Input
                     @FallSpeedUp.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
                     @FallSpeedUp.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
                     @FallSpeedUp.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
+                    @PointerFallSpeedUp.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerFallSpeedUp;
+                    @PointerFallSpeedUp.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerFallSpeedUp;
+                    @PointerFallSpeedUp.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerFallSpeedUp;
+                    @PointerPress.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerPress;
+                    @PointerPress.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerPress;
+                    @PointerPress.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerPress;
                 }
                 m_Wrapper.m_TowerLevelGameActionsCallbackInterface = instance;
                 if (instance != null)
@@ -935,6 +985,12 @@ namespace TetrisTower.Input
                     @FallSpeedUp.started += instance.OnFallSpeedUp;
                     @FallSpeedUp.performed += instance.OnFallSpeedUp;
                     @FallSpeedUp.canceled += instance.OnFallSpeedUp;
+                    @PointerFallSpeedUp.started += instance.OnPointerFallSpeedUp;
+                    @PointerFallSpeedUp.performed += instance.OnPointerFallSpeedUp;
+                    @PointerFallSpeedUp.canceled += instance.OnPointerFallSpeedUp;
+                    @PointerPress.started += instance.OnPointerPress;
+                    @PointerPress.performed += instance.OnPointerPress;
+                    @PointerPress.canceled += instance.OnPointerPress;
                 }
             }
         }
@@ -1144,6 +1200,8 @@ namespace TetrisTower.Input
             void OnRotateShapeUp(InputAction.CallbackContext context);
             void OnRotateShapeDown(InputAction.CallbackContext context);
             void OnFallSpeedUp(InputAction.CallbackContext context);
+            void OnPointerFallSpeedUp(InputAction.CallbackContext context);
+            void OnPointerPress(InputAction.CallbackContext context);
         }
         public interface ITowerLevelUIActions
         {

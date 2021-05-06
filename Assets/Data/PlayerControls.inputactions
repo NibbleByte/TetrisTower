@@ -44,6 +44,22 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "Pointer-FallSpeedUp",
+                    "type": "PassThrough",
+                    "id": "262069d4-7042-4ac7-a47f-46cec272d1c9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Pointer-Press",
+                    "type": "PassThrough",
+                    "id": "1ea63dad-8fe3-4d3e-8e95-8ba8c2e56623",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -209,6 +225,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "RotateShapeDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1729467b-c02e-4277-b198-5fc6e0903220",
+                    "path": "<Pointer>/press",
+                    "interactions": "MultiTap",
+                    "processors": "",
+                    "groups": "Touch;Keyboard&Mouse",
+                    "action": "Pointer-FallSpeedUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b55cdccc-bc3a-4777-a170-e9934bbd406a",
+                    "path": "<Pointer>/press",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse;Touch",
+                    "action": "Pointer-Press",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
