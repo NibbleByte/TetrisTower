@@ -1,6 +1,6 @@
+using DevLocker.GameFrame;
 using System.Collections;
 using System.Collections.Generic;
-using TetrisTower.Core;
 using UnityEngine;
 
 namespace TetrisTower.TowerLevels
@@ -19,17 +19,17 @@ namespace TetrisTower.TowerLevels
 
 		public void PauseLevel()
 		{
-			LevelSupervisorsManager.Instance.SetLevelState(new TowerPausedState());
+			LevelsManager.Instance.SetLevelState(new TowerPausedState());
 		}
 
 		public void ResumeLevel()
 		{
-			LevelSupervisorsManager.Instance.SetLevelState(new TowerPlayState());
+			LevelsManager.Instance.SetLevelState(new TowerPlayState());
 		}
 
 		public void ExitToHomeScreen()
 		{
-			LevelSupervisorsManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
+			LevelsManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
 		}
 	}
 }

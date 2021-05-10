@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace TetrisTower.Core
+namespace DevLocker.GameFrame
 {
 	/// <summary>
 	/// Single level state. It can be different playing modes (walking, driving, swimming) or UI screens (Menu, Game, Options).

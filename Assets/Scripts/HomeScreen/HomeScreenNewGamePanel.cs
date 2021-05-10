@@ -1,6 +1,6 @@
+using DevLocker.GameFrame;
 using System;
 using System.Collections.Generic;
-using TetrisTower.Core;
 using TetrisTower.Game;
 using UnityEngine;
 
@@ -10,11 +10,11 @@ namespace TetrisTower.HomeScreen
 	{
 		public void StartNewGame()
 		{
-			var gameContext = (GameContext) LevelSupervisorsManager.Instance.GameContext;
+			var gameContext = (GameContext) LevelsManager.Instance.GameContext;
 
 			gameContext.SetCurrentPlaythrough(gameContext.GameConfig.NewGameData);
 
-			LevelSupervisorsManager.Instance.SwitchLevel(new TowerLevels.TowerLevelSupervisor());
+			LevelsManager.Instance.SwitchLevel(new TowerLevels.TowerLevelSupervisor());
 		}
 	}
 

@@ -1,7 +1,6 @@
+using DevLocker.GameFrame;
 using System.Collections;
-using TetrisTower.Core;
 using TetrisTower.Input;
-using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {

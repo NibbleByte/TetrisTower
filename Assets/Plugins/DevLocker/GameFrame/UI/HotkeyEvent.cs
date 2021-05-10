@@ -1,10 +1,12 @@
+#if USE_INPUT_SYSTEM
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace TetrisTower.Core.UI
+namespace DevLocker.GameFrame.UI
 {
 	/// <summary>
 	/// Calls UnityEvent on specified InputAction.
@@ -20,7 +22,7 @@ namespace TetrisTower.Core.UI
 
 		void OnEnable()
 		{
-			var controls = (LevelSupervisorsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
+			var controls = (LevelsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
 
 			if (controls == null) {
 				Debug.LogWarning($"{nameof(HotkeyEvent)} {name} can't be used if Unity Input System is not provided.", this);
@@ -33,10 +35,10 @@ namespace TetrisTower.Core.UI
 		void OnDisable()
 		{
 			// Turning off Play mode.
-			if (LevelSupervisorsManager.Instance == null)
+			if (LevelsManager.Instance == null)
 				return;
 
-			var controls = (LevelSupervisorsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
+			var controls = (LevelsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
 
 			if (controls == null) {
 				return;
@@ -51,3 +53,5 @@ namespace TetrisTower.Core.UI
 		}
 	}
 }
+
+#endif

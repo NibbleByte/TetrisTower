@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace TetrisTower.Core
+namespace DevLocker.GameFrame
 {
 	/// <summary>
 	/// Marks class to be passed onto levels as game context.
@@ -10,6 +10,7 @@ namespace TetrisTower.Core
 
 	}
 
+#if USE_INPUT_SYSTEM
 	/// <summary>
 	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
 	/// </summary>
@@ -17,6 +18,7 @@ namespace TetrisTower.Core
 	{
 		UnityEngine.InputSystem.IInputActionCollection2 Controls { get; }
 	}
+#endif
 
 	/// <summary>
 	/// Controls the whole level: loading, unloading, switching states (via the StatesStack).

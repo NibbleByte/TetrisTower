@@ -1,10 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
-namespace TetrisTower.Core.UI
+namespace DevLocker.GameFrame.UI
 {
 	/// <summary>
 	/// Marks hotkey elements to be controlled by the HotkeyScope.

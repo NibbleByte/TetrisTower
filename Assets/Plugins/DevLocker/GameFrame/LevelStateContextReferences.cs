@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace TetrisTower.Core
+namespace DevLocker.GameFrame
 {
 	/// <summary>
 	/// Contains static shared level references that can be accessed by the level state.
-	/// Use them explicitly or implicitly by reflection.
+	/// Use them explicitly or implicitly (by reflection).
 	/// References are provided by the level supervisor on initialization.
 	/// </summary>
 	public class LevelStateContextReferences
