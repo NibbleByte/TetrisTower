@@ -26,7 +26,7 @@ namespace TetrisTower.Input
     ""name"": ""PlayerControls"",
     ""maps"": [
         {
-            ""name"": ""TowerLevelGame"",
+            ""name"": ""TowerLevelPlay"",
             ""id"": ""9cb11c57-6035-4442-b6b4-fb85c51dc04a"",
             ""actions"": [
                 {
@@ -277,7 +277,7 @@ namespace TetrisTower.Input
             ]
         },
         {
-            ""name"": ""TowerLevelUI"",
+            ""name"": ""TowerLevelPaused"",
             ""id"": ""8e96621b-511e-4f34-840f-669ae8e49f79"",
             ""actions"": [],
             ""bindings"": []
@@ -832,17 +832,17 @@ namespace TetrisTower.Input
         }
     ]
 }");
-            // TowerLevelGame
-            m_TowerLevelGame = asset.FindActionMap("TowerLevelGame", throwIfNotFound: true);
-            m_TowerLevelGame_MoveShapeLeft = m_TowerLevelGame.FindAction("MoveShapeLeft", throwIfNotFound: true);
-            m_TowerLevelGame_MoveShapeRight = m_TowerLevelGame.FindAction("MoveShapeRight", throwIfNotFound: true);
-            m_TowerLevelGame_RotateShapeUp = m_TowerLevelGame.FindAction("RotateShapeUp", throwIfNotFound: true);
-            m_TowerLevelGame_RotateShapeDown = m_TowerLevelGame.FindAction("RotateShapeDown", throwIfNotFound: true);
-            m_TowerLevelGame_FallSpeedUp = m_TowerLevelGame.FindAction("FallSpeedUp", throwIfNotFound: true);
-            m_TowerLevelGame_PointerFallSpeedUp = m_TowerLevelGame.FindAction("Pointer-FallSpeedUp", throwIfNotFound: true);
-            m_TowerLevelGame_PointerPress = m_TowerLevelGame.FindAction("Pointer-Press", throwIfNotFound: true);
-            // TowerLevelUI
-            m_TowerLevelUI = asset.FindActionMap("TowerLevelUI", throwIfNotFound: true);
+            // TowerLevelPlay
+            m_TowerLevelPlay = asset.FindActionMap("TowerLevelPlay", throwIfNotFound: true);
+            m_TowerLevelPlay_MoveShapeLeft = m_TowerLevelPlay.FindAction("MoveShapeLeft", throwIfNotFound: true);
+            m_TowerLevelPlay_MoveShapeRight = m_TowerLevelPlay.FindAction("MoveShapeRight", throwIfNotFound: true);
+            m_TowerLevelPlay_RotateShapeUp = m_TowerLevelPlay.FindAction("RotateShapeUp", throwIfNotFound: true);
+            m_TowerLevelPlay_RotateShapeDown = m_TowerLevelPlay.FindAction("RotateShapeDown", throwIfNotFound: true);
+            m_TowerLevelPlay_FallSpeedUp = m_TowerLevelPlay.FindAction("FallSpeedUp", throwIfNotFound: true);
+            m_TowerLevelPlay_PointerFallSpeedUp = m_TowerLevelPlay.FindAction("Pointer-FallSpeedUp", throwIfNotFound: true);
+            m_TowerLevelPlay_PointerPress = m_TowerLevelPlay.FindAction("Pointer-Press", throwIfNotFound: true);
+            // TowerLevelPaused
+            m_TowerLevelPaused = asset.FindActionMap("TowerLevelPaused", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -915,59 +915,59 @@ namespace TetrisTower.Input
             return asset.FindBinding(bindingMask, out action);
         }
 
-        // TowerLevelGame
-        private readonly InputActionMap m_TowerLevelGame;
-        private ITowerLevelGameActions m_TowerLevelGameActionsCallbackInterface;
-        private readonly InputAction m_TowerLevelGame_MoveShapeLeft;
-        private readonly InputAction m_TowerLevelGame_MoveShapeRight;
-        private readonly InputAction m_TowerLevelGame_RotateShapeUp;
-        private readonly InputAction m_TowerLevelGame_RotateShapeDown;
-        private readonly InputAction m_TowerLevelGame_FallSpeedUp;
-        private readonly InputAction m_TowerLevelGame_PointerFallSpeedUp;
-        private readonly InputAction m_TowerLevelGame_PointerPress;
-        public struct TowerLevelGameActions
+        // TowerLevelPlay
+        private readonly InputActionMap m_TowerLevelPlay;
+        private ITowerLevelPlayActions m_TowerLevelPlayActionsCallbackInterface;
+        private readonly InputAction m_TowerLevelPlay_MoveShapeLeft;
+        private readonly InputAction m_TowerLevelPlay_MoveShapeRight;
+        private readonly InputAction m_TowerLevelPlay_RotateShapeUp;
+        private readonly InputAction m_TowerLevelPlay_RotateShapeDown;
+        private readonly InputAction m_TowerLevelPlay_FallSpeedUp;
+        private readonly InputAction m_TowerLevelPlay_PointerFallSpeedUp;
+        private readonly InputAction m_TowerLevelPlay_PointerPress;
+        public struct TowerLevelPlayActions
         {
             private @PlayerControls m_Wrapper;
-            public TowerLevelGameActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
-            public InputAction @MoveShapeLeft => m_Wrapper.m_TowerLevelGame_MoveShapeLeft;
-            public InputAction @MoveShapeRight => m_Wrapper.m_TowerLevelGame_MoveShapeRight;
-            public InputAction @RotateShapeUp => m_Wrapper.m_TowerLevelGame_RotateShapeUp;
-            public InputAction @RotateShapeDown => m_Wrapper.m_TowerLevelGame_RotateShapeDown;
-            public InputAction @FallSpeedUp => m_Wrapper.m_TowerLevelGame_FallSpeedUp;
-            public InputAction @PointerFallSpeedUp => m_Wrapper.m_TowerLevelGame_PointerFallSpeedUp;
-            public InputAction @PointerPress => m_Wrapper.m_TowerLevelGame_PointerPress;
-            public InputActionMap Get() { return m_Wrapper.m_TowerLevelGame; }
+            public TowerLevelPlayActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @MoveShapeLeft => m_Wrapper.m_TowerLevelPlay_MoveShapeLeft;
+            public InputAction @MoveShapeRight => m_Wrapper.m_TowerLevelPlay_MoveShapeRight;
+            public InputAction @RotateShapeUp => m_Wrapper.m_TowerLevelPlay_RotateShapeUp;
+            public InputAction @RotateShapeDown => m_Wrapper.m_TowerLevelPlay_RotateShapeDown;
+            public InputAction @FallSpeedUp => m_Wrapper.m_TowerLevelPlay_FallSpeedUp;
+            public InputAction @PointerFallSpeedUp => m_Wrapper.m_TowerLevelPlay_PointerFallSpeedUp;
+            public InputAction @PointerPress => m_Wrapper.m_TowerLevelPlay_PointerPress;
+            public InputActionMap Get() { return m_Wrapper.m_TowerLevelPlay; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(TowerLevelGameActions set) { return set.Get(); }
-            public void SetCallbacks(ITowerLevelGameActions instance)
+            public static implicit operator InputActionMap(TowerLevelPlayActions set) { return set.Get(); }
+            public void SetCallbacks(ITowerLevelPlayActions instance)
             {
-                if (m_Wrapper.m_TowerLevelGameActionsCallbackInterface != null)
+                if (m_Wrapper.m_TowerLevelPlayActionsCallbackInterface != null)
                 {
-                    @MoveShapeLeft.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnMoveShapeLeft;
-                    @MoveShapeLeft.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnMoveShapeLeft;
-                    @MoveShapeLeft.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnMoveShapeLeft;
-                    @MoveShapeRight.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnMoveShapeRight;
-                    @MoveShapeRight.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnMoveShapeRight;
-                    @MoveShapeRight.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnMoveShapeRight;
-                    @RotateShapeUp.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnRotateShapeUp;
-                    @RotateShapeUp.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnRotateShapeUp;
-                    @RotateShapeUp.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnRotateShapeUp;
-                    @RotateShapeDown.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnRotateShapeDown;
-                    @RotateShapeDown.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnRotateShapeDown;
-                    @RotateShapeDown.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnRotateShapeDown;
-                    @FallSpeedUp.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
-                    @FallSpeedUp.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
-                    @FallSpeedUp.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnFallSpeedUp;
-                    @PointerFallSpeedUp.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerFallSpeedUp;
-                    @PointerFallSpeedUp.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerFallSpeedUp;
-                    @PointerFallSpeedUp.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerFallSpeedUp;
-                    @PointerPress.started -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerPress;
-                    @PointerPress.performed -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerPress;
-                    @PointerPress.canceled -= m_Wrapper.m_TowerLevelGameActionsCallbackInterface.OnPointerPress;
+                    @MoveShapeLeft.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeLeft;
+                    @MoveShapeLeft.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeLeft;
+                    @MoveShapeLeft.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeLeft;
+                    @MoveShapeRight.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeRight;
+                    @MoveShapeRight.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeRight;
+                    @MoveShapeRight.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeRight;
+                    @RotateShapeUp.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeUp;
+                    @RotateShapeUp.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeUp;
+                    @RotateShapeUp.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeUp;
+                    @RotateShapeDown.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeDown;
+                    @RotateShapeDown.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeDown;
+                    @RotateShapeDown.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeDown;
+                    @FallSpeedUp.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnFallSpeedUp;
+                    @FallSpeedUp.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnFallSpeedUp;
+                    @FallSpeedUp.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnFallSpeedUp;
+                    @PointerFallSpeedUp.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerFallSpeedUp;
+                    @PointerFallSpeedUp.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerFallSpeedUp;
+                    @PointerFallSpeedUp.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerFallSpeedUp;
+                    @PointerPress.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerPress;
+                    @PointerPress.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerPress;
+                    @PointerPress.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerPress;
                 }
-                m_Wrapper.m_TowerLevelGameActionsCallbackInterface = instance;
+                m_Wrapper.m_TowerLevelPlayActionsCallbackInterface = instance;
                 if (instance != null)
                 {
                     @MoveShapeLeft.started += instance.OnMoveShapeLeft;
@@ -994,32 +994,32 @@ namespace TetrisTower.Input
                 }
             }
         }
-        public TowerLevelGameActions @TowerLevelGame => new TowerLevelGameActions(this);
+        public TowerLevelPlayActions @TowerLevelPlay => new TowerLevelPlayActions(this);
 
-        // TowerLevelUI
-        private readonly InputActionMap m_TowerLevelUI;
-        private ITowerLevelUIActions m_TowerLevelUIActionsCallbackInterface;
-        public struct TowerLevelUIActions
+        // TowerLevelPaused
+        private readonly InputActionMap m_TowerLevelPaused;
+        private ITowerLevelPausedActions m_TowerLevelPausedActionsCallbackInterface;
+        public struct TowerLevelPausedActions
         {
             private @PlayerControls m_Wrapper;
-            public TowerLevelUIActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
-            public InputActionMap Get() { return m_Wrapper.m_TowerLevelUI; }
+            public TowerLevelPausedActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputActionMap Get() { return m_Wrapper.m_TowerLevelPaused; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(TowerLevelUIActions set) { return set.Get(); }
-            public void SetCallbacks(ITowerLevelUIActions instance)
+            public static implicit operator InputActionMap(TowerLevelPausedActions set) { return set.Get(); }
+            public void SetCallbacks(ITowerLevelPausedActions instance)
             {
-                if (m_Wrapper.m_TowerLevelUIActionsCallbackInterface != null)
+                if (m_Wrapper.m_TowerLevelPausedActionsCallbackInterface != null)
                 {
                 }
-                m_Wrapper.m_TowerLevelUIActionsCallbackInterface = instance;
+                m_Wrapper.m_TowerLevelPausedActionsCallbackInterface = instance;
                 if (instance != null)
                 {
                 }
             }
         }
-        public TowerLevelUIActions @TowerLevelUI => new TowerLevelUIActions(this);
+        public TowerLevelPausedActions @TowerLevelPaused => new TowerLevelPausedActions(this);
 
         // UI
         private readonly InputActionMap m_UI;
@@ -1193,7 +1193,7 @@ namespace TetrisTower.Input
                 return asset.controlSchemes[m_TouchSchemeIndex];
             }
         }
-        public interface ITowerLevelGameActions
+        public interface ITowerLevelPlayActions
         {
             void OnMoveShapeLeft(InputAction.CallbackContext context);
             void OnMoveShapeRight(InputAction.CallbackContext context);
@@ -1203,7 +1203,7 @@ namespace TetrisTower.Input
             void OnPointerFallSpeedUp(InputAction.CallbackContext context);
             void OnPointerPress(InputAction.CallbackContext context);
         }
-        public interface ITowerLevelUIActions
+        public interface ITowerLevelPausedActions
         {
         }
         public interface IUIActions

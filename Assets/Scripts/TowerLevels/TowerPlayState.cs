@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerPlayState : ILevelState, PlayerControls.ITowerLevelGameActions
+	public class TowerPlayState : ILevelState, PlayerControls.ITowerLevelPlayActions
 	{
 		private PlayerControls m_PlayerControls;
 		private GameConfig m_GameConfig;
@@ -22,8 +22,8 @@ namespace TetrisTower.TowerLevels
 			contextReferences.SetByType(out m_LevelController);
 			contextReferences.SetByType(out m_GameConfig);
 
-			m_PlayerControls.TowerLevelGame.SetCallbacks(this);
-			m_PlayerControls.TowerLevelGame.Enable();
+			m_PlayerControls.TowerLevelPlay.SetCallbacks(this);
+			m_PlayerControls.TowerLevelPlay.Enable();
 
 			// You don't want "Return" key to trigger selected buttons.
 			m_PlayerControls.UI.Submit.Disable();
@@ -34,8 +34,8 @@ namespace TetrisTower.TowerLevels
 
 		public IEnumerator ExitState()
 		{
-			m_PlayerControls.TowerLevelGame.SetCallbacks(null);
-			m_PlayerControls.TowerLevelGame.Disable();
+			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
+			m_PlayerControls.TowerLevelPlay.Disable();
 
 			// Restore it back to normal.
 			m_PlayerControls.UI.Submit.Enable();
@@ -86,7 +86,7 @@ namespace TetrisTower.TowerLevels
 				m_LevelController.RequestFallingSpeedUp(m_GameConfig.FallSpeedup);
 
 				// Avoid executing both actions, because they are set as "Pass through".
-				m_PlayerControls.TowerLevelGame.PointerPress.Reset();
+				m_PlayerControls.TowerLevelPlay.PointerPress.Reset();
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace TetrisTower.TowerLevels
 						var pressDir = pressDistance.normalized;
 
 						// Avoid executing both actions, because they are set as "Pass through".
-						m_PlayerControls.TowerLevelGame.PointerFallSpeedUp.Reset();
+						m_PlayerControls.TowerLevelPlay.PointerFallSpeedUp.Reset();
 
 						//Debug.Log($"Swipe: time - {pressDuration}, dist - {pressDistance.magnitude}");
 

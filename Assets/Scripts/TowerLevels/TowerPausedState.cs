@@ -4,7 +4,7 @@ using TetrisTower.Input;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerPausedState : ILevelState, PlayerControls.ITowerLevelUIActions
+	public class TowerPausedState : ILevelState, PlayerControls.ITowerLevelPausedActions
 	{
 		private PlayerControls m_PlayerControls;
 		private TowerLevelController m_LevelController;
@@ -16,8 +16,8 @@ namespace TetrisTower.TowerLevels
 			contextReferences.SetByType(out m_PlayerControls);
 			contextReferences.SetByType(out m_LevelController);
 
-			m_PlayerControls.TowerLevelUI.SetCallbacks(this);
-			m_PlayerControls.TowerLevelUI.Enable();
+			m_PlayerControls.TowerLevelPaused.SetCallbacks(this);
+			m_PlayerControls.TowerLevelPaused.Enable();
 			m_UIController.ShowPausedPanel(true);
 
 			m_LevelController.PauseLevel();
@@ -28,8 +28,8 @@ namespace TetrisTower.TowerLevels
 		public IEnumerator ExitState()
 		{
 			m_UIController.ShowPausedPanel(false);
-			m_PlayerControls.TowerLevelUI.SetCallbacks(null);
-			m_PlayerControls.TowerLevelUI.Disable();
+			m_PlayerControls.TowerLevelPaused.SetCallbacks(null);
+			m_PlayerControls.TowerLevelPaused.Disable();
 
 			m_LevelController.ResumeLevel();
 
