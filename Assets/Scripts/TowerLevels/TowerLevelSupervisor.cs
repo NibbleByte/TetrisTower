@@ -25,7 +25,6 @@ namespace TetrisTower.TowerLevels
 			levelController.Init(GameContext.CurrentPlaythrough.TowerLevel);
 
 			var uiController = GameObject.FindObjectOfType<TowerLevelUIController>(true);
-			uiController.ShowPausedPanel(false);
 
 			StatesStack = new LevelStateStack(
 				GameContext.GameConfig,

@@ -650,6 +650,8 @@ MonoBehaviour:
     Panel: {fileID: 533048042}
   - State: {fileID: 11400000, guid: f8eb1856868c5c44988d6be61afd203d, type: 2}
     Panel: {fileID: 1221062996}
+  - State: {fileID: 11400000, guid: 80141252dae46b94bac4b00acef9d032, type: 2}
+    Panel: {fileID: 1465370234}
   - State: {fileID: 11400000, guid: 249a366cc02f97d40aad5a70dde54169, type: 2}
     Panel: {fileID: 1624517864}
 --- !u!114 &540250533
@@ -727,6 +729,7 @@ RectTransform:
   - {fileID: 533048043}
   - {fileID: 1221062997}
   - {fileID: 1624517865}
+  - {fileID: 1465370235}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1764,6 +1767,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
+--- !u!1 &1465370234 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1268881109800414544, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+  m_PrefabInstance: {fileID: 1268881111154207530}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &1465370235 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+  m_PrefabInstance: {fileID: 1268881111154207530}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1592478626
 GameObject:
   m_ObjectHideFlags: 0
@@ -2390,7 +2403,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1887850219}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 540250532}
+        m_TargetAssemblyTypeName: TetrisTower.HomeScreen.HomeScreenController, Assembly-CSharp
+        m_MethodName: SwitchState
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000, guid: 80141252dae46b94bac4b00acef9d032, type: 2}
+          m_ObjectArgumentAssemblyTypeName: TetrisTower.HomeScreen.HomeScreenState,
+            Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1887850219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2818,3 +2844,168 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InputAction: {fileID: -545284412596635738, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
+--- !u!1001 &1268881111154207530
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 540250536}
+    m_Modifications:
+    - target: {fileID: 1268881109800414544, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_Name
+      value: OptionsPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414544, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 516.0633
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 374.465
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109800414545, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 540250532}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SwitchState
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: TetrisTower.HomeScreen.HomeScreenController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11400000, guid: fe766cf337334484cbdac1b86e04f7ef, type: 2}
+    - target: {fileID: 1268881109926130125, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: TetrisTower.HomeScreen.HomeScreenState, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 540250532}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SwitchState
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: TetrisTower.HomeScreen.HomeScreenController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11400000, guid: fe766cf337334484cbdac1b86e04f7ef, type: 2}
+    - target: {fileID: 1268881110886724375, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: TetrisTower.HomeScreen.HomeScreenState, Assembly-CSharp
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 76239b9299c6461449f8c22dcf3fffa9, type: 3}

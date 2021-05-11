@@ -48,7 +48,7 @@ namespace DevLocker.GameFrame
 
 		public IEnumerator SwitchLevelCrt(ILevelSupervisor nextLevel)
 		{
-			if (LevelSupervisor != null) {
+			if (m_LevelStatesStack != null) {
 				if (!m_LevelStatesStack.IsEmpty) {
 					yield return m_LevelStatesStack.ClearStackAndStateCrt();
 				}

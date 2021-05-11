@@ -12,6 +12,7 @@ namespace TetrisTower.TowerLevels
 		private PlayerControls m_PlayerControls;
 		private GameConfig m_GameConfig;
 		private TowerLevelController m_LevelController;
+		private TowerLevelUIController m_UIController;
 
 		private Vector2 m_PointerPressedPosition;
 		private double m_PointerPressedTime;
@@ -20,6 +21,7 @@ namespace TetrisTower.TowerLevels
 		{
 			contextReferences.SetByType(out m_PlayerControls);
 			contextReferences.SetByType(out m_LevelController);
+			contextReferences.SetByType(out m_UIController);
 			contextReferences.SetByType(out m_GameConfig);
 
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(this);
@@ -29,11 +31,17 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.UI.Submit.Disable();
 			m_PlayerControls.UI.Navigate.Disable();
 
+			m_UIController.SwitchState(TowerLevelUIState.Play);
+
+			m_LevelController.ResumeLevel();
+
 			yield break;
 		}
 
 		public IEnumerator ExitState()
 		{
+			m_LevelController.PauseLevel();
+
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
 			m_PlayerControls.TowerLevelPlay.Disable();
 

@@ -7,31 +7,25 @@ namespace TetrisTower.TowerLevels
 	public class TowerPausedState : ILevelState, PlayerControls.ITowerLevelPausedActions
 	{
 		private PlayerControls m_PlayerControls;
-		private TowerLevelController m_LevelController;
 		private TowerLevelUIController m_UIController;
 
 		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_UIController);
 			contextReferences.SetByType(out m_PlayerControls);
-			contextReferences.SetByType(out m_LevelController);
 
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(this);
 			m_PlayerControls.TowerLevelPaused.Enable();
-			m_UIController.ShowPausedPanel(true);
 
-			m_LevelController.PauseLevel();
+			m_UIController.SwitchState(TowerLevelUIState.Paused);
 
 			yield break;
 		}
 
 		public IEnumerator ExitState()
 		{
-			m_UIController.ShowPausedPanel(false);
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(null);
 			m_PlayerControls.TowerLevelPaused.Disable();
-
-			m_LevelController.ResumeLevel();
 
 			yield break;
 		}

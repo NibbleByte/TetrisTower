@@ -21,13 +21,14 @@ namespace TetrisTower.HomeScreen
 				yield return SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);
 			}
 
-			var levelController = GameObject.FindObjectOfType<HomeScreenController>();
-
-			StatesStack = new LevelStateStack(
-				GameContext.GameConfig,
-				GameContext.PlayerControls,
-				levelController
-				);
+			// StateStack not needed for now.
+			//var levelController = GameObject.FindObjectOfType<HomeScreenController>();
+			//
+			//StatesStack = new LevelStateStack(
+			//	GameContext.GameConfig,
+			//	GameContext.PlayerControls,
+			//	levelController
+			//	);
 
 			// The whole level is UI, so enable it for the whole level.
 			GameContext.PlayerControls.UI.Enable();
