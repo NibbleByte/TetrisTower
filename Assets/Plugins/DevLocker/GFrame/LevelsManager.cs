@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DevLocker.GameFrame
+namespace DevLocker.GFrame
 {
 	/// <summary>
 	/// Contains the currently active level supervisor and can switch it to another.

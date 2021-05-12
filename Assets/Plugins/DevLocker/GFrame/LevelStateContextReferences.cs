@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DevLocker.GameFrame
+namespace DevLocker.GFrame
 {
 	/// <summary>
 	/// Contains static shared level references that can be accessed by the level state.

@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace DevLocker.GameFrame
+namespace DevLocker.GFrame
 {
 	/// <summary>
 	/// Marks class to be passed onto levels as game context.

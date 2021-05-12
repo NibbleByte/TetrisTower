@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace DevLocker.GameFrame.UI
+namespace DevLocker.GFrame.UI
 {
 	/// <summary>
 	/// Put next to or under a UI.Button component to get invoked on specified InputAction.

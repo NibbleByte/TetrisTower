@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace DevLocker.GameFrame.UI
+namespace DevLocker.GFrame.UI
 {
 	/// <summary>
 	/// Calls UnityEvent on specified InputAction.

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DevLocker.GameFrame.UI
+namespace DevLocker.GFrame.UI
 {
 	/// <summary>
 	/// Marks hotkey elements to be controlled by the HotkeyScope.
