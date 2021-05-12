@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace DevLocker.GFrame.UI
+namespace DevLocker.GFrame.UIHotkeys
 {
 	/// <summary>
 	/// Calls UnityEvent on specified InputAction.

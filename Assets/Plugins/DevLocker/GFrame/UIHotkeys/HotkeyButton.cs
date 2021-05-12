@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace DevLocker.GFrame.UI
+namespace DevLocker.GFrame.UIHotkeys
 {
 	/// <summary>
 	/// Put next to or under a UI.Button component to get invoked on specified InputAction.
