@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.MessageBox;
 using System;
 using System.Collections;
 using TetrisTower.Game;
@@ -16,6 +17,10 @@ namespace TetrisTower.TowerLevels
 		public IEnumerator Load(IGameContext gameContext)
 		{
 			GameContext = (GameContext)gameContext;
+
+			if (MessageBox.Instance) {
+				MessageBox.Instance.ForceCloseAllMessages();
+			}
 
 			if (SceneManager.GetActiveScene().name != "GameScene") {
 				yield return SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Single);

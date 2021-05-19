@@ -25,7 +25,10 @@ namespace DevLocker.GFrame
 			}
 
 			Instance = this;
-			DontDestroyOnLoad(gameObject);
+
+			if (transform.parent == null) {
+				DontDestroyOnLoad(gameObject);
+			}
 		}
 
 		void OnDestroy()

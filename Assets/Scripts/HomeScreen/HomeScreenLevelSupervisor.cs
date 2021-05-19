@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.MessageBox;
 using System;
 using System.Collections;
 using TetrisTower.Game;
@@ -16,6 +17,10 @@ namespace TetrisTower.HomeScreen
 		public IEnumerator Load(IGameContext gameContext)
 		{
 			GameContext = (GameContext)gameContext;
+
+			if (MessageBox.Instance) {
+				MessageBox.Instance.ForceCloseAllMessages();
+			}
 
 			if (SceneManager.GetActiveScene().name != "HomeScreenScene") {
 				yield return SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);

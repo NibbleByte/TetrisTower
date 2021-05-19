@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.MessageBox;
 using System.Collections;
 using TetrisTower.Core;
 using TetrisTower.HomeScreen;
@@ -33,6 +34,7 @@ namespace TetrisTower.Game
 			var playerControls = new PlayerControls();
 
 			var gameInputObject = Instantiate(GameConfig.GameInputPrefab, transform);
+			Instantiate(GameConfig.MessageBoxPrefab.gameObject, transform);
 
 			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
 			uiInputModule.actionsAsset = playerControls.asset;
@@ -88,10 +90,36 @@ namespace TetrisTower.Game
 		private void Update()
 		{
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {
-				Serialize();
+				MessageBox.Instance.ShowSimple(
+					"Save?",
+					"Are you sure you want to save?",
+					MessageBoxIcon.Question,
+					MessageBoxButtons.YesNo,
+					Serialize,
+					this
+					);
+				//Serialize();
 			}
+
 			if (Keyboard.current.f6Key.wasPressedThisFrame) {
-				Deserialize();
+				MessageBox.Instance.ShowSimple(
+					"Load?",
+					"Are you sure you want to load?\nAll current progress will be lost!",
+					MessageBoxIcon.Warning,
+					MessageBoxButtons.YesNo,
+					Deserialize,
+					this
+					);
+
+				//Deserialize();
+			}
+
+			if (Keyboard.current.f7Key.wasPressedThisFrame) {
+				MessageBox.Instance.ForceConfirmShownMessage();
+			}
+
+			if (Keyboard.current.f8Key.wasPressedThisFrame) {
+				MessageBox.Instance.ForceDenyShownMessage();
 			}
 
 			if (Keyboard.current.f4Key.wasPressedThisFrame) {

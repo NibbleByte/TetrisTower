@@ -80,7 +80,8 @@ namespace DevLocker.GFrame.UIHotkeys
 
 			int eventCount = button.onClick.GetPersistentEventCount();
 			if (eventCount == 0) {
-				Debug.LogError($"Button {button.name} doesn't do anything on click, so it's hotkey will do nothing.", this);
+				// User may subscribe dynamically runtime.
+				//Debug.LogError($"Button {button.name} doesn't do anything on click, so it's hotkey will do nothing.", this);
 				return;
 			}
 
