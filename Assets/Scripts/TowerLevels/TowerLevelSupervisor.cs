@@ -38,17 +38,11 @@ namespace TetrisTower.TowerLevels
 				uiController
 				);
 
-			GameContext.PlayerControls.UI.Enable();
-			GameContext.PlayerControls.CommonHotkeys.Enable();
-
 			yield return StatesStack.SetStateCrt(new TowerPlayState());
 		}
 
 		public IEnumerator Unload()
 		{
-			GameContext.PlayerControls.UI.Disable();
-			GameContext.PlayerControls.CommonHotkeys.Disable();
-
 			yield break;
 		}
 	}

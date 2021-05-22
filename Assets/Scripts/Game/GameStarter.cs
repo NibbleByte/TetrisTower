@@ -3,7 +3,6 @@ using DevLocker.GFrame.MessageBox;
 using System.Collections;
 using TetrisTower.Core;
 using TetrisTower.HomeScreen;
-using TetrisTower.Input;
 using TetrisTower.TowerLevels;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -49,9 +48,6 @@ namespace TetrisTower.Game
 			uiInputModule.cancel = InputActionReference.Create(playerControls.UI.Cancel);
 			uiInputModule.trackedDevicePosition = InputActionReference.Create(playerControls.UI.TrackedDevicePosition);
 			uiInputModule.trackedDeviceOrientation = InputActionReference.Create(playerControls.UI.TrackedDeviceOrientation);
-
-			// Make sure no input is enabled when starting level (including UI).
-			playerControls.Disable();
 
 			var scheduler = gameObject.AddComponent<CoroutineScheduler>();
 
@@ -123,12 +119,12 @@ namespace TetrisTower.Game
 			}
 
 			if (Keyboard.current.f4Key.wasPressedThisFrame) {
-				if (!GameContext.Controls.devices.HasValue) {
+				if (!GameContext.PlayerControls.devices.HasValue) {
 					Debug.LogWarning("Forcing pointer exclusive input!");
-					GameContext.Controls.devices = new InputDevice[] { (InputDevice)Touchscreen.current ?? Mouse.current};
+					GameContext.PlayerControls.devices = new InputDevice[] { (InputDevice)Touchscreen.current ?? Mouse.current};
 				} else {
 					Debug.LogWarning("All devices are processed.");
-					GameContext.Controls.devices = default;
+					GameContext.PlayerControls.devices = default;
 				}
 			}
 		}

@@ -10,16 +10,6 @@ namespace DevLocker.GFrame
 
 	}
 
-#if USE_INPUT_SYSTEM
-	/// <summary>
-	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
-	/// </summary>
-	public interface IInputActionsProvider
-	{
-		UnityEngine.InputSystem.IInputActionCollection2 Controls { get; }
-	}
-#endif
-
 	/// <summary>
 	/// Controls the whole level: loading, unloading, switching states (via the StatesStack).
 	/// </summary>

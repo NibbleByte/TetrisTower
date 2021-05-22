@@ -12,7 +12,7 @@ namespace DevLocker.GFrame.UIHotkeys
 	/// Put next to or under a UI.Button component to get invoked on specified InputAction.
 	/// Note that this action has to be enabled in order to be invoked.
 	/// </summary>
-	public class HotkeyButton : MonoBehaviour, IHotkeyElement
+	public class HotkeyButton : MonoBehaviour, IHotkeyElement, IHotkeyWithInputAction
 	{
 		[SerializeField]
 		private InputActionReference m_InputAction;
@@ -21,15 +21,15 @@ namespace DevLocker.GFrame.UIHotkeys
 
 		void OnEnable()
 		{
-			var controls = (LevelsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
+			var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
 
-			if (controls == null) {
+			if (context == null) {
 				Debug.LogWarning($"{nameof(HotkeyButton)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			controls.FindAction(m_InputAction.name).performed += OnInputAction;
+			context.FindAction(m_InputAction.name).performed += OnInputAction;
 		}
 
 		void OnDisable()
@@ -38,13 +38,13 @@ namespace DevLocker.GFrame.UIHotkeys
 			if (LevelsManager.Instance == null)
 				return;
 
-			var controls = (LevelsManager.Instance.GameContext as IInputActionsProvider)?.Controls;
+			var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
 
-			if (controls == null) {
+			if (context == null) {
 				return;
 			}
 
-			controls.FindAction(m_InputAction.name).performed -= OnInputAction;
+			context.FindAction(m_InputAction.name).performed -= OnInputAction;
 		}
 
 		private void OnInputAction(InputAction.CallbackContext obj)
@@ -97,6 +97,18 @@ namespace DevLocker.GFrame.UIHotkeys
 				}
 			}
 
+		}
+
+		public IEnumerable<InputAction> GetUsedActions()
+		{
+			var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
+
+			if (context == null) {
+				Debug.LogWarning($"{nameof(HotkeyButton)} button {name} can't be used if Unity Input System is not provided.", this);
+				yield break;
+			}
+
+			yield return context.FindAction(m_InputAction.name);
 		}
 	}
 }

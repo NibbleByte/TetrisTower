@@ -1,6 +1,6 @@
 using DevLocker.GFrame;
 using System.Collections;
-using TetrisTower.Input;
+using TetrisTower.Game;
 
 namespace TetrisTower.TowerLevels
 {
@@ -14,6 +14,9 @@ namespace TetrisTower.TowerLevels
 			contextReferences.SetByType(out m_UIController);
 			contextReferences.SetByType(out m_PlayerControls);
 
+			m_PlayerControls.InputStack.PushActionsState(this);
+			m_PlayerControls.UI.Enable();
+			m_PlayerControls.CommonHotkeys.Enable();
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(this);
 			m_PlayerControls.TowerLevelPaused.Enable();
 
@@ -25,7 +28,7 @@ namespace TetrisTower.TowerLevels
 		public IEnumerator ExitState()
 		{
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(null);
-			m_PlayerControls.TowerLevelPaused.Disable();
+			m_PlayerControls.InputStack.PopActionsState(this);
 
 			yield break;
 		}

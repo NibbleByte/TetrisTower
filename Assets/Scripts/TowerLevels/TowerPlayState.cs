@@ -2,7 +2,6 @@ using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
 using System.Collections;
 using TetrisTower.Game;
-using TetrisTower.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,6 +24,9 @@ namespace TetrisTower.TowerLevels
 			contextReferences.SetByType(out m_UIController);
 			contextReferences.SetByType(out m_GameConfig);
 
+			m_PlayerControls.InputStack.PushActionsState(this);
+			m_PlayerControls.UI.Enable();
+			m_PlayerControls.CommonHotkeys.Enable();
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(this);
 			m_PlayerControls.TowerLevelPlay.Enable();
 
@@ -47,11 +49,7 @@ namespace TetrisTower.TowerLevels
 			m_LevelController.PauseLevel();
 
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
-			m_PlayerControls.TowerLevelPlay.Disable();
-
-			// Restore it back to normal.
-			m_PlayerControls.UI.Submit.Enable();
-			m_PlayerControls.UI.Navigate.Enable();
+			m_PlayerControls.InputStack.PopActionsState(this);
 
 			MessageBox.Instance.MessageShown -= m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed -= m_LevelController.ResumeLevel;
@@ -97,7 +95,6 @@ namespace TetrisTower.TowerLevels
 		// Pointer (touch or mouse) version, as binding interactions get ignored if grouped with other devices.
 		public void OnPointerFallSpeedUp(InputAction.CallbackContext context)
 		{
-			// TODO: When MessageBox is shown, double-click gesture is still started and executed.
 			if (context.phase == InputActionPhase.Performed) {
 				m_LevelController.RequestFallingSpeedUp(m_GameConfig.FallSpeedup);
 
@@ -109,7 +106,6 @@ namespace TetrisTower.TowerLevels
 		// Pointer (touch or mouse) gesture detections.
 		public void OnPointerPress(InputAction.CallbackContext context)
 		{
-			// TODO: When MessageBox is shown, click gesture is still started and executed.
 			if (Pointer.current == null)
 				return;
 

@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace TetrisTower.Input
+namespace TetrisTower.Game
 {
     public partial class @PlayerControls : IInputActionCollection2, IDisposable
     {
@@ -94,6 +94,17 @@ namespace TetrisTower.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""FallSpeedUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b89000c4-6b25-4e79-bfa9-46186462a044"",
+                    ""path"": ""<Keyboard>/numpadEnter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""FallSpeedUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -770,6 +781,17 @@ namespace TetrisTower.Input
                     ""name"": """",
                     ""id"": ""c9264633-0d18-4c29-a1ad-34bda9ec34fb"",
                     ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1744cc73-c376-483c-9a2d-832ae0cf6636"",
+                    ""path"": ""<Keyboard>/numpadEnter"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DevLocker.GFrame.UIHotkeys
@@ -12,6 +13,16 @@ namespace DevLocker.GFrame.UIHotkeys
 		bool enabled { get; set; }
 	}
 
+#if USE_INPUT_SYSTEM
+	/// <summary>
+	/// Used with Unity InputSystem for pushing and poppin states in the InputActionsStack.
+	/// </summary>
+	public interface IHotkeyWithInputAction
+	{
+		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions();
+	}
+#endif
+
 	/// <summary>
 	/// When working with more hotkeys on screen, some conflicts may arise.
 	/// For example:
@@ -22,6 +33,13 @@ namespace DevLocker.GFrame.UIHotkeys
 	[SelectionBase]
 	public class HotkeyScope : MonoBehaviour
 	{
+#if USE_INPUT_SYSTEM
+		[Tooltip("Push a new input state in the stack.\nOn deactivating, will pop this state and restore the previous one.\nThe only enabled actions will be the used ones by (under) this scope.")]
+		public bool PushInputStack = false;
+		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
+		public bool IncludeUIActions = true;
+#endif
+
 		public static HotkeyScope ActiveScope { get; private set; }
 
 		private static List<HotkeyScope> s_Scopes = new List<HotkeyScope>();
@@ -106,6 +124,38 @@ namespace DevLocker.GFrame.UIHotkeys
 			foreach(IHotkeyElement hotkeyElement in m_HotkeyElements) {
 				hotkeyElement.enabled = active;
 			}
+
+#if USE_INPUT_SYSTEM
+			if (PushInputStack) {
+
+				var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
+
+				if (context == null) {
+					Debug.LogWarning($"{nameof(HotkeyScope)} {name} can't be used if Unity Input System is not provided.", this);
+					return;
+				}
+
+				if (active) {
+
+					context.PushActionsState(this);
+
+					foreach (IHotkeyWithInputAction hotkeyElement in m_HotkeyElements.OfType<IHotkeyWithInputAction>()) {
+						foreach (var action in hotkeyElement.GetUsedActions()) {
+							action.Enable();
+						}
+					}
+
+					if (IncludeUIActions) {
+						foreach(var action in context.GetUIActions()) {
+							action.Enable();
+						}
+					}
+
+				} else {
+					context.PopActionsState(this);
+				}
+			}
+#endif
 		}
 	}
 }
