@@ -31,6 +31,10 @@ namespace DevLocker.GFrame.MessageBox
 #pragma warning disable 0649  // never assigned to
 
 		[SerializeField]
+		[Tooltip("Will be displayed when a message is shown.\nTo be used for blocking clicks (and maybe simple background).")]
+		private GameObject InputBlocker;
+
+		[SerializeField]
 		private List<MessageBoxUIControllerBind> m_UIControllers;
 
 #pragma warning disable 0649
@@ -59,8 +63,7 @@ namespace DevLocker.GFrame.MessageBox
 
 			ShownData = data;
 
-			// TODO
-			//InputConsumer.SetActive(true);
+			InputBlocker?.SetActive(true);
 			GetUIController(ShownData).Show(ShownData);
 
 			if (!wasShowingMessage) {
@@ -78,8 +81,6 @@ namespace DevLocker.GFrame.MessageBox
 
 			userCallback?.Invoke(responseData);
 
-			// TODO
-			//InputConsumer.SetActive(false);
 
 			// Show next pending message, but check if the user callback didn't show another one in the mean time.
 			if (m_PendingData.Count > 0 && ShownData == null) {
@@ -90,6 +91,7 @@ namespace DevLocker.GFrame.MessageBox
 			}
 
 			if (ShownData == null) {
+				InputBlocker?.SetActive(false);
 				MessageClosed?.Invoke();
 			}
 		}
@@ -172,12 +174,11 @@ namespace DevLocker.GFrame.MessageBox
 				ShownData = null;
 			}
 
-			// TODO
-			//InputConsumer.SetActive(false);
 
 			m_PendingData.Clear();
 
 			if (wasShowingMessage) {
+				InputBlocker?.SetActive(false);
 				MessageClosed?.Invoke();
 			}
 		}
@@ -200,6 +201,7 @@ namespace DevLocker.GFrame.MessageBox
 				}
 
 				if (ShownData == null) {
+					InputBlocker?.SetActive(false);
 					MessageClosed?.Invoke();
 				}
 
@@ -245,6 +247,7 @@ namespace DevLocker.GFrame.MessageBox
 				DontDestroyOnLoad(gameObject);
 			}
 
+			InputBlocker?.SetActive(false);
 
 			foreach (MessageBoxUIControllerBind bind in m_UIControllers) {
 				if (bind.Controller == null) {

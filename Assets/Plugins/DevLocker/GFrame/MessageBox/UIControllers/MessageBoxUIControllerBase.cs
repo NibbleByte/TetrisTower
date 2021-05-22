@@ -33,6 +33,8 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 	{
 		public event Action<MessageBoxResponseData> UserMadeChoice;
 
+		public bool OverrideNavigation = true;
+
 		public List<MessageBoxIconBind> Icons;
 
 		public List<MessageBoxButtonBind> Buttons;
@@ -56,7 +58,18 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 				UnityAction handler = () => { OnButtonClick(button); };
 
 				bind.Button.onClick.AddListener(handler);
+
+				if (OverrideNavigation) {
+					var nav = button.navigation;
+					nav.mode = Navigation.Mode.Explicit;
+					button.navigation = nav;
+				}
 			}
+
+			// Sort list for Navigation purposes.
+			Buttons.Sort((bind1, bind2) =>
+				bind1.Button.transform.GetSiblingIndex().CompareTo(bind2.Button.transform.GetSiblingIndex())
+			);
 		}
 
 		public virtual void Show(MessageData data)
@@ -74,8 +87,23 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 				}
 			}
 
+			Button lastButton = null;
 			foreach (Button button in GetButtons(m_ShownData.Buttons)) {
 				button.gameObject.SetActive(true);
+
+				if (OverrideNavigation) {
+					if (lastButton) {
+						var nav = lastButton.navigation;
+						nav.selectOnRight = button;
+						lastButton.navigation = nav;
+
+						nav = button.navigation;
+						nav.selectOnLeft = lastButton;
+						button.navigation = nav;
+					}
+
+					lastButton = button;
+				}
 			}
 
 			// This should be done last for optimization reasons.

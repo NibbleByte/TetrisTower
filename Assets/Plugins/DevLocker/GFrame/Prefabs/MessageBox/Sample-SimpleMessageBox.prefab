@@ -264,7 +264,7 @@ RectTransform:
   m_Children:
   - {fileID: 4595660821074180645}
   m_Father: {fileID: 4595660821015799263}
-  m_RootOrder: 5
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -574,7 +574,7 @@ RectTransform:
   m_Children:
   - {fileID: 4595660820913905522}
   m_Father: {fileID: 4595660821015799263}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -776,7 +776,7 @@ RectTransform:
   m_Children:
   - {fileID: 4595660820090041915}
   m_Father: {fileID: 4595660821015799263}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1086,7 +1086,7 @@ RectTransform:
   m_Children:
   - {fileID: 4595660820017001793}
   m_Father: {fileID: 4595660821015799263}
-  m_RootOrder: 1
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1326,7 +1326,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.8}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1406,7 +1406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.8}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1435,6 +1435,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b834d0bbcc86b34aa11158d4480d020, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OverrideNavigation: 1
   Icons:
   - Icon: 1
     Visual: {fileID: 4595660819702734563}
@@ -2207,12 +2208,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4595660819143756511}
-  - {fileID: 4595660820075468351}
   - {fileID: 4595660819440846821}
+  - {fileID: 4595660819204073863}
   - {fileID: 4595660820823125167}
   - {fileID: 4595660820432845999}
-  - {fileID: 4595660819204073863}
   - {fileID: 4595660819643864127}
+  - {fileID: 4595660820075468351}
   m_Father: {fileID: 4595660820359430503}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
