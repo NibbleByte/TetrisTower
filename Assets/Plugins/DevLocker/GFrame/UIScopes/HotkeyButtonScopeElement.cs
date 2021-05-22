@@ -6,13 +6,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace DevLocker.GFrame.UIHotkeys
+namespace DevLocker.GFrame.UIScope
 {
 	/// <summary>
 	/// Put next to or under a UI.Button component to get invoked on specified InputAction.
 	/// Note that this action has to be enabled in order to be invoked.
 	/// </summary>
-	public class HotkeyButton : MonoBehaviour, IHotkeyElement, IHotkeyWithInputAction
+	public class HotkeyButtonScopeElement : MonoBehaviour, IScopeElement, IHotkeyWithInputAction
 	{
 		[SerializeField]
 		private InputActionReference m_InputAction;
@@ -24,7 +24,7 @@ namespace DevLocker.GFrame.UIHotkeys
 			var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
 
 			if (context == null) {
-				Debug.LogWarning($"{nameof(HotkeyButton)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -104,7 +104,7 @@ namespace DevLocker.GFrame.UIHotkeys
 			var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
 
 			if (context == null) {
-				Debug.LogWarning($"{nameof(HotkeyButton)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				yield break;
 			}
 

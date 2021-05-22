@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DevLocker.GFrame.UIHotkeys
+namespace DevLocker.GFrame.UIScope
 {
 	/// <summary>
-	/// Marks hotkey elements to be controlled by the HotkeyScope.
+	/// Marks scope elements to be controlled by the UIScope.
 	/// </summary>
-	public interface IHotkeyElement
+	public interface IScopeElement
 	{
 		bool enabled { get; set; }
 	}
 
 #if USE_INPUT_SYSTEM
 	/// <summary>
-	/// Used with Unity InputSystem for pushing and poppin states in the InputActionsStack.
+	/// Used with Unity InputSystem for pushing and popping states in the InputActionsStack.
 	/// </summary>
 	public interface IHotkeyWithInputAction
 	{
@@ -24,14 +24,14 @@ namespace DevLocker.GFrame.UIHotkeys
 #endif
 
 	/// <summary>
-	/// When working with more hotkeys on screen, some conflicts may arise.
+	/// When working with more hotkeys, selections, etc. on screen, some conflicts may arise.
 	/// For example:
 	/// > "Back" hotkey element is attached on the displayed menu and another "Back" hotkey attached to the "Yes/No" pop up, displayed on top.
 	/// > The usual solution is to invoke only the last enabled hotkey instead of all of them.
-	/// HotkeyScope groups all child hotkey elements into a single group. The last enabled HotkeyScope is active, while the rest will be disabled.
+	/// UIScope groups all child scope elements into a single group. The last enabled UIScope is active, while the rest will be disabled.
 	/// </summary>
 	[SelectionBase]
-	public class HotkeyScope : MonoBehaviour
+	public class UIScope : MonoBehaviour
 	{
 #if USE_INPUT_SYSTEM
 		[Tooltip("Push a new input state in the stack.\nOn deactivating, will pop this state and restore the previous one.\nThe only enabled actions will be the used ones by (under) this scope.")]
@@ -40,15 +40,15 @@ namespace DevLocker.GFrame.UIHotkeys
 		public bool IncludeUIActions = true;
 #endif
 
-		public static HotkeyScope ActiveScope { get; private set; }
+		public static UIScope ActiveScope { get; private set; }
 
-		private static List<HotkeyScope> s_Scopes = new List<HotkeyScope>();
+		private static List<UIScope> s_Scopes = new List<UIScope>();
 
-		private List<IHotkeyElement> m_HotkeyElements = new List<IHotkeyElement>();
+		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 
-		private void Awake()
+		protected virtual void Awake()
 		{
-			ScanForChildHotkeyElements();
+			ScanForChildScopeElements();
 		}
 
 		void OnEnable()
@@ -90,12 +90,12 @@ namespace DevLocker.GFrame.UIHotkeys
 		}
 
 		/// <summary>
-		/// Call this if you changed your UI hierarchy and expect added or removed hotkey elements.
+		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.
 		/// </summary>
-		public void ScanForChildHotkeyElements()
+		public void ScanForChildScopeElements()
 		{
-			m_HotkeyElements.Clear();
-			ScanForChildHotkeyElements(this, transform, m_HotkeyElements);
+			m_ScopeElements.Clear();
+			ScanForChildScopeElements(this, transform, m_ScopeElements);
 
 			if (ActiveScope == this) {
 				ActiveScope.SetScopeState(true);
@@ -105,24 +105,24 @@ namespace DevLocker.GFrame.UIHotkeys
 			}
 		}
 
-		private static void ScanForChildHotkeyElements(HotkeyScope parentScope, Transform transform, List<IHotkeyElement> hotkeyElements)
+		internal static void ScanForChildScopeElements(UIScope parentScope, Transform transform, List<IScopeElement> scopeElements)
 		{
-			var scope = transform.GetComponent<HotkeyScope>();
+			var scope = transform.GetComponent<UIScope>();
 			// Another scope begins, it will handle its own child hotkey elements.
 			if (scope && parentScope != scope)
 				return;
 
-			hotkeyElements.AddRange(transform.GetComponents<IHotkeyElement>());
+			scopeElements.AddRange(transform.GetComponents<IScopeElement>());
 
 			foreach(Transform child in transform) {
-				ScanForChildHotkeyElements(parentScope, child, hotkeyElements);
+				ScanForChildScopeElements(parentScope, child, scopeElements);
 			}
 		}
 
-		private void SetScopeState(bool active)
+		protected virtual void SetScopeState(bool active)
 		{
-			foreach(IHotkeyElement hotkeyElement in m_HotkeyElements) {
-				hotkeyElement.enabled = active;
+			foreach(IScopeElement scopeElement in m_ScopeElements) {
+				scopeElement.enabled = active;
 			}
 
 #if USE_INPUT_SYSTEM
@@ -131,7 +131,7 @@ namespace DevLocker.GFrame.UIHotkeys
 				var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
 
 				if (context == null) {
-					Debug.LogWarning($"{nameof(HotkeyScope)} {name} can't be used if Unity Input System is not provided.", this);
+					Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
 					return;
 				}
 
@@ -139,7 +139,7 @@ namespace DevLocker.GFrame.UIHotkeys
 
 					context.PushActionsState(this);
 
-					foreach (IHotkeyWithInputAction hotkeyElement in m_HotkeyElements.OfType<IHotkeyWithInputAction>()) {
+					foreach (IHotkeyWithInputAction hotkeyElement in m_ScopeElements.OfType<IHotkeyWithInputAction>()) {
 						foreach (var action in hotkeyElement.GetUsedActions()) {
 							action.Enable();
 						}
@@ -158,4 +158,28 @@ namespace DevLocker.GFrame.UIHotkeys
 #endif
 		}
 	}
+
+#if UNITY_EDITOR
+	[UnityEditor.CustomEditor(typeof(UIScope), true)]
+	public class BaseDefEditor : UnityEditor.Editor
+	{
+		public override void OnInspectorGUI()
+		{
+			DrawDefaultInspector();
+
+			var uiScope = (UIScope)target;
+
+			var scopeElements = new List<IScopeElement>();
+			UIScope.ScanForChildScopeElements(uiScope, uiScope.transform, scopeElements);
+
+
+			UnityEditor.EditorGUILayout.Space();
+			UnityEditor.EditorGUILayout.LabelField("Controlled Elements:", UnityEditor.EditorStyles.boldLabel);
+
+			foreach(var element in scopeElements) {
+				UnityEditor.EditorGUILayout.ObjectField(element as Object, typeof(IScopeElement), true);
+			}
+		}
+	}
+#endif
 }
