@@ -40,6 +40,12 @@ namespace DevLocker.GFrame
 		/// Example: PlayerControls.UI.Get();
 		/// </summary>
 		IEnumerable<InputAction> GetUIActions();
+
+		/// <summary>
+		/// Resets all actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
+		/// Useful on changing states or scopes, so gestures, drags, sequences don't leak in.
+		/// </summary>
+		void ResetAllActions();
 	}
 
 
@@ -140,7 +146,13 @@ namespace DevLocker.GFrame
 			foreach (var statePair in bind.ActionsState) {
 				var action = m_Actions.FindAction(statePair.Key.ToString(), true);
 				if (statePair.Value) {
-					action.Enable();
+
+					if (action.enabled) {
+						action.Reset();
+					} else {
+						action.Enable();
+					}
+
 				} else {
 					action.Disable();
 				}

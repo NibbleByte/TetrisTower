@@ -75,6 +75,13 @@ namespace TetrisTower.Game
 			return PlayerControls.UI.Get();
 		}
 
+		public void ResetAllActions()
+		{
+			foreach(InputAction action in PlayerControls) {
+				action.Reset();
+			}
+		}
+
 		#endregion
 	}
 }

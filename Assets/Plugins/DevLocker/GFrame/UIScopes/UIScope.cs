@@ -34,6 +34,10 @@ namespace DevLocker.GFrame.UIScope
 	public class UIScope : MonoBehaviour
 	{
 #if USE_INPUT_SYSTEM
+		[Tooltip("Reset all input actions.\nThis will interrupt their progress and any gesture, drag, sequence will be canceled.")]
+		public bool ResetAllActionsOnEnable = true;
+
+		[Space]
 		[Tooltip("Push a new input state in the stack.\nOn deactivating, will pop this state and restore the previous one.\nThe only enabled actions will be the used ones by (under) this scope.")]
 		public bool PushInputStack = false;
 		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
@@ -126,6 +130,18 @@ namespace DevLocker.GFrame.UIScope
 			}
 
 #if USE_INPUT_SYSTEM
+			// Pushing input on stack will reset the actions anyway.
+			if (ResetAllActionsOnEnable && active && !PushInputStack) {
+				var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
+
+				if (context == null) {
+					Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
+					return;
+				}
+
+				context.ResetAllActions();
+			}
+
 			if (PushInputStack) {
 
 				var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
