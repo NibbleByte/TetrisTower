@@ -86,12 +86,14 @@ namespace TetrisTower.Game
 		private void Update()
 		{
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {
-				MessageBox.Instance.ShowSimple(
+				MessageBox.Instance.ShowInput(
 					"Save?",
 					"Are you sure you want to save?",
+					"Savegame-001",
+					null,
 					MessageBoxIcon.Question,
 					MessageBoxButtons.YesNo,
-					Serialize,
+					(res) => { if (res.ConfirmResponse) Serialize(); },
 					this
 					);
 				//Serialize();

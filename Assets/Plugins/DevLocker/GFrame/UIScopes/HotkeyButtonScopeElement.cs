@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -14,6 +15,16 @@ namespace DevLocker.GFrame.UIScope
 	/// </summary>
 	public class HotkeyButtonScopeElement : MonoBehaviour, IScopeElement, IHotkeyWithInputAction
 	{
+		public enum SkipHotkeyOption
+		{
+			Never = 0,
+			EnteringText = 4,
+			AnySelectableFocused = 8,
+		}
+
+		[Tooltip("Skip the hotkey based on the selected condition.")]
+		public SkipHotkeyOption SkipHotkey = SkipHotkeyOption.Never;
+
 		[SerializeField]
 		private InputActionReference m_InputAction;
 
@@ -51,6 +62,21 @@ namespace DevLocker.GFrame.UIScope
 		{
 			if (m_Button == null) {
 				m_Button = GetComponentInParent<Button>();
+			}
+
+			if (SkipHotkey == SkipHotkeyOption.AnySelectableFocused && EventSystem.current.currentSelectedGameObject)
+				return;
+
+			if (SkipHotkey == SkipHotkeyOption.EnteringText && EventSystem.current.currentSelectedGameObject) {
+				var inputField = EventSystem.current.currentSelectedGameObject.GetComponent<InputField>();
+				if (inputField && inputField.isFocused)
+					return;
+
+#if USE_TEXT_MESH_PRO
+				var inputFieldTMP = EventSystem.current.currentSelectedGameObject.GetComponent<TMPro.TMP_InputField>();
+				if (inputFieldTMP && inputFieldTMP.isFocused)
+					return;
+#endif
 			}
 
 			m_Button.onClick.Invoke();
