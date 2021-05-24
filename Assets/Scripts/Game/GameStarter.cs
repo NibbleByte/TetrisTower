@@ -38,17 +38,6 @@ namespace TetrisTower.Game
 			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
 			uiInputModule.actionsAsset = playerControls.asset;
 
-			uiInputModule.point = InputActionReference.Create(playerControls.UI.Point);
-			uiInputModule.leftClick = InputActionReference.Create(playerControls.UI.Click);
-			uiInputModule.middleClick = InputActionReference.Create(playerControls.UI.MiddleClick);
-			uiInputModule.rightClick = InputActionReference.Create(playerControls.UI.RightClick);
-			uiInputModule.scrollWheel = InputActionReference.Create(playerControls.UI.ScrollWheel);
-			uiInputModule.move = InputActionReference.Create(playerControls.UI.Navigate);
-			uiInputModule.submit = InputActionReference.Create(playerControls.UI.Submit);
-			uiInputModule.cancel = InputActionReference.Create(playerControls.UI.Cancel);
-			uiInputModule.trackedDevicePosition = InputActionReference.Create(playerControls.UI.TrackedDevicePosition);
-			uiInputModule.trackedDeviceOrientation = InputActionReference.Create(playerControls.UI.TrackedDeviceOrientation);
-
 			var scheduler = gameObject.AddComponent<CoroutineScheduler>();
 
 			GameContext = new GameContext(GameConfig, playerControls, scheduler);
