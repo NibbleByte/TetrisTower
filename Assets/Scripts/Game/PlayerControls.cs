@@ -769,7 +769,7 @@ namespace TetrisTower.Game
                 {
                     ""name"": """",
                     ""id"": ""0e856c71-d343-443e-9761-dd29c3282071"",
-                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""path"": ""*/{Back}"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -802,7 +802,7 @@ namespace TetrisTower.Game
                 {
                     ""name"": """",
                     ""id"": ""589d6359-788e-4ce2-bebd-99f58690a87b"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""path"": ""*/{Submit}"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
