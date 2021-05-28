@@ -249,6 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ResetAllActionsOnEnable: 1
   PushInputStack: 0
   IncludeUIActions: 1
 --- !u!114 &1268881109800414549
@@ -576,6 +577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SkipHotkey: 8
   m_InputAction: {fileID: -545284412596635738, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!114 &7259477364986978025
 MonoBehaviour:
@@ -589,6 +591,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PersistentSelection: 0
 --- !u!1 &1268881110335725833
 GameObject:
   m_ObjectHideFlags: 0
@@ -1205,6 +1208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SkipHotkey: 0
   m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1 &1268881110950398496
 GameObject:
