@@ -147,6 +147,16 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 			m_ShownData = null;
 		}
 
+		public void Submit()
+		{
+			OnButtonClick(GetActiveConfirmButton());
+		}
+
+		public void Cancel()
+		{
+			OnButtonClick(GetActiveDenyButton());
+		}
+
 		protected virtual void OverrideButtonTexts()
 		{
 			foreach (var pair in m_ShownData.ButtonsOverrideLabels) {
@@ -259,39 +269,5 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 
 			return resultData;
 		}
-
-		// TODO
-		//protected virtual bool OnInputEventInternal(InputEvent ev)
-		//{
-		//	if (ev.Type == InputEventType.Pressed) {
-		//		if (ev.Name == "Cancel") {
-		//			Button denyButton = GetActiveDenyButton();
-		//			if (denyButton) {
-		//				denyButton.onClick?.Invoke();
-		//				return true;
-		//			}
-		//		}
-		//		else if (ev.Name == "Submit" || ev.Name == "ConfirmAction") {
-		//
-		//			if (_input.InputType == InputType.Joystick) {
-		//				FreeCursorController cursor = GameUtl.GetFreeCursorController();
-		//				if (cursor != null) {
-		//					if (cursor.IsSelectableUnderTheCursor()) {
-		//						//if cursor is over a button - do not handle hotkeys
-		//						return false;
-		//					}
-		//				}
-		//			}
-		//
-		//			Button confirmButton = GetActiveConfirmButton();
-		//			if (confirmButton) {
-		//				confirmButton.onClick?.Invoke();
-		//				return true;
-		//			}
-		//		}
-		//	}
-		//
-		//	return false;
-		//}
 	}
 }

@@ -1,5 +1,9 @@
 namespace DevLocker.GFrame.MessageBox
 {
+	/// <summary>
+	/// Used by processing UI controller to display progress bar.
+	/// The confirm button will be disabled until the progress bar reaches 100%.
+	/// </summary>
 	public interface IMessageBoxProgressTracker
 	{
 		float PollFrequency { get; }	// In seconds

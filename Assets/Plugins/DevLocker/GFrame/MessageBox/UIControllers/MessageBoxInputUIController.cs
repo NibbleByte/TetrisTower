@@ -79,16 +79,5 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 
 			return resultData;
 		}
-
-		/* TODO
-		protected override bool OnInputEventInternal(InputEvent ev)
-		{
-			// HACK: ConfirmAction is Space. Don't confirm while typing.
-			if (ev.Type == InputEventType.Pressed && ev.Name == "ConfirmAction" && m_InputField.isFocused)
-				return false;
-
-			return base.OnInputEventInternal(ev);
-		}
-		*/
 	}
 }

@@ -124,14 +124,21 @@ namespace TetrisTower.Game
 		string m_DebugSave;
 		void Serialize()
 		{
-			m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(GameContext.CurrentPlaythrough, GameConfig.Converters);
-			Debug.Log(m_DebugSave);
+
+			if (GameContext.CurrentPlaythrough != null) {
+				m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(GameContext.CurrentPlaythrough, GameConfig.Converters);
+				Debug.Log(m_DebugSave);
+			} else {
+				Debug.Log("No game in progress.");
+			}
 		}
 
 		void Deserialize()
 		{
-			if (string.IsNullOrEmpty(m_DebugSave))
+			if (string.IsNullOrEmpty(m_DebugSave)) {
+				Debug.Log("No save found.");
 				return;
+			}
 
 			var playthrough = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(m_DebugSave, GameConfig.Converters);
 			GameContext.SetCurrentPlaythrough(playthrough);

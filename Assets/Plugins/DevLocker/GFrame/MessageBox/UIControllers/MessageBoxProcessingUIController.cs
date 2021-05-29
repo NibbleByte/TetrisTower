@@ -37,6 +37,18 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 			StopCoroutine(m_UpdateProgressCrt);
 		}
 
+		protected override bool ValidateResponse(MessageBoxResponse result)
+		{
+			switch (result) {
+				case MessageBoxResponse.Yes:
+				case MessageBoxResponse.OK:
+				case MessageBoxResponse.Retry:
+					return m_ShownData.ProgressTracker.IsReady;
+			}
+
+			return true;
+		}
+
 		private IEnumerator UpdateProgress()
 		{
 			while (!m_ShownData.ProgressTracker.IsReady) {
@@ -59,20 +71,5 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 
 			ProgressBarText.Text = ProgressBarTextPrefix + Mathf.Round(ProgressBar.value * 100) + ProgressBarTextSuffix;
 		}
-
-		// TODO
-		//protected override bool OnInputEventInternal(InputEvent ev)
-		//{
-		//	if (ev.Type == InputEventType.Pressed) {
-		//		if (ev.Name == "Submit" || ev.Name == "ConfirmAction") {
-		//			// Stop ConfirmAction if progress is not ready yet.
-		//			if (!_shownData.ProgressTracker.IsReady) {
-		//				return true;
-		//			}
-		//		}
-		//	}
-		//
-		//	return base.OnInputEventInternal(ev);
-		//}
 	}
 }

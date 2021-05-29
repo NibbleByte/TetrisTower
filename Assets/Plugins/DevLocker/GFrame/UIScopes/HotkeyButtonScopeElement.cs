@@ -1,5 +1,6 @@
 #if USE_INPUT_SYSTEM
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,15 +16,9 @@ namespace DevLocker.GFrame.UIScope
 	/// </summary>
 	public class HotkeyButtonScopeElement : MonoBehaviour, IScopeElement, IHotkeyWithInputAction
 	{
-		public enum SkipHotkeyOption
-		{
-			Never = 0,
-			EnteringText = 4,
-			AnySelectableFocused = 8,
-		}
-
 		[Tooltip("Skip the hotkey based on the selected condition.")]
-		public SkipHotkeyOption SkipHotkey = SkipHotkeyOption.Never;
+		[Utils.EnumMask]
+		public SkipHotkeyOption SkipHotkey;
 
 		[SerializeField]
 		private InputActionReference m_InputAction;
@@ -64,16 +59,24 @@ namespace DevLocker.GFrame.UIScope
 				m_Button = GetComponentInParent<Button>();
 			}
 
-			if (SkipHotkey == SkipHotkeyOption.AnySelectableFocused && EventSystem.current.currentSelectedGameObject)
+			var selected = EventSystem.current.currentSelectedGameObject;
+
+			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
+				&& selected
+				&& !selected.GetComponent<InputField>()
+#if USE_TEXT_MESH_PRO
+				&& !selected.GetComponent<TMPro.TMP_InputField>()
+#endif
+				)
 				return;
 
-			if (SkipHotkey == SkipHotkeyOption.EnteringText && EventSystem.current.currentSelectedGameObject) {
-				var inputField = EventSystem.current.currentSelectedGameObject.GetComponent<InputField>();
+			if ((SkipHotkey & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
+				var inputField = selected.GetComponent<InputField>();
 				if (inputField && inputField.isFocused)
 					return;
 
 #if USE_TEXT_MESH_PRO
-				var inputFieldTMP = EventSystem.current.currentSelectedGameObject.GetComponent<TMPro.TMP_InputField>();
+				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
 				if (inputFieldTMP && inputFieldTMP.isFocused)
 					return;
 #endif

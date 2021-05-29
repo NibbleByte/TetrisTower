@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,16 @@ namespace DevLocker.GFrame.UIScope
 		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions();
 	}
 #endif
+
+	/// <summary>
+	/// Used to skip hotkeys in some cases.
+	/// </summary>
+	[Flags]
+	public enum SkipHotkeyOption
+	{
+		InputFieldTextFocused = 1 << 0,
+		NonTextSelectableFocused = 1 << 1,
+	}
 
 	/// <summary>
 	/// When working with more hotkeys, selections, etc. on screen, some conflicts may arise.
@@ -193,7 +204,7 @@ namespace DevLocker.GFrame.UIScope
 			UnityEditor.EditorGUILayout.LabelField("Controlled Elements:", UnityEditor.EditorStyles.boldLabel);
 
 			foreach(var element in scopeElements) {
-				UnityEditor.EditorGUILayout.ObjectField(element as Object, typeof(IScopeElement), true);
+				UnityEditor.EditorGUILayout.ObjectField(element as UnityEngine.Object, typeof(IScopeElement), true);
 			}
 		}
 	}

@@ -12,10 +12,29 @@ namespace DevLocker.GFrame.UIScope
 		public bool PersistentSelection = false;
 
 		private GameObject m_PersistedSelection = null;
+		private bool m_SelectRequested = false;
 
 		void OnEnable()
 		{
-			if (EventSystem.current) {
+			m_SelectRequested = true;
+		}
+
+		void Update()
+		{
+			if (m_SelectRequested && EventSystem.current) {
+
+#if USE_INPUT_SYSTEM
+				// Hotkeys subscribe for the InputAction.perform event, which executes on key press / down,
+				// while "Submit" action of the InputSystemUIInputModule runs on key release / up.
+				// This makes hotkey being executed, new screen scope shown and executing the newly selected button on release.
+				// We don't want that so wait till submit action is no more pressed.
+				var inputModule = EventSystem.current.currentInputModule as UnityEngine.InputSystem.UI.InputSystemUIInputModule;
+				var submitAction = inputModule?.submit?.action;
+				if (submitAction != null && submitAction.IsPressed())
+					return;
+#endif
+
+				m_SelectRequested = false;
 				if (m_PersistedSelection && m_PersistedSelection.activeInHierarchy) {
 					EventSystem.current.SetSelectedGameObject(m_PersistedSelection);
 				} else {
