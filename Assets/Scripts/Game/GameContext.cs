@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace TetrisTower.Game
 	}
 
 	[Serializable]
-	public class GameContext : IGameContext, IInputActionsContext
+	public class GameContext : IGameContext, IInputContextProvider
 	{
 		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
 		{
@@ -31,6 +32,8 @@ namespace TetrisTower.Game
 			PlayerControls.InitStack();
 
 			CoroutineScheduler = coroutineScheduler;
+
+			InputContext = new SinglePlayerInputCollectionContext(PlayerControls, PlayerControls.InputStack, PlayerControls.UI.Get());
 		}
 
 		public GameConfig GameConfig { get; }
@@ -42,6 +45,8 @@ namespace TetrisTower.Game
 
 		public CoroutineScheduler CoroutineScheduler { get; }
 
+		public IInputContext InputContext { get; }
+
 		public void SetCurrentPlaythrough(PlaythroughData playthrough)
 		{
 			CurrentPlaythrough = m_DebugPlaythroughData = playthrough;
@@ -51,37 +56,5 @@ namespace TetrisTower.Game
 		{
 			return CoroutineScheduler.StartCoroutine(routine);
 		}
-
-
-		#region IInputActionsContext
-
-		public InputAction FindAction(string actionNameOrId, bool throwIfNotFound = false)
-		{
-			return PlayerControls.FindAction(actionNameOrId, throwIfNotFound);
-		}
-
-		public void PushActionsState(object source, bool resetActions = true)
-		{
-			PlayerControls.InputStack.PushActionsState(source, resetActions);
-		}
-
-		public bool PopActionsState(object source)
-		{
-			return PlayerControls.InputStack.PopActionsState(source);
-		}
-
-		public IEnumerable<InputAction> GetUIActions()
-		{
-			return PlayerControls.UI.Get();
-		}
-
-		public void ResetAllActions()
-		{
-			foreach(InputAction action in PlayerControls) {
-				action.Reset();
-			}
-		}
-
-		#endregion
 	}
 }

@@ -4,51 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
-namespace DevLocker.GFrame
+namespace DevLocker.GFrame.Input
 {
-	/// <summary>
-	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
-	/// </summary>
-	public interface IInputActionsContext
-	{
-		/// <summary>
-		/// Find InputAction by action name or id.
-		/// </summary>
-		InputAction FindAction(string actionNameOrId, bool throwIfNotFound = false);
-
-		/// <summary>
-		/// Push a new entry in the input actions stack, by specifying who is the source of the request.
-		/// All Enable() / Disable() InputAction calls after that belong to the newly pushed (top) entry.
-		/// If resetActions is true, all InputActions will be disabled after this call.
-		/// Previous top entry will record the InputActions enabled flags at the moment and re-apply them when it is reactivated.
-		/// It is strongly recommended to implement this method using <see cref="InputActionsStack" />.
-		/// </summary>
-		void PushActionsState(object source, bool resetActions = true);
-
-		/// <summary>
-		/// Removes an entry made from the specified source in the input actions stack.
-		/// If that entry was the top of the stack, next entry state's enabled flags are applied to the InputActions.
-		/// It is strongly recommended to implement this method using <see cref="InputActionsStack" />.
-		/// </summary>
-		bool PopActionsState(object source);
-
-		/// <summary>
-		/// Return all actions required for the UI input to work properly.
-		/// Usually those are the ones specified in the InputSystemUIInputModule,
-		/// which you can easily obtain from UnityEngine.EventSystems.EventSystem.current.currentInputModule.
-		/// If you have IInputActionCollection, you can just get the InputActionMap responsible for the UI.
-		/// Example: PlayerControls.UI.Get();
-		/// </summary>
-		IEnumerable<InputAction> GetUIActions();
-
-		/// <summary>
-		/// Resets all actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
-		/// Useful on changing states or scopes, so gestures, drags, sequences don't leak in.
-		/// </summary>
-		void ResetAllActions();
-	}
-
-
 	/// <summary>
 	/// Stack that keeps all InputActions' enabled flags in a single entry.
 	/// This is a named stack, i.e. it keeps track of the source who pushed the new entry.

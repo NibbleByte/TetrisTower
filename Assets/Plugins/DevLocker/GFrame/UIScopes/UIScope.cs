@@ -143,7 +143,7 @@ namespace DevLocker.GFrame.UIScope
 #if USE_INPUT_SYSTEM
 			// Pushing input on stack will reset the actions anyway.
 			if (ResetAllActionsOnEnable && active && !PushInputStack) {
-				var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
+				var context = (LevelsManager.Instance.GameContext as Input.IInputContextProvider)?.InputContext;
 
 				if (context == null) {
 					Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
@@ -155,7 +155,7 @@ namespace DevLocker.GFrame.UIScope
 
 			if (PushInputStack) {
 
-				var context = (LevelsManager.Instance.GameContext as IInputActionsContext);
+				var context = (LevelsManager.Instance.GameContext as Input.IInputContextProvider)?.InputContext;
 
 				if (context == null) {
 					Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
