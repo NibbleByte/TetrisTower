@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.Input
@@ -10,7 +11,7 @@ namespace DevLocker.GFrame.Input
 	/// <summary>
 	/// Use this as IInputContext if you have a single player game with generated IInputActionCollection class.
 	/// </summary>
-	public class SinglePlayerInputCollectionContext : IInputContext
+	public sealed class SinglePlayerInputCollectionContext : IInputContext
 	{
 		public IInputActionCollection2 InputActionsCollection { get; }
 
@@ -19,7 +20,9 @@ namespace DevLocker.GFrame.Input
 		public IReadOnlyCollection<InputAction> UIActions { get; }
 
 		public event Action PlayersChanged;
+		public event PlayerIndexEventHandler LastUsedDeviceChanged;
 
+		private InputDevice m_LastUsedDevice;
 
 		public SinglePlayerInputCollectionContext(IInputActionCollection2 actionsCollection, InputActionsStack inputStack, IEnumerable<InputAction> uiActions)
 		{
@@ -27,13 +30,22 @@ namespace DevLocker.GFrame.Input
 			InputActionsStack = inputStack;
 			UIActions = new List<InputAction>(uiActions);
 
+			m_LastUsedDevice = InputSystem.devices.FirstOrDefault();
+
 			// HACK: To silence warning that it is never used.
 			PlayersChanged?.Invoke();
+
+			InputSystem.onEvent += OnInputSystemEvent;
+		}
+
+		public void Dispose()
+		{
+			InputSystem.onEvent -= OnInputSystemEvent;
 		}
 
 		public InputAction FindActionFor(int playerIndex, string actionNameOrId, bool throwIfNotFound = false)
 		{
-			if (playerIndex > 0)
+			if (playerIndex > 0 || playerIndex < -1)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
 			return InputActionsCollection.FindAction(actionNameOrId, throwIfNotFound);
@@ -64,6 +76,33 @@ namespace DevLocker.GFrame.Input
 			foreach (InputAction action in InputActionsCollection) {
 				action.Reset();
 			}
+		}
+
+
+		public InputDevice GetLastUsedInputDevice(int playerIndex)
+		{
+			if (playerIndex > 0 || playerIndex < -1)
+				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
+
+			return m_LastUsedDevice;
+		}
+
+		public void TriggerLastUsedDeviceChanged(int playerIndex = -1)
+		{
+			if (playerIndex > 0 || playerIndex < -1)
+				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
+
+			LastUsedDeviceChanged?.Invoke(0);
+		}
+
+		private void OnInputSystemEvent(UnityEngine.InputSystem.LowLevel.InputEventPtr eventPtr, InputDevice device)
+		{
+			if (m_LastUsedDevice == device)
+				return;
+
+			m_LastUsedDevice = device;
+
+			TriggerLastUsedDeviceChanged(0);
 		}
 	}
 }

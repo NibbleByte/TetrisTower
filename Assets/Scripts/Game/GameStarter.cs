@@ -65,6 +65,7 @@ namespace TetrisTower.Game
 		private void OnDestroy()
 		{
 			if (m_Instance == this) {
+				GameContext.Dispose();
 				m_Instance = null;
 			}
 		}

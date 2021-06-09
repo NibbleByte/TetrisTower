@@ -23,7 +23,7 @@ namespace TetrisTower.Game
 	}
 
 	[Serializable]
-	public class GameContext : IGameContext, IInputContextProvider
+	public sealed class GameContext : IGameContext, IInputContextProvider
 	{
 		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
 		{
@@ -55,6 +55,11 @@ namespace TetrisTower.Game
 		public Coroutine StartCoroutine(IEnumerator routine)
 		{
 			return CoroutineScheduler.StartCoroutine(routine);
+		}
+
+		public void Dispose()
+		{
+			InputContext.Dispose();
 		}
 	}
 }

@@ -32,20 +32,28 @@ namespace DevLocker.GFrame.Input
 	/// Your <see cref="IGameContext" /> should implement this if you intend to use the Input System features of this framework,
 	/// even if you're using generated IInputActionCollection.
 	/// </summary>
-	public interface IInputContextProvider
+	public interface IInputContextProvider : IDisposable
 	{
 		IInputContext InputContext { get; }
 	}
 
+	public delegate void PlayerIndexEventHandler(int playerIndex);
+
 	/// <summary>
 	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
 	/// </summary>
-	public interface IInputContext
+	public interface IInputContext : IDisposable
 	{
 		/// <summary>
 		/// Notifies if any player joined or left, or any other action that would require a refresh.
 		/// </summary>
 		event Action PlayersChanged;
+
+		/// <summary>
+		/// Last device used changed for playerIndex.
+		/// </summary>
+		event PlayerIndexEventHandler LastUsedDeviceChanged;
+
 
 		/// <summary>
 		/// Find InputAction by action name or id for specific player.
@@ -96,6 +104,21 @@ namespace DevLocker.GFrame.Input
 		/// NOTE: If you support more than one player, execute this operation for each players' action!
 		/// </summary>
 		void ResetAllActions();
+
+
+		/// <summary>
+		/// Get last updated device for specified player.
+		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
+		/// </summary>
+		InputDevice GetLastUsedInputDevice(int playerIndex);
+
+		/// <summary>
+		/// Force invoke the LastUsedDeviceChanged for specified player, so UI and others can refresh.
+		/// This is useful if the player changed the controls or similar,
+		/// or if you're using PlayerInput component with SendMessage / Broadcast notification.
+		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
+		/// </summary>
+		void TriggerLastUsedDeviceChanged(int playerIndex = -1);
 	}
 
 	public static class PlayerIndexExtensions
