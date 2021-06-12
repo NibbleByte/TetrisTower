@@ -1,4 +1,5 @@
 using DevLocker.GFrame.MessageBox;
+using DevLocker.GFrame.UIInputDisplay;
 using TetrisTower.Core;
 using TetrisTower.Logic;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace TetrisTower.Game
 
 		public GameObject GameInputPrefab;
 		public MessageBox MessageBoxPrefab;
+
+		public InputBindingDisplayAsset[] BindingDisplayAssets;
 
 		public float FallSpeedup = 40f;
 

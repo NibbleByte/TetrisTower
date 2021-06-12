@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c98b4e3b4197014e8fddf9a9eef0e34, type: 3}
+  m_Name: PS4_DisplayAssets
+  m_EditorClassIdentifier: 
+  DeviceName: Playstation 4 Controller
+  DeviceIcon: {fileID: 21300040, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+  DeviceColor: {r: 0, g: 0.44705883, b: 1, a: 0}
+  FallbackToDefaultDisplayTexts: 1
+  MatchingDeviceLayouts:
+  - DualShock4GamepadHID
+  BindingDisplays:
+  - BindingPath: <Gamepad>/buttonSouth
+    Icon: {fileID: 21300052, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+    UseDefaultTexts: 1
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: <Gamepad>/buttonEast
+    Icon: {fileID: 21300050, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+    UseDefaultTexts: 1
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: <Gamepad>/buttonWest
+    Icon: {fileID: 21300046, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+    UseDefaultTexts: 0
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: <Gamepad>/buttonNorth
+    Icon: {fileID: 21300048, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+    UseDefaultTexts: 0
+    DisplayText: 
+    DisplayShortText: 

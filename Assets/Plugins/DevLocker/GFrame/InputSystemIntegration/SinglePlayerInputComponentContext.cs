@@ -2,6 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.Input
@@ -31,7 +33,11 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public event PlayerIndexEventHandler LastUsedDeviceChanged;
 
-		public SinglePlayerInputComponentContext(PlayerInput playerInput, InputActionsStack inputStack)
+		private InputControlScheme m_LastUsedControlScheme;
+
+		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
+
+		public SinglePlayerInputComponentContext(PlayerInput playerInput, InputActionsStack inputStack, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
 		{
 			PlayerInput = playerInput;
 			InputActionsStack = inputStack;
@@ -53,6 +59,8 @@ namespace DevLocker.GFrame.Input
 
 			UIActions = uiActions;
 
+			m_BindingsDisplayProviders = bindingDisplayProviders != null ? bindingDisplayProviders.ToArray() : new IInputBindingDisplayDataProvider[0];
+
 			// HACK: To silence warning that it is never used.
 			PlayersChanged?.Invoke();
 
@@ -61,12 +69,22 @@ namespace DevLocker.GFrame.Input
 			// TriggerLastUsedDeviceChanged() method manually.
 			PlayerInput.controlsChangedEvent.AddListener(OnControlsChanged);
 			PlayerInput.onControlsChanged += OnControlsChanged;
+
+			m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
 		}
 
 		public void Dispose()
 		{
 			PlayerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
 			PlayerInput.onControlsChanged -= OnControlsChanged;
+		}
+
+		public bool IsMasterPlayer(int playerIndex)
+		{
+			if (playerIndex < 0)
+				throw new ArgumentException($"{playerIndex} is not a proper player index.");
+
+			return playerIndex == 0;
 		}
 
 		public InputAction FindActionFor(int playerIndex, string actionNameOrId, bool throwIfNotFound = false)
@@ -117,6 +135,14 @@ namespace DevLocker.GFrame.Input
 				;
 		}
 
+		public InputControlScheme GetLastUsedInputControlScheme(int playerIndex)
+		{
+			if (playerIndex > 0 || playerIndex < -1)
+				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
+
+			return m_LastUsedControlScheme;
+		}
+
 		public void TriggerLastUsedDeviceChanged(int playerIndex = -1)
 		{
 			if (playerIndex > 0 || playerIndex < -1)
@@ -125,8 +151,21 @@ namespace DevLocker.GFrame.Input
 			LastUsedDeviceChanged?.Invoke(0);
 		}
 
+		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputDevice inputDevice, InputAction action)
+		{
+			foreach (var displaysProvider in m_BindingsDisplayProviders) {
+				if (displaysProvider.MatchesDevice(inputDevice)) {
+					foreach (var bindingDisplay in displaysProvider.GetBindingDisplaysFor(m_LastUsedControlScheme, action)) {
+						yield return bindingDisplay;
+					}
+				}
+			}
+		}
+
 		private void OnControlsChanged(PlayerInput obj)
 		{
+			m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
+
 			TriggerLastUsedDeviceChanged(0);
 		}
 	}

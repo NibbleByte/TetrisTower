@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.Input
@@ -39,6 +40,42 @@ namespace DevLocker.GFrame.Input
 
 	public delegate void PlayerIndexEventHandler(int playerIndex);
 
+
+	/// <summary>
+	/// Includes everything needed to display <see cref="InputBinding"/> to the UI.
+	/// Any one of those fields can be null (except Binding).
+	/// All texts can be localization keys if needed.
+	/// </summary>
+	public struct InputBindingDisplayData
+	{
+		public InputBinding Binding;
+		public UnityEngine.Sprite Icon;
+		public string Text;
+		public string ShortText;
+
+		public bool IsValid => Binding != null;
+
+		public bool HasIcon => Icon != null;
+		public bool HasText => !string.IsNullOrWhiteSpace(Text) || !string.IsNullOrWhiteSpace(ShortText);
+	}
+
+	/// <summary>
+	/// Provides the required binding representations to display hotkeys in the UI for specific device.
+	/// </summary>
+	public interface IInputBindingDisplayDataProvider
+	{
+		/// <summary>
+		/// What devices does this provider has representations for.
+		/// </summary>
+		bool MatchesDevice(InputDevice device);
+
+		/// <summary>
+		/// Get the display representations of the matched device for the passed action.
+		/// An action can have multiple bindings for the same device.
+		/// </summary>
+		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputControlScheme controlScheme, InputAction action);
+	}
+
 	/// <summary>
 	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
 	/// </summary>
@@ -54,6 +91,11 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		event PlayerIndexEventHandler LastUsedDeviceChanged;
 
+		/// <summary>
+		/// Returns true if the playerIndex is the master player.
+		/// This is usually the first player that has more permissions than the rest.
+		/// </summary>
+		bool IsMasterPlayer(int playerIndex);
 
 		/// <summary>
 		/// Find InputAction by action name or id for specific player.
@@ -113,22 +155,53 @@ namespace DevLocker.GFrame.Input
 		InputDevice GetLastUsedInputDevice(int playerIndex);
 
 		/// <summary>
+		/// Get last used <see cref="InputControlScheme" /> for specified player.
+		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
+		/// NOTE: If no devices used, empty control scheme will be returned.
+		/// </summary>
+		InputControlScheme GetLastUsedInputControlScheme(int playerIndex);
+
+		/// <summary>
 		/// Force invoke the LastUsedDeviceChanged for specified player, so UI and others can refresh.
 		/// This is useful if the player changed the controls or similar,
 		/// or if you're using PlayerInput component with SendMessage / Broadcast notification.
 		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
 		/// </summary>
 		void TriggerLastUsedDeviceChanged(int playerIndex = -1);
+
+		/// <summary>
+		/// Get the display representations of the matched device for the passed action.
+		/// An action can have multiple bindings for the same device.
+		/// </summary>
+		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputDevice inputDevice, InputAction action);
 	}
 
-	public static class PlayerIndexExtensions
+	public static class InputSystemIntegrationExtensions
 	{
+		/// <summary>
+		/// Converts enum values to int.
+		/// Passing <see cref="PlayerIndex.MasterPlayer" /> will return -1.
+		/// </summary>
 		public static int ToIndex(this PlayerIndex playerIndex)
 		{
 			if (playerIndex == PlayerIndex.AnyPlayer)
 				throw new ArgumentOutOfRangeException($"Trying to get int index for {playerIndex} which doesn't make sense.");
 
 			return (int)playerIndex - (int)PlayerIndex.Player0;
+		}
+
+		/// <summary>
+		/// Get the display representations of the matched device for the passed action.
+		/// An action can have multiple bindings for the same device.
+		/// </summary>
+		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, int playerIndex, InputAction action)
+		{
+			InputDevice lastUsedDevice = context.GetLastUsedInputDevice(playerIndex);
+			if (lastUsedDevice == null) {
+				return Enumerable.Empty<InputBindingDisplayData>();
+			}
+
+			return context.GetBindingDisplaysFor(lastUsedDevice, action);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.UIInputDisplay;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace TetrisTower.Game
 
 			CoroutineScheduler = coroutineScheduler;
 
-			InputContext = new SinglePlayerInputCollectionContext(PlayerControls, PlayerControls.InputStack, PlayerControls.UI.Get());
+			InputContext = new SinglePlayerInputCollectionContext(PlayerControls, PlayerControls.InputStack, PlayerControls.UI.Get(), GameConfig.BindingDisplayAssets);
 		}
 
 		public GameConfig GameConfig { get; }

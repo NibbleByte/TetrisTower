@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c98b4e3b4197014e8fddf9a9eef0e34, type: 3}
+  m_Name: KeyboardMouse_DisplayAssets
+  m_EditorClassIdentifier: 
+  DeviceName: Keyboard
+  DeviceIcon: {fileID: 0}
+  DeviceColor: {r: 1, g: 0.8895351, b: 0, a: 0}
+  FallbackToDefaultDisplayTexts: 1
+  MatchingDeviceLayouts:
+  - Keyboard
+  - Mouse
+  BindingDisplays:
+  - BindingPath: <Keyboard>/enter
+    Icon: {fileID: 0}
+    UseDefaultTexts: 1
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: <Keyboard>/space
+    Icon: {fileID: 0}
+    UseDefaultTexts: 1
+    DisplayText: 
+    DisplayShortText: 

@@ -100,22 +100,22 @@ namespace TetrisTower.Game
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b89000c4-6b25-4e79-bfa9-46186462a044"",
-                    ""path"": ""<Keyboard>/numpadEnter"",
+                    ""id"": ""fbd6776d-cc85-48bb-962b-3b856376eaa9"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""FallSpeedUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""fbd6776d-cc85-48bb-962b-3b856376eaa9"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""id"": ""b89000c4-6b25-4e79-bfa9-46186462a044"",
+                    ""path"": ""<Keyboard>/numpadEnter"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""FallSpeedUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
