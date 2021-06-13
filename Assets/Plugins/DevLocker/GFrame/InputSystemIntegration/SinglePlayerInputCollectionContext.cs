@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 namespace DevLocker.GFrame.Input
 {
@@ -131,10 +132,21 @@ namespace DevLocker.GFrame.Input
 			}
 		}
 
-		private void OnInputSystemEvent(UnityEngine.InputSystem.LowLevel.InputEventPtr eventPtr, InputDevice device)
+		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
 		{
 			if (m_LastUsedDevice == device)
 				return;
+
+			// Some devices like to spam events like crazy.
+			// Example: PS4 controller on PC keeps triggering events without meaningful change.
+			var eventType = eventPtr.type;
+			if (eventType == StateEvent.Type) {
+
+				// Go through the changed controls in the event and look for ones actuated
+				// above a magnitude of a little above zero.
+				if (!eventPtr.EnumerateChangedControls(device: device, magnitudeThreshold: 0.0001f).Any())
+					return;
+			}
 
 			m_LastUsedDevice = device;
 			if (m_LastUsedDevice != null) {
