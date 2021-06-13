@@ -17,8 +17,8 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[Serializable]
 		public struct BindingDisplayAssetsData
 		{
-			// TODO: This doesn't work in lists :(
-			//[UnityEngine.InputSystem.Layouts.InputControl]
+			// TODO: UPDATE TO InputControl WHEN FIXED
+			[InputControlFIXED]
 			public string BindingPath;
 
 			public Sprite Icon;
@@ -113,6 +113,46 @@ namespace DevLocker.GFrame.UIInputDisplay
 			}
 		}
 	}
+
+	/// <summary>
+	/// TODO: REMOVE WHEN FIXED
+	/// InputControlPathDrawer drawer doesn't work properly when used in lists - made a temporary fix until this gets resolved.
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Field)]
+	internal sealed class InputControlFIXEDAttribute : PropertyAttribute
+	{
+
+	}
+
+
+#if UNITY_EDITOR
+	/// <summary>
+	/// TODO: REMOVE WHEN FIXED
+	/// InputControlPathDrawer drawer doesn't work properly when used in lists - made a temporary fix until this gets resolved.
+	/// </summary>
+	[UnityEditor.CustomPropertyDrawer(typeof(InputControlFIXEDAttribute))]
+	internal sealed class InputControlPathDrawer : UnityEditor.PropertyDrawer
+	{
+		private UnityEngine.InputSystem.Editor.InputControlPickerState m_PickerState;
+
+		public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
+		{
+			if (m_PickerState == null)
+				m_PickerState = new UnityEngine.InputSystem.Editor.InputControlPickerState();
+
+			var editor = new UnityEngine.InputSystem.Editor.InputControlPathEditor(property, m_PickerState,
+				() => property.serializedObject.ApplyModifiedProperties(),
+				label: label);
+			editor.SetExpectedControlLayoutFromAttribute();
+
+			UnityEditor.EditorGUI.BeginProperty(position, label, property);
+			editor.OnGUI(position);
+			UnityEditor.EditorGUI.EndProperty();
+
+			editor.Dispose();
+		}
+	}
+#endif
 
 }
 #endif
