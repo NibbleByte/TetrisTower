@@ -21,6 +21,8 @@ namespace DevLocker.GFrame.UIScope
 	public interface IHotkeyWithInputAction
 	{
 		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions();
+
+		bool CheckIfAnyActionIsEnabled();
 	}
 #endif
 
@@ -188,7 +190,7 @@ namespace DevLocker.GFrame.UIScope
 
 #if UNITY_EDITOR
 	[UnityEditor.CustomEditor(typeof(UIScope), true)]
-	public class BaseDefEditor : UnityEditor.Editor
+	internal class UIScopeEditor : UnityEditor.Editor
 	{
 		public override void OnInspectorGUI()
 		{
@@ -204,7 +206,23 @@ namespace DevLocker.GFrame.UIScope
 			UnityEditor.EditorGUILayout.LabelField("Controlled Elements:", UnityEditor.EditorStyles.boldLabel);
 
 			foreach(var element in scopeElements) {
+				UnityEditor.EditorGUILayout.BeginHorizontal();
 				UnityEditor.EditorGUILayout.ObjectField(element as UnityEngine.Object, typeof(IScopeElement), true);
+
+#if USE_INPUT_SYSTEM
+				if (element is IHotkeyWithInputAction hotkeyElement) {
+
+					var prevColor = GUI.color;
+
+					bool actionsActive = uiScope.enabled && uiScope.gameObject.activeInHierarchy && hotkeyElement.CheckIfAnyActionIsEnabled();
+					string activeStr = actionsActive ? "Active" : "Inactive";
+					GUI.color = actionsActive ? Color.green : Color.red;
+
+					GUILayout.Label(new GUIContent(activeStr, "Are the hotkey input actions active or not?"), GUILayout.ExpandWidth(false));
+					GUI.color = prevColor;
+				}
+#endif
+				UnityEditor.EditorGUILayout.EndHorizontal();
 			}
 		}
 	}

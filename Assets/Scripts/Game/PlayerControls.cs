@@ -741,6 +741,22 @@ namespace TetrisTower.Game
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""NextSection"",
+                    ""type"": ""Button"",
+                    ""id"": ""3abb3d3f-b486-4f63-abe0-f795fb1342cd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""PrevSection"",
+                    ""type"": ""Button"",
+                    ""id"": ""3ea85ef3-5f21-4ad3-a0c8-31b003bd8a53"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -807,6 +823,50 @@ namespace TetrisTower.Game
                     ""processors"": """",
                     ""groups"": ""Gamepad;Keyboard&Mouse"",
                     ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ba42f8fa-228c-48bc-acc5-94c9a59f7e5e"",
+                    ""path"": ""<Keyboard>/rightBracket"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""NextSection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""70a8a5fd-1eda-43af-a842-7bb55d332651"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""NextSection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""62ae90ce-9021-4feb-b5d4-4c84912b8f00"",
+                    ""path"": ""<Keyboard>/leftBracket"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""PrevSection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ef978be4-7a5e-4298-858a-d8131888dae3"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""PrevSection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -881,6 +941,8 @@ namespace TetrisTower.Game
             m_CommonHotkeys = asset.FindActionMap("CommonHotkeys", throwIfNotFound: true);
             m_CommonHotkeys_Back = m_CommonHotkeys.FindAction("Back", throwIfNotFound: true);
             m_CommonHotkeys_Confirm = m_CommonHotkeys.FindAction("Confirm", throwIfNotFound: true);
+            m_CommonHotkeys_NextSection = m_CommonHotkeys.FindAction("NextSection", throwIfNotFound: true);
+            m_CommonHotkeys_PrevSection = m_CommonHotkeys.FindAction("PrevSection", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -1153,12 +1215,16 @@ namespace TetrisTower.Game
         private ICommonHotkeysActions m_CommonHotkeysActionsCallbackInterface;
         private readonly InputAction m_CommonHotkeys_Back;
         private readonly InputAction m_CommonHotkeys_Confirm;
+        private readonly InputAction m_CommonHotkeys_NextSection;
+        private readonly InputAction m_CommonHotkeys_PrevSection;
         public struct CommonHotkeysActions
         {
             private @PlayerControls m_Wrapper;
             public CommonHotkeysActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
             public InputAction @Back => m_Wrapper.m_CommonHotkeys_Back;
             public InputAction @Confirm => m_Wrapper.m_CommonHotkeys_Confirm;
+            public InputAction @NextSection => m_Wrapper.m_CommonHotkeys_NextSection;
+            public InputAction @PrevSection => m_Wrapper.m_CommonHotkeys_PrevSection;
             public InputActionMap Get() { return m_Wrapper.m_CommonHotkeys; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1174,6 +1240,12 @@ namespace TetrisTower.Game
                     @Confirm.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnConfirm;
                     @Confirm.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnConfirm;
                     @Confirm.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnConfirm;
+                    @NextSection.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnNextSection;
+                    @NextSection.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnNextSection;
+                    @NextSection.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnNextSection;
+                    @PrevSection.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevSection;
+                    @PrevSection.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevSection;
+                    @PrevSection.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevSection;
                 }
                 m_Wrapper.m_CommonHotkeysActionsCallbackInterface = instance;
                 if (instance != null)
@@ -1184,6 +1256,12 @@ namespace TetrisTower.Game
                     @Confirm.started += instance.OnConfirm;
                     @Confirm.performed += instance.OnConfirm;
                     @Confirm.canceled += instance.OnConfirm;
+                    @NextSection.started += instance.OnNextSection;
+                    @NextSection.performed += instance.OnNextSection;
+                    @NextSection.canceled += instance.OnNextSection;
+                    @PrevSection.started += instance.OnPrevSection;
+                    @PrevSection.performed += instance.OnPrevSection;
+                    @PrevSection.canceled += instance.OnPrevSection;
                 }
             }
         }
@@ -1245,6 +1323,8 @@ namespace TetrisTower.Game
         {
             void OnBack(InputAction.CallbackContext context);
             void OnConfirm(InputAction.CallbackContext context);
+            void OnNextSection(InputAction.CallbackContext context);
+            void OnPrevSection(InputAction.CallbackContext context);
         }
     }
 }

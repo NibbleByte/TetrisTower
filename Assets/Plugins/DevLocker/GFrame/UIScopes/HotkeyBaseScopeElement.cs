@@ -40,17 +40,9 @@ namespace DevLocker.GFrame.UIScope
 
 			context.PlayersChanged += OnPlayersChanged;
 
-			if (Player == PlayerIndex.AnyPlayer) {
-				foreach(InputAction action in context.FindActionsForAllPlayers(m_InputAction.name)) {
-					m_SubscribedActions.Add(action);
-					action.performed += OnInputAction;
-				}
-			} else {
-				InputAction action = context.FindActionFor(Player.ToIndex(), m_InputAction.name);
-				if (action != null) {
-					m_SubscribedActions.Add(action);
-					action.performed += OnInputAction;
-				}
+			foreach(InputAction action in GetUsedActions()) {
+				m_SubscribedActions.Add(action);
+				action.performed += OnInputAction;
 			}
 		}
 
@@ -120,7 +112,33 @@ namespace DevLocker.GFrame.UIScope
 				Enumerable.Empty<InputAction>();
 			}
 
-			return m_SubscribedActions;
+			// Don't use m_SubscribedActions directly as the behaviour may not yet be enabled when this method is called.
+
+			if (Player == PlayerIndex.AnyPlayer) {
+				foreach (InputAction action in context.FindActionsForAllPlayers(m_InputAction.name)) {
+					yield return action;
+				}
+			} else {
+				InputAction action = context.FindActionFor(Player.ToIndex(), m_InputAction.name);
+				if (action != null) {
+					yield return action;
+				}
+			}
+		}
+
+		public bool CheckIfAnyActionIsEnabled()
+		{
+			var context = (LevelsManager.Instance?.GameContext as IInputContextProvider)?.InputContext;
+
+			if (context == null)
+				return false;
+
+			foreach(InputAction action in GetUsedActions()) {
+				if (action.enabled)
+					return true;
+			}
+
+			return false;
 		}
 	}
 }

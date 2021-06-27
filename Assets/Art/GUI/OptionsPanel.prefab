@@ -354,6 +354,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1268881109920819539}
   - component: {fileID: 1268881109920819536}
+  - component: {fileID: 5924237794447704077}
   m_Layer: 5
   m_Name: FullScreenToggle
   m_TagString: Untagged
@@ -406,7 +407,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.68657833, g: 0.9433962, b: 0.5740477, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -430,6 +431,21 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!114 &5924237794447704077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268881109920819538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f06ea55a1aa7e4a8a6fcec53aa8944, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Player: 0
+  SkipHotkey: 1
+  m_InputAction: {fileID: -6345765068046251359, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1 &1268881109926130127
 GameObject:
   m_ObjectHideFlags: 0
@@ -1039,7 +1055,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.68657833, g: 0.9433962, b: 0.5740477, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -1586,7 +1602,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.68657833, g: 0.9433962, b: 0.5740477, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -2085,6 +2101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1268881111400655109}
   - component: {fileID: 1268881111400655130}
+  - component: {fileID: 6194416140014680882}
   m_Layer: 5
   m_Name: MusicToggle
   m_TagString: Untagged
@@ -2137,7 +2154,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.68657833, g: 0.9433962, b: 0.5740477, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -2161,6 +2178,21 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!114 &6194416140014680882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268881111400655108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f06ea55a1aa7e4a8a6fcec53aa8944, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Player: 0
+  SkipHotkey: 1
+  m_InputAction: {fileID: 2852409272423593020, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1 &1268881111879395786
 GameObject:
   m_ObjectHideFlags: 0
