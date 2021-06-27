@@ -32,6 +32,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 		public int BindingNumberToUse = 0;
 
 		[Space()]
+		[Tooltip("Should it show icon or text if available. If not it will display whatever it can.")]
 		public ShowPrioritySelection ShowPriority = ShowPrioritySelection.IconIsPriority;
 
 		public Image Icon;
@@ -54,6 +55,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 				return;
 			}
 
+			m_LastDevice = null;
 			RefreshDisplay(context, Player.ToIndex());
 		}
 
