@@ -140,6 +140,11 @@ namespace DevLocker.GFrame.UIScope
 
 			return false;
 		}
+
+		protected virtual void OnValidate()
+		{
+			Utils.Validation.ValidateMissingObject(this, m_InputAction, nameof(m_InputAction));
+		}
 	}
 }
 

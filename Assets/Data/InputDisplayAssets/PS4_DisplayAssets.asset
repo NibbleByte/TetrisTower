@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeviceName: Playstation 4 Controller
   DeviceIcon: {fileID: 21300040, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+  DeviceIconSmall: {fileID: 0}
   DeviceColor: {r: 0, g: 0.44705883, b: 1, a: 0}
   FallbackToDefaultDisplayTexts: 1
   MatchingDeviceLayouts:
@@ -36,6 +37,21 @@ MonoBehaviour:
     DisplayShortText: 
   - BindingPath: <Gamepad>/buttonNorth
     Icon: {fileID: 21300048, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+    UseDefaultTexts: 0
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: '*/{Submit}'
+    Icon: {fileID: 21300052, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+    UseDefaultTexts: 0
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: '*/{Back}'
+    Icon: {fileID: 21300050, guid: 10045ad39fef69944b33bedc39310592, type: 3}
+    UseDefaultTexts: 0
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: <Gamepad>/start
+    Icon: {fileID: 21300042, guid: 10045ad39fef69944b33bedc39310592, type: 3}
     UseDefaultTexts: 0
     DisplayText: 
     DisplayShortText: 

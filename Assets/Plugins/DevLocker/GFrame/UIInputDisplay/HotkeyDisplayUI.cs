@@ -1,8 +1,6 @@
 #if USE_INPUT_SYSTEM
 using DevLocker.GFrame.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using DevLocker.GFrame.UIScope;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -13,7 +11,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 	/// Displays hotkey icon / text.
 	/// Refreshes if devices change.
 	/// </summary>
-	public class HotkeyDisplayUI : MonoBehaviour
+	public class HotkeyDisplayUI : MonoBehaviour, IScopeElement
 	{
 		public enum ShowPrioritySelection
 		{
@@ -134,6 +132,15 @@ namespace DevLocker.GFrame.UIInputDisplay
 			}
 
 			context.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
+
+			if (Icon) {
+				Icon.gameObject.SetActive(false);
+				Icon.sprite = null;
+			}
+
+			if (Text) {
+				Text.gameObject.SetActive(false);
+			}
 		}
 
 		private void OnLastUsedDeviceChanged(int playerIndex)
@@ -162,12 +169,16 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		void OnValidate()
 		{
+			Utils.Validation.ValidateMissingObject(this, InputAction, nameof(InputAction));
+			Utils.Validation.ValidateMissingObject(this, Icon, nameof(Icon));
+			Utils.Validation.ValidateMissingObject(this, Text, nameof(Text));
+
 			if ((Icon && Icon.gameObject == gameObject) || (Text && Text.gameObject == gameObject)) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
+				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
 			}
 
 			if (Player == PlayerIndex.AnyPlayer) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} doesn't allow setting {nameof(PlayerIndex.AnyPlayer)} for {nameof(Player)}.", this);
+				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} doesn't allow setting {nameof(PlayerIndex.AnyPlayer)} for {nameof(Player)}.", this);
 				Player = PlayerIndex.MasterPlayer;
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeviceName: Xbox One Controller
   DeviceIcon: {fileID: 21300044, guid: fe9aa33e50412c242bd73e9324bc7922, type: 3}
+  DeviceIconSmall: {fileID: 0}
   DeviceColor: {r: 0.5137255, g: 0.90588236, b: 0.3137255, a: 0}
   FallbackToDefaultDisplayTexts: 1
   MatchingDeviceLayouts:
@@ -36,6 +37,21 @@ MonoBehaviour:
     DisplayShortText: 
   - BindingPath: <Gamepad>/buttonNorth
     Icon: {fileID: 21300050, guid: fe9aa33e50412c242bd73e9324bc7922, type: 3}
+    UseDefaultTexts: 1
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: '*/{Submit}'
+    Icon: {fileID: 21300052, guid: fe9aa33e50412c242bd73e9324bc7922, type: 3}
+    UseDefaultTexts: 1
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: '*/{Back}'
+    Icon: {fileID: 21300054, guid: fe9aa33e50412c242bd73e9324bc7922, type: 3}
+    UseDefaultTexts: 1
+    DisplayText: 
+    DisplayShortText: 
+  - BindingPath: <Gamepad>/start
+    Icon: {fileID: 21300046, guid: fe9aa33e50412c242bd73e9324bc7922, type: 3}
     UseDefaultTexts: 1
     DisplayText: 
     DisplayShortText: 

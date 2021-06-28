@@ -32,6 +32,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		public string DeviceName;
 		public Sprite DeviceIcon;
+		public Sprite DeviceIconSmall;
 		public Color DeviceColor;
 
 		[Tooltip("If one of the action's bindings doesn't have a defined display data in the list below, use the default display name provided by Unity.")]

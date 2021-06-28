@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using System.Collections;
 using TetrisTower.Game;
+using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
@@ -19,6 +20,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.CommonHotkeys.Enable();
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(this);
 			m_PlayerControls.TowerLevelPaused.Enable();
+			m_PlayerControls.TowerLevelShared.Enable();
 
 			m_UIController.SwitchState(TowerLevelUIState.Paused);
 

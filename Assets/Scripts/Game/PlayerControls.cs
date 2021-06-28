@@ -294,6 +294,44 @@ namespace TetrisTower.Game
             ""bindings"": []
         },
         {
+            ""name"": ""TowerLevelShared"",
+            ""id"": ""31910e90-aaf6-4365-8ae6-f48836710769"",
+            ""actions"": [
+                {
+                    ""name"": ""ToggleMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""36ad07ff-2f06-4744-84c1-304f39e36653"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""4a743f81-f59c-4d7e-93a2-5b6bd79836a3"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ToggleMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7622fb5c-346c-48a9-83e5-230709c3d7b1"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ToggleMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
             ""name"": ""UI"",
             ""id"": ""36699a9d-0fc8-428a-941c-cd7c0d64be36"",
             ""actions"": [
@@ -925,6 +963,9 @@ namespace TetrisTower.Game
             m_TowerLevelPlay_PointerPress = m_TowerLevelPlay.FindAction("Pointer-Press", throwIfNotFound: true);
             // TowerLevelPaused
             m_TowerLevelPaused = asset.FindActionMap("TowerLevelPaused", throwIfNotFound: true);
+            // TowerLevelShared
+            m_TowerLevelShared = asset.FindActionMap("TowerLevelShared", throwIfNotFound: true);
+            m_TowerLevelShared_ToggleMenu = m_TowerLevelShared.FindAction("ToggleMenu", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1104,6 +1145,39 @@ namespace TetrisTower.Game
             }
         }
         public TowerLevelPausedActions @TowerLevelPaused => new TowerLevelPausedActions(this);
+
+        // TowerLevelShared
+        private readonly InputActionMap m_TowerLevelShared;
+        private ITowerLevelSharedActions m_TowerLevelSharedActionsCallbackInterface;
+        private readonly InputAction m_TowerLevelShared_ToggleMenu;
+        public struct TowerLevelSharedActions
+        {
+            private @PlayerControls m_Wrapper;
+            public TowerLevelSharedActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @ToggleMenu => m_Wrapper.m_TowerLevelShared_ToggleMenu;
+            public InputActionMap Get() { return m_Wrapper.m_TowerLevelShared; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(TowerLevelSharedActions set) { return set.Get(); }
+            public void SetCallbacks(ITowerLevelSharedActions instance)
+            {
+                if (m_Wrapper.m_TowerLevelSharedActionsCallbackInterface != null)
+                {
+                    @ToggleMenu.started -= m_Wrapper.m_TowerLevelSharedActionsCallbackInterface.OnToggleMenu;
+                    @ToggleMenu.performed -= m_Wrapper.m_TowerLevelSharedActionsCallbackInterface.OnToggleMenu;
+                    @ToggleMenu.canceled -= m_Wrapper.m_TowerLevelSharedActionsCallbackInterface.OnToggleMenu;
+                }
+                m_Wrapper.m_TowerLevelSharedActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @ToggleMenu.started += instance.OnToggleMenu;
+                    @ToggleMenu.performed += instance.OnToggleMenu;
+                    @ToggleMenu.canceled += instance.OnToggleMenu;
+                }
+            }
+        }
+        public TowerLevelSharedActions @TowerLevelShared => new TowerLevelSharedActions(this);
 
         // UI
         private readonly InputActionMap m_UI;
@@ -1305,6 +1379,10 @@ namespace TetrisTower.Game
         }
         public interface ITowerLevelPausedActions
         {
+        }
+        public interface ITowerLevelSharedActions
+        {
+            void OnToggleMenu(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

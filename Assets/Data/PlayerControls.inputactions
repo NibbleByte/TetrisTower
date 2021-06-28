@@ -270,6 +270,44 @@
             "bindings": []
         },
         {
+            "name": "TowerLevelShared",
+            "id": "31910e90-aaf6-4365-8ae6-f48836710769",
+            "actions": [
+                {
+                    "name": "ToggleMenu",
+                    "type": "Button",
+                    "id": "36ad07ff-2f06-4744-84c1-304f39e36653",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "4a743f81-f59c-4d7e-93a2-5b6bd79836a3",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "ToggleMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7622fb5c-346c-48a9-83e5-230709c3d7b1",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "ToggleMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
             "name": "UI",
             "id": "36699a9d-0fc8-428a-941c-cd7c0d64be36",
             "actions": [

@@ -80,15 +80,17 @@ namespace DevLocker.GFrame.UIScope
 
 		void OnDisable()
 		{
+			// HACK: On turning off the game OnDisable() gets called and LevelsManager.Instance may get destroyed before that.
+
 			bool wasActive = false;
-			if (ActiveScope == this) {
+			if (ActiveScope == this && LevelsManager.Instance) {
 				ActiveScope.SetScopeState(false);
 				wasActive = true;
 			}
 
 			s_Scopes.Remove(this);
 
-			if (wasActive) {
+			if (wasActive && LevelsManager.Instance) {
 				ActiveScope = s_Scopes.Count > 0 ? s_Scopes[s_Scopes.Count - 1] : null;
 				ActiveScope?.SetScopeState(true);
 			}

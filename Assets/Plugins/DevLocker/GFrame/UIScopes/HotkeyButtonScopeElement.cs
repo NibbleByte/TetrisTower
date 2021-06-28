@@ -22,8 +22,10 @@ namespace DevLocker.GFrame.UIScope
 			m_Button.onClick.Invoke();
 		}
 
-		void OnValidate()
+		protected override void OnValidate()
 		{
+			base.OnValidate();
+
 			// OnValidate() gets called even if object is not active.
 			// HACK: Because Unity are idiots and missed this overload.
 			//var button = GetComponentInParent<Button>(true);
