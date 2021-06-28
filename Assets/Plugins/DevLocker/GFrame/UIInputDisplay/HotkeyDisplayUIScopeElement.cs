@@ -11,7 +11,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 	/// Displays hotkey icon / text.
 	/// Refreshes if devices change.
 	/// </summary>
-	public class HotkeyDisplayUI : MonoBehaviour, IScopeElement
+	public class HotkeyDisplayUIScopeElement : MonoBehaviour, IScopeElement
 	{
 		public enum ShowPrioritySelection
 		{
@@ -48,7 +48,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
 
 			if (context == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"{nameof(HotkeyDisplayUIScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -70,7 +70,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 			InputAction action = context.FindActionFor(playerIndex, InputAction.name);
 			if (action == null) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} couldn't find specified action {InputAction.name} for player {playerIndex}", this);
+				Debug.LogError($"{nameof(HotkeyDisplayUIScopeElement)} couldn't find specified action {InputAction.name} for player {playerIndex}", this);
 				return;
 			}
 
@@ -107,7 +107,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
 
 			if (context == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"{nameof(HotkeyDisplayUIScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -126,7 +126,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
 
 			if (context == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"{nameof(HotkeyDisplayUIScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -152,7 +152,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
 
 			if (context == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"{nameof(HotkeyDisplayUIScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -174,11 +174,11 @@ namespace DevLocker.GFrame.UIInputDisplay
 			Utils.Validation.ValidateMissingObject(this, Text, nameof(Text));
 
 			if ((Icon && Icon.gameObject == gameObject) || (Text && Text.gameObject == gameObject)) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
+				Debug.LogError($"{nameof(HotkeyDisplayUIScopeElement)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
 			}
 
 			if (Player == PlayerIndex.AnyPlayer) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} doesn't allow setting {nameof(PlayerIndex.AnyPlayer)} for {nameof(Player)}.", this);
+				Debug.LogError($"{nameof(HotkeyDisplayUIScopeElement)} {name} doesn't allow setting {nameof(PlayerIndex.AnyPlayer)} for {nameof(Player)}.", this);
 				Player = PlayerIndex.MasterPlayer;
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);

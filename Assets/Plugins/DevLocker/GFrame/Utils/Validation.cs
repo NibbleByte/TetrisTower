@@ -1,10 +1,16 @@
-using System.Reflection;
 using UnityEngine;
 
 namespace DevLocker.GFrame.Utils
 {
+	/// <summary>
+	/// Validation routines.
+	/// </summary>
 	public static class Validation
 	{
+		/// <summary>
+		/// Check if UnityObject has been destroyed and log error if it is.
+		/// </summary>
+		/// <returns></returns>
 		public static bool ValidateMissingObject(Object source, Object objValue, string fieldName = null)
 		{
 			if (!ReferenceEquals(objValue, null) && objValue == null) {
