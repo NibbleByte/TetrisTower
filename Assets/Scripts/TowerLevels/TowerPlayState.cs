@@ -26,10 +26,8 @@ namespace TetrisTower.TowerLevels
 
 			m_PlayerControls.InputStack.PushActionsState(this);
 			m_PlayerControls.UI.Enable();
-			m_PlayerControls.CommonHotkeys.Enable();
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(this);
 			m_PlayerControls.TowerLevelPlay.Enable();
-			m_PlayerControls.TowerLevelShared.Enable();
 
 			// You don't want "Return" key to trigger selected buttons.
 			m_PlayerControls.UI.Submit.Disable();

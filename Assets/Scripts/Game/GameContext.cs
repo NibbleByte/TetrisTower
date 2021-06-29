@@ -17,9 +17,6 @@ namespace TetrisTower.Game
 		public void InitStack()
 		{
 			InputStack = new InputActionsStack(this);
-
-			// Make sure no input is enabled when starting level (including UI).
-			Disable();
 		}
 	}
 

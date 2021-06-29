@@ -64,6 +64,11 @@ namespace DevLocker.GFrame.Input
 			// HACK: To silence warning that it is never used.
 			PlayersChanged?.Invoke();
 
+			// Make sure no input is enabled when starting level (including UI).
+			foreach (InputAction action in PlayerInput.actions) {
+				action.Disable();
+			}
+
 			// Based on the NotificationBehavior, one of these can be invoked.
 			// If selected behavior is via Messages, the user have to invoke the
 			// TriggerLastUsedDeviceChanged() method manually.
@@ -115,10 +120,12 @@ namespace DevLocker.GFrame.Input
 			return UIActions;
 		}
 
-		public void ResetAllActions()
+		public void ResetAllEnabledActions()
 		{
 			foreach (InputAction action in PlayerInput.actions) {
-				action.Reset();
+				if (action.enabled) {
+					action.Reset();
+				}
 			}
 		}
 

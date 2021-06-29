@@ -140,12 +140,12 @@ namespace DevLocker.GFrame.Input
 		IEnumerable<InputAction> GetUIActions();
 
 		/// <summary>
-		/// Resets all actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
+		/// Resets all enabled actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
 		/// Useful on changing states or scopes, so gestures, drags, sequences don't leak in.
 		///
 		/// NOTE: If you support more than one player, execute this operation for each players' action!
 		/// </summary>
-		void ResetAllActions();
+		void ResetAllEnabledActions();
 
 
 		/// <summary>

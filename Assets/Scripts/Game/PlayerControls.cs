@@ -320,6 +320,17 @@ namespace TetrisTower.Game
                 },
                 {
                     ""name"": """",
+                    ""id"": ""7f3db0ba-a088-416e-9fd5-c7e03fc19609"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ToggleMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""7622fb5c-346c-48a9-83e5-230709c3d7b1"",
                     ""path"": ""<Gamepad>/start"",
                     ""interactions"": """",

@@ -17,10 +17,8 @@ namespace TetrisTower.TowerLevels
 
 			m_PlayerControls.InputStack.PushActionsState(this);
 			m_PlayerControls.UI.Enable();
-			m_PlayerControls.CommonHotkeys.Enable();
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(this);
 			m_PlayerControls.TowerLevelPaused.Enable();
-			m_PlayerControls.TowerLevelShared.Enable();
 
 			m_UIController.SwitchState(TowerLevelUIState.Paused);
 

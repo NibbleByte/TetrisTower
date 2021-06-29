@@ -51,6 +51,8 @@ namespace DevLocker.GFrame.UIScope
 		public bool ResetAllActionsOnEnable = true;
 
 		[Space]
+		[Tooltip("When scope gets enabled this will activate the input actions (hotkeys) that are used by the scope elements under it.\nOn disabling it will deactivate the actions.\nNOTE: to avoid input conflicts, don't control the same actions from the code.")]
+		public bool EnableUsedInputActions = true;
 		[Tooltip("Use this for modal windows to suppress background hotkeys.\n\nPushes a new input state in the stack.\nOn deactivating, will pop this state and restore the previous one.\nThe only enabled actions will be the used ones by (under) this scope.")]
 		public bool PushInputStack = false;
 		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
@@ -62,6 +64,7 @@ namespace DevLocker.GFrame.UIScope
 		private static List<UIScope> s_Scopes = new List<UIScope>();
 
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
+		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
 
 		protected virtual void Awake()
 		{
@@ -114,7 +117,8 @@ namespace DevLocker.GFrame.UIScope
 		public void ScanForChildScopeElements()
 		{
 			m_ScopeElements.Clear();
-			ScanForChildScopeElements(this, transform, m_ScopeElements);
+			m_DirectChildScopes.Clear();
+			ScanForChildScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 
 			if (ActiveScope == this) {
 				ActiveScope.SetScopeState(true);
@@ -124,17 +128,19 @@ namespace DevLocker.GFrame.UIScope
 			}
 		}
 
-		internal static void ScanForChildScopeElements(UIScope parentScope, Transform transform, List<IScopeElement> scopeElements)
+		internal static void ScanForChildScopeElements(UIScope parentScope, Transform transform, List<IScopeElement> scopeElements, List<UIScope> directChildScopes)
 		{
 			var scope = transform.GetComponent<UIScope>();
 			// Another scope begins, it will handle its own child hotkey elements.
-			if (scope && parentScope != scope)
+			if (scope && parentScope != scope) {
+				directChildScopes.Add(scope);
 				return;
+			}
 
 			scopeElements.AddRange(transform.GetComponents<IScopeElement>());
 
 			foreach(Transform child in transform) {
-				ScanForChildScopeElements(parentScope, child, scopeElements);
+				ScanForChildScopeElements(parentScope, child, scopeElements, directChildScopes);
 			}
 		}
 
@@ -145,45 +151,62 @@ namespace DevLocker.GFrame.UIScope
 			}
 
 #if USE_INPUT_SYSTEM
-			// Pushing input on stack will reset the actions anyway.
-			if (ResetAllActionsOnEnable && active && !PushInputStack) {
-				var context = (LevelsManager.Instance.GameContext as Input.IInputContextProvider)?.InputContext;
+			var context = (LevelsManager.Instance.GameContext as Input.IInputContextProvider)?.InputContext;
 
-				if (context == null) {
-					Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
-					return;
-				}
-
-				context.ResetAllActions();
+			if (context == null) {
+				Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
+				return;
 			}
 
-			if (PushInputStack) {
+			// Pushing input on stack will reset the actions anyway.
+			if (ResetAllActionsOnEnable && active && !PushInputStack) {
+				context.ResetAllEnabledActions();
+			}
 
-				var context = (LevelsManager.Instance.GameContext as Input.IInputContextProvider)?.InputContext;
+			if (active) {
 
-				if (context == null) {
-					Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
-					return;
+				if (PushInputStack) {
+					context.PushActionsState(this);
+
+					if (IncludeUIActions) {
+						foreach (var action in context.GetUIActions()) {
+							action.Enable();
+						}
+					}
 				}
 
-				if (active) {
+				// Because the PushInputStack will have disabled all input actions.
+				if (EnableUsedInputActions || PushInputStack) {
+					foreach (var action in m_ScopeElements
+						.OfType<IHotkeyWithInputAction>()
+						.SelectMany(element => element.GetUsedActions())
+						.Distinct()) {
 
-					context.PushActionsState(this);
+						// MessageBox has multiple buttons with the same hotkey, but only one is active.
+						if (action.enabled) {
+							Debug.LogWarning($"{nameof(UIScope)} {name} is enabling action {action.name} that is already enabled. This is a sign of an input conflict!", this);
+						}
+						action.Enable();
+					}
+				}
+
+			} else {
+
+				if (PushInputStack) {
+					context.PopActionsState(this);
+
+				} else if (EnableUsedInputActions) {
 
 					foreach (IHotkeyWithInputAction hotkeyElement in m_ScopeElements.OfType<IHotkeyWithInputAction>()) {
 						foreach (var action in hotkeyElement.GetUsedActions()) {
-							action.Enable();
+							// This can often be a valid case since the code may push a new state in the input stack, resetting all the actions, before changing the UIScopes.
+							//if (!action.enabled) {
+							//	Debug.LogWarning($"{nameof(UIScope)} {name} is disabling action {action.name} that is already disabled. This is a sign of an input conflict!", this);
+							//}
+							action.Disable();
 						}
 					}
 
-					if (IncludeUIActions) {
-						foreach(var action in context.GetUIActions()) {
-							action.Enable();
-						}
-					}
-
-				} else {
-					context.PopActionsState(this);
 				}
 			}
 #endif
@@ -196,12 +219,28 @@ namespace DevLocker.GFrame.UIScope
 	{
 		public override void OnInspectorGUI()
 		{
-			DrawDefaultInspector();
+			serializedObject.Update();
 
 			var uiScope = (UIScope)target;
 
+			UnityEditor.EditorGUI.BeginDisabledGroup(true);
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
+			UnityEditor.EditorGUI.EndDisabledGroup();
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("ResetAllActionsOnEnable"));
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("EnableUsedInputActions"));
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("PushInputStack"));
+			if (uiScope.PushInputStack) {
+				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("IncludeUIActions"));
+			}
+
+			serializedObject.ApplyModifiedProperties();
+
+
 			var scopeElements = new List<IScopeElement>();
-			UIScope.ScanForChildScopeElements(uiScope, uiScope.transform, scopeElements);
+			var directChildScopes = new List<UIScope>();
+			UIScope.ScanForChildScopeElements(uiScope, uiScope.transform, scopeElements, directChildScopes);
 
 
 			UnityEditor.EditorGUILayout.Space();
