@@ -28,6 +28,9 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[Tooltip("If multiple bindings are present in the action matching this device, display the n-th one.")]
 		public int BindingNumberToUse = 0;
 
+		[Tooltip("Display only bindings for this device layout, ignoring the current one.")]
+		public string DeviceLayoutFilter;
+
 		[Space()]
 		[Tooltip("Should it show icon or text if available. If not it will display whatever it can.")]
 		public ShowPrioritySelection ShowPriority = ShowPrioritySelection.IconIsPriority;
@@ -58,14 +61,20 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		private void RefreshDisplay(IInputContext context, int playerIndex)
 		{
-			InputDevice device = context.GetLastUsedInputDevice(playerIndex);
+			string deviceLayout = DeviceLayoutFilter;
 
-			// HACK: Prevent from spamming on PC.
-			//		 Keyboard & Mouse are be considered (usually) the same. Gamepads are not - each one comes with its own assets.
-			if (device == m_LastDevice || (device is Keyboard && m_LastDevice is Mouse) || (device is Mouse && m_LastDevice is Keyboard))
-				return;
+			if (string.IsNullOrWhiteSpace(deviceLayout)) {
+				InputDevice device = context.GetLastUsedInputDevice(playerIndex);
 
-			m_LastDevice = device;
+				// HACK: Prevent from spamming on PC.
+				//		 Keyboard & Mouse are be considered (usually) the same. Gamepads are not - each one comes with its own assets.
+				if (device == m_LastDevice || (device is Keyboard && m_LastDevice is Mouse) || (device is Mouse && m_LastDevice is Keyboard))
+					return;
+
+				m_LastDevice = device;
+
+				deviceLayout = m_LastDevice.layout;
+			}
 
 			InputAction action = context.FindActionFor(playerIndex, InputAction.name);
 			if (action == null) {
@@ -73,11 +82,10 @@ namespace DevLocker.GFrame.UIInputDisplay
 				return;
 			}
 
-
 			int count = 0;
 			var foundData = new InputBindingDisplayData();
 
-			foreach (var bindingDisplay in context.GetBindingDisplaysFor(m_LastDevice, action)) {
+			foreach (var bindingDisplay in context.GetBindingDisplaysFor(deviceLayout, action)) {
 				if (count == BindingNumberToUse) {
 					foundData = bindingDisplay;
 					break;

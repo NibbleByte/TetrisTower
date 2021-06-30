@@ -129,11 +129,11 @@ namespace DevLocker.GFrame.Input
 			LastUsedDeviceChanged?.Invoke(0);
 		}
 
-		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputDevice inputDevice, InputAction action)
+		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action)
 		{
 			foreach (var displaysProvider in m_BindingsDisplayProviders) {
-				if (displaysProvider.MatchesDevice(inputDevice)) {
-					foreach(var bindingDisplay in displaysProvider.GetBindingDisplaysFor(m_LastUsedControlScheme, action)) {
+				if (displaysProvider.MatchesDevice(deviceLayout)) {
+					foreach(var bindingDisplay in displaysProvider.GetBindingDisplaysFor(action)) {
 						yield return bindingDisplay;
 					}
 				}

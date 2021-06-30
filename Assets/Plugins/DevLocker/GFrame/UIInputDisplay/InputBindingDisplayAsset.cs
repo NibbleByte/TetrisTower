@@ -39,6 +39,9 @@ namespace DevLocker.GFrame.UIInputDisplay
 		public bool FallbackToDefaultDisplayTexts = true;
 
 		[Space()]
+		[InputControlSchemePicker]
+		[Tooltip("The control scheme that matches the devices listed below.")]
+		public string MatchingControlScheme;
 		public string[] MatchingDeviceLayouts;
 
 		public BindingDisplayAssetsData[] BindingDisplays;
@@ -48,12 +51,12 @@ namespace DevLocker.GFrame.UIInputDisplay
 		private KeyValuePair<InputBinding, BindingDisplayAssetsData>[] m_BindingDisplaysAssetsCache;
 
 
-		public bool MatchesDevice(InputDevice device)
+		public bool MatchesDevice(string deviceLayout)
 		{
-			return MatchingDeviceLayouts.Contains(device.layout, StringComparer.OrdinalIgnoreCase);
+			return MatchingDeviceLayouts.Contains(deviceLayout, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputControlScheme controlScheme, InputAction action)
+		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action)
 		{
 			if (m_BindingDisplaysAssetsCache == null) {
 				m_BindingDisplaysAssetsCache = new KeyValuePair<InputBinding, BindingDisplayAssetsData>[BindingDisplays.Length];
@@ -64,11 +67,12 @@ namespace DevLocker.GFrame.UIInputDisplay
 				}
 			}
 
-			// Should never happen?
-			if (string.IsNullOrEmpty(controlScheme.bindingGroup))
+			if (string.IsNullOrWhiteSpace(MatchingControlScheme)) {
+				Debug.LogError($"Matching control scheme is missing for {name}!", this);
 				yield break;
+			}
 
-			m_ControlSchemeMatchBinding.groups = controlScheme.bindingGroup;
+			m_ControlSchemeMatchBinding.groups = MatchingControlScheme;
 
 			foreach(InputBinding binding in action.bindings) {
 

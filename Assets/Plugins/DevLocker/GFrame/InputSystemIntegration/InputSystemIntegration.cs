@@ -67,13 +67,13 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// What devices does this provider has representations for.
 		/// </summary>
-		bool MatchesDevice(InputDevice device);
+		bool MatchesDevice(string deviceLayout);
 
 		/// <summary>
-		/// Get the display representations of the matched device for the passed action.
+		/// Get the display representations for the passed action.
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
-		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputControlScheme controlScheme, InputAction action);
+		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action);
 	}
 
 	/// <summary>
@@ -173,7 +173,7 @@ namespace DevLocker.GFrame.Input
 		/// Get the display representations of the matched device for the passed action.
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
-		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputDevice inputDevice, InputAction action);
+		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action);
 	}
 
 	public static class InputSystemIntegrationExtensions
@@ -201,7 +201,7 @@ namespace DevLocker.GFrame.Input
 				return Enumerable.Empty<InputBindingDisplayData>();
 			}
 
-			return context.GetBindingDisplaysFor(lastUsedDevice, action);
+			return context.GetBindingDisplaysFor(lastUsedDevice.layout, action);
 		}
 	}
 }
