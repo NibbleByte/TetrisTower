@@ -59,7 +59,8 @@ namespace DevLocker.GFrame.UIScope
 		public bool IncludeUIActions = true;
 #endif
 
-		public static UIScope ActiveScope { get; private set; }
+		public static IReadOnlyCollection<UIScope> ActiveScopes => m_ActiveScopes;
+		private static UIScope[] m_ActiveScopes = Array.Empty<UIScope>();
 
 		private static List<UIScope> s_Scopes = new List<UIScope>();
 
@@ -73,29 +74,63 @@ namespace DevLocker.GFrame.UIScope
 
 		void OnEnable()
 		{
-			ActiveScope?.SetScopeState(false);
+			// Child scope was active, but this one was disabled. The user just enabled me.
+			// Re-insert me (us) to the collections keeping the correct order.
+			if (m_ActiveScopes.Length > 0 && m_ActiveScopes.Last().transform.IsChildOf(transform)) {
 
-			s_Scopes.Add(this);
+				// That would include me, freshly enabled.
+				UIScope[] nextScopes = CollectScopes(m_ActiveScopes.Last());
 
-			ActiveScope = this;
-			ActiveScope.SetScopeState(true);
+				foreach (UIScope scope in nextScopes) {
+					s_Scopes.Remove(scope);
+					s_Scopes.Add(scope);
+				}
+
+				m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
+
+			} else {
+
+				// OnEnabled() order of execution is undefined - sometimes parent invoked first, sometimes the children.
+				// Ensure that collections don't have any duplicates and are filled in the right order - parent to child.
+				UIScope[] nextScopes = CollectScopes(this);
+
+				foreach (UIScope scope in nextScopes) {
+					if (!s_Scopes.Contains(scope)) {
+						s_Scopes.Add(scope);
+					}
+				}
+
+				m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
+			}
 		}
 
 		void OnDisable()
 		{
-			// HACK: On turning off the game OnDisable() gets called and LevelsManager.Instance may get destroyed before that.
-
+			UIScope nextDeepestScope = null;
 			bool wasActive = false;
-			if (ActiveScope == this && LevelsManager.Instance) {
-				ActiveScope.SetScopeState(false);
+
+			// HACK: On turning off the game OnDisable() gets called and LevelsManager.Instance may get destroyed before that.
+			if (Array.IndexOf(m_ActiveScopes, this) != -1 && LevelsManager.Instance) {
+
+				// Try keep the current lowest scope as the target one.
+				if (this != m_ActiveScopes.Last()) {
+					nextDeepestScope = m_ActiveScopes.Last();
+				}
+
 				wasActive = true;
 			}
 
 			s_Scopes.Remove(this);
 
 			if (wasActive && LevelsManager.Instance) {
-				ActiveScope = s_Scopes.Count > 0 ? s_Scopes[s_Scopes.Count - 1] : null;
-				ActiveScope?.SetScopeState(true);
+				// Pick the next lowest (latest) child registered.
+				nextDeepestScope = nextDeepestScope ?? s_Scopes.LastOrDefault();
+				UIScope[] nextScopes = nextDeepestScope
+					? CollectScopes(nextDeepestScope)
+					: Array.Empty<UIScope>()
+					;
+
+				m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
 			}
 		}
 
@@ -105,11 +140,18 @@ namespace DevLocker.GFrame.UIScope
 		/// <param name="scope"></param>
 		public void ForceActiveScope()
 		{
-			ActiveScope?.SetScopeState(false);
+			// That would be weird.
+			if (!gameObject.activeInHierarchy) {
+				Debug.LogWarning($"Trying to force activate UIScope {name}, but it is not active in the hierarchy. Abort!", this);
+				return;
+			}
 
-			ActiveScope = this;
-			ActiveScope.SetScopeState(true);
+			UIScope[] nextScopes = CollectScopes(this);
+
+			m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
 		}
+
+		public static bool IsScopeActive(UIScope scope) => m_ActiveScopes.Contains(scope);
 
 		/// <summary>
 		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.
@@ -120,11 +162,13 @@ namespace DevLocker.GFrame.UIScope
 			m_DirectChildScopes.Clear();
 			ScanForChildScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 
-			if (ActiveScope == this) {
-				ActiveScope.SetScopeState(true);
+			if (Array.IndexOf(m_ActiveScopes, this) != -1) {
+				m_ActiveScopes.Last().ForceActiveScope();
 
-			} else if (ActiveScope != null) {
-				SetScopeState(false);
+			} else {
+				foreach(IScopeElement scopeElement in m_ScopeElements) {
+					scopeElement.enabled = false;
+				}
 			}
 		}
 
@@ -142,6 +186,32 @@ namespace DevLocker.GFrame.UIScope
 			foreach(Transform child in transform) {
 				ScanForChildScopeElements(parentScope, child, scopeElements, directChildScopes);
 			}
+		}
+
+		private static UIScope[] CollectScopes(Component target)
+		{
+			return target
+				.GetComponentsInParent<UIScope>()
+				.Reverse()
+				.Where(s => s.enabled)
+				.ToArray();
+		}
+
+		protected static UIScope[] SwitchActiveScopes(UIScope[] prevScopes, UIScope[] nextScopes)
+		{
+			foreach(UIScope scope in prevScopes) {
+				if (!nextScopes.Contains(scope)) {
+					scope.SetScopeState(false);
+				}
+			}
+
+			foreach(UIScope scope in nextScopes) {
+				if (!prevScopes.Contains(scope)) {
+					scope.SetScopeState(true);
+				}
+			}
+
+			return nextScopes;
 		}
 
 		protected virtual void SetScopeState(bool active)

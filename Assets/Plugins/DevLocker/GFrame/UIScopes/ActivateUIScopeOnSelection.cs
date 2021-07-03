@@ -21,7 +21,7 @@ namespace DevLocker.GFrame.UIScope
 			if (m_LastSelectedObject != EventSystem.current.currentSelectedGameObject) {
 				m_LastSelectedObject = EventSystem.current.currentSelectedGameObject;
 
-				if (!Scope.enabled && m_LastSelectedObject.transform.IsChildOf(transform)) {
+				if (!UIScope.IsScopeActive(Scope) && m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(transform)) {
 					Scope.ForceActiveScope();
 				}
 			}
