@@ -67,6 +67,12 @@ namespace DevLocker.GFrame.UIScope
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
 
+		// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
+		// Any such change will be pushed to a queue and applied later on.
+		private static bool s_ChangingActiveScopes = false;
+		private static Queue<KeyValuePair<UIScope, bool>> s_PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
+
+
 		protected virtual void Awake()
 		{
 			ScanForChildScopeElements();
@@ -74,6 +80,11 @@ namespace DevLocker.GFrame.UIScope
 
 		void OnEnable()
 		{
+			if (s_ChangingActiveScopes) {
+				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
+				return;
+			}
+
 			// Child scope was active, but this one was disabled. The user just enabled me.
 			// Re-insert me (us) to the collections keeping the correct order.
 			if (m_ActiveScopes.Length > 0 && m_ActiveScopes.Last().transform.IsChildOf(transform)) {
@@ -86,7 +97,7 @@ namespace DevLocker.GFrame.UIScope
 					s_Scopes.Add(scope);
 				}
 
-				m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
+				SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
 
 			} else {
 
@@ -100,12 +111,17 @@ namespace DevLocker.GFrame.UIScope
 					}
 				}
 
-				m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
+				SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
 			}
 		}
 
 		void OnDisable()
 		{
+			if (s_ChangingActiveScopes) {
+				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, false));
+				return;
+			}
+
 			UIScope nextDeepestScope = null;
 			bool wasActive = false;
 
@@ -130,7 +146,7 @@ namespace DevLocker.GFrame.UIScope
 					: Array.Empty<UIScope>()
 					;
 
-				m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
+				SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
 			}
 		}
 
@@ -140,6 +156,11 @@ namespace DevLocker.GFrame.UIScope
 		/// <param name="scope"></param>
 		public void ForceActiveScope()
 		{
+			if (s_ChangingActiveScopes) {
+				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
+				return;
+			}
+
 			// That would be weird.
 			if (!gameObject.activeInHierarchy) {
 				Debug.LogWarning($"Trying to force activate UIScope {name}, but it is not active in the hierarchy. Abort!", this);
@@ -148,7 +169,7 @@ namespace DevLocker.GFrame.UIScope
 
 			UIScope[] nextScopes = CollectScopes(this);
 
-			m_ActiveScopes = SwitchActiveScopes(m_ActiveScopes, nextScopes);
+			SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
 		}
 
 		public static bool IsScopeActive(UIScope scope) => m_ActiveScopes.Contains(scope);
@@ -188,7 +209,7 @@ namespace DevLocker.GFrame.UIScope
 			}
 		}
 
-		private static UIScope[] CollectScopes(Component target)
+		protected static UIScope[] CollectScopes(Component target)
 		{
 			return target
 				.GetComponentsInParent<UIScope>()
@@ -197,21 +218,41 @@ namespace DevLocker.GFrame.UIScope
 				.ToArray();
 		}
 
-		protected static UIScope[] SwitchActiveScopes(UIScope[] prevScopes, UIScope[] nextScopes)
+		protected static void SwitchActiveScopes(ref UIScope[] prevScopes, UIScope[] nextScopes)
 		{
-			foreach(UIScope scope in prevScopes) {
-				if (!nextScopes.Contains(scope)) {
-					scope.SetScopeState(false);
+			// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
+			// Any such change will be pushed to a queue and applied later on.
+			// TODO: This was never really tested.
+			s_ChangingActiveScopes = true;
+
+			try {
+				foreach (UIScope scope in prevScopes) {
+					if (!nextScopes.Contains(scope)) {
+						scope.SetScopeState(false);
+					}
+				}
+
+				foreach (UIScope scope in nextScopes) {
+					if (!prevScopes.Contains(scope)) {
+						scope.SetScopeState(true);
+					}
 				}
 			}
 
-			foreach(UIScope scope in nextScopes) {
-				if (!prevScopes.Contains(scope)) {
-					scope.SetScopeState(true);
-				}
+			finally {
+				prevScopes = nextScopes;
+				s_ChangingActiveScopes = false;
 			}
 
-			return nextScopes;
+			while(s_PendingScopeChanges.Count > 0) {
+				var scopeChange = s_PendingScopeChanges.Dequeue();
+
+				if (scopeChange.Value) {
+					scopeChange.Key.OnEnable();
+				} else {
+					scopeChange.Key.OnDisable();
+				}
+			}
 		}
 
 		protected virtual void SetScopeState(bool active)
