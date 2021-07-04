@@ -170,6 +170,11 @@ namespace DevLocker.GFrame.Input
 		void TriggerLastUsedDeviceChanged(int playerIndex = -1);
 
 		/// <summary>
+		/// Get all used <see cref="InputControlScheme" />.
+		/// </summary>
+		IEnumerable<InputControlScheme> GetAllInputControlSchemes();
+
+		/// <summary>
 		/// Get the display representations of the matched device for the passed action.
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
@@ -202,6 +207,11 @@ namespace DevLocker.GFrame.Input
 			}
 
 			return context.GetBindingDisplaysFor(lastUsedDevice.layout, action);
+		}
+
+		public static InputControlScheme GetInputControlSchemeFor(this IInputContext context, InputDevice device)
+		{
+			return context.GetAllInputControlSchemes().FirstOrDefault(c => c.SupportsDevice(device));
 		}
 	}
 }

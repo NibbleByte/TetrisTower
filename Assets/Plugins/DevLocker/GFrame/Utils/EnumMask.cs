@@ -17,7 +17,7 @@ namespace DevLocker.GFrame.Utils
 
 #if UNITY_EDITOR
 	[CustomPropertyDrawer(typeof(EnumMaskAttribute))]
-	public class EnumMaskPropertyDrawer : PropertyDrawer
+	internal class EnumMaskPropertyDrawer : PropertyDrawer
 	{
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{

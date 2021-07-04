@@ -1,5 +1,7 @@
 #if USE_INPUT_SYSTEM
 using DevLocker.GFrame.Input;
+using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -12,6 +14,31 @@ namespace DevLocker.GFrame.UIInputDisplay
 	/// </summary>
 	public class HotkeyDisplayUI : MonoBehaviour
 	{
+		public enum DisplayModes
+		{
+			UpdateWithCurrentDevice,
+			DisplaySpecificDeviceIgnoringTheCurrentOne,
+			UpdateWithCurrentDeviceExcludeSchemes,
+		}
+
+		[Serializable]
+		public struct DisplayModeData
+		{
+			[Tooltip("What should the component display.")]
+			public DisplayModes Mode;
+
+			[Tooltip("Device layout name to display bindings for.")]
+			public string DisplayedDeviceLayout;
+
+			[Tooltip("When excluded, should it keep displaying the last available device bindings, or should it hide everything?")]
+			public bool KeepDisplayingLastDevice;
+
+			[InputControlSchemePicker]
+			[NonReorderable]
+			[Tooltip("Control scheme to exclude. Use the picker to avoid typos.")]
+			public string[] ExcludedControlSchemes;
+		}
+
 		public enum ShowPrioritySelection
 		{
 			IconIsPriority,
@@ -28,8 +55,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[Tooltip("If multiple bindings are present in the action matching this device, display the n-th one.")]
 		public int BindingNumberToUse = 0;
 
-		[Tooltip("Display only bindings for this device layout, ignoring the current one.")]
-		public string DeviceLayoutFilter;
+		public DisplayModeData DisplayMode;
 
 		[Space()]
 		[Tooltip("Should it show icon or text if available. If not it will display whatever it can.")]
@@ -61,9 +87,9 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		private void RefreshDisplay(IInputContext context, int playerIndex)
 		{
-			string deviceLayout = DeviceLayoutFilter;
+			string deviceLayout;
 
-			if (string.IsNullOrWhiteSpace(deviceLayout)) {
+			if (DisplayMode.Mode != DisplayModes.DisplaySpecificDeviceIgnoringTheCurrentOne) {
 				InputDevice device = context.GetLastUsedInputDevice(playerIndex);
 
 				// HACK: Prevent from spamming on PC.
@@ -71,9 +97,38 @@ namespace DevLocker.GFrame.UIInputDisplay
 				if (device == m_LastDevice || (device is Keyboard && m_LastDevice is Mouse) || (device is Mouse && m_LastDevice is Keyboard))
 					return;
 
+				bool hadDeviceBefore = m_LastDevice != null;
 				m_LastDevice = device;
 
+				if (DisplayMode.Mode == DisplayModes.UpdateWithCurrentDeviceExcludeSchemes) {
+					var lastControlScheme = context.GetLastUsedInputControlScheme(playerIndex).bindingGroup;
+
+					if (DisplayMode.ExcludedControlSchemes.Contains(lastControlScheme)) {
+
+						if (!DisplayMode.KeepDisplayingLastDevice) {
+							if (Icon) Icon.gameObject.SetActive(false);
+							if (Text) Text.gameObject.SetActive(false);
+							return;
+						}
+
+						if (hadDeviceBefore)
+							return;
+
+						// I'm displayed for the first time - display first available device if current device is to be excluded.
+						m_LastDevice = InputSystem.devices
+							.Where(d => d != device)
+							.FirstOrDefault(d => !DisplayMode.ExcludedControlSchemes.Contains(context.GetInputControlSchemeFor(d).bindingGroup))
+							;
+
+						if (m_LastDevice == null)
+							return;
+					}
+				}
+
 				deviceLayout = m_LastDevice.layout;
+
+			} else {
+				deviceLayout = DisplayMode.DisplayedDeviceLayout;
 			}
 
 			InputAction action = context.FindActionFor(playerIndex, InputAction.name);
@@ -193,6 +248,70 @@ namespace DevLocker.GFrame.UIInputDisplay
 			}
 		}
 	}
+
+#if UNITY_EDITOR
+	[UnityEditor.CustomPropertyDrawer(typeof(HotkeyDisplayUI.DisplayModeData))]
+	internal class HotkeyDisplayUIUpdateModeDataPropertyDrawer : UnityEditor.PropertyDrawer
+	{
+		public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
+		{
+			var modeProperty = property.FindPropertyRelative("Mode");
+			var mode = (HotkeyDisplayUI.DisplayModes)modeProperty.enumValueIndex;
+
+			float height = UnityEditor.EditorGUIUtility.singleLineHeight;
+
+			switch(mode) {
+				case HotkeyDisplayUI.DisplayModes.DisplaySpecificDeviceIgnoringTheCurrentOne:
+					height += UnityEditor.EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedDeviceLayout)), label);
+					break;
+				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDeviceExcludeSchemes:
+					height += UnityEditor.EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.KeepDisplayingLastDevice)), label);
+					height += UnityEditor.EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.ExcludedControlSchemes)), label);
+					break;
+			}
+
+			return height;
+		}
+
+		public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
+		{
+			label = UnityEditor.EditorGUI.BeginProperty(position, label, property);
+
+			Rect lineRect = position;
+			lineRect.height = UnityEditor.EditorGUIUtility.singleLineHeight;
+
+			var modeProperty = property.FindPropertyRelative("Mode");
+			UnityEditor.EditorGUI.PropertyField(lineRect, modeProperty, label);
+
+			lineRect.y += UnityEditor.EditorGUIUtility.singleLineHeight + UnityEditor.EditorGUIUtility.standardVerticalSpacing;
+
+			var mode = (HotkeyDisplayUI.DisplayModes) modeProperty.enumValueIndex;
+			UnityEditor.EditorGUI.indentLevel++;
+			switch(mode) {
+				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDevice:
+					if (property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedDeviceLayout)).stringValue != string.Empty) {
+						property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedDeviceLayout)).stringValue = string.Empty;
+					}
+					if (property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.ExcludedControlSchemes)).arraySize != 0) {
+						property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.ExcludedControlSchemes)).arraySize = 0;
+					}
+					break;
+
+				case HotkeyDisplayUI.DisplayModes.DisplaySpecificDeviceIgnoringTheCurrentOne:
+					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedDeviceLayout)));
+					break;
+				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDeviceExcludeSchemes:
+					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.KeepDisplayingLastDevice)), true);
+					lineRect.y += UnityEditor.EditorGUIUtility.singleLineHeight + UnityEditor.EditorGUIUtility.standardVerticalSpacing;
+					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.ExcludedControlSchemes)), true);
+					break;
+			}
+			UnityEditor.EditorGUI.indentLevel--;
+
+			UnityEditor.EditorGUI.EndProperty();
+		}
+	}
+#endif
 
 }
 #endif

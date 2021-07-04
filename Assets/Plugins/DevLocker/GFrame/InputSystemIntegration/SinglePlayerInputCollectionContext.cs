@@ -129,6 +129,11 @@ namespace DevLocker.GFrame.Input
 			LastUsedDeviceChanged?.Invoke(0);
 		}
 
+		public IEnumerable<InputControlScheme> GetAllInputControlSchemes()
+		{
+			return InputActionsCollection.controlSchemes;
+		}
+
 		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action)
 		{
 			foreach (var displaysProvider in m_BindingsDisplayProviders) {
@@ -158,7 +163,7 @@ namespace DevLocker.GFrame.Input
 
 			m_LastUsedDevice = device;
 			if (m_LastUsedDevice != null) {
-				m_LastUsedControlScheme = InputActionsCollection.controlSchemes.FirstOrDefault(c => c.SupportsDevice(m_LastUsedDevice));
+				m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
 			}
 
 			TriggerLastUsedDeviceChanged(0);

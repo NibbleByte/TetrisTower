@@ -22,7 +22,7 @@ namespace DevLocker.GFrame.Input
 
 #if UNITY_EDITOR
 	[CustomPropertyDrawer(typeof(InputControlSchemePickerAttribute))]
-	public class InputControlSchemePickerPropertyDrawer : PropertyDrawer
+	internal class InputControlSchemePickerPropertyDrawer : PropertyDrawer
 	{
 		private GUIContent m_PickerButtonContent;
 		private GUIStyle m_PickerButtonStyle;

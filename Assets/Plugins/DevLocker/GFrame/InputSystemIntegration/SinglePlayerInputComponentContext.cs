@@ -158,6 +158,15 @@ namespace DevLocker.GFrame.Input
 			LastUsedDeviceChanged?.Invoke(0);
 		}
 
+		public IEnumerable<InputControlScheme> GetAllInputControlSchemes()
+		{
+			foreach (PlayerInput playerInput in PlayerInput.all) {
+				foreach(InputControlScheme controlScheme in playerInput.actions.controlSchemes) {
+					yield return controlScheme;
+				}
+			}
+		}
+
 		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action)
 		{
 			foreach (var displaysProvider in m_BindingsDisplayProviders) {
