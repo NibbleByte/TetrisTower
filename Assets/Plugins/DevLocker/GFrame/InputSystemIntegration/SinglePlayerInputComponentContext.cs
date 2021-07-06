@@ -40,19 +40,23 @@ namespace DevLocker.GFrame.Input
 		public SinglePlayerInputComponentContext(PlayerInput playerInput, InputActionsStack inputStack, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
 		{
 			PlayerInput = playerInput;
+
+			// We'll control the input actions.
+			PlayerInput.defaultActionMap = "";
+
 			InputActionsStack = inputStack;
 			var uiActions = new List<InputAction>();
 			if (PlayerInput.uiInputModule) {
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.point.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.leftClick.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.middleClick.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.rightClick.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.scrollWheel.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.move.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.submit.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.cancel.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.trackedDevicePosition.name));
-				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.trackedDeviceOrientation.name));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.point.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.leftClick.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.middleClick.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.rightClick.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.scrollWheel.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.move.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.submit.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.cancel.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.trackedDevicePosition.action?.id ?? new Guid()));
+				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.trackedDeviceOrientation.action?.id ?? new Guid()));
 
 				uiActions.RemoveAll(a => a == null);
 			}
