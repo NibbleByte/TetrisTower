@@ -1,6 +1,6 @@
 using DevLocker.GFrame.MessageBox;
-using DevLocker.GFrame.SampleGame.MainMenu;
 using DevLocker.GFrame.UIInputDisplay;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
@@ -51,14 +51,13 @@ namespace DevLocker.GFrame.SampleGame.Game
 		void Start()
 		{
 			// Boot game from current scene
-			//if (GameObject.FindObjectOfType<TowerLevelController>()) {
-			//	GameContext.SetCurrentPlaythrough(GameConfig.NewGameData);
-			//	LevelsManager.Instance.SwitchLevel(new TowerLevelSupervisor());
-			//	return;
-			//}
+			if (GameObject.FindObjectOfType<Play.SamplePlayerController>()) {
+				LevelsManager.Instance.SwitchLevel(new Play.SamplePlaySupervisor());
+				return;
+			}
 
-			if (GameObject.FindObjectOfType<SampleMainMenuController>()) {
-				LevelsManager.Instance.SwitchLevel(new SampleMainMenuLevelSupervisor());
+			if (GameObject.FindObjectOfType<MainMenu.SampleMainMenuController>()) {
+				LevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 				return;
 			}
 		}
@@ -74,6 +73,20 @@ namespace DevLocker.GFrame.SampleGame.Game
 #if UNITY_EDITOR
 		private void Update()
 		{
+			if (Keyboard.current.f4Key.wasPressedThisFrame) {
+				MessageBox.MessageBox.Instance.ShowProcessing(
+					"Level is downloading?", "",
+					"The level is downloading. Please wait or go play another level.",
+					MessageBoxIcon.Information,
+					MessageBoxButtons.RetryCancel,
+					new Dictionary<MessageBoxButtons, string>() { { MessageBoxButtons.Retry, "Start Level" } },
+					new FakeProcessingProgressTracker(20),
+					(res) => { Debug.Log($"Processing response - {res.MessageResponse}", this); },
+					this
+					);
+				//Serialize();
+			}
+
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {
 				MessageBox.MessageBox.Instance.ShowInput(
 					"Save?",
@@ -82,7 +95,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 					null,
 					MessageBoxIcon.Question,
 					MessageBoxButtons.YesNo,
-					(res) => { Debug.Log($"Save response - {res.ConfirmResponse}", this); },
+					(res) => { Debug.Log($"Save response - {res.MessageResponse}", this); },
 					this
 					);
 				//Serialize();
@@ -94,7 +107,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 					"Are you sure you want to load?\nAll current progress will be lost!",
 					MessageBoxIcon.Warning,
 					MessageBoxButtons.YesNo,
-					(res) => { Debug.Log($"Load response - {res.ConfirmResponse}", this); },
+					(res) => { Debug.Log($"Load response - {res.MessageResponse}", this); },
 					this
 					);
 			}

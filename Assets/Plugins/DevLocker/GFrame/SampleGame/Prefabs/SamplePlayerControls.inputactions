@@ -1,44 +1,20 @@
 {
-    "name": "PlayerControls",
+    "name": "SamplePlayerControls",
     "maps": [
         {
-            "name": "TowerLevelPlay",
+            "name": "PlayJumper",
             "id": "9cb11c57-6035-4442-b6b4-fb85c51dc04a",
             "actions": [
                 {
-                    "name": "MoveShapeLeft",
-                    "type": "Button",
-                    "id": "c42aaa47-96d2-4c31-b0c7-5be28c1a25df",
-                    "expectedControlType": "Button",
+                    "name": "JumperMovement",
+                    "type": "Value",
+                    "id": "15330b3f-1251-45fc-9096-629784c0210a",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": ""
                 },
                 {
-                    "name": "MoveShapeRight",
-                    "type": "Button",
-                    "id": "5bdcd5dc-047d-4593-96a8-d27f7fd530e6",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "RotateShapeUp",
-                    "type": "Button",
-                    "id": "12911e7a-7981-40c1-83b9-9342bd21583f",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "RotateShapeDown",
-                    "type": "Button",
-                    "id": "d2ca85d2-bb09-4e02-8dce-d151895698da",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "FallSpeedUp",
+                    "name": "JumperJump",
                     "type": "Button",
                     "id": "7ad6e614-2658-40c7-932a-9d41693753b3",
                     "expectedControlType": "Button",
@@ -46,17 +22,9 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Pointer-FallSpeedUp",
-                    "type": "PassThrough",
-                    "id": "262069d4-7042-4ac7-a47f-46cec272d1c9",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "Pointer-Press",
-                    "type": "PassThrough",
-                    "id": "1ea63dad-8fe3-4d3e-8e95-8ba8c2e56623",
+                    "name": "SwitchToChopper",
+                    "type": "Button",
+                    "id": "882b3af6-d8ad-4838-af0d-50e718002fca",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -65,34 +33,12 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "05f6913d-c316-48b2-a6bb-e225f14c7960",
-                    "path": "<Keyboard>/enter",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "FallSpeedUp",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "fbd6776d-cc85-48bb-962b-3b856376eaa9",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "FallSpeedUp",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b89000c4-6b25-4e79-bfa9-46186462a044",
-                    "path": "<Keyboard>/numpadEnter",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "FallSpeedUp",
+                    "action": "JumperJump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -103,174 +49,236 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "FallSpeedUp",
+                    "action": "JumperJump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "7f921f31-a271-4435-bee3-f8ebf3b5a101",
-                    "path": "<Keyboard>/leftArrow",
+                    "id": "1d63d413-5f28-4f5d-a026-3e85cdfbadc2",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "MoveShapeLeft",
+                    "action": "SwitchToChopper",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "e90a1de5-f1aa-41be-a56b-90f4b7fa3c09",
+                    "id": "521f1363-4aa0-4957-bd7e-389f45ca36e5",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "SwitchToChopper",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2016e497-0134-43ea-ba7a-2590eac18244",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "SwitchToChopper",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "AD",
+                    "id": "c5cdf313-ac44-4213-b9fe-bf1ad711a8e3",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "JumperMovement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "5c13ed70-9c31-4e70-89f8-370b4e6ed783",
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "MoveShapeLeft",
+                    "action": "JumperMovement",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "fccaa75c-6162-4e57-9452-308311e09c5b",
-                    "path": "<Gamepad>/dpad/left",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "MoveShapeLeft",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4c7376a0-a019-4e59-ab10-a13dda1bf8cd",
-                    "path": "<Keyboard>/rightArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "MoveShapeRight",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4fab62e1-b2fa-4bb5-ad59-b25e6e31a04e",
+                    "name": "positive",
+                    "id": "b44cb001-8ddf-4f74-8c82-70f8253e12c8",
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "MoveShapeRight",
+                    "action": "JumperMovement",
                     "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Left Stick",
+                    "id": "be16b3de-e5b2-4439-8583-bafc876a0e68",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "JumperMovement",
+                    "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "3bad19e9-17e9-4fb6-9728-219fb1d017e2",
-                    "path": "<Gamepad>/dpad/right",
+                    "name": "negative",
+                    "id": "8b9ddf48-b132-4ea1-9d2d-cfe82a16c05e",
+                    "path": "<Gamepad>/leftStick/left",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "MoveShapeRight",
+                    "action": "JumperMovement",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
+                    "name": "positive",
+                    "id": "db2b9a49-ab8a-422b-8112-bfd5d8f56c5c",
+                    "path": "<Gamepad>/leftStick/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "JumperMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                }
+            ]
+        },
+        {
+            "name": "PlayChopper",
+            "id": "4c44cb70-470a-4c8a-a8b6-f562605bacd2",
+            "actions": [
+                {
+                    "name": "ChopperMovement",
+                    "type": "Value",
+                    "id": "e5dc01de-2eb3-4d9b-825c-2e7e12001644",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "SwitchToJumper",
+                    "type": "Button",
+                    "id": "7d2cc9a1-28b7-459f-9d25-41965bdda9b8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
                     "name": "",
-                    "id": "948d3740-9b93-40c0-97a5-0308b3036a65",
-                    "path": "<Keyboard>/upArrow",
+                    "id": "370f92a8-f0cb-4784-8f40-26f861138326",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "RotateShapeUp",
+                    "action": "SwitchToJumper",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "25a29330-7f1e-4e20-9ff9-442f497d7f3f",
+                    "id": "cb4fd844-a44c-471f-b23a-b4c975bc1a3c",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "SwitchToJumper",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3b6fea6a-97a6-4ffc-9ed1-a8e6579f9687",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "SwitchToJumper",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "WASD",
+                    "id": "b65b3050-133c-4c3a-ad51-927821afbd7f",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ChopperMovement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "37170608-49ce-4d0a-a783-aa08ce23eec0",
                     "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "RotateShapeUp",
+                    "action": "ChopperMovement",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "a2fb49a3-b61b-4942-8d6f-26fdb3e979a6",
-                    "path": "<Gamepad>/dpad/up",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "RotateShapeUp",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ba3aa4a0-29fa-4d70-9fad-7a2c7cc5b260",
-                    "path": "<Keyboard>/downArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "RotateShapeDown",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "8b02350e-fce8-4d19-85c7-80ccc43b7d3b",
+                    "name": "down",
+                    "id": "bf931831-7e74-4abb-a39f-77ca6a1154a4",
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "RotateShapeDown",
+                    "action": "ChopperMovement",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "7464aca8-0179-4b63-bf60-2ff565f08b60",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "ChopperMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "69fede6e-edf6-4893-8866-788a54e53b0e",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "ChopperMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
-                    "id": "6b97bb9e-2c32-4ea2-9248-e04b2ac7fdbd",
-                    "path": "<Gamepad>/dpad/down",
+                    "id": "0d46dcc3-1425-47db-843c-66ba85bb0d0c",
+                    "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "RotateShapeDown",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1729467b-c02e-4277-b198-5fc6e0903220",
-                    "path": "<Pointer>/press",
-                    "interactions": "MultiTap",
-                    "processors": "",
-                    "groups": "Touch;Keyboard&Mouse",
-                    "action": "Pointer-FallSpeedUp",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b55cdccc-bc3a-4777-a170-e9934bbd406a",
-                    "path": "<Pointer>/press",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse;Touch",
-                    "action": "Pointer-Press",
+                    "action": "ChopperMovement",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
             ]
         },
         {
-            "name": "TowerLevelPaused",
-            "id": "8e96621b-511e-4f34-840f-669ae8e49f79",
-            "actions": [],
-            "bindings": []
-        },
-        {
-            "name": "TowerLevelShared",
+            "name": "PlayShared",
             "id": "31910e90-aaf6-4365-8ae6-f48836710769",
             "actions": [
                 {

@@ -26,43 +26,19 @@ namespace DevLocker.GFrame.SampleGame.Game
     ""name"": ""SamplePlayerControls"",
     ""maps"": [
         {
-            ""name"": ""TowerLevelPlay"",
+            ""name"": ""PlayJumper"",
             ""id"": ""9cb11c57-6035-4442-b6b4-fb85c51dc04a"",
             ""actions"": [
                 {
-                    ""name"": ""MoveShapeLeft"",
-                    ""type"": ""Button"",
-                    ""id"": ""c42aaa47-96d2-4c31-b0c7-5be28c1a25df"",
-                    ""expectedControlType"": ""Button"",
+                    ""name"": ""JumperMovement"",
+                    ""type"": ""Value"",
+                    ""id"": ""15330b3f-1251-45fc-9096-629784c0210a"",
+                    ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""MoveShapeRight"",
-                    ""type"": ""Button"",
-                    ""id"": ""5bdcd5dc-047d-4593-96a8-d27f7fd530e6"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                },
-                {
-                    ""name"": ""RotateShapeUp"",
-                    ""type"": ""Button"",
-                    ""id"": ""12911e7a-7981-40c1-83b9-9342bd21583f"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                },
-                {
-                    ""name"": ""RotateShapeDown"",
-                    ""type"": ""Button"",
-                    ""id"": ""d2ca85d2-bb09-4e02-8dce-d151895698da"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                },
-                {
-                    ""name"": ""FallSpeedUp"",
+                    ""name"": ""JumperJump"",
                     ""type"": ""Button"",
                     ""id"": ""7ad6e614-2658-40c7-932a-9d41693753b3"",
                     ""expectedControlType"": ""Button"",
@@ -70,17 +46,9 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""Pointer-FallSpeedUp"",
-                    ""type"": ""PassThrough"",
-                    ""id"": ""262069d4-7042-4ac7-a47f-46cec272d1c9"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                },
-                {
-                    ""name"": ""Pointer-Press"",
-                    ""type"": ""PassThrough"",
-                    ""id"": ""1ea63dad-8fe3-4d3e-8e95-8ba8c2e56623"",
+                    ""name"": ""SwitchToChopper"",
+                    ""type"": ""Button"",
+                    ""id"": ""882b3af6-d8ad-4838-af0d-50e718002fca"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -89,34 +57,12 @@ namespace DevLocker.GFrame.SampleGame.Game
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""05f6913d-c316-48b2-a6bb-e225f14c7960"",
-                    ""path"": ""<Keyboard>/enter"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""FallSpeedUp"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""fbd6776d-cc85-48bb-962b-3b856376eaa9"",
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""FallSpeedUp"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b89000c4-6b25-4e79-bfa9-46186462a044"",
-                    ""path"": ""<Keyboard>/numpadEnter"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""FallSpeedUp"",
+                    ""action"": ""JumperJump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -127,174 +73,236 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""FallSpeedUp"",
+                    ""action"": ""JumperJump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""7f921f31-a271-4435-bee3-f8ebf3b5a101"",
-                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""id"": ""1d63d413-5f28-4f5d-a026-3e85cdfbadc2"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShapeLeft"",
+                    ""action"": ""SwitchToChopper"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e90a1de5-f1aa-41be-a56b-90f4b7fa3c09"",
+                    ""id"": ""521f1363-4aa0-4957-bd7e-389f45ca36e5"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""SwitchToChopper"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2016e497-0134-43ea-ba7a-2590eac18244"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""SwitchToChopper"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""AD"",
+                    ""id"": ""c5cdf313-ac44-4213-b9fe-bf1ad711a8e3"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""JumperMovement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""5c13ed70-9c31-4e70-89f8-370b4e6ed783"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShapeLeft"",
+                    ""action"": ""JumperMovement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""fccaa75c-6162-4e57-9452-308311e09c5b"",
-                    ""path"": ""<Gamepad>/dpad/left"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""MoveShapeLeft"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4c7376a0-a019-4e59-ab10-a13dda1bf8cd"",
-                    ""path"": ""<Keyboard>/rightArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShapeRight"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4fab62e1-b2fa-4bb5-ad59-b25e6e31a04e"",
+                    ""name"": ""positive"",
+                    ""id"": ""b44cb001-8ddf-4f74-8c82-70f8253e12c8"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoveShapeRight"",
+                    ""action"": ""JumperMovement"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Left Stick"",
+                    ""id"": ""be16b3de-e5b2-4439-8583-bafc876a0e68"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""JumperMovement"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""3bad19e9-17e9-4fb6-9728-219fb1d017e2"",
-                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""name"": ""negative"",
+                    ""id"": ""8b9ddf48-b132-4ea1-9d2d-cfe82a16c05e"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""MoveShapeRight"",
+                    ""action"": ""JumperMovement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
+                    ""name"": ""positive"",
+                    ""id"": ""db2b9a49-ab8a-422b-8112-bfd5d8f56c5c"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""JumperMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
+        },
+        {
+            ""name"": ""PlayChopper"",
+            ""id"": ""4c44cb70-470a-4c8a-a8b6-f562605bacd2"",
+            ""actions"": [
+                {
+                    ""name"": ""ChopperMovement"",
+                    ""type"": ""Value"",
+                    ""id"": ""e5dc01de-2eb3-4d9b-825c-2e7e12001644"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""SwitchToJumper"",
+                    ""type"": ""Button"",
+                    ""id"": ""7d2cc9a1-28b7-459f-9d25-41965bdda9b8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
                     ""name"": """",
-                    ""id"": ""948d3740-9b93-40c0-97a5-0308b3036a65"",
-                    ""path"": ""<Keyboard>/upArrow"",
+                    ""id"": ""370f92a8-f0cb-4784-8f40-26f861138326"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShapeUp"",
+                    ""action"": ""SwitchToJumper"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""25a29330-7f1e-4e20-9ff9-442f497d7f3f"",
+                    ""id"": ""cb4fd844-a44c-471f-b23a-b4c975bc1a3c"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""SwitchToJumper"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3b6fea6a-97a6-4ffc-9ed1-a8e6579f9687"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""SwitchToJumper"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""WASD"",
+                    ""id"": ""b65b3050-133c-4c3a-ad51-927821afbd7f"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChopperMovement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""37170608-49ce-4d0a-a783-aa08ce23eec0"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShapeUp"",
+                    ""action"": ""ChopperMovement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""a2fb49a3-b61b-4942-8d6f-26fdb3e979a6"",
-                    ""path"": ""<Gamepad>/dpad/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""RotateShapeUp"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ba3aa4a0-29fa-4d70-9fad-7a2c7cc5b260"",
-                    ""path"": ""<Keyboard>/downArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShapeDown"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""8b02350e-fce8-4d19-85c7-80ccc43b7d3b"",
+                    ""name"": ""down"",
+                    ""id"": ""bf931831-7e74-4abb-a39f-77ca6a1154a4"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RotateShapeDown"",
+                    ""action"": ""ChopperMovement"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""7464aca8-0179-4b63-bf60-2ff565f08b60"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ChopperMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""69fede6e-edf6-4893-8866-788a54e53b0e"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ChopperMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
-                    ""id"": ""6b97bb9e-2c32-4ea2-9248-e04b2ac7fdbd"",
-                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""id"": ""0d46dcc3-1425-47db-843c-66ba85bb0d0c"",
+                    ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""RotateShapeDown"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""1729467b-c02e-4277-b198-5fc6e0903220"",
-                    ""path"": ""<Pointer>/press"",
-                    ""interactions"": ""MultiTap"",
-                    ""processors"": """",
-                    ""groups"": ""Touch;Keyboard&Mouse"",
-                    ""action"": ""Pointer-FallSpeedUp"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b55cdccc-bc3a-4777-a170-e9934bbd406a"",
-                    ""path"": ""<Pointer>/press"",
-                    ""interactions"": ""Press"",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse;Touch"",
-                    ""action"": ""Pointer-Press"",
+                    ""action"": ""ChopperMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
             ]
         },
         {
-            ""name"": ""TowerLevelPaused"",
-            ""id"": ""8e96621b-511e-4f34-840f-669ae8e49f79"",
-            ""actions"": [],
-            ""bindings"": []
-        },
-        {
-            ""name"": ""TowerLevelShared"",
+            ""name"": ""PlayShared"",
             ""id"": ""31910e90-aaf6-4365-8ae6-f48836710769"",
             ""actions"": [
                 {
@@ -963,20 +971,18 @@ namespace DevLocker.GFrame.SampleGame.Game
         }
     ]
 }");
-            // TowerLevelPlay
-            m_TowerLevelPlay = asset.FindActionMap("TowerLevelPlay", throwIfNotFound: true);
-            m_TowerLevelPlay_MoveShapeLeft = m_TowerLevelPlay.FindAction("MoveShapeLeft", throwIfNotFound: true);
-            m_TowerLevelPlay_MoveShapeRight = m_TowerLevelPlay.FindAction("MoveShapeRight", throwIfNotFound: true);
-            m_TowerLevelPlay_RotateShapeUp = m_TowerLevelPlay.FindAction("RotateShapeUp", throwIfNotFound: true);
-            m_TowerLevelPlay_RotateShapeDown = m_TowerLevelPlay.FindAction("RotateShapeDown", throwIfNotFound: true);
-            m_TowerLevelPlay_FallSpeedUp = m_TowerLevelPlay.FindAction("FallSpeedUp", throwIfNotFound: true);
-            m_TowerLevelPlay_PointerFallSpeedUp = m_TowerLevelPlay.FindAction("Pointer-FallSpeedUp", throwIfNotFound: true);
-            m_TowerLevelPlay_PointerPress = m_TowerLevelPlay.FindAction("Pointer-Press", throwIfNotFound: true);
-            // TowerLevelPaused
-            m_TowerLevelPaused = asset.FindActionMap("TowerLevelPaused", throwIfNotFound: true);
-            // TowerLevelShared
-            m_TowerLevelShared = asset.FindActionMap("TowerLevelShared", throwIfNotFound: true);
-            m_TowerLevelShared_ToggleMenu = m_TowerLevelShared.FindAction("ToggleMenu", throwIfNotFound: true);
+            // PlayJumper
+            m_PlayJumper = asset.FindActionMap("PlayJumper", throwIfNotFound: true);
+            m_PlayJumper_JumperMovement = m_PlayJumper.FindAction("JumperMovement", throwIfNotFound: true);
+            m_PlayJumper_JumperJump = m_PlayJumper.FindAction("JumperJump", throwIfNotFound: true);
+            m_PlayJumper_SwitchToChopper = m_PlayJumper.FindAction("SwitchToChopper", throwIfNotFound: true);
+            // PlayChopper
+            m_PlayChopper = asset.FindActionMap("PlayChopper", throwIfNotFound: true);
+            m_PlayChopper_ChopperMovement = m_PlayChopper.FindAction("ChopperMovement", throwIfNotFound: true);
+            m_PlayChopper_SwitchToJumper = m_PlayChopper.FindAction("SwitchToJumper", throwIfNotFound: true);
+            // PlayShared
+            m_PlayShared = asset.FindActionMap("PlayShared", throwIfNotFound: true);
+            m_PlayShared_ToggleMenu = m_PlayShared.FindAction("ToggleMenu", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1051,135 +1057,119 @@ namespace DevLocker.GFrame.SampleGame.Game
             return asset.FindBinding(bindingMask, out action);
         }
 
-        // TowerLevelPlay
-        private readonly InputActionMap m_TowerLevelPlay;
-        private ITowerLevelPlayActions m_TowerLevelPlayActionsCallbackInterface;
-        private readonly InputAction m_TowerLevelPlay_MoveShapeLeft;
-        private readonly InputAction m_TowerLevelPlay_MoveShapeRight;
-        private readonly InputAction m_TowerLevelPlay_RotateShapeUp;
-        private readonly InputAction m_TowerLevelPlay_RotateShapeDown;
-        private readonly InputAction m_TowerLevelPlay_FallSpeedUp;
-        private readonly InputAction m_TowerLevelPlay_PointerFallSpeedUp;
-        private readonly InputAction m_TowerLevelPlay_PointerPress;
-        public struct TowerLevelPlayActions
+        // PlayJumper
+        private readonly InputActionMap m_PlayJumper;
+        private IPlayJumperActions m_PlayJumperActionsCallbackInterface;
+        private readonly InputAction m_PlayJumper_JumperMovement;
+        private readonly InputAction m_PlayJumper_JumperJump;
+        private readonly InputAction m_PlayJumper_SwitchToChopper;
+        public struct PlayJumperActions
         {
             private @SamplePlayerControls m_Wrapper;
-            public TowerLevelPlayActions(@SamplePlayerControls wrapper) { m_Wrapper = wrapper; }
-            public InputAction @MoveShapeLeft => m_Wrapper.m_TowerLevelPlay_MoveShapeLeft;
-            public InputAction @MoveShapeRight => m_Wrapper.m_TowerLevelPlay_MoveShapeRight;
-            public InputAction @RotateShapeUp => m_Wrapper.m_TowerLevelPlay_RotateShapeUp;
-            public InputAction @RotateShapeDown => m_Wrapper.m_TowerLevelPlay_RotateShapeDown;
-            public InputAction @FallSpeedUp => m_Wrapper.m_TowerLevelPlay_FallSpeedUp;
-            public InputAction @PointerFallSpeedUp => m_Wrapper.m_TowerLevelPlay_PointerFallSpeedUp;
-            public InputAction @PointerPress => m_Wrapper.m_TowerLevelPlay_PointerPress;
-            public InputActionMap Get() { return m_Wrapper.m_TowerLevelPlay; }
+            public PlayJumperActions(@SamplePlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @JumperMovement => m_Wrapper.m_PlayJumper_JumperMovement;
+            public InputAction @JumperJump => m_Wrapper.m_PlayJumper_JumperJump;
+            public InputAction @SwitchToChopper => m_Wrapper.m_PlayJumper_SwitchToChopper;
+            public InputActionMap Get() { return m_Wrapper.m_PlayJumper; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(TowerLevelPlayActions set) { return set.Get(); }
-            public void SetCallbacks(ITowerLevelPlayActions instance)
+            public static implicit operator InputActionMap(PlayJumperActions set) { return set.Get(); }
+            public void SetCallbacks(IPlayJumperActions instance)
             {
-                if (m_Wrapper.m_TowerLevelPlayActionsCallbackInterface != null)
+                if (m_Wrapper.m_PlayJumperActionsCallbackInterface != null)
                 {
-                    @MoveShapeLeft.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeLeft;
-                    @MoveShapeLeft.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeLeft;
-                    @MoveShapeLeft.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeLeft;
-                    @MoveShapeRight.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeRight;
-                    @MoveShapeRight.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeRight;
-                    @MoveShapeRight.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnMoveShapeRight;
-                    @RotateShapeUp.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeUp;
-                    @RotateShapeUp.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeUp;
-                    @RotateShapeUp.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeUp;
-                    @RotateShapeDown.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeDown;
-                    @RotateShapeDown.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeDown;
-                    @RotateShapeDown.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnRotateShapeDown;
-                    @FallSpeedUp.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnFallSpeedUp;
-                    @FallSpeedUp.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnFallSpeedUp;
-                    @FallSpeedUp.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnFallSpeedUp;
-                    @PointerFallSpeedUp.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerFallSpeedUp;
-                    @PointerFallSpeedUp.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerFallSpeedUp;
-                    @PointerFallSpeedUp.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerFallSpeedUp;
-                    @PointerPress.started -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerPress;
-                    @PointerPress.performed -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerPress;
-                    @PointerPress.canceled -= m_Wrapper.m_TowerLevelPlayActionsCallbackInterface.OnPointerPress;
+                    @JumperMovement.started -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnJumperMovement;
+                    @JumperMovement.performed -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnJumperMovement;
+                    @JumperMovement.canceled -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnJumperMovement;
+                    @JumperJump.started -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnJumperJump;
+                    @JumperJump.performed -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnJumperJump;
+                    @JumperJump.canceled -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnJumperJump;
+                    @SwitchToChopper.started -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnSwitchToChopper;
+                    @SwitchToChopper.performed -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnSwitchToChopper;
+                    @SwitchToChopper.canceled -= m_Wrapper.m_PlayJumperActionsCallbackInterface.OnSwitchToChopper;
                 }
-                m_Wrapper.m_TowerLevelPlayActionsCallbackInterface = instance;
+                m_Wrapper.m_PlayJumperActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @MoveShapeLeft.started += instance.OnMoveShapeLeft;
-                    @MoveShapeLeft.performed += instance.OnMoveShapeLeft;
-                    @MoveShapeLeft.canceled += instance.OnMoveShapeLeft;
-                    @MoveShapeRight.started += instance.OnMoveShapeRight;
-                    @MoveShapeRight.performed += instance.OnMoveShapeRight;
-                    @MoveShapeRight.canceled += instance.OnMoveShapeRight;
-                    @RotateShapeUp.started += instance.OnRotateShapeUp;
-                    @RotateShapeUp.performed += instance.OnRotateShapeUp;
-                    @RotateShapeUp.canceled += instance.OnRotateShapeUp;
-                    @RotateShapeDown.started += instance.OnRotateShapeDown;
-                    @RotateShapeDown.performed += instance.OnRotateShapeDown;
-                    @RotateShapeDown.canceled += instance.OnRotateShapeDown;
-                    @FallSpeedUp.started += instance.OnFallSpeedUp;
-                    @FallSpeedUp.performed += instance.OnFallSpeedUp;
-                    @FallSpeedUp.canceled += instance.OnFallSpeedUp;
-                    @PointerFallSpeedUp.started += instance.OnPointerFallSpeedUp;
-                    @PointerFallSpeedUp.performed += instance.OnPointerFallSpeedUp;
-                    @PointerFallSpeedUp.canceled += instance.OnPointerFallSpeedUp;
-                    @PointerPress.started += instance.OnPointerPress;
-                    @PointerPress.performed += instance.OnPointerPress;
-                    @PointerPress.canceled += instance.OnPointerPress;
+                    @JumperMovement.started += instance.OnJumperMovement;
+                    @JumperMovement.performed += instance.OnJumperMovement;
+                    @JumperMovement.canceled += instance.OnJumperMovement;
+                    @JumperJump.started += instance.OnJumperJump;
+                    @JumperJump.performed += instance.OnJumperJump;
+                    @JumperJump.canceled += instance.OnJumperJump;
+                    @SwitchToChopper.started += instance.OnSwitchToChopper;
+                    @SwitchToChopper.performed += instance.OnSwitchToChopper;
+                    @SwitchToChopper.canceled += instance.OnSwitchToChopper;
                 }
             }
         }
-        public TowerLevelPlayActions @TowerLevelPlay => new TowerLevelPlayActions(this);
+        public PlayJumperActions @PlayJumper => new PlayJumperActions(this);
 
-        // TowerLevelPaused
-        private readonly InputActionMap m_TowerLevelPaused;
-        private ITowerLevelPausedActions m_TowerLevelPausedActionsCallbackInterface;
-        public struct TowerLevelPausedActions
+        // PlayChopper
+        private readonly InputActionMap m_PlayChopper;
+        private IPlayChopperActions m_PlayChopperActionsCallbackInterface;
+        private readonly InputAction m_PlayChopper_ChopperMovement;
+        private readonly InputAction m_PlayChopper_SwitchToJumper;
+        public struct PlayChopperActions
         {
             private @SamplePlayerControls m_Wrapper;
-            public TowerLevelPausedActions(@SamplePlayerControls wrapper) { m_Wrapper = wrapper; }
-            public InputActionMap Get() { return m_Wrapper.m_TowerLevelPaused; }
+            public PlayChopperActions(@SamplePlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @ChopperMovement => m_Wrapper.m_PlayChopper_ChopperMovement;
+            public InputAction @SwitchToJumper => m_Wrapper.m_PlayChopper_SwitchToJumper;
+            public InputActionMap Get() { return m_Wrapper.m_PlayChopper; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(TowerLevelPausedActions set) { return set.Get(); }
-            public void SetCallbacks(ITowerLevelPausedActions instance)
+            public static implicit operator InputActionMap(PlayChopperActions set) { return set.Get(); }
+            public void SetCallbacks(IPlayChopperActions instance)
             {
-                if (m_Wrapper.m_TowerLevelPausedActionsCallbackInterface != null)
+                if (m_Wrapper.m_PlayChopperActionsCallbackInterface != null)
                 {
+                    @ChopperMovement.started -= m_Wrapper.m_PlayChopperActionsCallbackInterface.OnChopperMovement;
+                    @ChopperMovement.performed -= m_Wrapper.m_PlayChopperActionsCallbackInterface.OnChopperMovement;
+                    @ChopperMovement.canceled -= m_Wrapper.m_PlayChopperActionsCallbackInterface.OnChopperMovement;
+                    @SwitchToJumper.started -= m_Wrapper.m_PlayChopperActionsCallbackInterface.OnSwitchToJumper;
+                    @SwitchToJumper.performed -= m_Wrapper.m_PlayChopperActionsCallbackInterface.OnSwitchToJumper;
+                    @SwitchToJumper.canceled -= m_Wrapper.m_PlayChopperActionsCallbackInterface.OnSwitchToJumper;
                 }
-                m_Wrapper.m_TowerLevelPausedActionsCallbackInterface = instance;
+                m_Wrapper.m_PlayChopperActionsCallbackInterface = instance;
                 if (instance != null)
                 {
+                    @ChopperMovement.started += instance.OnChopperMovement;
+                    @ChopperMovement.performed += instance.OnChopperMovement;
+                    @ChopperMovement.canceled += instance.OnChopperMovement;
+                    @SwitchToJumper.started += instance.OnSwitchToJumper;
+                    @SwitchToJumper.performed += instance.OnSwitchToJumper;
+                    @SwitchToJumper.canceled += instance.OnSwitchToJumper;
                 }
             }
         }
-        public TowerLevelPausedActions @TowerLevelPaused => new TowerLevelPausedActions(this);
+        public PlayChopperActions @PlayChopper => new PlayChopperActions(this);
 
-        // TowerLevelShared
-        private readonly InputActionMap m_TowerLevelShared;
-        private ITowerLevelSharedActions m_TowerLevelSharedActionsCallbackInterface;
-        private readonly InputAction m_TowerLevelShared_ToggleMenu;
-        public struct TowerLevelSharedActions
+        // PlayShared
+        private readonly InputActionMap m_PlayShared;
+        private IPlaySharedActions m_PlaySharedActionsCallbackInterface;
+        private readonly InputAction m_PlayShared_ToggleMenu;
+        public struct PlaySharedActions
         {
             private @SamplePlayerControls m_Wrapper;
-            public TowerLevelSharedActions(@SamplePlayerControls wrapper) { m_Wrapper = wrapper; }
-            public InputAction @ToggleMenu => m_Wrapper.m_TowerLevelShared_ToggleMenu;
-            public InputActionMap Get() { return m_Wrapper.m_TowerLevelShared; }
+            public PlaySharedActions(@SamplePlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @ToggleMenu => m_Wrapper.m_PlayShared_ToggleMenu;
+            public InputActionMap Get() { return m_Wrapper.m_PlayShared; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(TowerLevelSharedActions set) { return set.Get(); }
-            public void SetCallbacks(ITowerLevelSharedActions instance)
+            public static implicit operator InputActionMap(PlaySharedActions set) { return set.Get(); }
+            public void SetCallbacks(IPlaySharedActions instance)
             {
-                if (m_Wrapper.m_TowerLevelSharedActionsCallbackInterface != null)
+                if (m_Wrapper.m_PlaySharedActionsCallbackInterface != null)
                 {
-                    @ToggleMenu.started -= m_Wrapper.m_TowerLevelSharedActionsCallbackInterface.OnToggleMenu;
-                    @ToggleMenu.performed -= m_Wrapper.m_TowerLevelSharedActionsCallbackInterface.OnToggleMenu;
-                    @ToggleMenu.canceled -= m_Wrapper.m_TowerLevelSharedActionsCallbackInterface.OnToggleMenu;
+                    @ToggleMenu.started -= m_Wrapper.m_PlaySharedActionsCallbackInterface.OnToggleMenu;
+                    @ToggleMenu.performed -= m_Wrapper.m_PlaySharedActionsCallbackInterface.OnToggleMenu;
+                    @ToggleMenu.canceled -= m_Wrapper.m_PlaySharedActionsCallbackInterface.OnToggleMenu;
                 }
-                m_Wrapper.m_TowerLevelSharedActionsCallbackInterface = instance;
+                m_Wrapper.m_PlaySharedActionsCallbackInterface = instance;
                 if (instance != null)
                 {
                     @ToggleMenu.started += instance.OnToggleMenu;
@@ -1188,7 +1178,7 @@ namespace DevLocker.GFrame.SampleGame.Game
                 }
             }
         }
-        public TowerLevelSharedActions @TowerLevelShared => new TowerLevelSharedActions(this);
+        public PlaySharedActions @PlayShared => new PlaySharedActions(this);
 
         // UI
         private readonly InputActionMap m_UI;
@@ -1378,20 +1368,18 @@ namespace DevLocker.GFrame.SampleGame.Game
                 return asset.controlSchemes[m_TouchSchemeIndex];
             }
         }
-        public interface ITowerLevelPlayActions
+        public interface IPlayJumperActions
         {
-            void OnMoveShapeLeft(InputAction.CallbackContext context);
-            void OnMoveShapeRight(InputAction.CallbackContext context);
-            void OnRotateShapeUp(InputAction.CallbackContext context);
-            void OnRotateShapeDown(InputAction.CallbackContext context);
-            void OnFallSpeedUp(InputAction.CallbackContext context);
-            void OnPointerFallSpeedUp(InputAction.CallbackContext context);
-            void OnPointerPress(InputAction.CallbackContext context);
+            void OnJumperMovement(InputAction.CallbackContext context);
+            void OnJumperJump(InputAction.CallbackContext context);
+            void OnSwitchToChopper(InputAction.CallbackContext context);
         }
-        public interface ITowerLevelPausedActions
+        public interface IPlayChopperActions
         {
+            void OnChopperMovement(InputAction.CallbackContext context);
+            void OnSwitchToJumper(InputAction.CallbackContext context);
         }
-        public interface ITowerLevelSharedActions
+        public interface IPlaySharedActions
         {
             void OnToggleMenu(InputAction.CallbackContext context);
         }

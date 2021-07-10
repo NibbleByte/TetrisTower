@@ -1,12 +1,9 @@
-using DevLocker.GFrame;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace TetrisTower.TowerLevels
+namespace DevLocker.GFrame.SampleGame.Play
 {
-	public enum TowerLevelUIState
+	public enum PlayUIState
 	{
 		None = 0,
 		Play = 2,
@@ -14,16 +11,16 @@ namespace TetrisTower.TowerLevels
 		Options = 8,
 	}
 
-	public class TowerLevelUIController : MonoBehaviour
+	public class SamplePlayUIController : MonoBehaviour
 	{
 		[Serializable]
 		public struct StatePanelBinds
 		{
-			public TowerLevelUIState State;
+			public PlayUIState State;
 			public GameObject Panel;
 		}
 
-		public TowerLevelUIState CurrentState = TowerLevelUIState.Play;
+		public PlayUIState CurrentState = PlayUIState.Play;
 
 		public StatePanelBinds[] StatePanels;
 
@@ -36,12 +33,12 @@ namespace TetrisTower.TowerLevels
 			SwitchState(CurrentState);
 		}
 
-		public void SwitchState(TowerLevelUIState state)
+		public void SwitchState(PlayUIState state)
 		{
 			if (state == CurrentState)
 				return;
 
-			if (CurrentState != TowerLevelUIState.None) {
+			if (CurrentState != PlayUIState.None) {
 				var prevPanel = GetPanel(CurrentState);
 				prevPanel.SetActive(false);
 			}
@@ -52,7 +49,7 @@ namespace TetrisTower.TowerLevels
 			nextPanel.SetActive(true);
 		}
 
-		public GameObject GetPanel(TowerLevelUIState state)
+		public GameObject GetPanel(PlayUIState state)
 		{
 			foreach (var bind in StatePanels) {
 				if (state == bind.State)
@@ -66,22 +63,19 @@ namespace TetrisTower.TowerLevels
 
 		public void PauseLevel()
 		{
-			LevelsManager.Instance.PushLevelState(new TowerPausedState());
-		}
-
-		public void ResumeLevel()
-		{
-			LevelsManager.Instance.SetLevelState(new TowerPlayState());
+			// Will be popped by UI.
+			LevelsManager.Instance.PushLevelState(new SamplePlayPausedState());
 		}
 
 		public void OpenOptions()
 		{
-			LevelsManager.Instance.PushLevelState(new TowerOptionsState());
+			// Will be popped by UI.
+			LevelsManager.Instance.PushLevelState(new SamplePlayOptionsState());
 		}
 
-		public void ExitToHomeScreen()
+		public void ExitToMainMenu()
 		{
-			LevelsManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
+			LevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 		}
 	}
 }

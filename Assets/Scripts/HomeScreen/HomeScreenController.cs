@@ -23,13 +23,18 @@ namespace TetrisTower.HomeScreen
 				bind.Panel.SetActive(false);
 			}
 
-			SwitchState(CurrentState);
+			var nextState = CurrentState;
+			CurrentState = null;
+
+			SwitchState(nextState);
 		}
 
 		public void SwitchState(HomeScreenState state)
 		{
-			var prevPanel = GetPanel(CurrentState);
-			prevPanel.SetActive(false);
+			if (CurrentState) {
+				var prevPanel = GetPanel(CurrentState);
+				prevPanel.SetActive(false);
+			}
 
 			CurrentState = state;
 

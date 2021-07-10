@@ -7,10 +7,7 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 	{
 		public void StartNewGame()
 		{
-			var gameContext = (SampleGameContext) LevelsManager.Instance.GameContext;
-
-			// TODO: Play supervisor
-			//LevelsManager.Instance.SwitchLevel(new TowerLevels.TowerLevelSupervisor());
+			LevelsManager.Instance.SwitchLevel(new Play.SamplePlaySupervisor());
 		}
 	}
 
