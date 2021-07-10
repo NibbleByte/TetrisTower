@@ -26,7 +26,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_PlayerControls.UI.Submit.Disable();
 			m_PlayerControls.UI.Navigate.Disable();
 
-			m_UIController.SwitchState(PlayUIState.Play);
+			m_UIController.SwitchState(PlayUIState.Play, true);
 
 			yield break;
 		}

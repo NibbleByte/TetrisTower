@@ -22,6 +22,9 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 		public PlayUIState CurrentState = PlayUIState.Play;
 
+		public GameObject JumperModePanel;
+		public GameObject ChopperModePanel;
+
 		public StatePanelBinds[] StatePanels;
 
 		void Awake()
@@ -30,11 +33,16 @@ namespace DevLocker.GFrame.SampleGame.Play
 				bind.Panel.SetActive(false);
 			}
 
-			SwitchState(CurrentState);
+			SwitchState(CurrentState, true);
 		}
 
-		public void SwitchState(PlayUIState state)
+		public void SwitchState(PlayUIState state, bool? jumperMode = null)
 		{
+			if (jumperMode.HasValue) {
+				JumperModePanel.SetActive(jumperMode.Value);
+				ChopperModePanel.SetActive(!jumperMode.Value);
+			}
+
 			if (state == CurrentState)
 				return;
 
@@ -58,7 +66,6 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 			throw new NotImplementedException();
 		}
-
 
 
 		public void PauseLevel()
