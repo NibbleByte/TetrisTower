@@ -154,6 +154,7 @@ namespace DevLocker.GFrame.UIScope
 		/// Force selected scope to be active, instead of the last enabled.
 		/// </summary>
 		/// <param name="scope"></param>
+		[ContextMenu("Force activate scope")]
 		public void ForceActiveScope()
 		{
 			if (s_ChangingActiveScopes) {
@@ -177,6 +178,7 @@ namespace DevLocker.GFrame.UIScope
 		/// <summary>
 		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.
 		/// </summary>
+		[ContextMenu("Rescan for child scope elements")]
 		public void ScanForChildScopeElements()
 		{
 			m_ScopeElements.Clear();
@@ -184,7 +186,16 @@ namespace DevLocker.GFrame.UIScope
 			ScanForChildScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 
 			if (Array.IndexOf(m_ActiveScopes, this) != -1) {
-				m_ActiveScopes.Last().ForceActiveScope();
+				var lastActive = m_ActiveScopes.Last();
+
+				if (s_ChangingActiveScopes) {
+					s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
+					return;
+				}
+
+				// Force full re-initialization of all the scopes including this one.
+				SwitchActiveScopes(ref m_ActiveScopes, new UIScope[0]);
+				lastActive.ForceActiveScope();
 
 			} else {
 				foreach(IScopeElement scopeElement in m_ScopeElements) {
@@ -226,7 +237,8 @@ namespace DevLocker.GFrame.UIScope
 			s_ChangingActiveScopes = true;
 
 			try {
-				foreach (UIScope scope in prevScopes) {
+				// Reversed order, just in case.
+				foreach (UIScope scope in prevScopes.Reverse()) {
 					if (!nextScopes.Contains(scope)) {
 						scope.SetScopeState(false);
 					}
@@ -257,10 +269,21 @@ namespace DevLocker.GFrame.UIScope
 
 		protected virtual void SetScopeState(bool active)
 		{
+			// If this scope isn't still initialized, do it now, or no elements will be enabled.
+			// This happens when child scope tries to activate the parent scope for the first time, while the parent was still inactive.
+			if (m_ScopeElements.Count == 0) {
+				ScanForChildScopeElements();
+			}
+
 			foreach(IScopeElement scopeElement in m_ScopeElements) {
 				scopeElement.enabled = active;
 			}
 
+			ProcessInput(active);
+		}
+
+		protected void ProcessInput(bool active)
+		{
 #if USE_INPUT_SYSTEM
 			var context = (LevelsManager.Instance.GameContext as Input.IInputContextProvider)?.InputContext;
 
