@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DevLocker.GFrame.SampleGame.Play
 {
@@ -25,6 +26,8 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public GameObject JumperModePanel;
 		public GameObject ChopperModePanel;
 
+		public Text ModeLabel;
+
 		public StatePanelBinds[] StatePanels;
 
 		void Awake()
@@ -39,8 +42,12 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public void SwitchState(PlayUIState state, bool? jumperMode = null)
 		{
 			if (jumperMode.HasValue) {
-				JumperModePanel.SetActive(jumperMode.Value);
-				ChopperModePanel.SetActive(!jumperMode.Value);
+				JumperModePanel?.SetActive(jumperMode.Value);
+				ChopperModePanel?.SetActive(!jumperMode.Value);
+
+				if (ModeLabel) {
+					ModeLabel.text = $"Player Mode: {(jumperMode.Value ? "Jumper" : "Chopper")}";
+				}
 			}
 
 			if (state == CurrentState)
