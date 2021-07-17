@@ -48,12 +48,40 @@ namespace DevLocker.GFrame.Input
 	/// </summary>
 	public struct InputBindingDisplayData
 	{
+		/// <summary>
+		/// The binding that the text / icon data is for.
+		/// If this is a composite binding (e.g. 2DVector with WASD controls),
+		/// texts will be summarized like "W/A/S/D" by default.
+		/// You can check each part of the composite binding at the <see cref="CompositeBindingParts"/>.
+		///
+		/// https://docs.unity3d.com/Packages/com.unity.inputsystem@1.1/api/UnityEngine.InputSystem.InputBinding.html
+		/// </summary>
 		public InputBinding Binding;
+
+		/// <summary>
+		/// If the matched <see cref="Binding"/> is composite, this list stores it's part bindings.
+		///
+		/// NOTE: If <see cref="Binding"/> is part of composite, this collection will be null.
+		/// </summary>
+		public IReadOnlyList<InputBindingDisplayData> CompositeBindingParts;
+
+
 		public UnityEngine.Sprite Icon;
 		public string Text;
 		public string ShortText;
 
 		public bool IsValid => Binding != null;
+
+		/// <summary>
+		/// If binding is composite, it contains other bindings as part of it.
+		/// In that case this binding doesn't contain actual controls to use - the sub parts do.
+		/// The part bindings can be found in <see cref="CompositeBindingParts" />
+		///
+		/// https://docs.unity3d.com/Packages/com.unity.inputsystem@1.1/api/UnityEngine.InputSystem.InputBinding.html
+		/// </summary>
+		public bool IsComposite => Binding.isComposite;
+
+		public bool IsPartOfComposite => Binding.isPartOfComposite;
 
 		public bool HasIcon => Icon != null;
 		public bool HasText => !string.IsNullOrWhiteSpace(Text) || !string.IsNullOrWhiteSpace(ShortText);

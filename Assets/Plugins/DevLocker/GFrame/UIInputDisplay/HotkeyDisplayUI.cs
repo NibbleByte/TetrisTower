@@ -52,8 +52,12 @@ namespace DevLocker.GFrame.UIInputDisplay
 		public InputActionReference InputAction;
 
 		[Range(0, 5)]
-		[Tooltip("If multiple bindings are present in the action matching this device, display the n-th one.")]
+		[Tooltip("If multiple bindings are present in the action matching this device, display the n-th one.\n(i.e. \"alternative binding\")")]
 		public int BindingNumberToUse = 0;
+
+		[Range(0, 6)]
+		[Tooltip("If matched binding is composite (consists of multiple parts, e.g. WASD or Arrows), display the n-th part of it instead.\nIf value is left 0, it will display the initial composite binding summarized (e.g. \"W/A/S/D\")")]
+		public int CompositePartNumberToUse = 0;
 
 		public DisplayModeData DisplayMode;
 
@@ -142,7 +146,13 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 			foreach (var bindingDisplay in context.GetBindingDisplaysFor(deviceLayout, action)) {
 				if (count == BindingNumberToUse) {
-					foundData = bindingDisplay;
+
+					if (CompositePartNumberToUse == 0) {
+						foundData = bindingDisplay;
+					} else if (CompositePartNumberToUse - 1 < bindingDisplay.CompositeBindingParts.Count) {
+						foundData = bindingDisplay.CompositeBindingParts[CompositePartNumberToUse - 1];
+					}
+
 					break;
 				}
 				count++;

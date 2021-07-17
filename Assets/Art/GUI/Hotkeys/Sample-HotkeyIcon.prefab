@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5394036698972749555}
   - component: {fileID: 5394036698972749554}
   m_Layer: 5
-  m_Name: HotkeyIcon
+  m_Name: Sample-HotkeyIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53,6 +53,12 @@ MonoBehaviour:
   Player: 1
   InputAction: {fileID: 0}
   BindingNumberToUse: 0
+  CompositePartNumberToUse: 0
+  DisplayMode:
+    Mode: 0
+    DisplayedDeviceLayout: 
+    KeepDisplayingLastDevice: 0
+    ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 5394036700216754307}
   Text: {fileID: 5394036699964054010}
@@ -132,7 +138,7 @@ MonoBehaviour:
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Return

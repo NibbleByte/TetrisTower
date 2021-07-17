@@ -74,48 +74,84 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 			m_ControlSchemeMatchBinding.groups = MatchingControlScheme;
 
-			foreach(InputBinding binding in action.bindings) {
+			var bindings = action.bindings;
+			for(int i = 0; i < bindings.Count; ++i) {
+				int bindingIndex = i;
+				InputBinding binding = bindings[bindingIndex];
+				var compositeBindingParts = new List<InputBindingDisplayData>();
 
-				// InputBinding.Matches() compares semantically the binding. In case you have ";Keyboard&Mouse" etc...
-				if (!m_ControlSchemeMatchBinding.Matches(binding))
-					continue;
+				if (binding.isComposite) {
+					++i;
 
-				bool found = false;
-				foreach(var pair in m_BindingDisplaysAssetsCache) {
+					// Assume the other parts are of the same scheme.
+					if (!m_ControlSchemeMatchBinding.Matches(bindings[i]))
+						continue;
 
-					// InputBinding.Matches() compares semantically the binding. In case you have "<Keyboard>/space;<Keyboard>/enter" etc...
-					if (pair.Key.Matches(binding)) {
-						var bindingDisplay = new InputBindingDisplayData {
-							Binding = binding,
-							Icon = pair.Value.Icon,
-						};
-
-						if (pair.Value.UseDefaultTexts) {
-							bindingDisplay.Text = binding.ToDisplayString(InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
-							bindingDisplay.ShortText = binding.ToDisplayString();
-						} else {
-							bindingDisplay.Text = pair.Value.DisplayText;
-							bindingDisplay.ShortText = pair.Value.DisplayShortText;
-						}
-
-						yield return bindingDisplay;
-						found = true;
-						break;
+					if (i >= bindings.Count || !bindings[i].isPartOfComposite) {
+						Debug.LogError($"Action {action.name} has composite binding {binding.name} with no parts.", this);
+						continue;
 					}
+
+					for(; i < bindings.Count && bindings[i].isPartOfComposite; ++i) {
+						InputBindingDisplayData bindingPartDisplay = PrepareDisplayDataFor(action, bindings[i], i);
+						compositeBindingParts.Add(bindingPartDisplay);
+					}
+
+					--i;	// Compensate for the initial for-loop iteration.
+
+				} else if (!m_ControlSchemeMatchBinding.Matches(binding)) {
+					// InputBinding.Matches() compares semantically the binding. In case you have ";Keyboard&Mouse" etc...
+					continue;
 				}
 
-				if (!found && FallbackToDefaultDisplayTexts) {
+				InputBindingDisplayData bindingDisplay = PrepareDisplayDataFor(action, binding, bindingIndex);
+				bindingDisplay.CompositeBindingParts = compositeBindingParts;
 
+				if (binding.isComposite) {
+					// Composite bindings should always be valid.
+					// Their parts are the important ones if no display data found for this one.
+					bindingDisplay.Binding = binding;
+				}
+
+				if (bindingDisplay.IsValid)
+					yield return bindingDisplay;
+			}
+		}
+
+		private InputBindingDisplayData PrepareDisplayDataFor(InputAction action, InputBinding binding, int bindingIndex)
+		{
+			foreach (var pair in m_BindingDisplaysAssetsCache) {
+
+				// InputBinding.Matches() compares semantically the binding. In case you have "<Keyboard>/space;<Keyboard>/enter" etc...
+				if (pair.Key.Matches(binding)) {
 					var bindingDisplay = new InputBindingDisplayData {
 						Binding = binding,
-						Icon = null,
-						Text = binding.ToDisplayString(InputBinding.DisplayStringOptions.DontUseShortDisplayNames),
-						ShortText = binding.ToDisplayString(),
+						Icon = pair.Value.Icon,
 					};
 
-					yield return bindingDisplay;
+					if (pair.Value.UseDefaultTexts) {
+						bindingDisplay.Text = action.GetBindingDisplayString(bindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
+						bindingDisplay.ShortText = action.GetBindingDisplayString(bindingIndex);
+					} else {
+						bindingDisplay.Text = pair.Value.DisplayText;
+						bindingDisplay.ShortText = pair.Value.DisplayShortText;
+					}
+
+					return bindingDisplay;
 				}
 			}
+
+			if (FallbackToDefaultDisplayTexts) {
+
+				return new InputBindingDisplayData {
+					Binding = binding,
+					Icon = null,
+					Text = action.GetBindingDisplayString(bindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames),
+					ShortText = action.GetBindingDisplayString(bindingIndex),
+				};
+			}
+
+			return new InputBindingDisplayData();
 		}
 	}
 
