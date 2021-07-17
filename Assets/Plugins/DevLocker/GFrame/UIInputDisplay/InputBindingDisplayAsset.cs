@@ -58,15 +58,6 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action)
 		{
-			if (m_BindingDisplaysAssetsCache == null) {
-				m_BindingDisplaysAssetsCache = new KeyValuePair<InputBinding, BindingDisplayAssetsData>[BindingDisplays.Length];
-
-				for(int i = 0; i < BindingDisplays.Length; ++i) {
-					BindingDisplayAssetsData bindingDisplay = BindingDisplays[i];
-					m_BindingDisplaysAssetsCache[i] = new KeyValuePair<InputBinding, BindingDisplayAssetsData>(new InputBinding(bindingDisplay.BindingPath), bindingDisplay);
-				}
-			}
-
 			if (string.IsNullOrWhiteSpace(MatchingControlScheme)) {
 				Debug.LogError($"Matching control scheme is missing for {name}!", this);
 				yield break;
@@ -120,10 +111,20 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		private InputBindingDisplayData PrepareDisplayDataFor(InputAction action, InputBinding binding, int bindingIndex)
 		{
+			if (m_BindingDisplaysAssetsCache == null) {
+				m_BindingDisplaysAssetsCache = new KeyValuePair<InputBinding, BindingDisplayAssetsData>[BindingDisplays.Length];
+
+				for (int i = 0; i < BindingDisplays.Length; ++i) {
+					BindingDisplayAssetsData bindingDisplay = BindingDisplays[i];
+					m_BindingDisplaysAssetsCache[i] = new KeyValuePair<InputBinding, BindingDisplayAssetsData>(new InputBinding(bindingDisplay.BindingPath), bindingDisplay);
+				}
+			}
+
 			foreach (var pair in m_BindingDisplaysAssetsCache) {
 
 				// InputBinding.Matches() compares semantically the binding. In case you have "<Keyboard>/space;<Keyboard>/enter" etc...
-				if (pair.Key.Matches(binding)) {
+				// In case of composite binding, path is an invalid parameter to match on. Use the name instead.
+				if (pair.Key.Matches(binding) || (binding.isComposite && pair.Key.path.Equals(binding.name, StringComparison.OrdinalIgnoreCase))) {
 					var bindingDisplay = new InputBindingDisplayData {
 						Binding = binding,
 						Icon = pair.Value.Icon,
