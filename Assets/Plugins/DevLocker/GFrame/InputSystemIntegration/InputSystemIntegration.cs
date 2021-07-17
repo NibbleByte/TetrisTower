@@ -70,7 +70,7 @@ namespace DevLocker.GFrame.Input
 		public string Text;
 		public string ShortText;
 
-		public bool IsValid => Binding != null;
+		public bool IsValid => Binding.id != Guid.Empty;
 
 		/// <summary>
 		/// If binding is composite, it contains other bindings as part of it.
@@ -85,6 +85,8 @@ namespace DevLocker.GFrame.Input
 
 		public bool HasIcon => Icon != null;
 		public bool HasText => !string.IsNullOrWhiteSpace(Text) || !string.IsNullOrWhiteSpace(ShortText);
+
+		public override string ToString() => $"{Binding.name} - {ShortText}";
 	}
 
 	/// <summary>
