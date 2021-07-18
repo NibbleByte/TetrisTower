@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace DevLocker.GFrame.SampleGame.MainMenu
 {
+	/// <summary>
+	/// Controls the MainMenu UI.
+	/// </summary>
 	public class SampleMainMenuController : MonoBehaviour
 	{
 		[Serializable]
@@ -40,6 +43,11 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 
 			var nextPanel = GetPanel(state);
 			nextPanel.SetActive(true);
+		}
+
+		public void LoadUITester()
+		{
+			LevelsManager.Instance.SwitchLevel(new UITester.SampleUITesterLevelSupervisor());
 		}
 
 		public void QuitGame()

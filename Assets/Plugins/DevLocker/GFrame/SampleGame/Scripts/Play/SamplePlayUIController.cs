@@ -12,6 +12,9 @@ namespace DevLocker.GFrame.SampleGame.Play
 		Options = 8,
 	}
 
+	/// <summary>
+	/// Sample UI controller to switch states of the UI and expose methods for the UI buttons to call.
+	/// </summary>
 	public class SamplePlayUIController : MonoBehaviour
 	{
 		[Serializable]

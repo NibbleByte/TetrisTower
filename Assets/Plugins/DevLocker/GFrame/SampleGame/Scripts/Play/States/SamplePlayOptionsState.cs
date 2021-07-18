@@ -3,6 +3,9 @@ using System.Collections;
 
 namespace DevLocker.GFrame.SampleGame.Play
 {
+	/// <summary>
+	/// Options is displayed.
+	/// </summary>
 	public class SamplePlayOptionsState : ILevelState
 	{
 		private SamplePlayerControls m_PlayerControls;

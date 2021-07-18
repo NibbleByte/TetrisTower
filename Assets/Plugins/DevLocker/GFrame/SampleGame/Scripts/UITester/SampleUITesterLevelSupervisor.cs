@@ -2,12 +2,12 @@ using DevLocker.GFrame.SampleGame.Game;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-namespace DevLocker.GFrame.SampleGame.MainMenu
+namespace DevLocker.GFrame.SampleGame.UITester
 {
 	/// <summary>
-	/// Supervisor to load the main menu and pass on the control.
+	/// Supervisor to load the UITestScene used for testing out the UI + Input features of the GFrame.
 	/// </summary>
-	public class SampleMainMenuLevelSupervisor : ILevelSupervisor
+	public class SampleUITesterLevelSupervisor : ILevelSupervisor
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
@@ -22,8 +22,8 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 			}
 
 			// Can pass it on as a parameter to the supervisor, instead of hard-coding it here.
-			if (SceneManager.GetActiveScene().name != "Sample-MainMenuScene") {
-				yield return SceneManager.LoadSceneAsync("Sample-MainMenuScene", LoadSceneMode.Single);
+			if (SceneManager.GetActiveScene().name != "Sample-UITestScene") {
+				yield return SceneManager.LoadSceneAsync("Sample-UITestScene", LoadSceneMode.Single);
 			}
 
 			// StateStack not needed for now.

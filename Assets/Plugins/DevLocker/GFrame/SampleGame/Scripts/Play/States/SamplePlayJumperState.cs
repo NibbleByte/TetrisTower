@@ -5,6 +5,10 @@ using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.SampleGame.Play
 {
+	/// <summary>
+	/// Player is in jumper state - can move left and right + jump and is affected by gravity.
+	/// This state also controls what is displayed on the UI via the UIController.
+	/// </summary>
 	public class SamplePlayJumperState : ILevelState, SamplePlayerControls.IPlayJumperActions
 	{
 		private SamplePlayerControls m_PlayerControls;

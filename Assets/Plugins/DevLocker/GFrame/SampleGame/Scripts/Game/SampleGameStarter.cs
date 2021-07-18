@@ -7,6 +7,14 @@ using UnityEngine.InputSystem.UI;
 
 namespace DevLocker.GFrame.SampleGame.Game
 {
+	/// <summary>
+	/// Used to start the game:
+	/// - Create a LevelsManager
+	/// - Prepare Input and UI systems.
+	/// - Set the starting level supervisor
+	///
+	/// Should be able to start the game from any game scene correctly.
+	/// </summary>
 	public class SampleGameStarter : MonoBehaviour
 	{
 		public SampleGameContext GameContext;
@@ -58,6 +66,11 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 			if (GameObject.FindObjectOfType<MainMenu.SampleMainMenuController>()) {
 				LevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+				return;
+			}
+
+			if (GameObject.FindObjectOfType<UITester.SampleUITesterController>()) {
+				LevelsManager.Instance.SwitchLevel(new UITester.SampleUITesterLevelSupervisor());
 				return;
 			}
 		}

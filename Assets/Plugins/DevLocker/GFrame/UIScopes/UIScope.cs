@@ -139,8 +139,8 @@ namespace DevLocker.GFrame.UIScope
 			s_Scopes.Remove(this);
 
 			if (wasActive && LevelsManager.Instance) {
-				// Pick the next lowest (latest) child registered.
-				nextDeepestScope = nextDeepestScope ?? s_Scopes.LastOrDefault();
+				// Pick the next lowest (latest) child registered that is still enabled (might be in the process of disabling).
+				nextDeepestScope = nextDeepestScope ?? s_Scopes.LastOrDefault(s => s.enabled);
 				UIScope[] nextScopes = nextDeepestScope
 					? CollectScopes(nextDeepestScope)
 					: Array.Empty<UIScope>()
@@ -243,7 +243,7 @@ namespace DevLocker.GFrame.UIScope
 		protected static UIScope[] CollectScopes(Component target)
 		{
 			return target
-				.GetComponentsInParent<UIScope>()
+				.GetComponentsInParent<UIScope>(true)	// Collect all so they get deactivated properly later on.
 				.Reverse()
 				.Where(s => s.enabled)
 				.ToArray();

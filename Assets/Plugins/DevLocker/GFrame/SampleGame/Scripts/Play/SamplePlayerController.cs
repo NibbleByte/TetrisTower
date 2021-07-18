@@ -3,6 +3,12 @@ using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.SampleGame.Play
 {
+	/// <summary>
+	/// Sample player controller responsible for moving the "player".
+	/// It handles the two player's modes:
+	/// - Jumper - moves left and right and can jump with gravity pulling it down.
+	/// - Chopper - gravity is disabled and the player can move freely in all directions (i.e. flying).
+	/// </summary>
 	public class SamplePlayerController : MonoBehaviour
 	{
 		public float JumperSpeed = 2f;

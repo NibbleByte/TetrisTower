@@ -1082,6 +1082,134 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UITester"",
+            ""id"": ""caa998c5-d0c8-46c7-b7ec-f1cfe1fc0715"",
+            ""actions"": [
+                {
+                    ""name"": ""TestHotkeyA"",
+                    ""type"": ""Button"",
+                    ""id"": ""cb72ec70-a019-4245-91b7-97a372ced4b3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""TestHotkeyB"",
+                    ""type"": ""Button"",
+                    ""id"": ""092d4590-f7e2-4667-9117-91d862ce9d6f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""TestHotkeyX"",
+                    ""type"": ""Button"",
+                    ""id"": ""455d6408-8e15-400f-882e-2c928dc89710"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""TestHotkeyY"",
+                    ""type"": ""Button"",
+                    ""id"": ""623dfe61-d955-4a3a-8507-77cc105f4fd4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""b5dc8df7-3e90-48f2-a165-55e016b4ff49"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""TestHotkeyA"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a82b9fe6-6255-44bc-ac32-3df77b601bad"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""TestHotkeyA"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f41fb754-e949-4784-94ec-39484e2f2fe7"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""TestHotkeyB"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e3345a69-99af-40f8-b09f-cca0fe5a17ad"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""TestHotkeyB"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c81f73d8-f0ab-40cb-8c17-86448608979e"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""TestHotkeyX"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ec744ad0-8a0f-4ddb-92ed-30f5332ca138"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""TestHotkeyX"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b5ba1bdd-f8e9-41d3-ad2a-e60936db54c2"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""TestHotkeyY"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8ed9d220-df59-4f38-a905-67b6f2e7743c"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""TestHotkeyY"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1155,6 +1283,12 @@ namespace DevLocker.GFrame.SampleGame.Game
             m_CommonHotkeys_Confirm = m_CommonHotkeys.FindAction("Confirm", throwIfNotFound: true);
             m_CommonHotkeys_NextSection = m_CommonHotkeys.FindAction("NextSection", throwIfNotFound: true);
             m_CommonHotkeys_PrevSection = m_CommonHotkeys.FindAction("PrevSection", throwIfNotFound: true);
+            // UITester
+            m_UITester = asset.FindActionMap("UITester", throwIfNotFound: true);
+            m_UITester_TestHotkeyA = m_UITester.FindAction("TestHotkeyA", throwIfNotFound: true);
+            m_UITester_TestHotkeyB = m_UITester.FindAction("TestHotkeyB", throwIfNotFound: true);
+            m_UITester_TestHotkeyX = m_UITester.FindAction("TestHotkeyX", throwIfNotFound: true);
+            m_UITester_TestHotkeyY = m_UITester.FindAction("TestHotkeyY", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -1495,6 +1629,63 @@ namespace DevLocker.GFrame.SampleGame.Game
             }
         }
         public CommonHotkeysActions @CommonHotkeys => new CommonHotkeysActions(this);
+
+        // UITester
+        private readonly InputActionMap m_UITester;
+        private IUITesterActions m_UITesterActionsCallbackInterface;
+        private readonly InputAction m_UITester_TestHotkeyA;
+        private readonly InputAction m_UITester_TestHotkeyB;
+        private readonly InputAction m_UITester_TestHotkeyX;
+        private readonly InputAction m_UITester_TestHotkeyY;
+        public struct UITesterActions
+        {
+            private @SamplePlayerControls m_Wrapper;
+            public UITesterActions(@SamplePlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @TestHotkeyA => m_Wrapper.m_UITester_TestHotkeyA;
+            public InputAction @TestHotkeyB => m_Wrapper.m_UITester_TestHotkeyB;
+            public InputAction @TestHotkeyX => m_Wrapper.m_UITester_TestHotkeyX;
+            public InputAction @TestHotkeyY => m_Wrapper.m_UITester_TestHotkeyY;
+            public InputActionMap Get() { return m_Wrapper.m_UITester; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(UITesterActions set) { return set.Get(); }
+            public void SetCallbacks(IUITesterActions instance)
+            {
+                if (m_Wrapper.m_UITesterActionsCallbackInterface != null)
+                {
+                    @TestHotkeyA.started -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyA;
+                    @TestHotkeyA.performed -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyA;
+                    @TestHotkeyA.canceled -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyA;
+                    @TestHotkeyB.started -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyB;
+                    @TestHotkeyB.performed -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyB;
+                    @TestHotkeyB.canceled -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyB;
+                    @TestHotkeyX.started -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyX;
+                    @TestHotkeyX.performed -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyX;
+                    @TestHotkeyX.canceled -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyX;
+                    @TestHotkeyY.started -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyY;
+                    @TestHotkeyY.performed -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyY;
+                    @TestHotkeyY.canceled -= m_Wrapper.m_UITesterActionsCallbackInterface.OnTestHotkeyY;
+                }
+                m_Wrapper.m_UITesterActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @TestHotkeyA.started += instance.OnTestHotkeyA;
+                    @TestHotkeyA.performed += instance.OnTestHotkeyA;
+                    @TestHotkeyA.canceled += instance.OnTestHotkeyA;
+                    @TestHotkeyB.started += instance.OnTestHotkeyB;
+                    @TestHotkeyB.performed += instance.OnTestHotkeyB;
+                    @TestHotkeyB.canceled += instance.OnTestHotkeyB;
+                    @TestHotkeyX.started += instance.OnTestHotkeyX;
+                    @TestHotkeyX.performed += instance.OnTestHotkeyX;
+                    @TestHotkeyX.canceled += instance.OnTestHotkeyX;
+                    @TestHotkeyY.started += instance.OnTestHotkeyY;
+                    @TestHotkeyY.performed += instance.OnTestHotkeyY;
+                    @TestHotkeyY.canceled += instance.OnTestHotkeyY;
+                }
+            }
+        }
+        public UITesterActions @UITester => new UITesterActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         public InputControlScheme KeyboardMouseScheme
         {
@@ -1556,6 +1747,13 @@ namespace DevLocker.GFrame.SampleGame.Game
             void OnConfirm(InputAction.CallbackContext context);
             void OnNextSection(InputAction.CallbackContext context);
             void OnPrevSection(InputAction.CallbackContext context);
+        }
+        public interface IUITesterActions
+        {
+            void OnTestHotkeyA(InputAction.CallbackContext context);
+            void OnTestHotkeyB(InputAction.CallbackContext context);
+            void OnTestHotkeyX(InputAction.CallbackContext context);
+            void OnTestHotkeyY(InputAction.CallbackContext context);
         }
     }
 }

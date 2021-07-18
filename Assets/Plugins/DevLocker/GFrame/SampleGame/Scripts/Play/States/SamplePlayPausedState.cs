@@ -3,6 +3,9 @@ using System.Collections;
 
 namespace DevLocker.GFrame.SampleGame.Play
 {
+	/// <summary>
+	/// Game is paused - menu is shown.
+	/// </summary>
 	public class SamplePlayPausedState : ILevelState
 	{
 		private SamplePlayerControls m_PlayerControls;

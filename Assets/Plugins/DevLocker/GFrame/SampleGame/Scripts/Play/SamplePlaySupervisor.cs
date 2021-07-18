@@ -6,6 +6,10 @@ using UnityEngine.SceneManagement;
 
 namespace DevLocker.GFrame.SampleGame.Play
 {
+	/// <summary>
+	/// Supervisor to load the sample play scene used to demonstrate sample gameplay with the GFrame,
+	/// focusing on play states & input hotkeys.
+	/// </summary>
 	public class SamplePlaySupervisor : ILevelSupervisor
 	{
 		public LevelStateStack StatesStack { get; private set; }
@@ -20,6 +24,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 				MessageBox.MessageBox.Instance.ForceCloseAllMessages();
 			}
 
+			// Can pass it on as a parameter to the supervisor, instead of hard-coding it here.
 			if (SceneManager.GetActiveScene().name != "Sample-PlayScene") {
 				yield return SceneManager.LoadSceneAsync("Sample-PlayScene", LoadSceneMode.Single);
 			}

@@ -5,6 +5,10 @@ using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.SampleGame.Play
 {
+	/// <summary>
+	/// Player is in chopper state - can move freely in all directions with gravity turned off.
+	/// This state also controls what is displayed on the UI via the UIController.
+	/// </summary>
 	public class SamplePlayChopperState : ILevelState, SamplePlayerControls.IPlayChopperActions
 	{
 		private SamplePlayerControls m_PlayerControls;
