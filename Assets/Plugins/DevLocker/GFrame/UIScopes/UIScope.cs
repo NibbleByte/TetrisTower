@@ -67,6 +67,8 @@ namespace DevLocker.GFrame.UIScope
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
 
+		private bool m_HasScannedForElements = false;
+
 		// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
 		// Any such change will be pushed to a queue and applied later on.
 		private static bool s_ChangingActiveScopes = false;
@@ -75,7 +77,9 @@ namespace DevLocker.GFrame.UIScope
 
 		protected virtual void Awake()
 		{
-			ScanForChildScopeElements();
+			if (!m_HasScannedForElements) {
+				ScanForChildScopeElements();
+			}
 		}
 
 		void OnEnable()
@@ -204,6 +208,7 @@ namespace DevLocker.GFrame.UIScope
 			m_ScopeElements.Clear();
 			m_DirectChildScopes.Clear();
 			ScanForChildScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
+			m_HasScannedForElements = true;
 
 			if (Array.IndexOf(m_ActiveScopes, this) != -1) {
 				var lastActive = m_ActiveScopes.Last();
@@ -291,7 +296,7 @@ namespace DevLocker.GFrame.UIScope
 		{
 			// If this scope isn't still initialized, do it now, or no elements will be enabled.
 			// This happens when child scope tries to activate the parent scope for the first time, while the parent was still inactive.
-			if (m_ScopeElements.Count == 0) {
+			if (!m_HasScannedForElements) {
 				ScanForChildScopeElements();
 			}
 
