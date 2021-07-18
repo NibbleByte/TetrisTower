@@ -25,7 +25,7 @@ namespace DevLocker.GFrame
 
 		public static LevelsManager Instance { get; private set; }
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			if (Instance) {
 				GameObject.DestroyImmediate(this);
@@ -39,14 +39,14 @@ namespace DevLocker.GFrame
 			}
 		}
 
-		void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			if (Instance == this) {
 				Instance = null;
 			}
 		}
 
-		public void SetGameContext(IGameContext gameContext)
+		public virtual void SetGameContext(IGameContext gameContext)
 		{
 			GameContext = gameContext;
 		}
