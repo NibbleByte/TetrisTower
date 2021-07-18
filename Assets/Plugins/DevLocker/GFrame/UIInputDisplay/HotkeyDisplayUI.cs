@@ -70,6 +70,9 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		public bool UseShortText = true;
 
+		[Tooltip("Optional - enter how the hotkey text should be displayed. Use \"{Hotkey}\" to be replaced with the matched text.\nLeave empty to skip.")]
+		public string FormatText;
+
 		private InputDevice m_LastDevice;
 
 		/// <summary>
@@ -170,7 +173,10 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 				string usedText = UseShortText ? foundData.ShortText : foundData.Text;
 				Text.gameObject.SetActive(foundData.HasText && textIsPriority);
-				Text.text = usedText;
+				Text.text = string.IsNullOrWhiteSpace(FormatText)
+					? usedText
+					: FormatText.Replace("{Hotkey}", usedText)
+					;
 			}
 		}
 
