@@ -151,9 +151,29 @@ namespace DevLocker.GFrame.UIScope
 		}
 
 		/// <summary>
+		/// Deactivate the current active scopes and reactivate them back, forcing full reinitialization.
+		/// NOTE: This will not rescan for new ScopeElements.
+		/// </summary>
+		public static void RefocusActiveScopes()
+		{
+			if (m_ActiveScopes.Length == 0)
+				return;
+
+			var lastActive = m_ActiveScopes.Last();
+
+			if (s_ChangingActiveScopes) {
+				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
+				return;
+			}
+
+			// Force full re-initialization of all the scopes.
+			SwitchActiveScopes(ref m_ActiveScopes, new UIScope[0]);
+			lastActive.ForceActiveScope();
+		}
+
+		/// <summary>
 		/// Force selected scope to be active, instead of the last enabled.
 		/// </summary>
-		/// <param name="scope"></param>
 		[ContextMenu("Force activate scope")]
 		public void ForceActiveScope()
 		{

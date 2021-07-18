@@ -15,6 +15,14 @@ namespace DevLocker.GFrame
 		public ILevelSupervisor LevelSupervisor { get; private set; }
 		private LevelStateStack m_LevelStatesStack => LevelSupervisor?.StatesStack;
 
+		// Listen for supervisor change.
+		// NOTE: avoid using events with more complex logic as it will blow up to your face.
+		//		 If you really need to do it, you can inherit this LevelsManager and override the corresponding protected methods.
+		public event Action UnloadingSupervisor;
+		public event Action UnloadedSupervisor;
+		public event Action LoadingSupervisor;
+		public event Action LoadedSupervisor;
+
 		public static LevelsManager Instance { get; private set; }
 
 		void Awake()
@@ -52,18 +60,70 @@ namespace DevLocker.GFrame
 		public IEnumerator SwitchLevelCrt(ILevelSupervisor nextLevel)
 		{
 			if (m_LevelStatesStack != null) {
+
+				yield return UnloadingSupervisorCrt();
+
 				if (!m_LevelStatesStack.IsEmpty) {
 					yield return m_LevelStatesStack.ClearStackAndStateCrt();
 				}
 
-				Debug.Log($"Unloading level supervisor {LevelSupervisor}");
 				yield return LevelSupervisor.Unload();
+
+				yield return UnloadedSupervisorCrt();
 			}
 
 			LevelSupervisor = nextLevel;
 
-			Debug.Log($"Loading level supervisor {nextLevel}");
+			yield return LoadingSupervisorCrt();
+
 			yield return nextLevel.Load(GameContext);
+
+			yield return LoadedSupervisorCrt();
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator UnloadingSupervisorCrt()
+		{
+			Debug.Log($"Unloading level supervisor {LevelSupervisor}");
+			UnloadingSupervisor?.Invoke();
+
+			yield break;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator UnloadedSupervisorCrt()
+		{
+			UnloadedSupervisor?.Invoke();
+
+			yield break;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator LoadingSupervisorCrt()
+		{
+			Debug.Log($"Loading level supervisor {LevelSupervisor}");
+			LoadingSupervisor?.Invoke();
+
+			yield break;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator LoadedSupervisorCrt()
+		{
+			LoadedSupervisor?.Invoke();
+
+			// In case the scopes were already active when the supervisor kicked in and it pushed
+			// a new state onto the InputActionsStack (resetting the previous actions).
+			UIScope.UIScope.RefocusActiveScopes();
+			yield break;
 		}
 
 
