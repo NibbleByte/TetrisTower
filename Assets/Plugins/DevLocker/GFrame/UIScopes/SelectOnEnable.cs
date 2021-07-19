@@ -4,9 +4,9 @@ using UnityEngine.EventSystems;
 namespace DevLocker.GFrame.UIScope
 {
 	/// <summary>
-	/// When this scope element is enabled, it will set this object as selected in the Unity event system.
+	/// When this component is enabled, it will set this object as selected in the Unity event system.
 	/// </summary>
-	public class SelectOnEnableScopeElement : MonoBehaviour, IScopeElement
+	public class SelectOnEnable : MonoBehaviour
 	{
 		[Tooltip("Start by selecting current object, but remember what the selection was on disable.\nOn re-enabling, resume from that selection.")]
 		public bool PersistentSelection = false;
@@ -35,11 +35,18 @@ namespace DevLocker.GFrame.UIScope
 #endif
 
 				m_SelectRequested = false;
-				if (m_PersistedSelection && m_PersistedSelection.activeInHierarchy) {
-					EventSystem.current.SetSelectedGameObject(m_PersistedSelection);
-				} else {
-					EventSystem.current.SetSelectedGameObject(gameObject);
+
+				GameObject targetSelection = (m_PersistedSelection && m_PersistedSelection.activeInHierarchy)
+					? m_PersistedSelection
+					: gameObject
+					;
+
+				// If UI was deactivated but selection didn't change, activating it back will leave the button selected but not highlighted.
+				if (EventSystem.current.currentSelectedGameObject == targetSelection) {
+					EventSystem.current.SetSelectedGameObject(null);
 				}
+
+				EventSystem.current.SetSelectedGameObject(targetSelection);
 			}
 		}
 

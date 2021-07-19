@@ -13,6 +13,13 @@ namespace DevLocker.GFrame.UIScope
 
 		private GameObject m_LastSelectedObject;
 
+		void Awake()
+		{
+			if (Scope == null) {
+				Scope = GetComponent<UIScope>();
+			}
+		}
+
 		void Update()
 		{
 			if (EventSystem.current == null)

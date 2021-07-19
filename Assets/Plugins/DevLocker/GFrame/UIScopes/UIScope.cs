@@ -64,6 +64,9 @@ namespace DevLocker.GFrame.UIScope
 
 		private static List<UIScope> s_Scopes = new List<UIScope>();
 
+		public IReadOnlyList<IScopeElement> OwnedElements => m_ScopeElements;
+		public IReadOnlyList<UIScope> DirectChildScopes => m_DirectChildScopes;
+
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
 
@@ -227,6 +230,11 @@ namespace DevLocker.GFrame.UIScope
 					scopeElement.enabled = false;
 				}
 			}
+		}
+
+		public bool Owns(IScopeElement scopeElement)
+		{
+			return m_ScopeElements.Contains(scopeElement);
 		}
 
 		internal static void ScanForChildScopeElements(UIScope parentScope, Transform transform, List<IScopeElement> scopeElements, List<UIScope> directChildScopes)
