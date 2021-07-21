@@ -54,6 +54,15 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public LevelStateContextReferences ContextReferences { get; private set; }
 
+
+		// Listen for state change.
+		// NOTE: avoid using events with more complex logic as it will blow up in your face.
+		//		 If you really need to do it, you can inherit this class and override the corresponding protected methods.
+		public event Action ExitingState;
+		public event Action ExitedState;
+		public event Action EnteringState;
+		public event Action EnteredState;
+
 		private readonly Stack<ILevelState> m_StackedStates = new Stack<ILevelState>();
 
 		// Used when state is changed inside another state change event.
@@ -104,13 +113,17 @@ namespace DevLocker.GFrame
 				yield break;
 			}
 
+			yield return ExitingStateCrt();
 			yield return CurrentState.ExitState();
+			yield return ExitedStateCrt();
 
 			for (int i = 0; i < count; ++i) {
 				m_StackedStates.Pop();
 			}
 
+			yield return EnteringStateCrt();
 			yield return CurrentState?.EnterState(ContextReferences);
+			yield return EnteredStateCrt();
 		}
 
 		/// <summary>
@@ -154,7 +167,11 @@ namespace DevLocker.GFrame
 				m_ChangingStates = true;
 			}
 
-			yield return CurrentState?.ExitState();
+			if (CurrentState != null) {
+				yield return ExitingStateCrt();
+				yield return CurrentState.ExitState();
+				yield return ExitedStateCrt();
+			}
 
 			if (stackAction == StackAction.ClearAndPush) {
 				m_StackedStates.Clear();
@@ -166,7 +183,9 @@ namespace DevLocker.GFrame
 
 			m_StackedStates.Push(state);
 
+			yield return EnteringStateCrt();
 			yield return CurrentState.EnterState(ContextReferences);
+			yield return EnteredStateCrt();
 
 			m_ChangingStates = false;
 
@@ -176,6 +195,51 @@ namespace DevLocker.GFrame
 
 				yield return ChangeStateCrt(stateArgs.State, stateArgs.StackAction);
 			}
+		}
+
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator ExitingStateCrt()
+		{
+			ExitingState?.Invoke();
+
+			yield break;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator ExitedStateCrt()
+		{
+			ExitedState?.Invoke();
+
+			yield break;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator EnteringStateCrt()
+		{
+			EnteringState?.Invoke();
+
+			yield break;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual IEnumerator EnteredStateCrt()
+		{
+			EnteredState?.Invoke();
+
+			// In case the scopes were already active when the state kicked in and it pushed
+			// a new state onto the InputActionsStack (resetting the previous actions).
+			UIScope.UIScope.RefocusActiveScopes();
+
+			yield break;
 		}
 	}
 }

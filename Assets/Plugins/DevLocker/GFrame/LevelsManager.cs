@@ -16,7 +16,7 @@ namespace DevLocker.GFrame
 		private LevelStateStack m_LevelStatesStack => LevelSupervisor?.StatesStack;
 
 		// Listen for supervisor change.
-		// NOTE: avoid using events with more complex logic as it will blow up to your face.
+		// NOTE: avoid using events with more complex logic as it will blow up in your face.
 		//		 If you really need to do it, you can inherit this LevelsManager and override the corresponding protected methods.
 		public event Action UnloadingSupervisor;
 		public event Action UnloadedSupervisor;
@@ -120,9 +120,6 @@ namespace DevLocker.GFrame
 		{
 			LoadedSupervisor?.Invoke();
 
-			// In case the scopes were already active when the supervisor kicked in and it pushed
-			// a new state onto the InputActionsStack (resetting the previous actions).
-			UIScope.UIScope.RefocusActiveScopes();
 			yield break;
 		}
 
