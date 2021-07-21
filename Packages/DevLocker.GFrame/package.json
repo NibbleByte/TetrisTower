@@ -1,6 +1,6 @@
 {
-    "name": "DevLocker.GameFrame",
-    "displayName": "Game Frame",
+    "name": "devlocker.gframe",
+    "displayName": "GFrame",
     "version": "1.0.0",
     "unity": "2018.4",
     "description": "Simple frame for a game that has levels and states. It also utilizes the Input System package if available.",
@@ -14,5 +14,12 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/NibbleByte/DevLocker.git"
-    }
+    },
+    "samples": [
+        {
+          "displayName": "Sample Game",
+          "description": "Sample game implemented using GFrame showing basic level and state switching, UI hotkeys and proper input handling.",
+          "path": "SampleGame~"
+        }
+    ]
 }

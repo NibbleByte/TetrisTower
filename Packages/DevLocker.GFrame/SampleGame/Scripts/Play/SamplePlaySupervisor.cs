@@ -24,10 +24,19 @@ namespace DevLocker.GFrame.SampleGame.Play
 				MessageBox.MessageBox.Instance.ForceCloseAllMessages();
 			}
 
+#if UNITY_EDITOR
+			// Can pass it on as a parameter to the supervisor, instead of hard-coding it here.
+			if (SceneManager.GetActiveScene().name != "Sample-PlayScene") {
+				// To bypass build settings list.
+				var sceneParam = new LoadSceneParameters() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.Physics3D };
+				yield return UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode("Packages/devlocker.gframe/SampleGame/Scenes/Sample-PlayScene.unity", sceneParam);
+			}
+#else
 			// Can pass it on as a parameter to the supervisor, instead of hard-coding it here.
 			if (SceneManager.GetActiveScene().name != "Sample-PlayScene") {
 				yield return SceneManager.LoadSceneAsync("Sample-PlayScene", LoadSceneMode.Single);
 			}
+#endif
 
 			var playerController = GameObject.FindObjectOfType<SamplePlayerController>();
 
