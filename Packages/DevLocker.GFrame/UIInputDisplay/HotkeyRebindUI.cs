@@ -29,6 +29,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[NonReorderable]
 		public string[] ExcludeRebindsTo;
 
+		public UnityEvent RebindStarted;
 		public UnityEvent RebindFinished;
 		public UnityEvent RebindReset;
 
@@ -90,6 +91,8 @@ namespace DevLocker.GFrame.UIInputDisplay
 			m_RebindOperation.OnComplete(OnRebindComplete);
 
 			m_RebindOperation.Start();
+
+			RebindStarted.Invoke();
 		}
 
 		[ContextMenu("Cancel Rebind")]
@@ -123,6 +126,9 @@ namespace DevLocker.GFrame.UIInputDisplay
 				m_RebindOperation.Cancel();
 				// Will be disposed by the OnCancel hook.
 			}
+
+			if (DisplayUI.CurrentlyDisplayedData.Binding.id == Guid.Empty)
+				return;
 
 			InputAction action = context.FindActionFor(DisplayUI.Player, DisplayUI.InputAction.name);
 			InputActionRebindingExtensions.RemoveBindingOverride(action, DisplayUI.CurrentlyDisplayedData.BindingIndex);

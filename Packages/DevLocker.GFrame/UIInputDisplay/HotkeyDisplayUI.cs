@@ -17,8 +17,9 @@ namespace DevLocker.GFrame.UIInputDisplay
 		public enum DisplayModes
 		{
 			UpdateWithCurrentDevice,
-			DisplaySpecificDeviceIgnoringTheCurrentOne,
+			UpdateWithCurrentDeviceOnlyForControlScheme,
 			UpdateWithCurrentDeviceExcludeSchemes,
+			DisplaySpecificDeviceIgnoringTheCurrentOne,
 		}
 
 		[Serializable]
@@ -32,6 +33,10 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 			[Tooltip("When excluded, should it keep displaying the last available device bindings, or should it hide everything?")]
 			public bool KeepDisplayingLastDevice;
+
+			[InputControlSchemePicker]
+			[Tooltip("Control scheme to update for. One control scheme can match multiple devices (e.g. XBox and PS gamepads). Use the picker to avoid typos.")]
+			public string DisplayedControlScheme;
 
 			[InputControlSchemePicker]
 			[NonReorderable]
@@ -109,6 +114,27 @@ namespace DevLocker.GFrame.UIInputDisplay
 				bool hadDeviceBefore = m_LastDevice != null;
 				m_LastDevice = device;
 
+				if (DisplayMode.Mode == DisplayModes.UpdateWithCurrentDeviceOnlyForControlScheme) {
+					var lastControlScheme = context.GetLastUsedInputControlScheme(playerIndex).bindingGroup;
+
+					if (!DisplayMode.DisplayedControlScheme.Equals(lastControlScheme, StringComparison.OrdinalIgnoreCase)) {
+
+						if (!DisplayMode.KeepDisplayingLastDevice) {
+							if (Icon) Icon.gameObject.SetActive(false);
+							if (Text) Text.gameObject.SetActive(false);
+							return;
+						}
+
+						if (hadDeviceBefore)
+							return;
+
+						// I'm displayed for the first time - display first available device if current device is to be excluded.
+						m_LastDevice = InputSystem.devices
+							.FirstOrDefault(d => DisplayMode.DisplayedControlScheme.Equals(context.GetInputControlSchemeFor(d).bindingGroup))
+							;
+					}
+				}
+
 				if (DisplayMode.Mode == DisplayModes.UpdateWithCurrentDeviceExcludeSchemes) {
 					var lastControlScheme = context.GetLastUsedInputControlScheme(playerIndex).bindingGroup;
 
@@ -125,14 +151,14 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 						// I'm displayed for the first time - display first available device if current device is to be excluded.
 						m_LastDevice = InputSystem.devices
-							.Where(d => d != device)
 							.FirstOrDefault(d => !DisplayMode.ExcludedControlSchemes.Contains(context.GetInputControlSchemeFor(d).bindingGroup))
 							;
-
-						if (m_LastDevice == null)
-							return;
 					}
 				}
+
+				// Player may not have available devices at the moment. Abort in that case.
+				if (m_LastDevice == null)
+					return;
 
 				deviceLayout = m_LastDevice.layout;
 
@@ -276,7 +302,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 	{
 		public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
 		{
-			var modeProperty = property.FindPropertyRelative("Mode");
+			var modeProperty = property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.Mode));
 			var mode = (HotkeyDisplayUI.DisplayModes)modeProperty.enumValueIndex;
 
 			float height = UnityEditor.EditorGUIUtility.singleLineHeight;
@@ -284,6 +310,10 @@ namespace DevLocker.GFrame.UIInputDisplay
 			switch(mode) {
 				case HotkeyDisplayUI.DisplayModes.DisplaySpecificDeviceIgnoringTheCurrentOne:
 					height += UnityEditor.EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedDeviceLayout)), label);
+					break;
+				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDeviceOnlyForControlScheme:
+					height += UnityEditor.EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.KeepDisplayingLastDevice)), label);
+					height += UnityEditor.EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedControlScheme)), label);
 					break;
 				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDeviceExcludeSchemes:
 					height += UnityEditor.EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.KeepDisplayingLastDevice)), label);
@@ -320,6 +350,11 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 				case HotkeyDisplayUI.DisplayModes.DisplaySpecificDeviceIgnoringTheCurrentOne:
 					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedDeviceLayout)));
+					break;
+				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDeviceOnlyForControlScheme:
+					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.KeepDisplayingLastDevice)), true);
+					lineRect.y += UnityEditor.EditorGUIUtility.singleLineHeight + UnityEditor.EditorGUIUtility.standardVerticalSpacing;
+					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.DisplayedControlScheme)), true);
 					break;
 				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDeviceExcludeSchemes:
 					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.KeepDisplayingLastDevice)), true);
