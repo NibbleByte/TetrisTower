@@ -59,6 +59,21 @@ namespace DevLocker.GFrame.Input
 		public InputBinding Binding;
 
 		/// <summary>
+		/// The binding index this Binding was found at.
+		/// </summary>
+		public int BindingIndex;
+
+		/// <summary>
+		/// The control scheme that matched the binding.
+		/// </summary>
+		public string ControlScheme;
+
+		/// <summary>
+		/// The device layout that matched the binding.
+		/// </summary>
+		public string DeviceLayout;
+
+		/// <summary>
 		/// If the matched <see cref="Binding"/> is composite, this list stores it's part bindings.
 		///
 		/// NOTE: If <see cref="Binding"/> is part of composite, this collection will be null.

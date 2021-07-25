@@ -73,6 +73,8 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[Tooltip("Optional - enter how the hotkey text should be displayed. Use \"{Hotkey}\" to be replaced with the matched text.\nLeave empty to skip.")]
 		public string FormatText;
 
+		public InputBindingDisplayData CurrentlyDisplayedData { get; private set; }
+
 		private InputDevice m_LastDevice;
 
 		/// <summary>
@@ -145,15 +147,15 @@ namespace DevLocker.GFrame.UIInputDisplay
 			}
 
 			int count = 0;
-			var foundData = new InputBindingDisplayData();
+			var displayedData = new InputBindingDisplayData();
 
 			foreach (var bindingDisplay in context.GetBindingDisplaysFor(deviceLayout, action)) {
 				if (count == BindingNumberToUse) {
 
 					if (CompositePartNumberToUse == 0) {
-						foundData = bindingDisplay;
+						displayedData = bindingDisplay;
 					} else if (CompositePartNumberToUse - 1 < bindingDisplay.CompositeBindingParts.Count) {
-						foundData = bindingDisplay.CompositeBindingParts[CompositePartNumberToUse - 1];
+						displayedData = bindingDisplay.CompositeBindingParts[CompositePartNumberToUse - 1];
 					}
 
 					break;
@@ -161,18 +163,21 @@ namespace DevLocker.GFrame.UIInputDisplay
 				count++;
 			}
 
-			if (Icon) {
-				bool iconIsPriority = ShowPriority == ShowPrioritySelection.IconIsPriority || ShowPriority == ShowPrioritySelection.ShowBoth || !foundData.HasText;
+			displayedData.DeviceLayout = deviceLayout;
+			CurrentlyDisplayedData = displayedData;
 
-				Icon.gameObject.SetActive(foundData.HasIcon && iconIsPriority);
-				Icon.sprite = foundData.Icon;
+			if (Icon) {
+				bool iconIsPriority = ShowPriority == ShowPrioritySelection.IconIsPriority || ShowPriority == ShowPrioritySelection.ShowBoth || !CurrentlyDisplayedData.HasText;
+
+				Icon.gameObject.SetActive(CurrentlyDisplayedData.HasIcon && iconIsPriority);
+				Icon.sprite = CurrentlyDisplayedData.Icon;
 			}
 
 			if (Text) {
-				bool textIsPriority = ShowPriority == ShowPrioritySelection.TextIsPriority || ShowPriority == ShowPrioritySelection.ShowBoth || !foundData.HasIcon;
+				bool textIsPriority = ShowPriority == ShowPrioritySelection.TextIsPriority || ShowPriority == ShowPrioritySelection.ShowBoth || !CurrentlyDisplayedData.HasIcon;
 
-				string usedText = UseShortText ? foundData.ShortText : foundData.Text;
-				Text.gameObject.SetActive(foundData.HasText && textIsPriority);
+				string usedText = UseShortText ? CurrentlyDisplayedData.ShortText : CurrentlyDisplayedData.Text;
+				Text.gameObject.SetActive(CurrentlyDisplayedData.HasText && textIsPriority);
 				Text.text = string.IsNullOrWhiteSpace(FormatText)
 					? usedText
 					: FormatText.Replace("{Hotkey}", usedText)

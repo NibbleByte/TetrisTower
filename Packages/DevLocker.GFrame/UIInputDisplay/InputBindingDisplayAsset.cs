@@ -124,9 +124,16 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 				// InputBinding.Matches() compares semantically the binding. In case you have "<Keyboard>/space;<Keyboard>/enter" etc...
 				// In case of composite binding, path is an invalid parameter to match on. Use the name instead.
-				if (pair.Key.Matches(binding) || (binding.isComposite && pair.Key.path.Equals(binding.name, StringComparison.OrdinalIgnoreCase))) {
+				//bool matches = pair.Key.Matches(binding);
+
+				// TODO: InputBinding.Matches() uses the .path instead of .effectivePath. There are some REVIEW comments to fix this, but no one knows when.
+				bool matches = pair.Key.path.Equals(binding.effectivePath, StringComparison.OrdinalIgnoreCase);
+
+				if (matches || (binding.isComposite && pair.Key.path.Equals(binding.name, StringComparison.OrdinalIgnoreCase))) {
 					var bindingDisplay = new InputBindingDisplayData {
 						Binding = binding,
+						BindingIndex = bindingIndex,
+						ControlScheme = MatchingControlScheme,
 						Icon = pair.Value.Icon,
 					};
 
@@ -146,13 +153,15 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 				return new InputBindingDisplayData {
 					Binding = binding,
+					BindingIndex = bindingIndex,
+					ControlScheme = MatchingControlScheme,
 					Icon = null,
 					Text = action.GetBindingDisplayString(bindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames),
 					ShortText = action.GetBindingDisplayString(bindingIndex),
 				};
 			}
 
-			return new InputBindingDisplayData();
+			return new InputBindingDisplayData() { BindingIndex = -1 };
 		}
 	}
 
