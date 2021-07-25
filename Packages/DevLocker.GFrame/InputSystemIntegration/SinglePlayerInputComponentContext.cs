@@ -88,17 +88,17 @@ namespace DevLocker.GFrame.Input
 			PlayerInput.onControlsChanged -= OnControlsChanged;
 		}
 
-		public bool IsMasterPlayer(int playerIndex)
+		public bool IsMasterPlayer(PlayerIndex playerIndex)
 		{
-			if (playerIndex < 0)
+			if (playerIndex < PlayerIndex.Player0)
 				throw new ArgumentException($"{playerIndex} is not a proper player index.");
 
-			return playerIndex == 0;
+			return playerIndex == PlayerIndex.Player0;
 		}
 
-		public InputAction FindActionFor(int playerIndex, string actionNameOrId, bool throwIfNotFound = false)
+		public InputAction FindActionFor(PlayerIndex playerIndex, string actionNameOrId, bool throwIfNotFound = false)
 		{
-			if (playerIndex > 0 || playerIndex < -1)
+			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
 			return PlayerInput.actions.FindAction(actionNameOrId, throwIfNotFound);
@@ -124,19 +124,17 @@ namespace DevLocker.GFrame.Input
 			return UIActions;
 		}
 
-		public void ResetAllEnabledActions()
+		public IEnumerable<InputAction> GetAllActionsFor(PlayerIndex playerIndex)
 		{
-			foreach (InputAction action in PlayerInput.actions) {
-				if (action.enabled) {
-					action.Reset();
-				}
-			}
+			if (playerIndex > PlayerIndex.Player0)
+				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
+
+			return PlayerInput.actions;
 		}
 
-
-		public InputDevice GetLastUsedInputDevice(int playerIndex)
+		public InputDevice GetLastUsedInputDevice(PlayerIndex playerIndex)
 		{
-			if (playerIndex > 0 || playerIndex < -1)
+			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
 			// HACK: In the case of keyboard and mouse, this will always return keyboard.
@@ -146,20 +144,20 @@ namespace DevLocker.GFrame.Input
 				;
 		}
 
-		public InputControlScheme GetLastUsedInputControlScheme(int playerIndex)
+		public InputControlScheme GetLastUsedInputControlScheme(PlayerIndex playerIndex)
 		{
-			if (playerIndex > 0 || playerIndex < -1)
+			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
 			return m_LastUsedControlScheme;
 		}
 
-		public void TriggerLastUsedDeviceChanged(int playerIndex = -1)
+		public void TriggerLastUsedDeviceChanged(PlayerIndex playerIndex = PlayerIndex.MasterPlayer)
 		{
-			if (playerIndex > 0 || playerIndex < -1)
+			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
-			LastUsedDeviceChanged?.Invoke(0);
+			LastUsedDeviceChanged?.Invoke(PlayerIndex.Player0);
 		}
 
 		public IEnumerable<InputControlScheme> GetAllInputControlSchemes()
@@ -186,7 +184,7 @@ namespace DevLocker.GFrame.Input
 		{
 			m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
 
-			TriggerLastUsedDeviceChanged(0);
+			TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
 		}
 	}
 }

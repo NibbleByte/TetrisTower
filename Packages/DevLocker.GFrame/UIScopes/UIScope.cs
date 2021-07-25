@@ -327,7 +327,14 @@ namespace DevLocker.GFrame.UIScope
 
 			// Pushing input on stack will reset the actions anyway.
 			if (ResetAllActionsOnEnable && active && !PushInputStack) {
-				context.ResetAllEnabledActions();
+
+				// Resets all enabled actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
+				// Useful on changing states or scopes, so gestures, drags, sequences don't leak in.
+				foreach (var action in context.GetAllActionsFor(Input.PlayerIndex.AnyPlayer)) {
+					if (action.enabled) {
+						action.Reset();
+					}
+				}
 			}
 
 			if (active) {

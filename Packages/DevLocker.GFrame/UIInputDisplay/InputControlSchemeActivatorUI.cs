@@ -31,7 +31,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		private string m_LastControlScheme;
 
-		private void RefreshObjects(IInputContext context, int playerIndex)
+		private void RefreshObjects(IInputContext context, PlayerIndex playerIndex)
 		{
 			InputControlScheme scheme = context.GetLastUsedInputControlScheme(playerIndex);
 
@@ -86,7 +86,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 			context.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
 			m_LastControlScheme = null;
-			RefreshObjects(context, Player.ToIndex());
+			RefreshObjects(context, Player);
 		}
 
 		void OnDisable()
@@ -106,7 +106,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			context.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
 		}
 
-		private void OnLastUsedDeviceChanged(int playerIndex)
+		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)
 		{
 			// Turning off Play mode.
 			if (LevelsManager.Instance == null)
@@ -123,7 +123,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			if (Player == PlayerIndex.MasterPlayer) {
 				if (!context.IsMasterPlayer(playerIndex))
 					return;
-			} else if (playerIndex != Player.ToIndex()) {
+			} else if (playerIndex != Player) {
 				return;
 			}
 

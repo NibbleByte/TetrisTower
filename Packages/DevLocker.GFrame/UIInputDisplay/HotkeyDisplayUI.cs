@@ -91,10 +91,10 @@ namespace DevLocker.GFrame.UIInputDisplay
 			}
 
 			m_LastDevice = null;
-			RefreshDisplay(context, Player.ToIndex());
+			RefreshDisplay(context, Player);
 		}
 
-		private void RefreshDisplay(IInputContext context, int playerIndex)
+		private void RefreshDisplay(IInputContext context, PlayerIndex playerIndex)
 		{
 			string deviceLayout;
 
@@ -197,7 +197,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 			context.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
 			m_LastDevice = null;
-			RefreshDisplay(context, Player.ToIndex());
+			RefreshDisplay(context, Player);
 		}
 
 		void OnDisable()
@@ -226,7 +226,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			}
 		}
 
-		private void OnLastUsedDeviceChanged(int playerIndex)
+		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)
 		{
 			// Turning off Play mode.
 			if (LevelsManager.Instance == null)
@@ -243,7 +243,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			if (Player == PlayerIndex.MasterPlayer) {
 				if (!context.IsMasterPlayer(playerIndex))
 					return;
-			} else if (playerIndex != Player.ToIndex()) {
+			} else if (playerIndex != Player) {
 				return;
 			}
 

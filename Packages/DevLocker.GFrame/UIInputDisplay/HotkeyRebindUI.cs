@@ -58,7 +58,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 				m_RebindOperation = null;
 			}
 
-			InputAction action = context.FindActionFor(DisplayUI.Player.ToIndex(), DisplayUI.InputAction.name);
+			InputAction action = context.FindActionFor(DisplayUI.Player, DisplayUI.InputAction.name);
 
 			if (DisplayUI.CurrentlyDisplayedData.Binding.id == Guid.Empty)
 				return;
@@ -124,7 +124,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 				// Will be disposed by the OnCancel hook.
 			}
 
-			InputAction action = context.FindActionFor(DisplayUI.Player.ToIndex(), DisplayUI.InputAction.name);
+			InputAction action = context.FindActionFor(DisplayUI.Player, DisplayUI.InputAction.name);
 			InputActionRebindingExtensions.RemoveBindingOverride(action, DisplayUI.CurrentlyDisplayedData.BindingIndex);
 
 			DisplayUI.RefreshDisplay();

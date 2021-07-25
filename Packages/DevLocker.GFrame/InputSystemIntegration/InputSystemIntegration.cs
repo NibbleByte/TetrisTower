@@ -38,7 +38,7 @@ namespace DevLocker.GFrame.Input
 		IInputContext InputContext { get; }
 	}
 
-	public delegate void PlayerIndexEventHandler(int playerIndex);
+	public delegate void PlayerIndexEventHandler(PlayerIndex playerIndex);
 
 
 	/// <summary>
@@ -140,13 +140,14 @@ namespace DevLocker.GFrame.Input
 		/// Returns true if the playerIndex is the master player.
 		/// This is usually the first player that has more permissions than the rest.
 		/// </summary>
-		bool IsMasterPlayer(int playerIndex);
+		bool IsMasterPlayer(PlayerIndex playerIndex);
 
 		/// <summary>
 		/// Find InputAction by action name or id for specific player.
-		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
+		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
+		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
-		InputAction FindActionFor(int playerIndex, string actionNameOrId, bool throwIfNotFound = false);
+		InputAction FindActionFor(PlayerIndex playerIndex, string actionNameOrId, bool throwIfNotFound = false);
 
 		/// <summary>
 		/// Find InputActions by action name or id for all currently active players.
@@ -185,34 +186,35 @@ namespace DevLocker.GFrame.Input
 		IEnumerable<InputAction> GetUIActions();
 
 		/// <summary>
-		/// Resets all enabled actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
-		/// Useful on changing states or scopes, so gestures, drags, sequences don't leak in.
-		///
-		/// NOTE: If you support more than one player, execute this operation for each players' action!
+		/// Returns all <see cref="InputAction"/> for the specified player.
+		/// <see cref="PlayerIndex.MasterPlayer"/> will return results for the master player.
+		/// <see cref="PlayerIndex.AnyPlayer"/> will return all actions for all the players.
 		/// </summary>
-		void ResetAllEnabledActions();
-
+		IEnumerable<InputAction> GetAllActionsFor(PlayerIndex playerIndex);
 
 		/// <summary>
 		/// Get last updated device for specified player.
-		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
+		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
+		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
-		InputDevice GetLastUsedInputDevice(int playerIndex);
+		InputDevice GetLastUsedInputDevice(PlayerIndex playerIndex);
 
 		/// <summary>
 		/// Get last used <see cref="InputControlScheme" /> for specified player.
-		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
+		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
+		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// NOTE: If no devices used, empty control scheme will be returned.
 		/// </summary>
-		InputControlScheme GetLastUsedInputControlScheme(int playerIndex);
+		InputControlScheme GetLastUsedInputControlScheme(PlayerIndex playerIndex);
 
 		/// <summary>
 		/// Force invoke the LastUsedDeviceChanged for specified player, so UI and others can refresh.
 		/// This is useful if the player changed the controls or similar,
 		/// or if you're using PlayerInput component with SendMessage / Broadcast notification.
-		/// Provide playerIndex with -1 to use the master player (usually the first player that has more permissions than the rest).
+		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
+		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
-		void TriggerLastUsedDeviceChanged(int playerIndex = -1);
+		void TriggerLastUsedDeviceChanged(PlayerIndex playerIndex = PlayerIndex.MasterPlayer);
 
 		/// <summary>
 		/// Get all used <see cref="InputControlScheme" />.
@@ -229,22 +231,12 @@ namespace DevLocker.GFrame.Input
 	public static class InputSystemIntegrationExtensions
 	{
 		/// <summary>
-		/// Converts enum values to int.
-		/// Passing <see cref="PlayerIndex.MasterPlayer" /> will return -1.
-		/// </summary>
-		public static int ToIndex(this PlayerIndex playerIndex)
-		{
-			if (playerIndex == PlayerIndex.AnyPlayer)
-				throw new ArgumentOutOfRangeException($"Trying to get int index for {playerIndex} which doesn't make sense.");
-
-			return (int)playerIndex - (int)PlayerIndex.Player0;
-		}
-
-		/// <summary>
 		/// Get the display representations of the matched device for the passed action.
 		/// An action can have multiple bindings for the same device.
+		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
+		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
-		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, int playerIndex, InputAction action)
+		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, PlayerIndex playerIndex, InputAction action)
 		{
 			InputDevice lastUsedDevice = context.GetLastUsedInputDevice(playerIndex);
 			if (lastUsedDevice == null) {

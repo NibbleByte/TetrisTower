@@ -119,7 +119,7 @@ namespace DevLocker.GFrame.UIScope
 					yield return action;
 				}
 			} else {
-				InputAction action = context.FindActionFor(Player.ToIndex(), m_InputAction.name);
+				InputAction action = context.FindActionFor(Player, m_InputAction.name);
 				if (action != null) {
 					yield return action;
 				}
