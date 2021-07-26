@@ -108,10 +108,9 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 				// HACK: Prevent from spamming on PC.
 				//		 Keyboard & Mouse are be considered (usually) the same. Gamepads are not - each one comes with its own assets.
-				if (device == m_LastDevice || (device is Keyboard && m_LastDevice is Mouse) || (device is Mouse && m_LastDevice is Keyboard))
+				if ((device is Keyboard && m_LastDevice is Mouse) || (device is Mouse && m_LastDevice is Keyboard))
 					return;
 
-				bool hadDeviceBefore = m_LastDevice != null;
 				m_LastDevice = device;
 
 				if (DisplayMode.Mode == DisplayModes.UpdateWithCurrentDeviceOnlyForControlScheme) {
@@ -124,9 +123,6 @@ namespace DevLocker.GFrame.UIInputDisplay
 							if (Text) Text.gameObject.SetActive(false);
 							return;
 						}
-
-						if (hadDeviceBefore)
-							return;
 
 						// I'm displayed for the first time - display first available device if current device is to be excluded.
 						m_LastDevice = InputSystem.devices
@@ -145,9 +141,6 @@ namespace DevLocker.GFrame.UIInputDisplay
 							if (Text) Text.gameObject.SetActive(false);
 							return;
 						}
-
-						if (hadDeviceBefore)
-							return;
 
 						// I'm displayed for the first time - display first available device if current device is to be excluded.
 						m_LastDevice = InputSystem.devices
