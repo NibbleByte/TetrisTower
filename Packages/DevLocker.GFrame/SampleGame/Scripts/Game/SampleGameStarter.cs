@@ -20,6 +20,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public SampleGameContext GameContext;
 
 		public GameObject GameInputPrefab;
+		public UIUtils.UISimpleCanvasGroupFader LevelFader;
 		public MessageBox.MessageBox MessageBoxPrefab;
 
 		public InputBindingDisplayAsset[] BindingDisplayAssets;
@@ -40,6 +41,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 			var playerControls = new SamplePlayerControls();
 
 			var gameInputObject = Instantiate(GameInputPrefab, transform);
+			var levelFader = Instantiate(LevelFader.gameObject, transform).GetComponent<UIUtils.UISimpleCanvasGroupFader>();
 			Instantiate(MessageBoxPrefab.gameObject, transform);
 
 			var playerInput = gameInputObject.GetComponentInChildren<PlayerInput>();
@@ -52,8 +54,9 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 			GameContext = new SampleGameContext(playerInput, playerControls, BindingDisplayAssets);
 
-			var supervisorManager = gameObject.AddComponent<LevelsManager>();
-			supervisorManager.SetGameContext(GameContext);
+			var levelsManager = gameObject.AddComponent<LevelsManager>();
+			levelsManager.LevelLoadingScreen = levelFader;
+			levelsManager.SetGameContext(GameContext);
 		}
 
 		void Start()

@@ -12,6 +12,16 @@ namespace DevLocker.GFrame
 	{
 		public IGameContext GameContext { get; private set; }
 
+		/// <summary>
+		/// Assign this if you want to show / hide loading screen between your levels (e.g. fade out effects).
+		/// You may assign this multiple times based on your needs and next level to load.
+		/// If null, it will be skipped.
+		/// </summary>
+		public ILevelLoadingScreen LevelLoadingScreen;
+
+		[Tooltip("Should level loading screen show before exiting the level states or after.")]
+		public bool ShowLoadingScreenBeforeLevelStates = false;
+
 		public ILevelSupervisor LevelSupervisor { get; private set; }
 		private LevelStateStack m_LevelStatesStack => LevelSupervisor?.StatesStack;
 
@@ -59,17 +69,32 @@ namespace DevLocker.GFrame
 
 		public IEnumerator SwitchLevelCrt(ILevelSupervisor nextLevel)
 		{
-			if (m_LevelStatesStack != null) {
+			bool hadPreviousSupervisor = false;
+
+			if (LevelSupervisor != null) {
+
+				hadPreviousSupervisor = true;
 
 				yield return UnloadingSupervisorCrt();
 
-				if (!m_LevelStatesStack.IsEmpty) {
+				if (ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
+					yield return LevelLoadingScreen.Show();
+				}
+
+				if (m_LevelStatesStack != null && !m_LevelStatesStack.IsEmpty) {
 					yield return m_LevelStatesStack.ClearStackAndStateCrt();
+				}
+
+				if (!ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
+					yield return LevelLoadingScreen.Show();
 				}
 
 				yield return LevelSupervisor.Unload();
 
 				yield return UnloadedSupervisorCrt();
+
+			} else if (LevelLoadingScreen != null) {
+				LevelLoadingScreen.HideInstantly();
 			}
 
 			LevelSupervisor = nextLevel;
@@ -77,6 +102,11 @@ namespace DevLocker.GFrame
 			yield return LoadingSupervisorCrt();
 
 			yield return nextLevel.Load(GameContext);
+
+			// Avoid first show of loading screen when the game starts.
+			if (hadPreviousSupervisor && LevelLoadingScreen != null) {
+				yield return LevelLoadingScreen.Hide();
+			}
 
 			yield return LoadedSupervisorCrt();
 		}
