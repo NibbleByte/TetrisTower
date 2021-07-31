@@ -36,7 +36,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -34}
-  m_SizeDelta: {x: 60, y: 30}
+  m_SizeDelta: {x: 50, y: 20}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &5394036698972749554
 MonoBehaviour:
@@ -58,11 +58,13 @@ MonoBehaviour:
     Mode: 0
     DisplayedDeviceLayout: 
     KeepDisplayingLastDevice: 0
+    DisplayedControlScheme: 
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 5394036700216754307}
   Text: {fileID: 5394036699964054010}
   UseShortText: 1
+  FormatText: 
 --- !u!1 &5394036699964054008
 GameObject:
   m_ObjectHideFlags: 0
@@ -98,7 +100,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 60, y: 24}
+  m_SizeDelta: {x: 60, y: 20}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5394036699964053957
 CanvasRenderer:
@@ -130,7 +132,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 12
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
@@ -177,7 +179,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 24, y: 24}
+  m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5394036700216754306
 CanvasRenderer:
