@@ -101,9 +101,11 @@ namespace DevLocker.VersionControl.WiseSVN
 
 		#endregion
 
-		public static readonly string ProjectRoot;
+		public static readonly string ProjectRootNative;
+		public static readonly string ProjectRootUnity;
 
 		public static event Action ShowChangesUI;
+		public static event Action RunUpdateUI;
 
 		/// <summary>
 		/// Is the integration enabled.
@@ -137,7 +139,7 @@ namespace DevLocker.VersionControl.WiseSVN
 
 		private static string SVN_Command => string.IsNullOrEmpty(m_ProjectPrefs.PlatformSvnCLIPath)
 			? "svn"
-			: Path.Combine(ProjectRoot, m_ProjectPrefs.PlatformSvnCLIPath);
+			: Path.Combine(ProjectRootNative, m_ProjectPrefs.PlatformSvnCLIPath);
 
 		internal const int COMMAND_TIMEOUT = 20000;	// Milliseconds
 		internal const int ONLINE_COMMAND_TIMEOUT = 45000;  // Milliseconds
@@ -185,6 +187,12 @@ namespace DevLocker.VersionControl.WiseSVN
 				// Not used for now...
 			}
 
+			// Because using AppendOutputLine() will output all the SVN operation spam that we parse.
+			public void AppendTraceLine(string line)
+			{
+				m_CombinedOutput.Enqueue(line);
+			}
+
 			public void AppendErrorLine(string line)
 			{
 				m_CombinedOutput.Enqueue(line);
@@ -195,6 +203,11 @@ namespace DevLocker.VersionControl.WiseSVN
 			{
 				AbortRequested = true;
 				RequestAbort?.Invoke(kill);
+			}
+
+			public void ResetErrorFlag()
+			{
+				m_HasErrors = false;
 			}
 
 			public void Dispose()
@@ -214,6 +227,9 @@ namespace DevLocker.VersionControl.WiseSVN
 					} else if (m_LogOutput && m_HasCommand) {
 						Debug.Log(output);
 					}
+
+					m_HasErrors = false;
+					m_HasCommand = false;
 				}
 			}
 		}
@@ -229,7 +245,8 @@ namespace DevLocker.VersionControl.WiseSVN
 
 		static WiseSVNIntegration()
 		{
-			ProjectRoot = Path.GetDirectoryName(Application.dataPath);
+			ProjectRootNative = Path.GetDirectoryName(Application.dataPath);
+			ProjectRootUnity = ProjectRootNative.Replace('\\', '/');
 		}
 
 		/// <summary>
@@ -1394,7 +1411,7 @@ namespace DevLocker.VersionControl.WiseSVN
 		/// </summary>
 		public static string WorkingCopyRootPath()
 		{
-			var result = ShellUtils.ExecuteCommand(SVN_Command, $"info \"{SVNFormatPath(ProjectRoot)}\"", COMMAND_TIMEOUT);
+			var result = ShellUtils.ExecuteCommand(SVN_Command, $"info \"{SVNFormatPath(ProjectRootNative)}\"", COMMAND_TIMEOUT);
 
 			if (result.HasErrors)
 				return string.Empty;
@@ -1439,7 +1456,7 @@ namespace DevLocker.VersionControl.WiseSVN
 		/// </summary>
 		public static string CheckForSVNErrors()
 		{
-			var result = ShellUtils.ExecuteCommand(SVN_Command, $"status --depth=empty \"{SVNFormatPath(ProjectRoot)}\"", COMMAND_TIMEOUT);
+			var result = ShellUtils.ExecuteCommand(SVN_Command, $"status --depth=empty \"{SVNFormatPath(ProjectRootNative)}\"", COMMAND_TIMEOUT);
 
 			return result.Error;
 		}
@@ -1474,7 +1491,13 @@ namespace DevLocker.VersionControl.WiseSVN
 					EditorUtility.DisplayDialog(
 						"Deleted file",
 						$"The desired location\n\"{path}\"\nis marked as deleted in SVN. The file will be replaced in SVN with the new one.\n\nIf this is an automated change, consider adding this file to the exclusion list in the project preferences:\n\"{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\n...or change your tool to silence the integration.",
-						"Replace");
+						"Replace"
+#if UNITY_2019_4_OR_NEWER
+						, DialogOptOutDecisionType.ForThisSession, "WiseSVN.ReplaceFile"
+					);
+#else
+					);
+#endif
 				}
 
 				using (var reporter = CreateReporter()) {
@@ -1564,16 +1587,127 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (!CheckAndAddParentFolderIfNeeded(newPath, true, reporter))
 					return AssetMoveResult.FailedMove;
 
-				var result = ShellUtils.ExecuteCommand(SVN_Command, $"move \"{SVNFormatPath(oldPath)}\" \"{newPath}\"", COMMAND_TIMEOUT, reporter);
-				if (result.HasErrors)
-					return AssetMoveResult.FailedMove;
 
+				if (m_ProjectPrefs.MoveBehaviour == SVNMoveBehaviour.UseAddAndDeleteForAllAssets ||
+					m_ProjectPrefs.MoveBehaviour == SVNMoveBehaviour.UseAddAndDeleteForFolders && Directory.Exists(oldPath)
+					) {
+
+					return MoveAssetByAddDeleteOperations(oldPath, newPath, reporter)
+						? AssetMoveResult.DidMove
+						: AssetMoveResult.FailedMove
+						;
+				}
+
+
+				var result = ShellUtils.ExecuteCommand(SVN_Command, $"move \"{SVNFormatPath(oldPath)}\" \"{newPath}\"", COMMAND_TIMEOUT, reporter);
+				if (result.HasErrors) {
+
+					// Moving files from one repository to another is not allowed (nested checkouts or externals).
+					//svn: E155023: Cannot copy to '...', as it is not from repository '...'; it is from '...'
+					if (result.Error.Contains("E155023")) {
+
+						if (Silent || EditorUtility.DisplayDialog(
+							"Error moving asset",
+							$"Failed to move file as destination is in another external repository:\n{oldPath}\n\nWould you like to force move the file anyway?\nWARNING: You'll loose the SVN history of the file.\n\nTarget path:\n{newPath}",
+							"Yes, ignore SVN",
+							"Cancel"
+							)) {
+
+							return MoveAssetByAddDeleteOperations(oldPath, newPath, reporter)
+								? AssetMoveResult.DidMove
+								: AssetMoveResult.FailedMove
+								;
+
+						} else {
+							reporter.ResetErrorFlag();
+							return AssetMoveResult.FailedMove;
+						}
+
+
+						// Moving files / folder into unversioned folder, sometimes results in this strange error. Handle it gracefully.
+						//svn: E155040: Cannot move mixed-revision subtree '...' [52:53]; try updating it first
+					} else if (result.Error.Contains("try updating it first") && !Silent) {
+						var formattedError = result
+							.Error
+							.Replace(ProjectRootNative + Path.DirectorySeparatorChar, "")
+							.Replace(" '", "\n'")
+							.Replace("; ", ";\n\n");
+
+						reporter.ResetErrorFlag();
+
+						if (EditorUtility.DisplayDialog(
+							"Update Needed",
+							$"Failed to move / rename files with error: \n{formattedError}",
+							"Run Update",
+							"Cancel"
+							)) {
+
+							reporter.AppendTraceLine("Running Update via GUI...");
+							RunUpdateUI?.Invoke();
+							reporter.AppendTraceLine("Update Finished.");
+
+							if (EditorUtility.DisplayDialog(
+								"Retry Move / Rename?",
+								$"Update finished.\nDo you wish to retry moving the asset?\nAsset: {oldPath}",
+								"Retry Move / Rename",
+								"Cancel"
+								)) {
+								// Try moving it again with all the checks because the situation may have changed (conflicts & stuff).
+								reporter.Dispose();
+								return OnWillMoveAsset(oldPath, newPath);
+							} else {
+								return AssetMoveResult.FailedMove;
+							}
+
+						} else {
+							return AssetMoveResult.FailedMove;
+						}
+					} else {
+						return AssetMoveResult.FailedMove;
+					}
+				}
+
+				// HACK: Really don't want to copy-paste the "try update first" error handle from above a second time. Hope this case never happens here.
 				result = ShellUtils.ExecuteCommand(SVN_Command, $"move \"{SVNFormatPath(oldPath + ".meta")}\" \"{newPath}.meta\"", COMMAND_TIMEOUT, reporter);
 				if (result.HasErrors)
 					return AssetMoveResult.FailedMove;
 
 				return AssetMoveResult.DidMove;
 			}
+		}
+
+		private static bool MoveAssetByAddDeleteOperations(string oldPath, string newPath, ResultReporter reporter)
+		{
+			reporter.AppendTraceLine($"Moving file \"{oldPath}\" to \"{newPath}\" without SVN history...");
+
+			if (Directory.Exists(oldPath)) {
+				Directory.Move(oldPath, newPath);
+				Directory.Move(oldPath + ".meta", newPath + ".meta");
+			} else {
+				File.Move(oldPath, newPath);
+				File.Move(oldPath + ".meta", newPath + ".meta");
+			}
+
+			// Reset after the danger is gone (manual file operations)
+			reporter.ResetErrorFlag();
+
+			var result = ShellUtils.ExecuteCommand(SVN_Command, $"delete --force \"{SVNFormatPath(oldPath)}\"", COMMAND_TIMEOUT, reporter);
+			if (result.HasErrors)
+				return false;
+
+			result = ShellUtils.ExecuteCommand(SVN_Command, $"delete --force \"{SVNFormatPath(oldPath + ".meta")}\"", COMMAND_TIMEOUT, reporter);
+			if (result.HasErrors)
+				return false;
+
+			result = ShellUtils.ExecuteCommand(SVN_Command, $"add \"{SVNFormatPath(newPath)}\"", COMMAND_TIMEOUT, reporter);
+			if (result.HasErrors)
+				return false;
+
+			result = ShellUtils.ExecuteCommand(SVN_Command, $"add \"{SVNFormatPath(newPath + ".meta")}\"", COMMAND_TIMEOUT, reporter);
+			if (result.HasErrors)
+				return false;
+
+			return true;
 		}
 
 		private static bool SVNReplaceFile(string oldPath, string newPath, IShellMonitor shellMonitor = null)
@@ -1658,7 +1792,7 @@ namespace DevLocker.VersionControl.WiseSVN
 					// If -u is used, additional line is added at the end:
 					// Status against revision:     14
 					if (line.StartsWith("Status", StringComparison.Ordinal))
-						break;
+						continue;
 
 					// All externals append separate sections with their statuses:
 					// Performing status on external item at '...':
@@ -1667,7 +1801,7 @@ namespace DevLocker.VersionControl.WiseSVN
 
 					// If user has files in the "ignore-on-commit" list, this is added at the end plus empty line:
 					// ---Changelist 'ignore-on-commit': ...
-					if (string.IsNullOrEmpty(line))
+					if (string.IsNullOrWhiteSpace(line))
 						continue;
 					if (line.StartsWith("---", StringComparison.Ordinal))
 						break;
