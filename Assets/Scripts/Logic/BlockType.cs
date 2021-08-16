@@ -7,7 +7,8 @@ namespace TetrisTower.Logic
 	[CreateAssetMenu(fileName = "Unknown_Block", menuName = "Tetris Tower/Block")]
 	public class BlockType : SerializableAsset
 	{
-		public GameObject Prefab;
+		public GameObject Prefab3D;
+		public GameObject Prefab2D;
 	}
 
 	[Serializable]

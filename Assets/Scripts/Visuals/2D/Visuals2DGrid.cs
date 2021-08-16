@@ -5,9 +5,9 @@ using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace TetrisTower.Visuals
+namespace TetrisTower.Visuals2D
 {
-	public class VisualsGrid : MonoBehaviour, GameGrid
+	public class Visuals2DGrid : MonoBehaviour, GameGrid
 	{
 		public float BlockMoveSpeed = 1f;
 		public Vector2 BlockSize = Vector2.one;
@@ -200,7 +200,7 @@ namespace TetrisTower.Visuals
 			if (reuseVisuals) {
 				reuseVisuals.transform.SetParent(transform);
 			} else {
-				reuseVisuals = GameObject.Instantiate(blockType.Prefab, transform);
+				reuseVisuals = GameObject.Instantiate(blockType.Prefab2D, transform);
 			}
 
 			// Hitting the limit, won't be stored.

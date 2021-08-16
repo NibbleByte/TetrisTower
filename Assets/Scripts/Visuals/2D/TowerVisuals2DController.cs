@@ -4,16 +4,16 @@ using TetrisTower.TowerLevels;
 using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.Visuals
+namespace TetrisTower.Visuals2D
 {
-	public class TowerVisualsController : MonoBehaviour
+	public class TowerVisuals2DController : MonoBehaviour
 	{
 		[Serializable]
 		public class VisualsShape : GridShape<GameObject>
 		{
 		}
 
-		public VisualsGrid VisualsGrid;
+		public Visuals2DGrid VisualsGrid;
 		public TowerLevelController TowerLevel;
 		public TowerLevelData LevelData => TowerLevel.LevelData;
 
@@ -83,7 +83,7 @@ namespace TetrisTower.Visuals
 			var visualbinds = new List<GridShape<GameObject>.ShapeBind>();
 
 			foreach (var bind in blocksShape.ShapeCoords) {
-				var visualBlock = GameObject.Instantiate(bind.Value.Prefab, FallingVisualsContainer);
+				var visualBlock = GameObject.Instantiate(bind.Value.Prefab2D, FallingVisualsContainer);
 				visualbinds.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
 				var coords = startCoords + bind.Coords;
 				coords.WrapColumn(LevelData.Grid);
