@@ -37,20 +37,6 @@ namespace TetrisTower.Logic
 		public void WrapColumn(int columns) => Column = MathUtils.WrapValue(Column, columns);
 		public void WrapColumn(GameGrid grid) => Column = MathUtils.WrapValue(Column, grid.Columns);
 
-		public static GridCoords WrapAround(GridCoords coords, int rows, int columns)
-		{
-			var result = new GridCoords(coords);
-			result.WrapAround(rows, columns);
-			return result;
-		}
-
-		public static GridCoords WrapAround(GridCoords coords, GameGrid grid)
-		{
-			var result = new GridCoords(coords);
-			result.WrapAround(grid);
-			return result;
-		}
-
 		public bool IsInside(GameGrid grid)
 		{
 			return 0 <= Row && Row < grid.Rows && 0 <= Column && Column < grid.Columns;
@@ -93,6 +79,13 @@ namespace TetrisTower.Logic
 
 	public interface GridAction
 	{
+	}
+
+	public static class GameGridExtensions
+	{
+		public static int WrappedColumn(this GameGrid grid, int column) => MathUtils.WrapValue(column, grid.Columns);
+
+		public static GridCoords WrappedCoords(this GameGrid grid, GridCoords coords) => new GridCoords(coords.Row, MathUtils.WrapValue(coords.Column, grid.Columns));
 	}
 
 

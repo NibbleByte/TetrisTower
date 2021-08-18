@@ -109,7 +109,7 @@ namespace TetrisTower.TowerLevels
 					return false;
 			}
 
-			LevelData.FallingColumn = MathUtils.WrapValue(requestedColumn, Grid.Columns);
+			LevelData.FallingColumn = Grid.WrappedColumn(requestedColumn);
 
 			FallingShapeMoved?.Invoke();
 
