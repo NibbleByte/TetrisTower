@@ -177,10 +177,14 @@ MonoBehaviour:
   SupportedColumnsCount: 13
   FrontFaceTopEdgeLength: 6.99998
   FrontFaceBottomEdgeLength: 7.17947
+  BlockHeight: 2.5
+  ConeOuterRadius: 15
   ConeHeight: 100
   BlockMoveSpeed: 5
   MatchBlockDelay: 0.075
   MatchActionDelay: 0.6
+  m_GizmoShowGrid: 1
+  m_GizmoShowGridHeader: 1
 --- !u!114 &205915260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +211,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205915257}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

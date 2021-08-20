@@ -41,6 +41,9 @@ namespace TetrisTower.Visuals
 		public float FrontFaceTopEdgeLength;
 		public float FrontFaceBottomEdgeLength;
 
+		public float BlockHeight = 2.5f;
+		public float ConeOuterRadius = 15f;
+
 		// This is used to locate the apex of the cone.
 		// The position of this object will be considered the center of the base.
 		public float ConeHeight = 100;
@@ -77,9 +80,7 @@ namespace TetrisTower.Visuals
 			if (SupportedColumnsCount != grid.Columns)
 				throw new System.ArgumentException($"Supported number of columns for cone visuals is {SupportedColumnsCount} but {grid.Columns} is provided");
 
-			ConeApex = transform.position + Vector3.up * ConeHeight;
-			m_ScaleChangeRatio = FrontFaceTopEdgeLength / FrontFaceBottomEdgeLength;
-			m_ConeSectorEulerAngle = 360f / grid.Columns;
+			CalculateCone(grid.Columns);
 
 			m_Blocks = new GameObject[grid.Rows, grid.Columns];
 
@@ -95,10 +96,31 @@ namespace TetrisTower.Visuals
 			}
 		}
 
+		private void CalculateCone(int columns)
+		{
+			ConeApex = transform.position + Vector3.up * ConeHeight;
+			m_ScaleChangeRatio = FrontFaceTopEdgeLength / FrontFaceBottomEdgeLength;
+			m_ConeSectorEulerAngle = 360f / columns;
+		}
+
 		public Vector3 GridDistanceToScale(float fallDistance) => Vector3.one * Mathf.Pow(m_ScaleChangeRatio, Rows - fallDistance);
 		public Vector3 GridToScale(GridCoords coords) => Vector3.one * Mathf.Pow(m_ScaleChangeRatio, coords.Row);
 
 		public Quaternion GridColumnToRotation(int column) => Quaternion.Euler(0f, -m_ConeSectorEulerAngle * column /* Negative because rotation works the other way*/, 0f);
+
+		public Vector3 GridToWorldVertex(GridCoords coords) =>
+			transform.position + Vector3.up * BlockHeight * coords.Row
+			+ Quaternion.Euler(0f, -m_ConeSectorEulerAngle * coords.Column + m_ConeSectorEulerAngle / 2f, 0f)
+			* transform.forward * Mathf.Pow(m_ScaleChangeRatio, coords.Row) * ConeOuterRadius;
+
+		public Vector3 GridToWorldSideMidpoint(GridCoords coords)
+		{
+			var vertexStart = GridToWorldVertex(coords);
+			coords.Column++;
+			var vertexEnd = GridToWorldVertex(coords);
+
+			return vertexStart + (vertexEnd - vertexStart) / 2f;
+		}
 
 		private void DestroyInstances()
 		{
@@ -273,6 +295,100 @@ namespace TetrisTower.Visuals
 		{
 			m_PlacedShapeToBeReused = shape;
 		}
+
+
+#if UNITY_EDITOR
+		private GUIStyle m_GizmoCoordsStyle;
+		[SerializeField]
+		private bool m_GizmoShowGrid = false;
+		[SerializeField]
+		private bool m_GizmoShowGridHeader = true;
+		[SerializeField]
+		private bool m_GizmoShowOnlyFaced = true;
+		private bool m_GizmoPressed = false;
+
+		private int m_FallingColumn = 0;
+
+		internal void __GizmoUpdateFallingColumn(int fallingColumn)
+		{
+			m_FallingColumn = fallingColumn;
+		}
+
+		void OnDrawGizmos()
+		{
+			if (Keyboard.current == null)
+				return;
+
+			if (Application.isPlaying) {
+				// Because Input.GetKeyDown() doesn't work here :(
+				if (!m_GizmoPressed && Keyboard.current.gKey.isPressed) {
+					m_GizmoShowGrid = !m_GizmoShowGrid;
+					m_GizmoPressed = true;
+				}
+				if (!m_GizmoPressed && Keyboard.current.hKey.isPressed) {
+					m_GizmoShowGridHeader = !m_GizmoShowGridHeader;
+					m_GizmoPressed = true;
+				}
+				if (!m_GizmoPressed && Keyboard.current.fKey.isPressed) {
+					m_GizmoShowOnlyFaced = !m_GizmoShowOnlyFaced;
+					m_GizmoPressed = true;
+				}
+				if (m_GizmoPressed && !Keyboard.current.gKey.isPressed && !Keyboard.current.hKey.isPressed && !Keyboard.current.fKey.isPressed) {
+					m_GizmoPressed = false;
+				}
+			}
+
+			if (m_GizmoCoordsStyle == null || true) {
+				m_GizmoCoordsStyle = new GUIStyle(GUI.skin.label);
+				m_GizmoCoordsStyle.alignment = TextAnchor.MiddleCenter;
+				m_GizmoCoordsStyle.padding = new RectOffset();
+				m_GizmoCoordsStyle.margin = new RectOffset();
+				m_GizmoCoordsStyle.contentOffset = new Vector2(-6, -5);
+				m_GizmoCoordsStyle.normal.textColor = new Color(0f, 1f, 0f, 0.6f);
+			}
+
+			int rows = m_Blocks != null ? Rows : 13;
+			int columns = m_Blocks != null ? Columns : 13;
+
+			if (Mathf.Approximately(ConeApex.magnitude, 0f)) {
+				CalculateCone(columns);
+			}
+
+			var coords = new GridCoords();
+
+			if (m_GizmoShowGridHeader) {
+
+				coords.Row = 0;
+				for (coords.Column = 0; coords.Column < columns; ++coords.Column) {
+					var position = GridToWorldSideMidpoint(coords);
+
+					if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
+						continue;
+
+					UnityEditor.Handles.Label(position, coords.Column.ToString(), m_GizmoCoordsStyle);
+				}
+			}
+
+			if (m_GizmoShowGrid) {
+				for (coords.Row = 0; coords.Row < rows; ++coords.Row) {
+					for (coords.Column = 0; coords.Column < columns; ++coords.Column) {
+
+						if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
+							continue;
+
+						var vertexStart = GridToWorldVertex(coords);
+						var vertexEndNextColumn = GridToWorldVertex(new GridCoords(coords.Row, coords.Column + 1));
+						var vertexEndNextRow = GridToWorldVertex(new GridCoords(coords.Row + 1, coords.Column));
+
+						UnityEditor.Handles.color = new Color(0, 0, 0, 0.4f);
+						UnityEditor.Handles.DrawLine(vertexStart, vertexEndNextColumn);
+						UnityEditor.Handles.DrawLine(vertexStart, vertexEndNextRow);
+
+					}
+				}
+			}
+		}
+#endif
 	}
 
 }

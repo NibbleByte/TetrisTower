@@ -113,6 +113,10 @@ namespace TetrisTower.Visuals
 
 		void Update()
 		{
+#if UNITY_EDITOR
+			VisualsGrid.__GizmoUpdateFallingColumn(LevelData?.FallingColumn ?? 0);
+#endif
+
 			if (FallingVisualsShape != null && !TowerLevel.AreGridActionsRunning) {
 
 				foreach (var shapeCoords in FallingVisualsShape.ShapeCoords) {
