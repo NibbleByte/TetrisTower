@@ -25,7 +25,7 @@ namespace TetrisTower.TowerLevels
 		public event System.Action PlacedOutsideGrid;
 		public event System.Action FallingShapeSelected;
 
-		public event System.Action FallingShapeMoved;
+		public event System.Action FallingColumnChanged;
 		public event System.Action FallingShapeRotated;
 
 		private int m_NextRunId = 0;
@@ -91,9 +91,6 @@ namespace TetrisTower.TowerLevels
 
 		public bool RequestFallingShapeMove(int offsetColumns)
 		{
-			if (LevelData.FallingShape == null)
-				return false;
-
 			int requestedColumn = LevelData.FallingColumn + offsetColumns;
 			if (!LevelData.Rules.WrapSidesOnMove) {
 				requestedColumn = Mathf.Clamp(requestedColumn, 0, Grid.Columns - LevelData.FallingShape.Columns);
@@ -103,15 +100,17 @@ namespace TetrisTower.TowerLevels
 			var fallCoords = LevelData.CalcFallShapeCoordsAt(requestedColumn);
 			fallCoords.WrapAround(Grid);
 
-			foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
+			if (LevelData.FallingShape != null) {
+				foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
-				if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords])
-					return false;
+					if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords])
+						return false;
+				}
 			}
 
 			LevelData.FallingColumn = Grid.WrappedColumn(requestedColumn);
 
-			FallingShapeMoved?.Invoke();
+			FallingColumnChanged?.Invoke();
 
 			return true;
 		}
