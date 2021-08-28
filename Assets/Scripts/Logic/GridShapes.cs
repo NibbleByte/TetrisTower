@@ -53,6 +53,12 @@ namespace TetrisTower.Logic
 		public int Rows => GetSize(GridCoords.GetRow);
 		public int Columns => GetSize(GridCoords.GetColumn);
 
+		public int MinRow => GetMin(GridCoords.GetRow);
+		public int MaxRow => GetMax(GridCoords.GetRow);
+
+		public int MinColumn => GetMin(GridCoords.GetColumn);
+		public int MaxColumn => GetMax(GridCoords.GetColumn);
+
 		public IEnumerable<ShapeBind> AddToCoordsWrapped(GridCoords addedCoords, GameGrid grid)
 		{
 			foreach(var shapeCoords in ShapeCoords) {
@@ -65,16 +71,26 @@ namespace TetrisTower.Logic
 			}
 		}
 
-		private int GetSize(Func<GridCoords, int> selector) {
+		private int GetMax(Func<GridCoords, int> selector)
+		{
 			int max = int.MinValue;
-			foreach(var pair in ShapeCoords) {
+			foreach (var pair in ShapeCoords) {
 				if (selector(pair.Coords) > max) max = selector(pair.Coords);
 			}
 
-			return max + 1;
+			return max;
 		}
 
-		private int GetUsedSize(Func<GridCoords, int> selector) {
+		private int GetMin(Func<GridCoords, int> selector) {
+			int min = int.MaxValue;
+			foreach(var pair in ShapeCoords) {
+				if (selector(pair.Coords) < min) min = selector(pair.Coords);
+			}
+
+			return min;
+		}
+
+		private int GetSize(Func<GridCoords, int> selector) {
 			int min = int.MaxValue;
 			int max = int.MinValue;
 			foreach(var pair in ShapeCoords) {

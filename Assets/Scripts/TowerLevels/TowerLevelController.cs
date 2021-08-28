@@ -82,8 +82,14 @@ namespace TetrisTower.TowerLevels
 
 			LevelData.NextShape = GenerateShape();
 
-			if (!LevelData.Rules.WrapSidesOnMove && LevelData.FallingColumn + LevelData.FallingShape.Columns > Grid.Columns) {
-				LevelData.FallingColumn = Grid.Columns - LevelData.FallingShape.Columns;
+			if (!LevelData.Rules.WrapSidesOnMove) {
+				if (LevelData.FallingColumn + LevelData.FallingShape.MaxColumn > Grid.Columns) {
+					LevelData.FallingColumn = Grid.Columns - LevelData.FallingShape.MaxColumn - 1;
+				}
+
+				if (LevelData.FallingColumn + LevelData.FallingShape.MinColumn < 0) {
+					LevelData.FallingColumn = 0 - LevelData.FallingShape.MinColumn;
+				}
 			}
 
 			FallingShapeSelected?.Invoke();
@@ -93,7 +99,10 @@ namespace TetrisTower.TowerLevels
 		{
 			int requestedColumn = LevelData.FallingColumn + offsetColumns;
 			if (!LevelData.Rules.WrapSidesOnMove) {
-				requestedColumn = Mathf.Clamp(requestedColumn, 0, Grid.Columns - LevelData.FallingShape.Columns);
+				requestedColumn = Mathf.Clamp(requestedColumn,
+					0 - (LevelData.FallingShape?.MinColumn ?? 0),
+					Grid.Columns - (LevelData.FallingShape?.MaxColumn ?? 0) - 1
+					);
 			}
 
 			// NOTE: This won't check in-between cells and jump over occupied ones.
