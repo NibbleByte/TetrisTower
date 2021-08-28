@@ -39,6 +39,12 @@ namespace TetrisTower.TowerLevels
 				);
 
 			yield return StatesStack.SetStateCrt(new TowerPlayState());
+
+			// If save came with available matches, or pending actions, do them.
+			var pendingActions = Logic.GameGridEvaluation.Evaluate(GameContext.CurrentPlaythrough.TowerLevel.Grid, GameContext.CurrentPlaythrough.TowerLevel.Rules);
+			if (pendingActions.Count > 0) {
+				yield return levelController.RunActions(pendingActions);
+			}
 		}
 
 		public IEnumerator Unload()
