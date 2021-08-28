@@ -108,10 +108,17 @@ namespace TetrisTower.Visuals
 
 		public Quaternion GridColumnToRotation(int column) => Quaternion.Euler(0f, -m_ConeSectorEulerAngle * column /* Negative because rotation works the other way*/, 0f);
 
-		public Vector3 GridToWorldVertex(GridCoords coords) =>
-			transform.position + Vector3.up * BlockHeight * coords.Row
-			+ Quaternion.Euler(0f, -m_ConeSectorEulerAngle * coords.Column + m_ConeSectorEulerAngle / 2f, 0f)
-			* transform.forward * Mathf.Pow(m_ScaleChangeRatio, coords.Row) * ConeOuterRadius;
+
+		public Vector3 GridToWorldVertex(GridCoords coords)
+		{
+			var baseVertex = transform.position
+				+ Quaternion.Euler(0f, -m_ConeSectorEulerAngle * coords.Column + m_ConeSectorEulerAngle / 2f, 0f)
+				* transform.forward * ConeOuterRadius
+				;
+
+			var coneEdgeFullDist = baseVertex - ConeApex;
+			return ConeApex + coneEdgeFullDist * GridToScale(coords).x;
+		}
 
 		public Vector3 GridToWorldSideMidpoint(GridCoords coords)
 		{
@@ -347,10 +354,10 @@ namespace TetrisTower.Visuals
 				m_GizmoCoordsStyle.normal.textColor = new Color(0f, 1f, 0f, 0.6f);
 			}
 
-			int rows = m_Blocks != null ? Rows : 13;
+			int rows = m_Blocks != null ? Rows : Mathf.RoundToInt(ConeHeight / BlockHeight);
 			int columns = m_Blocks != null ? Columns : 13;
 
-			if (Mathf.Approximately(ConeApex.magnitude, 0f)) {
+			if (Mathf.Approximately(ConeApex.magnitude, 0f) || !Application.isPlaying) {
 				CalculateCone(columns);
 			}
 
@@ -360,10 +367,12 @@ namespace TetrisTower.Visuals
 
 				coords.Row = 0;
 				for (coords.Column = 0; coords.Column < columns; ++coords.Column) {
-					var position = GridToWorldSideMidpoint(coords);
 
 					if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
 						continue;
+
+					var position = GridToWorldSideMidpoint(coords);
+					position.y -= 1f;
 
 					UnityEditor.Handles.Label(position, coords.Column.ToString(), m_GizmoCoordsStyle);
 				}
