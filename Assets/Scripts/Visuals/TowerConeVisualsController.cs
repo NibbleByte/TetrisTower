@@ -18,11 +18,19 @@ namespace TetrisTower.Visuals
 		public TowerLevelController TowerLevel;
 		public TowerLevelData LevelData => TowerLevel.LevelData;
 
+		public Transform FallingVisualsContainer;
+
+		public float ChangeColumnDuration = 0.1f;
+
 		public VisualsShape FallingVisualsShape { get; private set; }
+
 		// For debug to be displayed by the Inspector!
 		[SerializeReference] private VisualsShape m_DebugFallingVisualsShape;
 
-		private Transform FallingVisualsContainer;
+		private int m_CurrentFallingColumn = 0;
+		private bool m_ChangingFallingColumn = false;
+		private float m_ChangingFallingColumnStarted;
+		private Quaternion m_ChangingFallingColumnStartedRotation;
 
 		private void Awake()
 		{
@@ -34,7 +42,6 @@ namespace TetrisTower.Visuals
 
 			TowerLevel.FallingShapeRotated += OnFallingShapeRotated;
 
-			FallingVisualsContainer = new GameObject("-- Falling-Shape --").transform;
 			FallingVisualsContainer.SetParent(transform);
 			FallingVisualsContainer.localPosition = Vector3.zero;
 		}
@@ -45,7 +52,9 @@ namespace TetrisTower.Visuals
 			VisualsGrid.Init(LevelData.Grid);
 
 			DestroyFallingVisuals();
-			FallingVisualsContainer.SetAsFirstSibling();
+
+			FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(LevelData.FallingColumn);
+			m_CurrentFallingColumn = LevelData.FallingColumn;
 		}
 
 		private void ReplaceFallingVisuals()
@@ -83,10 +92,8 @@ namespace TetrisTower.Visuals
 				var visualBlock = GameObject.Instantiate(bind.Value.Prefab3D, FallingVisualsContainer);
 				visualbinds.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
 
-				int blockColumn = VisualsGrid.WrappedColumn(LevelData.FallingColumn + bind.Coords.Column);
-
 				visualBlock.transform.position = VisualsGrid.ConeApex;
-				visualBlock.transform.rotation = VisualsGrid.GridColumnToRotation(blockColumn);
+				visualBlock.transform.localRotation = VisualsGrid.GridColumnToRotation(bind.Coords.Column);	 // Set rotation in case of shape with multiple columns.
 				visualBlock.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - bind.Coords.Row);
 			}
 
@@ -95,8 +102,15 @@ namespace TetrisTower.Visuals
 
 		private void DestroyFallingVisuals()
 		{
-			foreach (Transform child in FallingVisualsContainer) {
-				GameObject.Destroy(child.gameObject);
+			if (FallingVisualsShape == null)
+				return;
+
+			foreach (var bind in FallingVisualsShape.ShapeCoords) {
+				// Don't destroy if reused in the Visuals grid itself.
+				// It could have been destroyed already by the visuals grid if match happened.
+				if (bind.Value && bind.Value.transform.IsChildOf(FallingVisualsContainer)) {
+					GameObject.Destroy(bind.Value.gameObject);
+				}
 			}
 
 			FallingVisualsShape = m_DebugFallingVisualsShape = null;
@@ -113,19 +127,43 @@ namespace TetrisTower.Visuals
 
 		void Update()
 		{
+			if (LevelData == null)
+				return;
+
 #if UNITY_EDITOR
-			VisualsGrid.__GizmoUpdateFallingColumn(LevelData?.FallingColumn ?? 0);
+			VisualsGrid.__GizmoUpdateFallingColumn(LevelData.FallingColumn);
 #endif
+
+			UpdateRotation();
 
 			if (FallingVisualsShape != null && !TowerLevel.AreGridActionsRunning) {
 
 				foreach (var shapeCoords in FallingVisualsShape.ShapeCoords) {
-
-					int blockColumn = VisualsGrid.WrappedColumn(LevelData.FallingColumn + shapeCoords.Coords.Column);
-
-					shapeCoords.Value.transform.rotation = VisualsGrid.GridColumnToRotation(blockColumn);
 					shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
 				}
+			}
+		}
+
+		private void UpdateRotation()
+		{
+			if (m_CurrentFallingColumn != LevelData.FallingColumn) {
+				m_ChangingFallingColumnStarted = Time.time;
+				m_ChangingFallingColumnStartedRotation = FallingVisualsContainer.localRotation;
+				m_ChangingFallingColumn = true;
+				m_CurrentFallingColumn = LevelData.FallingColumn;
+			}
+
+			if (m_ChangingFallingColumn && Time.time - m_ChangingFallingColumnStarted > ChangeColumnDuration) {
+				m_ChangingFallingColumn = false;
+
+				FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
+			}
+
+			if (m_ChangingFallingColumn) {
+				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
+
+				FallingVisualsContainer.localRotation =
+					Quaternion.Lerp(m_ChangingFallingColumnStartedRotation, endRotation, (Time.time - m_ChangingFallingColumnStarted) / ChangeColumnDuration);
 			}
 		}
 	}
