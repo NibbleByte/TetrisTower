@@ -34,6 +34,7 @@ namespace TetrisTower.TowerLevels
 			StatesStack = new LevelStateStack(
 				GameContext.GameConfig,
 				GameContext.PlayerControls,
+				GameContext.Options,
 				levelController,
 				uiController
 				);

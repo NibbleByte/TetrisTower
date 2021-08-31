@@ -29,6 +29,8 @@ namespace TetrisTower.Visuals
 
 		private int m_CurrentFallingColumn = 0;
 		private bool m_ChangingFallingColumn = false;
+		private bool m_ChangingFallingColumnByAnalog = false;
+
 		private float m_ChangingFallingColumnStarted;
 		private Quaternion m_ChangingFallingColumnStartedRotation;
 
@@ -134,7 +136,7 @@ namespace TetrisTower.Visuals
 			VisualsGrid.__GizmoUpdateFallingColumn(LevelData.FallingColumn);
 #endif
 
-			UpdateRotation();
+			UpdateFallingVisualsFacing();
 
 			if (FallingVisualsShape != null && !TowerLevel.AreGridActionsRunning) {
 
@@ -144,12 +146,30 @@ namespace TetrisTower.Visuals
 			}
 		}
 
-		private void UpdateRotation()
+		private void UpdateFallingVisualsFacing()
 		{
-			if (m_CurrentFallingColumn != LevelData.FallingColumn) {
+			// Analog offset overrides other movement animations.
+			if (TowerLevel.FallingColumnAnalogOffset != 0f) {
+				m_CurrentFallingColumn = LevelData.FallingColumn;
+
+				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
+				var eulerAngles = endRotation.eulerAngles;
+				eulerAngles.y -= TowerLevel.FallingColumnAnalogOffset * VisualsGrid.ConeSectorEulerAngle;
+				endRotation.eulerAngles = eulerAngles;
+
+				FallingVisualsContainer.localRotation = endRotation;
+
+				m_ChangingFallingColumn = false;
+				m_ChangingFallingColumnByAnalog = true;
+
+				return;
+			}
+
+			if (m_CurrentFallingColumn != LevelData.FallingColumn || m_ChangingFallingColumnByAnalog) {
 				m_ChangingFallingColumnStarted = Time.time;
 				m_ChangingFallingColumnStartedRotation = FallingVisualsContainer.localRotation;
 				m_ChangingFallingColumn = true;
+				m_ChangingFallingColumnByAnalog = false;
 				m_CurrentFallingColumn = LevelData.FallingColumn;
 			}
 

@@ -66,7 +66,7 @@ namespace TetrisTower.Visuals
 		private GameObject[,] m_Blocks;
 
 		public Vector3 ConeApex { get; private set; }
-		private float m_ConeSectorEulerAngle;
+		public float ConeSectorEulerAngle { get; private set; }
 		private float m_ScaleChangeRatio;
 
 		private GridShape<GameObject> m_PlacedShapeToBeReused = null;
@@ -100,19 +100,19 @@ namespace TetrisTower.Visuals
 		{
 			ConeApex = transform.position + Vector3.up * ConeHeight;
 			m_ScaleChangeRatio = FrontFaceTopEdgeLength / FrontFaceBottomEdgeLength;
-			m_ConeSectorEulerAngle = 360f / columns;
+			ConeSectorEulerAngle = 360f / columns;
 		}
 
 		public Vector3 GridDistanceToScale(float fallDistance) => Vector3.one * Mathf.Pow(m_ScaleChangeRatio, Rows - fallDistance);
 		public Vector3 GridToScale(GridCoords coords) => Vector3.one * Mathf.Pow(m_ScaleChangeRatio, coords.Row);
 
-		public Quaternion GridColumnToRotation(int column) => Quaternion.Euler(0f, -m_ConeSectorEulerAngle * column /* Negative because rotation works the other way*/, 0f);
+		public Quaternion GridColumnToRotation(int column) => Quaternion.Euler(0f, -ConeSectorEulerAngle * column /* Negative because rotation works the other way*/, 0f);
 
 
 		public Vector3 GridToWorldVertex(GridCoords coords)
 		{
 			var baseVertex = transform.position
-				+ Quaternion.Euler(0f, -m_ConeSectorEulerAngle * coords.Column + m_ConeSectorEulerAngle / 2f, 0f)
+				+ Quaternion.Euler(0f, -ConeSectorEulerAngle * coords.Column + ConeSectorEulerAngle / 2f, 0f)
 				* transform.forward * ConeOuterRadius
 				;
 

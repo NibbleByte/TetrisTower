@@ -56,6 +56,36 @@ namespace DevLocker.GFrame
 			}
 		}
 
+		protected virtual void Update()
+		{
+			if (GameContext is IUpdateListener updateContext) {
+				updateContext.Update();
+			}
+
+			if (LevelSupervisor is IUpdateListener updateSupervisor) {
+				updateSupervisor.Update();
+			}
+
+			if (m_LevelStatesStack?.CurrentState is IUpdateListener updateState) {
+				updateState.Update();
+			}
+		}
+
+		protected virtual void LateUpdate()
+		{
+			if (GameContext is ILateUpdateListener lateUpdateContext) {
+				lateUpdateContext.LateUpdate();
+			}
+
+			if (LevelSupervisor is ILateUpdateListener updateSupervisor) {
+				updateSupervisor.LateUpdate();
+			}
+
+			if (m_LevelStatesStack?.CurrentState is ILateUpdateListener updateState) {
+				updateState.LateUpdate();
+			}
+		}
+
 		public virtual void SetGameContext(IGameContext gameContext)
 		{
 			GameContext = gameContext;

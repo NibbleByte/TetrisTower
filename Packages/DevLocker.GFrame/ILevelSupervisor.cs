@@ -38,4 +38,19 @@ namespace DevLocker.GFrame
 		IEnumerator Unload();
 	}
 
+	/// <summary>
+	/// Your game context, level supervisor or level state can implement this to get invoked on Unity update.
+	/// </summary>
+	public interface IUpdateListener
+	{
+		void Update();
+	}
+
+	/// <summary>
+	/// Your game context, level supervisor or level state can implement this to get invoked on Unity update.
+	/// </summary>
+	public interface ILateUpdateListener
+	{
+		void LateUpdate();
+	}
 }

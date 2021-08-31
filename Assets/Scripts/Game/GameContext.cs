@@ -34,6 +34,8 @@ namespace TetrisTower.Game
 
 		public GameConfig GameConfig { get; }
 
+		public PlayerOptions Options { get; } = new PlayerOptions();
+
 		public PlayerControls PlayerControls { get; }
 
 		public PlaythroughData CurrentPlaythrough { get; private set; }

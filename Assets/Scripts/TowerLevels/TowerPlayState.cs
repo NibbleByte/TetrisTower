@@ -7,14 +7,17 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerPlayState : ILevelState, PlayerControls.ITowerLevelPlayActions
+	public class TowerPlayState : ILevelState, IUpdateListener, PlayerControls.ITowerLevelPlayActions
 	{
 		private PlayerControls m_PlayerControls;
 		private GameConfig m_GameConfig;
+		private PlayerOptions m_Options;
 		private TowerLevelController m_LevelController;
 		private TowerLevelUIController m_UIController;
 
-		private Vector2 m_PointerPressedPosition;
+		private bool m_PointerPressed = false;
+		private Vector2 m_PointerPressedStartPosition;
+		private Vector2 m_PointerPressedLastPosition;
 		private double m_PointerPressedTime;
 
 		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
@@ -23,6 +26,7 @@ namespace TetrisTower.TowerLevels
 			contextReferences.SetByType(out m_LevelController);
 			contextReferences.SetByType(out m_UIController);
 			contextReferences.SetByType(out m_GameConfig);
+			contextReferences.SetByType(out m_Options);
 
 			m_PlayerControls.InputStack.PushActionsState(this);
 			m_PlayerControls.UI.Enable();
@@ -110,13 +114,23 @@ namespace TetrisTower.TowerLevels
 
 			switch (context.phase) {
 				case InputActionPhase.Started:
-					m_PointerPressedPosition = Pointer.current.position.ReadValue();
+					m_PointerPressedStartPosition = Pointer.current.position.ReadValue();
+					m_PointerPressedLastPosition = m_PointerPressedStartPosition;
 					m_PointerPressedTime = context.time;
+					m_PointerPressed = true;
 					break;
 
 				case InputActionPhase.Canceled:
+
+					Debug.Assert(m_PointerPressed);
+					m_PointerPressed = false;
+					m_LevelController.ClearFallingShapeAnalogMoveOffset();
+
+					if (m_Options.TouchInputControls != PlayerOptions.TouchInputControlMethod.Swipes)
+						break;
+
 					var pressDuration = context.time - m_PointerPressedTime;
-					var pressDistance = Pointer.current.position.ReadValue() - m_PointerPressedPosition;
+					var pressDistance = Pointer.current.position.ReadValue() - m_PointerPressedStartPosition;
 
 					// Swipe detection.
 					if (pressDuration < m_GameConfig.SwipeMaxTime && pressDistance.magnitude >= m_GameConfig.SwipeMinDistance) {
@@ -144,6 +158,29 @@ namespace TetrisTower.TowerLevels
 						}
 					}
 					break;
+
+				case InputActionPhase.Disabled:
+				case InputActionPhase.Waiting:
+					m_PointerPressed = false;
+					m_LevelController.ClearFallingShapeAnalogMoveOffset();
+					break;
+
+			}
+		}
+
+		public void Update()
+		{
+			if (Pointer.current == null)
+				return;
+
+			if (m_PointerPressed && m_Options.TouchInputControls == PlayerOptions.TouchInputControlMethod.Drag) {
+				var currentPosition = Pointer.current.position.ReadValue();
+				var dragDistance = currentPosition - m_PointerPressedLastPosition;
+				m_PointerPressedLastPosition = currentPosition;
+
+				if (dragDistance.magnitude > 0.01f) {
+					m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
+				}
 			}
 		}
 	}

@@ -33,6 +33,8 @@ namespace TetrisTower.TowerLevels
 
 		public bool AreGridActionsRunning => m_FinishedRuns != m_NextRunId;
 
+		public float FallingColumnAnalogOffset { get; private set; }
+
 		private float m_FallingSpeedup = 0;
 
 		public void Init(TowerLevelData data)
@@ -124,6 +126,68 @@ namespace TetrisTower.TowerLevels
 			return true;
 		}
 
+		public bool AddFallingShapeAnalogMoveOffset(float offset)
+		{
+			FallingColumnAnalogOffset += offset;
+
+			ValidateAnalogOffset();
+
+			while (FallingColumnAnalogOffset > 0.5f) {
+				FallingColumnAnalogOffset -= 1f;
+				RequestFallingShapeMove(1);
+			}
+
+			while (FallingColumnAnalogOffset < -0.5f) {
+				FallingColumnAnalogOffset += 1f;
+				RequestFallingShapeMove(-1);
+			}
+
+			return true;
+		}
+
+		public bool ClearFallingShapeAnalogMoveOffset()
+		{
+			int roundDirection = Mathf.RoundToInt(FallingColumnAnalogOffset);
+
+			FallingColumnAnalogOffset = 0f;
+
+			// Snap to the closest.
+			if (roundDirection != 0) {
+				RequestFallingShapeMove(roundDirection);
+			}
+
+			return true;
+		}
+
+		private void ValidateAnalogOffset()
+		{
+			if (FallingColumnAnalogOffset != 0f) {
+
+				// Check if falling shape can move to the next column or there are other shapes.
+				int requestedColumn = LevelData.FallingColumn + (int)Mathf.Sign(FallingColumnAnalogOffset);
+				if (!LevelData.Rules.WrapSidesOnMove) {
+					requestedColumn = Mathf.Clamp(requestedColumn,
+						0 - (LevelData.FallingShape?.MinColumn ?? 0),
+						Grid.Columns - (LevelData.FallingShape?.MaxColumn ?? 0) - 1
+						);
+				}
+
+				// NOTE: This won't check in-between cells and jump over occupied ones.
+				var fallCoords = LevelData.CalcFallShapeCoordsAt(requestedColumn);
+				fallCoords.WrapAround(Grid);
+
+				if (LevelData.FallingShape != null) {
+					foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
+
+						if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords]) {
+							ClearFallingShapeAnalogMoveOffset();
+							break;
+						}
+					}
+				}
+			}
+		}
+
 		public bool RequestFallingSpeedUp(float speedUp)
 		{
 			if (LevelData.FallingShape == null)
@@ -213,6 +277,11 @@ namespace TetrisTower.TowerLevels
 			}
 
 			DebugClearRow();
+		}
+
+		void LateUpdate()
+		{
+			ValidateAnalogOffset();
 		}
 
 		private bool CanSelectNextShape()

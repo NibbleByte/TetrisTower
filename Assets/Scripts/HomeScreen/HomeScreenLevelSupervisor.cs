@@ -31,6 +31,7 @@ namespace TetrisTower.HomeScreen
 			//
 			//StatesStack = new LevelStateStack(
 			//	GameContext.GameConfig,
+			//	GameContext.Options,
 			//	GameContext.PlayerControls,
 			//	levelController
 			//	);
