@@ -125,6 +125,7 @@ namespace TetrisTower.TowerLevels
 					Debug.Assert(m_PointerPressed);
 					m_PointerPressed = false;
 					m_LevelController.ClearFallingShapeAnalogMoveOffset();
+					m_LevelController.ClearFallingShapeAnalogRotateOffset();
 
 					if (m_Options.TouchInputControls != PlayerOptions.TouchInputControlMethod.Swipes)
 						break;
@@ -174,12 +175,27 @@ namespace TetrisTower.TowerLevels
 				return;
 
 			if (m_PointerPressed && m_Options.TouchInputControls == PlayerOptions.TouchInputControlMethod.Drag) {
+
 				var currentPosition = Pointer.current.position.ReadValue();
 				var dragDistance = currentPosition - m_PointerPressedLastPosition;
 				m_PointerPressedLastPosition = currentPosition;
 
-				if (dragDistance.magnitude > 0.01f) {
-					m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
+				if (m_LevelController.FallingColumnAnalogOffset != 0f) {
+					if (Mathf.Abs(dragDistance.x) > 0.01f) {
+						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
+					}
+
+				} else if (m_LevelController.FallingShapeAnalogRotateOffset != 0f) {
+					if (Mathf.Abs(dragDistance.y) > 0.01f) {
+						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
+					}
+				} else {
+					dragDistance = currentPosition - m_PointerPressedStartPosition;
+					if (Mathf.Abs(dragDistance.x) > 2f) {
+						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
+					} else if (Mathf.Abs(dragDistance.y) > 2f) {
+						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
+					}
 				}
 			}
 		}

@@ -119,6 +119,13 @@ namespace TetrisTower.Game
 					GameContext.PlayerControls.devices = default;
 				}
 			}
+
+
+
+			if (Keyboard.current.pKey.wasPressedThisFrame) {
+				var levelData = GameContext.CurrentPlaythrough.TowerLevel;
+				levelData.FallSpeedNormalized = levelData.FallSpeedNormalized == 0f ? 2f : 0f;
+			}
 		}
 #endif
 

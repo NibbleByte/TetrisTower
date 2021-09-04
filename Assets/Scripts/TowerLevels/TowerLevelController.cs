@@ -34,6 +34,7 @@ namespace TetrisTower.TowerLevels
 		public bool AreGridActionsRunning => m_FinishedRuns != m_NextRunId;
 
 		public float FallingColumnAnalogOffset { get; private set; }
+		public float FallingShapeAnalogRotateOffset { get; private set; }
 
 		private float m_FallingSpeedup = 0;
 
@@ -130,7 +131,7 @@ namespace TetrisTower.TowerLevels
 		{
 			FallingColumnAnalogOffset += offset;
 
-			ValidateAnalogOffset();
+			ValidateAnalogMoveOffset();
 
 			while (FallingColumnAnalogOffset > 0.5f) {
 				FallingColumnAnalogOffset -= 1f;
@@ -159,7 +160,7 @@ namespace TetrisTower.TowerLevels
 			return true;
 		}
 
-		private void ValidateAnalogOffset()
+		private void ValidateAnalogMoveOffset()
 		{
 			if (FallingColumnAnalogOffset != 0f) {
 
@@ -186,6 +187,40 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 			}
+		}
+		public bool AddFallingShapeAnalogRotateOffset(float offset)
+		{
+			FallingShapeAnalogRotateOffset += offset;
+
+			// Since our shapes are 1x3 rotating them is always possible.
+			// If we start using wide shapes, this needs to validate if rotation is possible.
+			//ValidateAnalogRotateOffset();
+
+			while (FallingShapeAnalogRotateOffset > 0.5f) {
+				FallingShapeAnalogRotateOffset -= 1f;
+				RequestFallingShapeRotate(1);
+			}
+
+			while (FallingShapeAnalogRotateOffset < -0.5f) {
+				FallingShapeAnalogRotateOffset += 1f;
+				RequestFallingShapeRotate(-1);
+			}
+
+			return true;
+		}
+
+		public bool ClearFallingShapeAnalogRotateOffset()
+		{
+			int roundDirection = Mathf.RoundToInt(FallingShapeAnalogRotateOffset);
+
+			FallingShapeAnalogRotateOffset = 0f;
+
+			// Snap to the closest.
+			if (roundDirection != 0) {
+				RequestFallingShapeRotate(roundDirection);
+			}
+
+			return true;
 		}
 
 		public bool RequestFallingSpeedUp(float speedUp)
@@ -281,7 +316,7 @@ namespace TetrisTower.TowerLevels
 
 		void LateUpdate()
 		{
-			ValidateAnalogOffset();
+			ValidateAnalogMoveOffset();
 		}
 
 		private bool CanSelectNextShape()

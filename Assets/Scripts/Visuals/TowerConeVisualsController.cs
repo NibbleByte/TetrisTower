@@ -21,6 +21,7 @@ namespace TetrisTower.Visuals
 		public Transform FallingVisualsContainer;
 
 		public float ChangeColumnDuration = 0.1f;
+		public float ChangeRotationDuration = 0.25f;
 
 		public VisualsShape FallingVisualsShape { get; private set; }
 
@@ -33,6 +34,12 @@ namespace TetrisTower.Visuals
 
 		private float m_ChangingFallingColumnStarted;
 		private Quaternion m_ChangingFallingColumnStartedRotation;
+
+
+		private bool m_RotatingFallingShape = false;
+		private bool m_RotatingFallingShapeAnalog = false;
+		private float m_RotatingFallingShapeStarted;
+		private Vector3[] m_RotatingFallingShapeStartedScales;
 
 		private void Awake()
 		{
@@ -73,6 +80,8 @@ namespace TetrisTower.Visuals
 			// Instead of destroying blocks now and re-creating them later, try reusing them.
 			//DestroyFallingVisuals();
 			VisualsGrid.SetPlacedShapeToBeReused(FallingVisualsShape);
+
+			m_RotatingFallingShape = false;
 		}
 
 		private void OnFallingShapeSelected()
@@ -118,15 +127,6 @@ namespace TetrisTower.Visuals
 			FallingVisualsShape = m_DebugFallingVisualsShape = null;
 		}
 
-		private void OnFallingShapeRotated()
-		{
-			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == LevelData.FallingShape.ShapeCoords.Length);
-
-			for(int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
-				FallingVisualsShape.ShapeCoords[i].Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
-			}
-		}
-
 		void Update()
 		{
 			if (LevelData == null)
@@ -138,12 +138,7 @@ namespace TetrisTower.Visuals
 
 			UpdateFallingVisualsFacing();
 
-			if (FallingVisualsShape != null && !TowerLevel.AreGridActionsRunning) {
-
-				foreach (var shapeCoords in FallingVisualsShape.ShapeCoords) {
-					shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
-				}
-			}
+			UpdateFallingVisualsPosition();
 		}
 
 		private void UpdateFallingVisualsFacing()
@@ -180,10 +175,96 @@ namespace TetrisTower.Visuals
 			}
 
 			if (m_ChangingFallingColumn) {
+				float progress = (Time.time - m_ChangingFallingColumnStarted) / ChangeColumnDuration;
 				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
 
-				FallingVisualsContainer.localRotation =
-					Quaternion.Lerp(m_ChangingFallingColumnStartedRotation, endRotation, (Time.time - m_ChangingFallingColumnStarted) / ChangeColumnDuration);
+				FallingVisualsContainer.localRotation = Quaternion.Lerp(m_ChangingFallingColumnStartedRotation, endRotation, progress);
+			}
+		}
+
+		private void OnFallingShapeRotated()
+		{
+			if (m_RotatingFallingShapeAnalog)
+				return;
+
+			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == LevelData.FallingShape.ShapeCoords.Length);
+
+			m_RotatingFallingShape = true;
+			m_RotatingFallingShapeStarted = Time.time;
+
+			m_RotatingFallingShapeStartedScales = new Vector3[FallingVisualsShape.ShapeCoords.Length];
+
+			for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
+				ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
+				shapeCoords.Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
+				m_RotatingFallingShapeStartedScales[i] = shapeCoords.Value.transform.localScale;
+			}
+		}
+
+		private void UpdateFallingVisualsPosition()
+		{
+			if (FallingVisualsShape == null || TowerLevel.AreGridActionsRunning)
+				return;
+
+			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == LevelData.FallingShape.ShapeCoords.Length);
+
+			// Analog offset overrides other rotate animations.
+			if (TowerLevel.FallingShapeAnalogRotateOffset != 0f) {
+
+				int fallingRows = LevelData.FallingShape.Rows;
+
+				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
+					ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
+					shapeCoords.Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
+
+					Vector3 currentScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
+
+					float previewRow = MathUtils.WrapValue(shapeCoords.Coords.Row + Mathf.Sign(TowerLevel.FallingShapeAnalogRotateOffset), fallingRows);
+					Vector3 previewScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - previewRow);
+
+
+					shapeCoords.Value.transform.localScale = Vector3.Lerp(currentScale, previewScale, Mathf.Abs(TowerLevel.FallingShapeAnalogRotateOffset));
+
+					//float rowDistance = previewRow - TowerLevel.FallingShapeAnalogRotateOffset;
+					//shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - rowDistance);
+				}
+
+				m_RotatingFallingShape = false;
+				m_RotatingFallingShapeAnalog = true;
+
+				return;
+			}
+
+			if (m_RotatingFallingShapeAnalog) {
+				m_RotatingFallingShapeAnalog = false;
+				OnFallingShapeRotated();
+			}
+
+			if (m_RotatingFallingShape && Time.time - m_RotatingFallingShapeStarted > ChangeRotationDuration) {
+				m_RotatingFallingShape = false;
+
+				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
+					ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
+					shapeCoords.Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
+					shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
+				}
+			}
+
+			if (m_RotatingFallingShape) {
+				float progress = (Time.time - m_RotatingFallingShapeStarted) / ChangeRotationDuration;
+
+				for(int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
+					var shapeCoords = FallingVisualsShape.ShapeCoords[i];
+
+					Vector3 endScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
+					shapeCoords.Value.transform.localScale = Vector3.Lerp(m_RotatingFallingShapeStartedScales[i], endScale, progress);
+				}
+
+			} else {
+
+				foreach(var shapeCoords in FallingVisualsShape.ShapeCoords) {
+					shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
+				}
 			}
 		}
 	}
