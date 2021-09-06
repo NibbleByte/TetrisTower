@@ -188,7 +188,7 @@ namespace TetrisTower.TowerLevels
 					foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
 						if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords]) {
-							ClearFallingShapeAnalogMoveOffset();
+							FallingColumnAnalogOffset = 0;
 							break;
 						}
 					}

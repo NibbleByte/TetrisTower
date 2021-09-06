@@ -16,6 +16,7 @@ namespace TetrisTower.TowerLevels
 		private TowerLevelUIController m_UIController;
 
 		private bool m_PointerPressed = false;
+		private bool m_PointerDragConsumed = false;
 		private Vector2 m_PointerPressedStartPosition;
 		private Vector2 m_PointerPressedLastPosition;
 		private double m_PointerPressedTime;
@@ -118,12 +119,14 @@ namespace TetrisTower.TowerLevels
 					m_PointerPressedLastPosition = m_PointerPressedStartPosition;
 					m_PointerPressedTime = context.time;
 					m_PointerPressed = true;
+					m_PointerDragConsumed = false;
 					break;
 
 				case InputActionPhase.Canceled:
 
 					Debug.Assert(m_PointerPressed);
 					m_PointerPressed = false;
+					m_PointerDragConsumed = false;
 					m_LevelController.ClearFallingShapeAnalogMoveOffset();
 					m_LevelController.ClearFallingShapeAnalogRotateOffset();
 
@@ -189,12 +192,16 @@ namespace TetrisTower.TowerLevels
 					if (Mathf.Abs(dragDistance.y) > 0.01f) {
 						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
 					}
-				} else {
+
+				// Avoid starting another drag operation if the last one was interrupted.
+				} else if (!m_PointerDragConsumed) {
 					dragDistance = currentPosition - m_PointerPressedStartPosition;
 					if (Mathf.Abs(dragDistance.x) > 4f) {
 						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
+						m_PointerDragConsumed = true;
 					} else if (Mathf.Abs(dragDistance.y) > 4f) {
 						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
+						m_PointerDragConsumed = true;
 					}
 				}
 			}
