@@ -353,6 +353,8 @@ namespace TetrisTower.Visuals
 				m_GizmoCoordsStyle.margin = new RectOffset();
 				m_GizmoCoordsStyle.contentOffset = new Vector2(-6, -5);
 				m_GizmoCoordsStyle.normal.textColor = new Color(0f, 1f, 0f, 0.6f);
+				m_GizmoCoordsStyle.fontSize = 14;
+				m_GizmoCoordsStyle.fontStyle = FontStyle.Bold;
 			}
 
 			int rows = m_Blocks != null ? Rows : Mathf.RoundToInt(ConeHeight / BlockHeight);
