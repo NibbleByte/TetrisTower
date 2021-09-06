@@ -42,6 +42,7 @@ namespace TetrisTower.Visuals
 		public float FrontFaceBottomEdgeLength;
 
 		public float BlockHeight = 2.5f;
+		public float BlockDepth = 2.84f;
 		public float ConeOuterRadius = 15f;
 
 		// This is used to locate the apex of the cone.

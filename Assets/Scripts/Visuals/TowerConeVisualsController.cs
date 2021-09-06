@@ -39,7 +39,9 @@ namespace TetrisTower.Visuals
 		private bool m_RotatingFallingShape = false;
 		private bool m_RotatingFallingShapeAnalog = false;
 		private float m_RotatingFallingShapeStarted;
-		private Vector3[] m_RotatingFallingShapeStartedScales;
+		// Tuple<Start Row, End Row, Wrapped>
+		private Tuple<int, int, bool>[] m_RotatingFallingShapeCoordsChange;
+		private float m_RotatingFallingShapeAnalogLastProgress;
 
 		private void Awake()
 		{
@@ -82,6 +84,7 @@ namespace TetrisTower.Visuals
 			VisualsGrid.SetPlacedShapeToBeReused(FallingVisualsShape);
 
 			m_RotatingFallingShape = false;
+			m_RotatingFallingShapeAnalog = false;
 		}
 
 		private void OnFallingShapeSelected()
@@ -144,7 +147,7 @@ namespace TetrisTower.Visuals
 		private void UpdateFallingVisualsFacing()
 		{
 			// Analog offset overrides other movement animations.
-			if (TowerLevel.FallingColumnAnalogOffset != 0f) {
+			if (!float.IsNaN(TowerLevel.FallingColumnAnalogOffset)) {
 				m_CurrentFallingColumn = LevelData.FallingColumn;
 
 				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
@@ -192,12 +195,20 @@ namespace TetrisTower.Visuals
 			m_RotatingFallingShape = true;
 			m_RotatingFallingShapeStarted = Time.time;
 
-			m_RotatingFallingShapeStartedScales = new Vector3[FallingVisualsShape.ShapeCoords.Length];
+			m_RotatingFallingShapeCoordsChange = new Tuple<int, int, bool>[FallingVisualsShape.ShapeCoords.Length];
 
 			for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
 				ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
-				shapeCoords.Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
-				m_RotatingFallingShapeStartedScales[i] = shapeCoords.Value.transform.localScale;
+
+				// Reset the position, interrupting any prior rotation.
+				shapeCoords.Value.transform.position = VisualsGrid.ConeApex;
+				shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
+
+				var targetCoords = LevelData.FallingShape.ShapeCoords[i].Coords;
+				bool isWrapped = Mathf.Abs(targetCoords.Row - shapeCoords.Coords.Row) > 1;
+				m_RotatingFallingShapeCoordsChange[i] = new Tuple<int, int, bool>(shapeCoords.Coords.Row, targetCoords.Row, isWrapped);
+
+				shapeCoords.Coords = targetCoords;
 			}
 		}
 
@@ -209,60 +220,77 @@ namespace TetrisTower.Visuals
 			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == LevelData.FallingShape.ShapeCoords.Length);
 
 			// Analog offset overrides other rotate animations.
-			if (TowerLevel.FallingShapeAnalogRotateOffset != 0f) {
+			if (!float.IsNaN(TowerLevel.FallingShapeAnalogRotateOffset)) {
 
 				int fallingRows = LevelData.FallingShape.Rows;
+
+				if (m_RotatingFallingShapeCoordsChange?.Length != FallingVisualsShape.ShapeCoords.Length) {
+					m_RotatingFallingShapeCoordsChange = new Tuple<int, int, bool>[FallingVisualsShape.ShapeCoords.Length];
+				}
 
 				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
 					ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
 					shapeCoords.Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
 
-					Vector3 currentScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
+					// Configure data as if we are rotating towards the current row.
+					// This will help a smooth transition when player releases drag and animation falls back to the current row.
+					int nextRow = shapeCoords.Coords.Row;
+					int startRow = MathUtils.WrapValue(nextRow + (int)Mathf.Sign(TowerLevel.FallingShapeAnalogRotateOffset), fallingRows);
+					bool isWrapped = Mathf.Abs(nextRow - startRow) > 1;
 
-					float previewRow = MathUtils.WrapValue(shapeCoords.Coords.Row + Mathf.Sign(TowerLevel.FallingShapeAnalogRotateOffset), fallingRows);
-					Vector3 previewScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - previewRow);
-
-
-					shapeCoords.Value.transform.localScale = Vector3.Lerp(currentScale, previewScale, Mathf.Abs(TowerLevel.FallingShapeAnalogRotateOffset));
-
-					//float rowDistance = previewRow - TowerLevel.FallingShapeAnalogRotateOffset;
-					//shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - rowDistance);
+					m_RotatingFallingShapeCoordsChange[i] = new Tuple<int, int, bool>(startRow, nextRow, isWrapped);
 				}
 
 				m_RotatingFallingShape = false;
 				m_RotatingFallingShapeAnalog = true;
-
-				return;
 			}
 
-			if (m_RotatingFallingShapeAnalog) {
+			// Analog rotation finished.
+			if (m_RotatingFallingShapeAnalog && float.IsNaN(TowerLevel.FallingShapeAnalogRotateOffset)) {
 				m_RotatingFallingShapeAnalog = false;
-				OnFallingShapeRotated();
+				m_RotatingFallingShape = true;
+
+				// Simulate normal rotation, from hotkey.
+				m_RotatingFallingShapeStarted = Time.time - ChangeRotationDuration * m_RotatingFallingShapeAnalogLastProgress;
 			}
 
-			if (m_RotatingFallingShape && Time.time - m_RotatingFallingShapeStarted > ChangeRotationDuration) {
+			// Normal rotation finished.
+			if (m_RotatingFallingShape && !m_RotatingFallingShapeAnalog && Time.time - m_RotatingFallingShapeStarted > ChangeRotationDuration) {
 				m_RotatingFallingShape = false;
-
-				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
-					ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
-					shapeCoords.Coords = LevelData.FallingShape.ShapeCoords[i].Coords;
-					shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
-				}
 			}
 
-			if (m_RotatingFallingShape) {
+			if (m_RotatingFallingShape || m_RotatingFallingShapeAnalog) {
 				float progress = (Time.time - m_RotatingFallingShapeStarted) / ChangeRotationDuration;
 
-				for(int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
+				if (m_RotatingFallingShapeAnalog) {
+					// 1f - offset simulates that progress is rotating towards the current (start) row, not the next one.
+					// This will help a smooth transition when player releases drag and animation falls back to the current row.
+					progress = 1f - Mathf.Abs(TowerLevel.FallingShapeAnalogRotateOffset);
+					m_RotatingFallingShapeAnalogLastProgress = progress;
+				}
+
+				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
 					var shapeCoords = FallingVisualsShape.ShapeCoords[i];
 
-					Vector3 endScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
-					shapeCoords.Value.transform.localScale = Vector3.Lerp(m_RotatingFallingShapeStartedScales[i], endScale, progress);
+					Vector3 startScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - m_RotatingFallingShapeCoordsChange[i].Item1);
+					Vector3 endScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - m_RotatingFallingShapeCoordsChange[i].Item2);
+					shapeCoords.Value.transform.localScale = Vector3.Lerp(startScale, endScale, progress);
+
+					// Graph formula: min(8-abs(x / 0.0625 - 8), 2.5 / 2)
+					// BlockDepth 2.5 is divided by two because both groups move in opposite directions.
+					float zOffset = Mathf.Min(8 - Mathf.Abs(progress / 0.0625f - 8), VisualsGrid.BlockDepth / 2f);
+
+					// Wrapped goes in front, others go behind.
+					int sign = m_RotatingFallingShapeCoordsChange[i].Item3 ? 1 : -1;
+
+					shapeCoords.Value.transform.position = VisualsGrid.ConeApex;
+					shapeCoords.Value.transform.localPosition += new Vector3(0f, 0f, sign * zOffset);
 				}
 
 			} else {
 
 				foreach(var shapeCoords in FallingVisualsShape.ShapeCoords) {
+					shapeCoords.Value.transform.position = VisualsGrid.ConeApex;
 					shapeCoords.Value.transform.localScale = VisualsGrid.GridDistanceToScale(LevelData.FallDistanceNormalized - shapeCoords.Coords.Row);
 				}
 			}

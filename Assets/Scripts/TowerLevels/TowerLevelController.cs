@@ -33,8 +33,8 @@ namespace TetrisTower.TowerLevels
 
 		public bool AreGridActionsRunning => m_FinishedRuns != m_NextRunId;
 
-		public float FallingColumnAnalogOffset { get; private set; }
-		public float FallingShapeAnalogRotateOffset { get; private set; }
+		public float FallingColumnAnalogOffset { get; private set; } = float.NaN;
+		public float FallingShapeAnalogRotateOffset { get; private set; } = float.NaN;
 
 		private float m_FallingSpeedup = 0;
 
@@ -129,6 +129,10 @@ namespace TetrisTower.TowerLevels
 
 		public bool AddFallingShapeAnalogMoveOffset(float offset)
 		{
+			if (float.IsNaN(FallingColumnAnalogOffset)) {
+				FallingColumnAnalogOffset = 0;
+			}
+
 			FallingColumnAnalogOffset += offset;
 
 			ValidateAnalogMoveOffset();
@@ -148,9 +152,12 @@ namespace TetrisTower.TowerLevels
 
 		public bool ClearFallingShapeAnalogMoveOffset()
 		{
+			if (float.IsNaN(FallingColumnAnalogOffset))
+				return false;
+
 			int roundDirection = Mathf.RoundToInt(FallingColumnAnalogOffset);
 
-			FallingColumnAnalogOffset = 0f;
+			FallingColumnAnalogOffset = float.NaN;
 
 			// Snap to the closest.
 			if (roundDirection != 0) {
@@ -162,7 +169,7 @@ namespace TetrisTower.TowerLevels
 
 		private void ValidateAnalogMoveOffset()
 		{
-			if (FallingColumnAnalogOffset != 0f) {
+			if (!float.IsNaN(FallingColumnAnalogOffset)) {
 
 				// Check if falling shape can move to the next column or there are other shapes.
 				int requestedColumn = LevelData.FallingColumn + (int)Mathf.Sign(FallingColumnAnalogOffset);
@@ -190,6 +197,10 @@ namespace TetrisTower.TowerLevels
 		}
 		public bool AddFallingShapeAnalogRotateOffset(float offset)
 		{
+			if (float.IsNaN(FallingShapeAnalogRotateOffset)) {
+				FallingShapeAnalogRotateOffset = 0;
+			}
+
 			FallingShapeAnalogRotateOffset += offset;
 
 			// Since our shapes are 1x3 rotating them is always possible.
@@ -211,9 +222,12 @@ namespace TetrisTower.TowerLevels
 
 		public bool ClearFallingShapeAnalogRotateOffset()
 		{
+			if (float.IsNaN(FallingShapeAnalogRotateOffset))
+				return false;
+
 			int roundDirection = Mathf.RoundToInt(FallingShapeAnalogRotateOffset);
 
-			FallingShapeAnalogRotateOffset = 0f;
+			FallingShapeAnalogRotateOffset = float.NaN;
 
 			// Snap to the closest.
 			if (roundDirection != 0) {

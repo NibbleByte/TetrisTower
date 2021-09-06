@@ -180,20 +180,20 @@ namespace TetrisTower.TowerLevels
 				var dragDistance = currentPosition - m_PointerPressedLastPosition;
 				m_PointerPressedLastPosition = currentPosition;
 
-				if (m_LevelController.FallingColumnAnalogOffset != 0f) {
+				if (!float.IsNaN(m_LevelController.FallingColumnAnalogOffset)) {
 					if (Mathf.Abs(dragDistance.x) > 0.01f) {
 						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
 					}
 
-				} else if (m_LevelController.FallingShapeAnalogRotateOffset != 0f) {
+				} else if (!float.IsNaN(m_LevelController.FallingShapeAnalogRotateOffset)) {
 					if (Mathf.Abs(dragDistance.y) > 0.01f) {
 						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
 					}
 				} else {
 					dragDistance = currentPosition - m_PointerPressedStartPosition;
-					if (Mathf.Abs(dragDistance.x) > 2f) {
+					if (Mathf.Abs(dragDistance.x) > 4f) {
 						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
-					} else if (Mathf.Abs(dragDistance.y) > 2f) {
+					} else if (Mathf.Abs(dragDistance.y) > 4f) {
 						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
 					}
 				}
