@@ -154,11 +154,11 @@ namespace TetrisTower.TowerLevels
 						}
 
 						if (Vector2.Dot(Vector2.right, pressDir) >= m_GameConfig.SwipeConformity) {
-							m_LevelController.RequestFallingShapeMove(+1);
+							m_LevelController.RequestFallingShapeMove(-1);
 						}
 
 						if (Vector2.Dot(Vector2.left, pressDir) >= m_GameConfig.SwipeConformity) {
-							m_LevelController.RequestFallingShapeMove(-1);
+							m_LevelController.RequestFallingShapeMove(+1);
 						}
 					}
 					break;

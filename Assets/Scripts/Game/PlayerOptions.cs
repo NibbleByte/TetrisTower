@@ -12,6 +12,6 @@ namespace TetrisTower.Game
 			OnScreenControls
 		}
 
-		public TouchInputControlMethod TouchInputControls = TouchInputControlMethod.Swipes;
+		public TouchInputControlMethod TouchInputControls = TouchInputControlMethod.Drag;
 	}
 }
