@@ -19,7 +19,7 @@ namespace TetrisTower.TowerLevels
 		private bool m_PointerDragConsumed = false;
 		private Vector2 m_PointerPressedStartPosition;
 		private Vector2 m_PointerPressedLastPosition;
-		private double m_PointerPressedTime;
+		private float m_PointerPressedTime;
 
 		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
 		{
@@ -117,7 +117,7 @@ namespace TetrisTower.TowerLevels
 				case InputActionPhase.Started:
 					m_PointerPressedStartPosition = Pointer.current.position.ReadValue();
 					m_PointerPressedLastPosition = m_PointerPressedStartPosition;
-					m_PointerPressedTime = context.time;
+					m_PointerPressedTime = Time.time;
 					m_PointerPressed = true;
 					m_PointerDragConsumed = false;
 					break;
@@ -133,7 +133,7 @@ namespace TetrisTower.TowerLevels
 					if (m_Options.TouchInputControls != PlayerOptions.TouchInputControlMethod.Swipes)
 						break;
 
-					var pressDuration = context.time - m_PointerPressedTime;
+					var pressDuration = Time.time - m_PointerPressedTime;
 					var pressDistance = Pointer.current.position.ReadValue() - m_PointerPressedStartPosition;
 
 					// Swipe detection.
@@ -185,23 +185,27 @@ namespace TetrisTower.TowerLevels
 
 				if (!float.IsNaN(m_LevelController.FallingColumnAnalogOffset)) {
 					if (Mathf.Abs(dragDistance.x) > 0.01f) {
-						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
+						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f / InputMetrics.InputPrecision);
 					}
 
 				} else if (!float.IsNaN(m_LevelController.FallingShapeAnalogRotateOffset)) {
 					if (Mathf.Abs(dragDistance.y) > 0.01f) {
-						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
+						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.020f / InputMetrics.InputPrecision);
 					}
 
 				// Avoid starting another drag operation if the last one was interrupted.
 				} else if (!m_PointerDragConsumed) {
 					dragDistance = currentPosition - m_PointerPressedStartPosition;
-					if (Mathf.Abs(dragDistance.x) > 4f) {
-						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f);
+
+					if (dragDistance.magnitude > 6f * InputMetrics.InputPrecision && Time.time - m_PointerPressedTime > 0.1f) {
 						m_PointerDragConsumed = true;
-					} else if (Mathf.Abs(dragDistance.y) > 4f) {
-						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.025f);
-						m_PointerDragConsumed = true;
+						m_PlayerControls.TowerLevelPlay.PointerFallSpeedUp.Reset();
+
+						if (Mathf.Abs(dragDistance.x) > Mathf.Abs(dragDistance.y)) {
+							m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f / InputMetrics.InputPrecision);
+						} else {
+							m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.020f / InputMetrics.InputPrecision);
+						}
 					}
 				}
 			}
