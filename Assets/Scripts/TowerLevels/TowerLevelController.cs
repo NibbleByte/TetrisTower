@@ -416,5 +416,21 @@ namespace TetrisTower.TowerLevels
 			}
 #endif
 		}
+
+		#region Debug Stuff
+
+		public void __DEBUG_ToggleFalling()
+		{
+			LevelData.FallSpeedNormalized = LevelData.FallSpeedNormalized == 0f ? 2f : 0f;
+		}
+
+		public void __DEBUG_Reset()
+		{
+			var context = (Game.GameContext) DevLocker.GFrame.LevelsManager.Instance.GameContext;
+			context.SetCurrentPlaythrough(context.GameConfig.NewGameData);
+			DevLocker.GFrame.LevelsManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+		}
+
+		#endregion
 	}
 }

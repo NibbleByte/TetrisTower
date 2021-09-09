@@ -72,6 +72,7 @@ namespace TetrisTower.Game
 
 		#region Debug Stuff
 
+
 #if UNITY_EDITOR
 		private void Update()
 		{
@@ -123,11 +124,9 @@ namespace TetrisTower.Game
 
 
 			if (Keyboard.current.pKey.wasPressedThisFrame) {
-				var levelData = GameContext.CurrentPlaythrough.TowerLevel;
-				levelData.FallSpeedNormalized = levelData.FallSpeedNormalized == 0f ? 2f : 0f;
+				GameObject.FindObjectOfType<TowerLevelController>().__DEBUG_ToggleFalling();
 			}
 		}
-#endif
 
 		string m_DebugSave;
 		void Serialize()
@@ -152,6 +151,7 @@ namespace TetrisTower.Game
 			GameContext.SetCurrentPlaythrough(playthrough);
 			LevelsManager.Instance.SwitchLevel(new TowerLevelSupervisor());
 		}
+#endif
 
 		#endregion
 	}
