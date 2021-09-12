@@ -207,13 +207,23 @@ namespace TetrisTower.TowerLevels
 			// If we start using wide shapes, this needs to validate if rotation is possible.
 			//ValidateAnalogRotateOffset();
 
-			while (FallingShapeAnalogRotateOffset > 0.5f) {
+			while (FallingShapeAnalogRotateOffset >= 0.5f) {
+				//Debug.LogWarning($"ROTATION for {FallingShapeAnalogRotateOffset} ({offset}) at {Time.time} frame {Time.frameCount}");
 				FallingShapeAnalogRotateOffset -= 1f;
+
+				if (FallingShapeAnalogRotateOffset == -0.5f)
+					FallingShapeAnalogRotateOffset += 0.0001f;
+
 				RequestFallingShapeRotate(1);
 			}
 
-			while (FallingShapeAnalogRotateOffset < -0.5f) {
+			while (FallingShapeAnalogRotateOffset <= -0.5f) {
+				//Debug.LogWarning($"ROTATION for {FallingShapeAnalogRotateOffset} ({offset}) at {Time.time} frame {Time.frameCount}");
 				FallingShapeAnalogRotateOffset += 1f;
+
+				if (FallingShapeAnalogRotateOffset == 0.5f)
+					FallingShapeAnalogRotateOffset -= 0.0001f;
+
 				RequestFallingShapeRotate(-1);
 			}
 

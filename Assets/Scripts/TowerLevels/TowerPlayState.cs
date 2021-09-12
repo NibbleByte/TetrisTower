@@ -17,9 +17,12 @@ namespace TetrisTower.TowerLevels
 
 		private bool m_PointerPressed = false;
 		private bool m_PointerDragConsumed = false;
+		private bool m_PointerDragSwiped = false;
 		private Vector2 m_PointerPressedStartPosition;
 		private Vector2 m_PointerPressedLastPosition;
 		private float m_PointerPressedTime;
+
+		private int m_LastUpdateFrame;
 
 		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
 		{
@@ -120,24 +123,37 @@ namespace TetrisTower.TowerLevels
 					m_PointerPressedTime = Time.time;
 					m_PointerPressed = true;
 					m_PointerDragConsumed = false;
+					m_PointerDragSwiped = false;
 					break;
 
 				case InputActionPhase.Canceled:
 
+					// Input handles get called before the Update(), so the last frame doesn't get applied if input is canceled.
+					// This is especially noticeable for hyper-fast swipes with duration 1 frame:
+					// First frame starts, next frame ends and no Update gets called (including on the first frame?!).
+					// Maybe Started is called after update and Canceled before? Or there is some race condition?
+					if (m_LastUpdateFrame != Time.frameCount) {
+						Update();
+					}
+
 					Debug.Assert(m_PointerPressed);
 					m_PointerPressed = false;
 					m_PointerDragConsumed = false;
+					m_PointerDragSwiped = false;
 					m_LevelController.ClearFallingShapeAnalogMoveOffset();
 					m_LevelController.ClearFallingShapeAnalogRotateOffset();
 
-					if (m_Options.TouchInputControls != PlayerOptions.TouchInputControlMethod.Swipes)
-						break;
 
 					var pressDuration = Time.time - m_PointerPressedTime;
 					var pressDistance = Pointer.current.position.ReadValue() - m_PointerPressedStartPosition;
 
+					if (m_Options.TouchInputControls == PlayerOptions.TouchInputControlMethod.Drag) {
+						break;
+					}
+
+
 					// Swipe detection.
-					if (pressDuration < m_GameConfig.SwipeMaxTime && pressDistance.magnitude >= m_GameConfig.SwipeMinDistance) {
+					if (pressDuration < m_GameConfig.SwipeMaxTime && pressDistance.magnitude >= m_GameConfig.SwipeMinDistance * InputMetrics.InputPrecision) {
 						var pressDir = pressDistance.normalized;
 
 						// Avoid executing both actions, because they are set as "Pass through".
@@ -174,37 +190,89 @@ namespace TetrisTower.TowerLevels
 
 		public void Update()
 		{
+			m_LastUpdateFrame = Time.frameCount;
+
 			if (Pointer.current == null)
 				return;
 
 			if (m_PointerPressed && m_Options.TouchInputControls == PlayerOptions.TouchInputControlMethod.Drag) {
 
 				var currentPosition = Pointer.current.position.ReadValue();
-				var dragDistance = currentPosition - m_PointerPressedLastPosition;
+				var dragLastDistance = currentPosition - m_PointerPressedLastPosition;
+				var dragFullDistance = currentPosition - m_PointerPressedStartPosition;
+				var dragDuration = Time.time - m_PointerPressedTime;
 				m_PointerPressedLastPosition = currentPosition;
 
+				float currentRotateOffset = m_LevelController.FallingShapeAnalogRotateOffset;
+				currentRotateOffset = float.IsNaN(currentRotateOffset) ? 0 : currentRotateOffset;
+
+
+				// Horizontal drag in progress - move
 				if (!float.IsNaN(m_LevelController.FallingColumnAnalogOffset)) {
-					if (Mathf.Abs(dragDistance.x) > 0.01f) {
-						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f / InputMetrics.InputPrecision);
+					if (Mathf.Abs(dragLastDistance.x) > 0.01f) {
+						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragLastDistance.x * m_GameConfig.AnalogMoveSpeed / InputMetrics.InputPrecision);
 					}
 
+				// Vertical drag in progress - rotate
 				} else if (!float.IsNaN(m_LevelController.FallingShapeAnalogRotateOffset)) {
-					if (Mathf.Abs(dragDistance.y) > 0.01f) {
-						m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.020f / InputMetrics.InputPrecision);
+
+					bool isSwipe = dragDuration < m_GameConfig.SwipeMaxTime
+						&& Mathf.Abs(dragFullDistance.y) > m_GameConfig.SwipeMinDistance * InputMetrics.InputPrecision;
+
+					if (Mathf.Abs(dragLastDistance.y) > 0.01f) {
+
+						// Limit rotation to 1 per frame.
+						float rotateSign = Mathf.Sign(dragLastDistance.y);
+						float rotateValue = rotateSign * Mathf.Min(
+							Mathf.Abs(dragLastDistance.y) * m_GameConfig.AnalogRotateSpeed / InputMetrics.InputPrecision,
+							0.5f // Rotation is [-0.5, 0.5].
+						);
+
+						//Debug.LogError($"Drag with {dragLastDistance.y} ({rotateValue}) at {dragDuration} frame {Time.frameCount}");
+
+						// Offset larger than 0.5f will trigger rotation.
+						// If this is a swipe, don't allow more than 1 rotation.
+						if (isSwipe && !m_PointerDragSwiped && Mathf.Abs(rotateValue + currentRotateOffset) >= 0.5f) {
+							m_PointerDragSwiped = true;
+							rotateValue += rotateSign * 0.2f; // 0.5 means visually rotation is half-way. Snap it visually towards the end.
+							m_LevelController.AddFallingShapeAnalogRotateOffset(rotateValue);
+
+							//Debug.LogWarning($"SWIPE! SKIP! {dragFullDistance.y} for {dragDuration}");
+
+						} else if (!isSwipe || !m_PointerDragSwiped) {
+							m_LevelController.AddFallingShapeAnalogRotateOffset(rotateValue);
+						}
+
 					}
 
+				// No drag - try starting one.
 				// Avoid starting another drag operation if the last one was interrupted.
 				} else if (!m_PointerDragConsumed) {
-					dragDistance = currentPosition - m_PointerPressedStartPosition;
 
-					if (dragDistance.magnitude > 6f * InputMetrics.InputPrecision && Time.time - m_PointerPressedTime > 0.1f) {
+					if (dragFullDistance.magnitude > 20f * InputMetrics.InputPrecision) {
 						m_PointerDragConsumed = true;
 						m_PlayerControls.TowerLevelPlay.PointerFallSpeedUp.Reset();
 
-						if (Mathf.Abs(dragDistance.x) > Mathf.Abs(dragDistance.y)) {
-							m_LevelController.AddFallingShapeAnalogMoveOffset(-dragDistance.x * 0.025f / InputMetrics.InputPrecision);
+						if (Mathf.Abs(dragFullDistance.x) > Mathf.Abs(dragFullDistance.y)) {
+							m_LevelController.AddFallingShapeAnalogMoveOffset(-dragFullDistance.x * m_GameConfig.AnalogMoveSpeed / InputMetrics.InputPrecision);
 						} else {
-							m_LevelController.AddFallingShapeAnalogRotateOffset(dragDistance.y * 0.020f / InputMetrics.InputPrecision);
+							float rotateSign = Mathf.Sign(dragFullDistance.y);
+							float rotateValue = rotateSign * Mathf.Min(
+								Mathf.Abs(dragFullDistance.y) * m_GameConfig.AnalogRotateSpeed / InputMetrics.InputPrecision,
+								0.5f // Rotation is [-0.5, 0.5].
+							);
+
+							//Debug.LogWarning($"Drag rotate STARTED with {dragFullDistance.y} ({rotateValue}) at {dragDuration} frame {Time.frameCount}");
+
+							// Offset larger than 0.5f will trigger rotation.
+							// If this is a swipe, don't allow more than 1 rotation.
+							if (Mathf.Abs(rotateValue + currentRotateOffset) >= 0.5f) {
+								m_PointerDragSwiped = true;
+								rotateValue += rotateSign * 0.2f; // 0.5 means visually rotation is half-way. Snap it visually towards the end.
+								//Debug.LogWarning($"SWIPE INITIAL! SKIP! {rotateValue} for {dragDuration}");
+							}
+
+							m_LevelController.AddFallingShapeAnalogRotateOffset(rotateValue);
 						}
 					}
 				}

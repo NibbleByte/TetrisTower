@@ -18,8 +18,10 @@ namespace TetrisTower.Tools
 		private bool m_PointerPressed;
 		private Vector2 m_StartPointerPos;
 		private float m_StartPointerTime;
+		private Vector2 m_LastPointerPos;
 		private float m_LastPointerPressDuration;
-		private Vector2 m_LastPointerPressDistance;
+		private Vector2 m_LastFullPointerPressDistance;
+		private Vector2 m_MaxPointerPressDistancePerFrame;
 
 		void Awake()
 		{
@@ -50,10 +52,17 @@ namespace TetrisTower.Tools
 						m_PointerPressed = true;
 						m_StartPointerPos = pointerPos;
 						m_StartPointerTime = Time.time;
+						m_LastPointerPos = pointerPos;
+						m_MaxPointerPressDistancePerFrame = Vector2.zero;
 					}
 
-					m_LastPointerPressDistance = pointerPos - m_StartPointerPos;
+					m_LastFullPointerPressDistance = pointerPos - m_StartPointerPos;
 					m_LastPointerPressDuration = Time.time - m_StartPointerTime;
+					if (m_MaxPointerPressDistancePerFrame.magnitude < (pointerPos - m_LastPointerPos).magnitude) {
+						m_MaxPointerPressDistancePerFrame = pointerPos - m_LastPointerPos;
+					}
+
+					m_LastPointerPos = pointerPos;
 
 					text.AppendLine($"Pointer: {pointerPos}");
 				} else {
@@ -61,7 +70,8 @@ namespace TetrisTower.Tools
 					text.AppendLine($"Pointer: none");
 				}
 
-				text.AppendLine($"Drag: {m_LastPointerPressDistance} {m_LastPointerPressDistance.magnitude:0.##}");
+				text.AppendLine($"Drag: {m_LastFullPointerPressDistance} {m_LastFullPointerPressDistance.magnitude:0.##}");
+				text.AppendLine($"Drag Max: {m_MaxPointerPressDistancePerFrame} {m_MaxPointerPressDistancePerFrame.magnitude:0.##}");
 				text.AppendLine($"Drag Time: {m_LastPointerPressDuration:0.####}");
 			}
 

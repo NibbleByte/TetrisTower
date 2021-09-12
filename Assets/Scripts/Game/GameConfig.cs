@@ -20,6 +20,8 @@ namespace TetrisTower.Game
 
 		public float SwipeMaxTime = 0.5f;
 		public float SwipeMinDistance = 100f;
+		public float AnalogMoveSpeed = 0.025f;
+		public float AnalogRotateSpeed = 0.020f;
 
 		[Range(0f, 1f)]
 		public float SwipeConformity = 0.9f;
