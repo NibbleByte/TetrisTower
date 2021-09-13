@@ -1,7 +1,7 @@
 #if USE_INPUT_SYSTEM
 using UnityEngine;
 
-namespace DevLocker.GFrame.UIInputDisplay
+namespace DevLocker.GFrame.Input.UIInputDisplay
 {
 	/// <summary>
 	/// Displays hotkey icon / text.

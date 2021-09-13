@@ -1,5 +1,5 @@
 using DevLocker.GFrame.MessageBox;
-using DevLocker.GFrame.UIInputDisplay;
+using DevLocker.GFrame.Input.UIInputDisplay;
 using TetrisTower.Core;
 using TetrisTower.Logic;
 using UnityEngine;

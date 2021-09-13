@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DevLocker.GFrame.UIScope
+namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Put next to or under a UI.Button component to get invoked on specified InputAction.

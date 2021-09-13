@@ -1,10 +1,9 @@
 {
-    "name": "DevLocker.GFrame",
+    "name": "DevLocker.GFrame.Input",
     "rootNamespace": "",
     "references": [
         "GUID:75469ad4d38634e559750d17036d5f7c",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:7609e7e6e9a515f44a047facc31d2bec",
         "GUID:3ef934d68eec8f04db510596dcbbe6f9"
     ],
     "includePlatforms": [],
@@ -15,6 +14,11 @@
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0",
+            "define": "USE_INPUT_SYSTEM"
+        },
         {
             "name": "com.unity.textmeshpro",
             "expression": "1.0",

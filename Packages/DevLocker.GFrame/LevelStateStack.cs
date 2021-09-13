@@ -237,7 +237,7 @@ namespace DevLocker.GFrame
 
 			// In case the scopes were already active when the state kicked in and it pushed
 			// a new state onto the InputActionsStack (resetting the previous actions).
-			UIScope.UIScope.RefocusActiveScopes();
+			Input.UIScope.UIScope.RefocusActiveScopes();
 
 			yield break;
 		}

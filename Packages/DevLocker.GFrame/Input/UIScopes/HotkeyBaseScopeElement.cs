@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace DevLocker.GFrame.UIScope
+namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Base class for hotkey scope elements (that use Unity's Input System).
@@ -30,15 +30,13 @@ namespace DevLocker.GFrame.UIScope
 
 		protected virtual void OnEnable()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			context.PlayersChanged += OnPlayersChanged;
+			InputContextManager.InputContext.PlayersChanged += OnPlayersChanged;
 
 			foreach(InputAction action in GetUsedActions()) {
 				m_SubscribedActions.Add(action);
@@ -48,17 +46,10 @@ namespace DevLocker.GFrame.UIScope
 
 		protected virtual void OnDisable()
 		{
-			// Turning off Play mode.
-			if (LevelsManager.Instance == null)
+			if (InputContextManager.InputContext == null)
 				return;
 
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
-				return;
-			}
-
-			context.PlayersChanged -= OnPlayersChanged;
+			InputContextManager.InputContext.PlayersChanged -= OnPlayersChanged;
 
 			foreach (InputAction action in m_SubscribedActions) {
 				action.performed -= OnInputAction;
@@ -105,9 +96,7 @@ namespace DevLocker.GFrame.UIScope
 
 		public IEnumerable<InputAction> GetUsedActions()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				Enumerable.Empty<InputAction>();
 			}
@@ -115,11 +104,11 @@ namespace DevLocker.GFrame.UIScope
 			// Don't use m_SubscribedActions directly as the behaviour may not yet be enabled when this method is called.
 
 			if (Player == PlayerIndex.AnyPlayer) {
-				foreach (InputAction action in context.FindActionsForAllPlayers(m_InputAction.name)) {
+				foreach (InputAction action in InputContextManager.InputContext.FindActionsForAllPlayers(m_InputAction.name)) {
 					yield return action;
 				}
 			} else {
-				InputAction action = context.FindActionFor(Player, m_InputAction.name);
+				InputAction action = InputContextManager.InputContext.FindActionFor(Player, m_InputAction.name);
 				if (action != null) {
 					yield return action;
 				}
@@ -128,9 +117,7 @@ namespace DevLocker.GFrame.UIScope
 
 		public bool CheckIfAnyActionIsEnabled()
 		{
-			var context = (LevelsManager.Instance?.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null)
+			if (InputContextManager.InputContext == null)
 				return false;
 
 			foreach(InputAction action in GetUsedActions()) {

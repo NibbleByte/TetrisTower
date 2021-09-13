@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace DevLocker.GFrame.UIInputDisplay
+namespace DevLocker.GFrame.Input.UIInputDisplay
 {
 	/// <summary>
 	/// Activates objects when specified control scheme is active, deactivates the rest.
@@ -76,58 +76,45 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		void OnEnable()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			context.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
+			InputContextManager.InputContext.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
 			m_LastControlScheme = null;
-			RefreshObjects(context, Player);
+			RefreshObjects(InputContextManager.InputContext, Player);
 		}
 
 		void OnDisable()
 		{
-			// Turning off Play mode.
-			if (LevelsManager.Instance == null)
-				return;
-
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			context.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
+			InputContextManager.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
 		}
 
 		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)
 		{
-			// Turning off Play mode.
-			if (LevelsManager.Instance == null)
-				return;
 
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
 			if (Player == PlayerIndex.MasterPlayer) {
-				if (!context.IsMasterPlayer(playerIndex))
+				if (!InputContextManager.InputContext.IsMasterPlayer(playerIndex))
 					return;
 			} else if (playerIndex != Player) {
 				return;
 			}
 
-			RefreshObjects(context, playerIndex);
+			RefreshObjects(InputContextManager.InputContext, playerIndex);
 		}
 
 		void OnValidate()

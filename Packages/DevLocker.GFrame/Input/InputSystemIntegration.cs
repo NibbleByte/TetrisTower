@@ -29,15 +29,6 @@ namespace DevLocker.GFrame.Input
 		Player15,
 	}
 
-	/// <summary>
-	/// Your <see cref="IGameContext" /> should implement this if you intend to use the Input System features of this framework,
-	/// even if you're using generated IInputActionCollection.
-	/// </summary>
-	public interface IInputContextProvider : IDisposable
-	{
-		IInputContext InputContext { get; }
-	}
-
 	public delegate void PlayerIndexEventHandler(PlayerIndex playerIndex);
 
 
@@ -119,6 +110,20 @@ namespace DevLocker.GFrame.Input
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
 		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action);
+	}
+
+	/// <summary>
+	/// A place for the framework to find the <see cref="IInputContext"/>.
+	/// Set it initially.
+	/// </summary>
+	public static class InputContextManager
+	{
+		public static IInputContext InputContext { get; private set; }
+
+		public static void SetContext(IInputContext context)
+		{
+			InputContext = context;
+		}
 	}
 
 	/// <summary>

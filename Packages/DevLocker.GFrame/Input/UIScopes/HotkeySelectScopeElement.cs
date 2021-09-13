@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace DevLocker.GFrame.UIScope
+namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Put next to or under a UI.Selectable to be selected on performing the specified input action.

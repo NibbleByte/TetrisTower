@@ -1,11 +1,10 @@
 #if USE_INPUT_SYSTEM
-using DevLocker.GFrame.Input;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace DevLocker.GFrame.UIInputDisplay
+namespace DevLocker.GFrame.Input.UIInputDisplay
 {
 	/// <summary>
 	/// Exposes API to rebind an InputAction.
@@ -46,9 +45,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[ContextMenu("Start Rebind")]
 		public void StartRebind()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
@@ -59,13 +56,13 @@ namespace DevLocker.GFrame.UIInputDisplay
 				m_RebindOperation = null;
 			}
 
-			InputAction action = context.FindActionFor(DisplayUI.Player, DisplayUI.InputAction.name);
+			InputAction action = InputContextManager.InputContext.FindActionFor(DisplayUI.Player, DisplayUI.InputAction.name);
 
 			if (DisplayUI.CurrentlyDisplayedData.Binding.id == Guid.Empty)
 				return;
 
 			// Actions need to be disabled in order to be re-bind.
-			context.PushActionsState(this, true);
+			InputContextManager.InputContext.PushActionsState(this, true);
 
 			m_RebindOperation = action.PerformInteractiveRebinding();
 			m_RebindOperation.WithTargetBinding(DisplayUI.CurrentlyDisplayedData.BindingIndex);
@@ -98,9 +95,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[ContextMenu("Cancel Rebind")]
 		public void CancelRebind()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
@@ -114,9 +109,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 		[ContextMenu("Reset Bind")]
 		public void ResetBind()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
@@ -130,7 +123,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			if (DisplayUI.CurrentlyDisplayedData.Binding.id == Guid.Empty)
 				return;
 
-			InputAction action = context.FindActionFor(DisplayUI.Player, DisplayUI.InputAction.name);
+			InputAction action = InputContextManager.InputContext.FindActionFor(DisplayUI.Player, DisplayUI.InputAction.name);
 			InputActionRebindingExtensions.RemoveBindingOverride(action, DisplayUI.CurrentlyDisplayedData.BindingIndex);
 
 			DisplayUI.RefreshDisplay();
@@ -147,9 +140,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			m_RebindOperation.Dispose();
 			m_RebindOperation = null;
 
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			context?.PopActionsState(this);
+			InputContextManager.InputContext?.PopActionsState(this);
 
 			DisplayUI.RefreshDisplay();
 			RebindFinished.Invoke();
@@ -165,9 +156,7 @@ namespace DevLocker.GFrame.UIInputDisplay
 			m_RebindOperation.Dispose();
 			m_RebindOperation = null;
 
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			context?.PopActionsState(this);
+			InputContextManager.InputContext?.PopActionsState(this);
 
 			DisplayUI.RefreshDisplay();
 			RebindFinished.Invoke();

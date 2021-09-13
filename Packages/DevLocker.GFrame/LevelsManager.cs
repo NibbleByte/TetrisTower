@@ -182,7 +182,7 @@ namespace DevLocker.GFrame
 				// In case the scopes were already active when the supervisor kicked in and it pushed
 				// a new state onto the InputActionsStack (resetting the previous actions).
 				// Do this only if there is no StatesStack, as it will do the same thing on setting a state.
-				UIScope.UIScope.RefocusActiveScopes();
+				Input.UIScope.UIScope.RefocusActiveScopes();
 			}
 
 			LoadedSupervisor?.Invoke();

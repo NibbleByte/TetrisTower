@@ -1,14 +1,9 @@
 #if USE_INPUT_SYSTEM
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
-namespace DevLocker.GFrame.UIScope
+namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Calls UnityEvent on specified InputAction.

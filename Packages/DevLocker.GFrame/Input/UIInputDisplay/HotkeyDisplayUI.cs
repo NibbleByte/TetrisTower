@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace DevLocker.GFrame.UIInputDisplay
+namespace DevLocker.GFrame.Input.UIInputDisplay
 {
 	/// <summary>
 	/// Displays hotkey icon / text.
@@ -87,16 +87,14 @@ namespace DevLocker.GFrame.UIInputDisplay
 		/// </summary>
 		public void RefreshDisplay()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
 			m_LastDevice = null;
-			RefreshDisplay(context, Player);
+			RefreshDisplay(InputContextManager.InputContext, Player);
 		}
 
 		private void RefreshDisplay(IInputContext context, PlayerIndex playerIndex)
@@ -206,34 +204,27 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		void OnEnable()
 		{
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
 
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			context.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
+			InputContextManager.InputContext.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
 			m_LastDevice = null;
-			RefreshDisplay(context, Player);
+			RefreshDisplay(InputContextManager.InputContext, Player);
 		}
 
 		void OnDisable()
 		{
-			// Turning off Play mode.
-			if (LevelsManager.Instance == null)
-				return;
-
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			context.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
+			InputContextManager.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
 
 			if (Icon) {
 				Icon.gameObject.SetActive(false);
@@ -247,26 +238,20 @@ namespace DevLocker.GFrame.UIInputDisplay
 
 		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)
 		{
-			// Turning off Play mode.
-			if (LevelsManager.Instance == null)
-				return;
-
-			var context = (LevelsManager.Instance.GameContext as IInputContextProvider)?.InputContext;
-
-			if (context == null) {
+			if (InputContextManager.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
 			if (Player == PlayerIndex.MasterPlayer) {
-				if (!context.IsMasterPlayer(playerIndex))
+				if (!InputContextManager.InputContext.IsMasterPlayer(playerIndex))
 					return;
 			} else if (playerIndex != Player) {
 				return;
 			}
 
-			RefreshDisplay(context, playerIndex);
+			RefreshDisplay(InputContextManager.InputContext, playerIndex);
 		}
 
 		void OnValidate()

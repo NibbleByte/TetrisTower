@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace DevLocker.GFrame.UIInputDisplay
+namespace DevLocker.GFrame.Input.UIInputDisplay
 {
 	/// <summary>
 	/// ScriptableObject containing the required assets to display hotkeys in the UI for specific device.

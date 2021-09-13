@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace DevLocker.GFrame.UIScope
+namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// When UI selectable is selected under this component target UIScope is force activated.

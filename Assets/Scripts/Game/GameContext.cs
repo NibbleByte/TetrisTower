@@ -19,7 +19,7 @@ namespace TetrisTower.Game
 	}
 
 	[Serializable]
-	public sealed class GameContext : IGameContext, IInputContextProvider
+	public sealed class GameContext : IGameContext
 	{
 		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
 		{
@@ -30,6 +30,7 @@ namespace TetrisTower.Game
 			CoroutineScheduler = coroutineScheduler;
 
 			InputContext = new SinglePlayerInputCollectionContext(PlayerControls, PlayerControls.InputStack, PlayerControls.UI.Get(), GameConfig.BindingDisplayAssets);
+			InputContextManager.SetContext(InputContext);
 		}
 
 		public GameConfig GameConfig { get; }

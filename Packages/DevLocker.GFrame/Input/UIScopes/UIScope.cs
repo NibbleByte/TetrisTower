@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DevLocker.GFrame.UIScope
+namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Marks scope elements to be controlled by the UIScope.
@@ -77,12 +77,18 @@ namespace DevLocker.GFrame.UIScope
 		private static bool s_ChangingActiveScopes = false;
 		private static Queue<KeyValuePair<UIScope, bool>> s_PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
 
+		private bool m_GameQuitting = false;
 
 		protected virtual void Awake()
 		{
 			if (!m_HasScannedForElements) {
 				ScanForChildScopeElements();
 			}
+		}
+
+		void OnApplicationQuit()
+		{
+			m_GameQuitting = true;
 		}
 
 		void OnEnable()
@@ -132,8 +138,8 @@ namespace DevLocker.GFrame.UIScope
 			UIScope nextDeepestScope = null;
 			bool wasActive = false;
 
-			// HACK: On turning off the game OnDisable() gets called and LevelsManager.Instance may get destroyed before that.
-			if (Array.IndexOf(m_ActiveScopes, this) != -1 && LevelsManager.Instance) {
+			// HACK: On turning off the game OnDisable() gets called which may call methods on destroyed objects.
+			if (Array.IndexOf(m_ActiveScopes, this) != -1 && !m_GameQuitting) {
 
 				// Try keep the current lowest scope as the target one.
 				if (this != m_ActiveScopes.Last()) {
@@ -145,7 +151,7 @@ namespace DevLocker.GFrame.UIScope
 
 			s_Scopes.Remove(this);
 
-			if (wasActive && LevelsManager.Instance) {
+			if (wasActive && !m_GameQuitting) {
 				// Pick the next lowest (latest) child registered that is still enabled (might be in the process of disabling).
 				nextDeepestScope = nextDeepestScope ?? s_Scopes.LastOrDefault(s => s.enabled);
 				UIScope[] nextScopes = nextDeepestScope
@@ -318,7 +324,7 @@ namespace DevLocker.GFrame.UIScope
 		protected void ProcessInput(bool active)
 		{
 #if USE_INPUT_SYSTEM
-			var context = (LevelsManager.Instance.GameContext as Input.IInputContextProvider)?.InputContext;
+			var context = Input.InputContextManager.InputContext;
 
 			if (context == null) {
 				Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
