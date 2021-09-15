@@ -45,7 +45,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_Rigidbody.isKinematic = true;
 			m_Velocity = Vector3.zero;
 
-			LevelsManager.Instance.SetLevelState(new SamplePlayChopperState());
+			Game.SampleLevelsManager.Instance.SetLevelState(new SamplePlayChopperState());
 		}
 
 		#endregion
@@ -63,7 +63,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_Rigidbody.isKinematic = false;
 			m_Velocity = Vector3.zero;
 
-			LevelsManager.Instance.SetLevelState(new SamplePlayJumperState());
+			Game.SampleLevelsManager.Instance.SetLevelState(new SamplePlayJumperState());
 		}
 
 		#endregion

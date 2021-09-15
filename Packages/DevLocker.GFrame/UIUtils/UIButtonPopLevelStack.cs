@@ -26,7 +26,10 @@ namespace DevLocker.GFrame.UIUtils
 
 		private void OnButtonClick()
 		{
-			LevelsManager.Instance.PopLevelState();
+			// Assuming there is only one instance.
+			// Singleton (if present) is implemented by the user code which is not accessible here.
+			var levelsManager = GameObject.FindObjectOfType<LevelsManager>();
+			levelsManager.PopLevelState();
 		}
 	}
 }

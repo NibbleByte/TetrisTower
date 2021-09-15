@@ -10,8 +10,6 @@ namespace DevLocker.GFrame
 	/// </summary>
 	public class LevelsManager : MonoBehaviour
 	{
-		public IGameContext GameContext { get; private set; }
-
 		/// <summary>
 		/// Assign this if you want to show / hide loading screen between your levels (e.g. fade out effects).
 		/// You may assign this multiple times based on your needs and next level to load.
@@ -33,35 +31,8 @@ namespace DevLocker.GFrame
 		public event Action LoadingSupervisor;
 		public event Action LoadedSupervisor;
 
-		public static LevelsManager Instance { get; private set; }
-
-		protected virtual void Awake()
-		{
-			if (Instance) {
-				GameObject.DestroyImmediate(this);
-				return;
-			}
-
-			Instance = this;
-
-			if (transform.parent == null) {
-				DontDestroyOnLoad(gameObject);
-			}
-		}
-
-		protected virtual void OnDestroy()
-		{
-			if (Instance == this) {
-				Instance = null;
-			}
-		}
-
 		protected virtual void Update()
 		{
-			if (GameContext is IUpdateListener updateContext) {
-				updateContext.Update();
-			}
-
 			if (LevelSupervisor is IUpdateListener updateSupervisor) {
 				updateSupervisor.Update();
 			}
@@ -71,12 +42,19 @@ namespace DevLocker.GFrame
 			}
 		}
 
-		protected virtual void LateUpdate()
+		protected virtual void FixedUpdate()
 		{
-			if (GameContext is ILateUpdateListener lateUpdateContext) {
-				lateUpdateContext.LateUpdate();
+			if (LevelSupervisor is IFixedUpdateListener updateSupervisor) {
+				updateSupervisor.FixedUpdate();
 			}
 
+			if (m_LevelStatesStack?.CurrentState is IFixedUpdateListener updateState) {
+				updateState.FixedUpdate();
+			}
+		}
+
+		protected virtual void LateUpdate()
+		{
 			if (LevelSupervisor is ILateUpdateListener updateSupervisor) {
 				updateSupervisor.LateUpdate();
 			}
@@ -84,11 +62,6 @@ namespace DevLocker.GFrame
 			if (m_LevelStatesStack?.CurrentState is ILateUpdateListener updateState) {
 				updateState.LateUpdate();
 			}
-		}
-
-		public virtual void SetGameContext(IGameContext gameContext)
-		{
-			GameContext = gameContext;
 		}
 
 
@@ -131,7 +104,7 @@ namespace DevLocker.GFrame
 
 			yield return LoadingSupervisorCrt();
 
-			yield return nextLevel.Load(GameContext);
+			yield return nextLevel.Load();
 
 			// Avoid first show of loading screen when the game starts.
 			if (hadPreviousSupervisor && LevelLoadingScreen != null) {

@@ -12,11 +12,9 @@ namespace TetrisTower.HomeScreen
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
-		public GameContext GameContext { get; private set; }
-
-		public IEnumerator Load(IGameContext gameContext)
+		public IEnumerator Load()
 		{
-			GameContext = (GameContext)gameContext;
+			var gameContext = GameManager.Instance.GameContext;
 
 			if (MessageBox.Instance) {
 				MessageBox.Instance.ForceCloseAllMessages();
@@ -37,13 +35,13 @@ namespace TetrisTower.HomeScreen
 			//	);
 
 			// The whole level is UI, so enable it for the whole level.
-			GameContext.PlayerControls.InputStack.PushActionsState(this);
-			GameContext.PlayerControls.UI.Enable();
+			gameContext.PlayerControls.InputStack.PushActionsState(this);
+			gameContext.PlayerControls.UI.Enable();
 		}
 
 		public IEnumerator Unload()
 		{
-			GameContext.PlayerControls.InputStack.PopActionsState(this);
+			GameManager.Instance.GameContext.PlayerControls.InputStack.PopActionsState(this);
 
 			yield break;
 		}

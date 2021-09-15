@@ -42,7 +42,7 @@ namespace TetrisTower.Game
 
 			GameContext = new GameContext(GameConfig, playerControls, scheduler);
 
-			var supervisorManager = gameObject.AddComponent<LevelsManager>();
+			var supervisorManager = gameObject.AddComponent<GameManager>();
 			supervisorManager.SetGameContext(GameContext);
 		}
 
@@ -51,13 +51,13 @@ namespace TetrisTower.Game
 			// Boot game from current scene
 			if (GameObject.FindObjectOfType<TowerLevelController>()) {
 				GameContext.SetCurrentPlaythrough(GameConfig.NewGameData);
-				LevelsManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+				GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
 				return;
 			}
 
 			if (GameObject.FindObjectOfType<HomeScreenController>()) {
 				GameContext.SetCurrentPlaythrough(null);
-				LevelsManager.Instance.SwitchLevel(new HomeScreenLevelSupervisor());
+				GameManager.Instance.SwitchLevel(new HomeScreenLevelSupervisor());
 				return;
 			}
 		}
@@ -149,7 +149,7 @@ namespace TetrisTower.Game
 
 			var playthrough = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(m_DebugSave, GameConfig.Converters);
 			GameContext.SetCurrentPlaythrough(playthrough);
-			LevelsManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+			GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
 		}
 #endif
 

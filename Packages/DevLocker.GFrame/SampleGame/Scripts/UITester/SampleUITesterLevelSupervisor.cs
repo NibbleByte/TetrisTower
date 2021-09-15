@@ -11,11 +11,9 @@ namespace DevLocker.GFrame.SampleGame.UITester
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
-		public SampleGameContext GameContext { get; private set; }
-
-		public IEnumerator Load(IGameContext gameContext)
+		public IEnumerator Load()
 		{
-			GameContext = (SampleGameContext)gameContext;
+			SampleGameContext gameContext = SampleLevelsManager.Instance.GameContext;
 
 			if (MessageBox.MessageBox.Instance) {
 				MessageBox.MessageBox.Instance.ForceCloseAllMessages();
@@ -45,13 +43,13 @@ namespace DevLocker.GFrame.SampleGame.UITester
 			//	);
 
 			// The whole level is UI, so enable it for the whole level.
-			GameContext.PlayerControls.InputStack.PushActionsState(this);
-			GameContext.PlayerControls.UI.Enable();
+			gameContext.PlayerControls.InputStack.PushActionsState(this);
+			gameContext.PlayerControls.UI.Enable();
 		}
 
 		public IEnumerator Unload()
 		{
-			GameContext.PlayerControls.InputStack.PopActionsState(this);
+			SampleLevelsManager.Instance.GameContext.PlayerControls.InputStack.PopActionsState(this);
 
 			yield break;
 		}

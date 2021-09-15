@@ -19,7 +19,7 @@ namespace TetrisTower.Game
 	}
 
 	[Serializable]
-	public sealed class GameContext : IGameContext
+	public sealed class GameContext
 	{
 		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
 		{

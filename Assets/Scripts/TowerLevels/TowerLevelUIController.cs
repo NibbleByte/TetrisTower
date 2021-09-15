@@ -66,22 +66,22 @@ namespace TetrisTower.TowerLevels
 
 		public void PauseLevel()
 		{
-			LevelsManager.Instance.PushLevelState(new TowerPausedState());
+			Game.GameManager.Instance.PushLevelState(new TowerPausedState());
 		}
 
 		public void ResumeLevel()
 		{
-			LevelsManager.Instance.SetLevelState(new TowerPlayState());
+			Game.GameManager.Instance.SetLevelState(new TowerPlayState());
 		}
 
 		public void OpenOptions()
 		{
-			LevelsManager.Instance.PushLevelState(new TowerOptionsState());
+			Game.GameManager.Instance.PushLevelState(new TowerOptionsState());
 		}
 
 		public void ExitToHomeScreen()
 		{
-			LevelsManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
+			Game.GameManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
 		}
 	}
 }

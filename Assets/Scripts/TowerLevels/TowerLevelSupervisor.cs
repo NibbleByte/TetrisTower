@@ -12,11 +12,9 @@ namespace TetrisTower.TowerLevels
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
-		public GameContext GameContext { get; private set; }
-
-		public IEnumerator Load(IGameContext gameContext)
+		public IEnumerator Load()
 		{
-			GameContext = (GameContext)gameContext;
+			var gameContext = GameManager.Instance.GameContext;
 
 			if (MessageBox.Instance) {
 				MessageBox.Instance.ForceCloseAllMessages();
@@ -27,14 +25,14 @@ namespace TetrisTower.TowerLevels
 			}
 
 			var levelController = GameObject.FindObjectOfType<TowerLevelController>();
-			levelController.Init(GameContext.CurrentPlaythrough.TowerLevel);
+			levelController.Init(gameContext.CurrentPlaythrough.TowerLevel);
 
 			var uiController = GameObject.FindObjectOfType<TowerLevelUIController>(true);
 
 			StatesStack = new LevelStateStack(
-				GameContext.GameConfig,
-				GameContext.PlayerControls,
-				GameContext.Options,
+				gameContext.GameConfig,
+				gameContext.PlayerControls,
+				gameContext.Options,
 				levelController,
 				uiController
 				);
@@ -42,7 +40,7 @@ namespace TetrisTower.TowerLevels
 			yield return StatesStack.SetStateCrt(new TowerPlayState());
 
 			// If save came with available matches, or pending actions, do them.
-			var pendingActions = Logic.GameGridEvaluation.Evaluate(GameContext.CurrentPlaythrough.TowerLevel.Grid, GameContext.CurrentPlaythrough.TowerLevel.Rules);
+			var pendingActions = Logic.GameGridEvaluation.Evaluate(gameContext.CurrentPlaythrough.TowerLevel.Grid, gameContext.CurrentPlaythrough.TowerLevel.Rules);
 			if (pendingActions.Count > 0) {
 				yield return levelController.RunActions(pendingActions);
 			}

@@ -16,6 +16,8 @@ namespace DevLocker.GFrame.UIUtils
 		private ILevelSupervisor m_CurrentLevelSupervisor;
 		private ILevelState m_CurrentLevelState;
 
+		private LevelsManager m_LevelsManager;
+
 		void Awake()
 		{
 			if (SupervisorText) SupervisorText.text = string.Empty;
@@ -24,10 +26,18 @@ namespace DevLocker.GFrame.UIUtils
 
 		void Update()
 		{
-			if (LevelsManager.Instance == null)
-				return;
+			if (m_LevelsManager == null) {
 
-			ILevelSupervisor nextSupervisor = LevelsManager.Instance.LevelSupervisor;
+				// Assuming there is only one instance.
+				// Singleton (if present) is implemented by the user code which is not accessible here.
+				m_LevelsManager = GameObject.FindObjectOfType<LevelsManager>();
+
+				if (m_LevelsManager == null)
+					return;
+			}
+
+
+			ILevelSupervisor nextSupervisor = m_LevelsManager.LevelSupervisor;
 			ILevelState nextState = nextSupervisor?.StatesStack?.CurrentState;
 
 			if (SupervisorText && nextSupervisor != m_CurrentLevelSupervisor) {

@@ -20,7 +20,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 	/// It is stored in the LevelsManager being accessible from everywhere.
 	/// Use this to share data needed by everyone.
 	/// </summary>
-	public sealed class SampleGameContext : IGameContext
+	public sealed class SampleGameContext
 	{
 		public SampleGameContext(PlayerInput playerInput, SamplePlayerControls controls, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders)
 		{

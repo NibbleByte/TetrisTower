@@ -436,9 +436,9 @@ namespace TetrisTower.TowerLevels
 
 		public void __DEBUG_Reset()
 		{
-			var context = (Game.GameContext) DevLocker.GFrame.LevelsManager.Instance.GameContext;
+			var context = Game.GameManager.Instance.GameContext;
 			context.SetCurrentPlaythrough(context.GameConfig.NewGameData);
-			DevLocker.GFrame.LevelsManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+			Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
 		}
 
 		#endregion

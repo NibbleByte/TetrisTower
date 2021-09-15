@@ -81,18 +81,18 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public void PauseLevel()
 		{
 			// Will be popped by UI.
-			LevelsManager.Instance.PushLevelState(new SamplePlayPausedState());
+			Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayPausedState());
 		}
 
 		public void OpenOptions()
 		{
 			// Will be popped by UI.
-			LevelsManager.Instance.PushLevelState(new SamplePlayOptionsState());
+			Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayOptionsState());
 		}
 
 		public void ExitToMainMenu()
 		{
-			LevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+			Game.SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 		}
 	}
 }

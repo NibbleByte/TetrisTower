@@ -3,14 +3,6 @@ using System.Collections;
 namespace DevLocker.GFrame
 {
 	/// <summary>
-	/// Marks class to be passed onto levels as game context.
-	/// </summary>
-	public interface IGameContext
-	{
-
-	}
-
-	/// <summary>
 	/// Implement this if you want to show / hide loading screen between your levels (e.g. fade out effects).
 	/// Set it to the LevelsManager to be used.
 	/// </summary>
@@ -33,13 +25,13 @@ namespace DevLocker.GFrame
 	{
 		LevelStateStack StatesStack { get; }
 
-		IEnumerator Load(IGameContext gameContext);
+		IEnumerator Load();
 
 		IEnumerator Unload();
 	}
 
 	/// <summary>
-	/// Your game context, level supervisor or level state can implement this to get invoked on Unity update.
+	/// Your level supervisor or level state can implement this to get invoked on Unity update.
 	/// </summary>
 	public interface IUpdateListener
 	{
@@ -47,7 +39,15 @@ namespace DevLocker.GFrame
 	}
 
 	/// <summary>
-	/// Your game context, level supervisor or level state can implement this to get invoked on Unity update.
+	/// Your level supervisor or level state can implement this to get invoked on Unity fixed update.
+	/// </summary>
+	public interface IFixedUpdateListener
+	{
+		void FixedUpdate();
+	}
+
+	/// <summary>
+	/// Your level supervisor or level state can implement this to get invoked on Unity late update.
 	/// </summary>
 	public interface ILateUpdateListener
 	{

@@ -54,7 +54,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 			GameContext = new SampleGameContext(playerInput, playerControls, BindingDisplayAssets);
 
-			var levelsManager = gameObject.AddComponent<LevelsManager>();
+			var levelsManager = gameObject.AddComponent<SampleLevelsManager>();
 			levelsManager.LevelLoadingScreen = levelFader;
 			levelsManager.SetGameContext(GameContext);
 		}
@@ -63,17 +63,17 @@ namespace DevLocker.GFrame.SampleGame.Game
 		{
 			// Boot game from current scene
 			if (GameObject.FindObjectOfType<Play.SamplePlayerController>()) {
-				LevelsManager.Instance.SwitchLevel(new Play.SamplePlaySupervisor());
+				SampleLevelsManager.Instance.SwitchLevel(new Play.SamplePlaySupervisor());
 				return;
 			}
 
 			if (GameObject.FindObjectOfType<MainMenu.SampleMainMenuController>()) {
-				LevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+				SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 				return;
 			}
 
 			if (GameObject.FindObjectOfType<UITester.SampleUITesterController>()) {
-				LevelsManager.Instance.SwitchLevel(new UITester.SampleUITesterLevelSupervisor());
+				SampleLevelsManager.Instance.SwitchLevel(new UITester.SampleUITesterLevelSupervisor());
 				return;
 			}
 		}

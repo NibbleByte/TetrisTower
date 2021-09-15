@@ -14,11 +14,9 @@ namespace DevLocker.GFrame.SampleGame.Play
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
-		public SampleGameContext GameContext { get; private set; }
-
-		public IEnumerator Load(IGameContext gameContext)
+		public IEnumerator Load()
 		{
-			GameContext = (SampleGameContext)gameContext;
+			SampleGameContext gameContext = SampleLevelsManager.Instance.GameContext;
 
 			if (MessageBox.MessageBox.Instance) {
 				MessageBox.MessageBox.Instance.ForceCloseAllMessages();
@@ -43,7 +41,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			var uiController = GameObject.FindObjectOfType<SamplePlayUIController>(true);
 
 			StatesStack = new LevelStateStack(
-				GameContext.PlayerControls,
+				gameContext.PlayerControls,
 				playerController,
 				uiController
 				);

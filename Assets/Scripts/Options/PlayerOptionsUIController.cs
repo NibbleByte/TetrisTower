@@ -18,9 +18,7 @@ namespace TetrisTower.Options
 
 		void OnEnable()
 		{
-			var gameContext = (GameContext)LevelsManager.Instance.GameContext;
-
-			switch(gameContext.Options.TouchInputControls) {
+			switch(GameManager.Instance.GameContext.Options.TouchInputControls) {
 				case PlayerOptions.TouchInputControlMethod.Drag:
 					TouchInputType.SetIsOnWithoutNotify(true);
 					break;
@@ -32,9 +30,7 @@ namespace TetrisTower.Options
 
 		private void SetTouchInputType(bool drag)
 		{
-			var gameContext = (GameContext)LevelsManager.Instance.GameContext;
-
-			gameContext.Options.TouchInputControls = drag
+			GameManager.Instance.GameContext.Options.TouchInputControls = drag
 				? PlayerOptions.TouchInputControlMethod.Drag
 				: PlayerOptions.TouchInputControlMethod.Swipes
 				;

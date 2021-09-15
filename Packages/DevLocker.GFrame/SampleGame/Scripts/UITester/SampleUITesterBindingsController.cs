@@ -13,7 +13,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 	{
 		public void SaveBindings()
 		{
-			var context = (SampleGameContext) LevelsManager.Instance.GameContext;
+			var context = SampleLevelsManager.Instance.GameContext;
 
 			var rebinds = context.PlayerInput.actions.SaveBindingOverridesAsJson();
 			PlayerPrefs.SetString("sample-game-rebinds", rebinds);
@@ -23,7 +23,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 
 		public void LoadBindings()
 		{
-			var context = (SampleGameContext)LevelsManager.Instance.GameContext;
+			var context = SampleLevelsManager.Instance.GameContext;
 
 			var rebinds = PlayerPrefs.GetString("sample-game-rebinds");
 			if (!string.IsNullOrEmpty(rebinds)) {
