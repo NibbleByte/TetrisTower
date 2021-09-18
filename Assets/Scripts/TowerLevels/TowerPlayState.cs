@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
 using System.Collections;
+using TetrisTower.Core;
 using TetrisTower.Game;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -119,6 +120,11 @@ namespace TetrisTower.TowerLevels
 			switch (context.phase) {
 				case InputActionPhase.Started:
 					m_PointerPressedStartPosition = Pointer.current.position.ReadValue();
+
+					// Pressed on the UI.
+					if (UIUtils.RaycastUIElements(m_PointerPressedStartPosition).Count > 0)
+						return;
+
 					m_PointerPressedLastPosition = m_PointerPressedStartPosition;
 					m_PointerPressedTime = Time.time;
 					m_PointerPressed = true;
