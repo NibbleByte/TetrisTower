@@ -20,7 +20,6 @@ namespace TetrisTower.TowerLevels
 		public bool IsPaused => !enabled;
 
 		public event System.Action LevelInitialized;
-		public event System.Action LevelFallingShapeChanged;
 		public event System.Action PlacingFallingShape;
 		public event System.Action PlacedOutsideGrid;
 		public event System.Action FallingShapeSelected;
@@ -50,7 +49,6 @@ namespace TetrisTower.TowerLevels
 			Grids.Add(LevelData.Grid);
 
 			LevelInitialized?.Invoke();
-			LevelFallingShapeChanged?.Invoke();
 		}
 
 		public IEnumerator RunActions(IList<GridAction> actions)

@@ -1,10 +1,7 @@
-using DevLocker.GFrame;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace TetrisTower.TowerLevels
+namespace TetrisTower.TowerLevels.UI
 {
 	public enum TowerLevelUIState
 	{

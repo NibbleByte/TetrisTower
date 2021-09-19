@@ -46,7 +46,6 @@ namespace TetrisTower.Visuals
 		private void Awake()
 		{
 			TowerLevel.LevelInitialized += OnLevelInitialized;
-			TowerLevel.LevelFallingShapeChanged += ReplaceFallingVisuals;
 			TowerLevel.PlacingFallingShape += OnPlacingFallingShape;
 			TowerLevel.PlacedOutsideGrid += DestroyFallingVisuals;
 			TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
@@ -66,15 +65,8 @@ namespace TetrisTower.Visuals
 
 			FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(LevelData.FallingColumn);
 			m_CurrentFallingColumn = LevelData.FallingColumn;
-		}
 
-		private void ReplaceFallingVisuals()
-		{
-			DestroyFallingVisuals();
-
-			if (LevelData.FallingShape != null) {
-				CreateFallingVisuals();
-			}
+			OnFallingShapeSelected();
 		}
 
 		private void OnPlacingFallingShape()
@@ -91,7 +83,9 @@ namespace TetrisTower.Visuals
 		{
 			DestroyFallingVisuals();
 
-			CreateFallingVisuals();
+			if (LevelData.FallingShape != null) {
+				CreateFallingVisuals();
+			}
 		}
 
 		private void CreateFallingVisuals()

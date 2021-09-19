@@ -26,7 +26,6 @@ namespace TetrisTower.Visuals2D
 		private void Awake()
 		{
 			TowerLevel.LevelInitialized += OnLevelInitialized;
-			TowerLevel.LevelFallingShapeChanged += ReplaceFallingVisuals;
 			TowerLevel.PlacingFallingShape += OnPlacingFallingShape;
 			TowerLevel.PlacedOutsideGrid += DestroyFallingVisuals;
 			TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
@@ -45,15 +44,8 @@ namespace TetrisTower.Visuals2D
 
 			DestroyFallingVisuals();
 			FallingVisualsContainer.SetAsFirstSibling();
-		}
 
-		private void ReplaceFallingVisuals()
-		{
-			DestroyFallingVisuals();
-
-			if (LevelData.FallingShape != null) {
-				CreateFallingVisuals();
-			}
+			OnFallingShapeSelected();
 		}
 
 		private void OnPlacingFallingShape()
@@ -67,7 +59,9 @@ namespace TetrisTower.Visuals2D
 		{
 			DestroyFallingVisuals();
 
-			CreateFallingVisuals();
+			if (LevelData.FallingShape != null) {
+				CreateFallingVisuals();
+			}
 		}
 
 		private void CreateFallingVisuals()

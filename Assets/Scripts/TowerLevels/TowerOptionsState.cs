@@ -6,7 +6,7 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerOptionsState : ILevelState
 	{
-		private TowerLevelUIController m_UIController;
+		private UI.TowerLevelUIController m_UIController;
 		private PlayerControls m_PlayerControls;
 
 		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
@@ -17,7 +17,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.InputStack.PushActionsState(this);
 			m_PlayerControls.UI.Enable();
 
-			m_UIController.SwitchState(TowerLevelUIState.Options);
+			m_UIController.SwitchState(UI.TowerLevelUIState.Options);
 
 			yield break;
 		}

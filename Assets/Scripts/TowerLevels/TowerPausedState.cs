@@ -8,7 +8,7 @@ namespace TetrisTower.TowerLevels
 	public class TowerPausedState : ILevelState, PlayerControls.ITowerLevelPausedActions
 	{
 		private PlayerControls m_PlayerControls;
-		private TowerLevelUIController m_UIController;
+		private UI.TowerLevelUIController m_UIController;
 
 		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
 		{
@@ -20,7 +20,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(this);
 			m_PlayerControls.TowerLevelPaused.Enable();
 
-			m_UIController.SwitchState(TowerLevelUIState.Paused);
+			m_UIController.SwitchState(UI.TowerLevelUIState.Paused);
 
 			yield break;
 		}

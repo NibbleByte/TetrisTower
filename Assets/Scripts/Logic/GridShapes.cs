@@ -59,6 +59,9 @@ namespace TetrisTower.Logic
 		public int MinColumn => GetMin(GridCoords.GetColumn);
 		public int MaxColumn => GetMax(GridCoords.GetColumn);
 
+		public GridCoords MinCoords => new GridCoords(MinRow, MinColumn);
+		public GridCoords MaxCoords => new GridCoords(MaxRow, MaxColumn);
+
 		public IEnumerable<ShapeBind> AddToCoordsWrapped(GridCoords addedCoords, GameGrid grid)
 		{
 			foreach(var shapeCoords in ShapeCoords) {

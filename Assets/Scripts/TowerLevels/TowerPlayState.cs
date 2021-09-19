@@ -14,7 +14,7 @@ namespace TetrisTower.TowerLevels
 		private GameConfig m_GameConfig;
 		private PlayerOptions m_Options;
 		private TowerLevelController m_LevelController;
-		private TowerLevelUIController m_UIController;
+		private UI.TowerLevelUIController m_UIController;
 
 		private bool m_PointerPressed = false;
 		private bool m_PointerDragConsumed = false;
@@ -42,7 +42,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.UI.Submit.Disable();
 			m_PlayerControls.UI.Navigate.Disable();
 
-			m_UIController.SwitchState(TowerLevelUIState.Play);
+			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
 
 			m_LevelController.ResumeLevel();
 
