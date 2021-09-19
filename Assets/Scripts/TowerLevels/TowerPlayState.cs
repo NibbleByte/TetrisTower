@@ -1,7 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
 using System.Collections;
-using TetrisTower.Core;
+using TetrisTower.Core.UI;
 using TetrisTower.Game;
 using UnityEngine;
 using UnityEngine.InputSystem;

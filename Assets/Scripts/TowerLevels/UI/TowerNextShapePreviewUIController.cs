@@ -14,12 +14,20 @@ namespace TetrisTower.TowerLevels.UI
 
 		public GameObject PreviewIconPrefab;
 
-		private void Awake()
+		void OnEnable()
 		{
 			TowerLevel.LevelInitialized += RecreatePreview;
 			TowerLevel.FallingShapeSelected += RecreatePreview;
 
 			RecreatePreview();
+		}
+
+		private void OnDisable()
+		{
+			if (TowerLevel) {
+				TowerLevel.LevelInitialized -= RecreatePreview;
+				TowerLevel.FallingShapeSelected -= RecreatePreview;
+			}
 		}
 
 		private void RecreatePreview()
@@ -35,11 +43,10 @@ namespace TetrisTower.TowerLevels.UI
 
 			int shapeRows = LevelData.NextShape.Rows;
 			int shapeColumns = LevelData.NextShape.Columns;
+			int gridArea = shapeRows * shapeColumns;
 
-			if (Grid.constraintCount != shapeColumns) {
+			if (gridTransform.childCount != gridArea) {
 				Grid.constraintCount = shapeColumns;
-
-				int gridArea = shapeRows * shapeColumns;
 
 				while(gridTransform.childCount > gridArea) {
 					var child = gridTransform.GetChild(0);
@@ -68,6 +75,8 @@ namespace TetrisTower.TowerLevels.UI
 					var previewIcon = gridTransform.GetChild(row * shapeColumns + column).GetComponentInChildren<Image>();
 					previewIcon.sprite = icon;
 					previewIcon.enabled = icon != null;
+
+					previewIcon.gameObject.SetActive(true);
 				}
 			}
 		}

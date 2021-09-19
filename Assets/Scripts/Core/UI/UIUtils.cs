@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TetrisTower.Core
+namespace TetrisTower.Core.UI
 {
 	public static class UIUtils
 	{
