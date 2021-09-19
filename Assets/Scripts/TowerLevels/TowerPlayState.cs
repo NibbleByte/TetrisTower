@@ -134,6 +134,9 @@ namespace TetrisTower.TowerLevels
 
 				case InputActionPhase.Canceled:
 
+					if (!m_PointerPressed)
+						return;
+
 					// Input handles get called before the Update(), so the last frame doesn't get applied if input is canceled.
 					// This is especially noticeable for hyper-fast swipes with duration 1 frame:
 					// First frame starts, next frame ends and no Update gets called (including on the first frame?!).
@@ -142,7 +145,6 @@ namespace TetrisTower.TowerLevels
 						Update();
 					}
 
-					Debug.Assert(m_PointerPressed);
 					m_PointerPressed = false;
 					m_PointerDragConsumed = false;
 					m_PointerDragSwiped = false;
@@ -187,6 +189,9 @@ namespace TetrisTower.TowerLevels
 
 				case InputActionPhase.Disabled:
 				case InputActionPhase.Waiting:
+					if (!m_PointerPressed)
+						return;
+
 					m_PointerPressed = false;
 					m_LevelController.ClearFallingShapeAnalogMoveOffset();
 					break;
