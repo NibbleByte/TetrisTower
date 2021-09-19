@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5394036698972749555}
   - component: {fileID: 5394036698972749554}
   m_Layer: 5
-  m_Name: HotkeyIcon
+  m_Name: Sample-HotkeyIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53,10 +53,18 @@ MonoBehaviour:
   Player: 1
   InputAction: {fileID: 0}
   BindingNumberToUse: 0
+  CompositePartNumberToUse: 0
+  DisplayMode:
+    Mode: 0
+    DisplayedDeviceLayout: 
+    KeepDisplayingLastDevice: 0
+    DisplayedControlScheme: 
+    ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 5394036700216754307}
   Text: {fileID: 5394036699964054010}
   UseShortText: 1
+  FormatText: 
 --- !u!1 &5394036699964054008
 GameObject:
   m_ObjectHideFlags: 0
@@ -116,7 +124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -195,7 +203,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
