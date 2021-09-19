@@ -12,7 +12,15 @@ namespace TetrisTower.TowerLevels.UI
 		public TowerLevelController TowerLevel;
 		public TowerLevelData LevelData => TowerLevel.LevelData;
 
-		public GameObject PreviewIconPrefab;
+		public TowerNextShapePreviewIcon PreviewIconPrefab;
+
+		private void Awake()
+		{
+			// Editor left overs...
+			foreach(Transform child in Grid.transform) {
+				child.gameObject.SetActive(true);
+			}
+		}
 
 		void OnEnable()
 		{
@@ -22,7 +30,7 @@ namespace TetrisTower.TowerLevels.UI
 			RecreatePreview();
 		}
 
-		private void OnDisable()
+		void OnDisable()
 		{
 			if (TowerLevel) {
 				TowerLevel.LevelInitialized -= RecreatePreview;
@@ -72,11 +80,8 @@ namespace TetrisTower.TowerLevels.UI
 						}
 					}
 
-					var previewIcon = gridTransform.GetChild(row * shapeColumns + column).GetComponentInChildren<Image>();
-					previewIcon.sprite = icon;
-					previewIcon.enabled = icon != null;
-
-					previewIcon.gameObject.SetActive(true);
+					var previewIcon = gridTransform.GetChild(row * shapeColumns + column).GetComponentInChildren<TowerNextShapePreviewIcon>();
+					previewIcon.SetIcon(icon);
 				}
 			}
 		}
