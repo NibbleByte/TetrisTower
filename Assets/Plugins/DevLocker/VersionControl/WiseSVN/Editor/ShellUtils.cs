@@ -217,7 +217,7 @@ namespace DevLocker.VersionControl.WiseSVN.Shell
 				}
 			}
 
-			//process.CancelOutputRead();
+			process.CancelOutputRead();
 			process.OutputDataReceived -= outputReadLineHandler;
 			//process.StandardOutput.Close();
 			lock (outputBuilder) {
@@ -226,7 +226,7 @@ namespace DevLocker.VersionControl.WiseSVN.Shell
 				result.Output = outputBuilder.ToString();
 			}
 
-			//process.CancelErrorRead();
+			process.CancelErrorRead();
 			process.ErrorDataReceived -= errorReadLineHandler;
 			//process.StandardError.Close();
 			lock (errorBuilder) {
