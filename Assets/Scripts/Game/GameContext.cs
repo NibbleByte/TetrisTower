@@ -58,7 +58,7 @@ namespace TetrisTower.Game
 
 		public void Dispose()
 		{
-			InputContext.Dispose();
+			InputContextManager.DisposeContext();
 		}
 	}
 }

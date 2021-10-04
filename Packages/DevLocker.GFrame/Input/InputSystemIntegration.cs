@@ -124,6 +124,12 @@ namespace DevLocker.GFrame.Input
 		{
 			InputContext = context;
 		}
+
+		public static void DisposeContext()
+		{
+			InputContext?.Dispose();
+			InputContext = null;
+		}
 	}
 
 	/// <summary>

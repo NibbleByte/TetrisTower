@@ -40,7 +40,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 		public void Dispose()
 		{
-			InputContext.Dispose();
+			InputContextManager.DisposeContext();
 		}
 	}
 }

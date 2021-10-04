@@ -82,6 +82,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		private InputDevice m_LastDevice;
 
+		private bool m_GameQuitting = false;
+
 		/// <summary>
 		/// Call this if you rebind the input or something...
 		/// </summary>
@@ -219,8 +221,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		void OnDisable()
 		{
 			if (InputContextManager.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
-				enabled = false;
+				if (!m_GameQuitting) {
+					Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+					enabled = false;
+				}
 				return;
 			}
 
@@ -271,6 +275,11 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
 			}
+		}
+
+		void OnApplicationQuit()
+		{
+			m_GameQuitting = true;
 		}
 	}
 
