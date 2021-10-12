@@ -522,6 +522,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 #if UNITY_EDITOR
 	[UnityEditor.CustomEditor(typeof(UIScope), true)]
+	[UnityEditor.CanEditMultipleObjects]
 	internal class UIScopeEditor : UnityEditor.Editor
 	{
 		public override void OnInspectorGUI()
