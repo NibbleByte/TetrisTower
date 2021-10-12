@@ -41,11 +41,36 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// For example:
 	/// > "Back" hotkey element is attached on the displayed menu and another "Back" hotkey attached to the "Yes/No" pop up, displayed on top.
 	/// > The usual solution is to invoke only the last enabled hotkey instead of all of them.
-	/// UIScope groups all child scope elements into a single group. The last enabled UIScope is active, while the rest will be disabled.
+	/// UIScope groups all child scope elements into a single group. The last enabled UIScope is focused - it and all its parent scopes are activated, while the rest will be disabled.
 	/// </summary>
 	[SelectionBase]
 	public class UIScope : MonoBehaviour
 	{
+		public enum OnEnablePolicy
+		{
+			Focus = 0,
+			FocusWithFramePriority = 2,	// If multiple activations
+			FocusIfCurrentIsLowerDepth = 5,
+			FocusIfCurrentIsLowerOrEqualDepth = 7,
+			DontFocus = 20,
+		}
+
+		public enum OnDisablePolicy
+		{
+			FocusScopeWithHighestDepth = 0,
+			//FocusPreviousScope = 5, Someday... decide what to do if prev is inactive and what happens if gets disabled the same frame as well.
+			FocusParentScope = 10,
+			FocusFirstEnabledScopeFromList = 15,
+			EmptyFocus = 20,
+		}
+
+		[Tooltip("What should happen when this scope gets enabled.\n\nFocusWithFramePriority - use when multiple scopes get enabled in the same frame to prioritize this one.")]
+		public OnEnablePolicy OnEnableBehaviour;
+		[Tooltip("What should happen when this scope gets disabled ONLY if this is the FOCUSED (deepest) one.")]
+		public OnDisablePolicy OnDisableBehaviour;
+
+		public List<UIScope> OnDisableScopes;
+
 #if USE_INPUT_SYSTEM
 		[Tooltip("Reset all input actions.\nThis will interrupt their progress and any gesture, drag, sequence will be canceled.")]
 		public bool ResetAllActionsOnEnable = true;
@@ -59,7 +84,19 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool IncludeUIActions = true;
 #endif
 
+		private int m_FrameEnabled = -1;
+		private int m_ScopeDepth;
+
+		/// <summary>
+		/// Focused scope which keeps it and all its parents active (and the rest will be inactive).
+		/// </summary>
+		public static UIScope FocusedScope => m_ActiveScopes.LastOrDefault();
+
+		/// <summary>
+		/// The focused scope plus all it's parents - top to bottom.
+		/// </summary>
 		public static IReadOnlyCollection<UIScope> ActiveScopes => m_ActiveScopes;
+
 		private static UIScope[] m_ActiveScopes = Array.Empty<UIScope>();
 
 		private static List<UIScope> s_Scopes = new List<UIScope>();
@@ -91,8 +128,19 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_GameQuitting = true;
 		}
 
+		public virtual void OnValidate()
+		{
+			for(int i = 0; i < OnDisableScopes.Count; ++i) {
+				if (OnDisableScopes[i] == null) {
+					Debug.LogError($"\"{name}\" has missing scope in {nameof(OnDisableScopes)} list at scene \"{gameObject.scene.name}\"", this);
+				}
+			}
+		}
+
 		void OnEnable()
 		{
+			m_FrameEnabled = Time.frameCount;
+
 			if (s_ChangingActiveScopes) {
 				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
 				return;
@@ -105,9 +153,13 @@ namespace DevLocker.GFrame.Input.UIScope
 				// That would include me, freshly enabled.
 				UIScope[] nextScopes = CollectScopes(m_ActiveScopes.Last());
 
-				foreach (UIScope scope in nextScopes) {
-					s_Scopes.Remove(scope);
-					s_Scopes.Add(scope);
+				for (int i = 0; i < nextScopes.Length; ++i) {
+					UIScope scope = nextScopes[i];
+					scope.m_ScopeDepth = i; // Always set this in case hierarchy changed in the mean time.
+				}
+
+				if (!s_Scopes.Contains(this)) {
+					s_Scopes.Add(this);
 				}
 
 				SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
@@ -118,44 +170,119 @@ namespace DevLocker.GFrame.Input.UIScope
 				// Ensure that collections don't have any duplicates and are filled in the right order - parent to child.
 				UIScope[] nextScopes = CollectScopes(this);
 
-				foreach (UIScope scope in nextScopes) {
+				for(int i = 0; i < nextScopes.Length; ++i) {
+					UIScope scope = nextScopes[i];
+					scope.m_ScopeDepth = i;	// Always set this in case hierarchy changed in the mean time.
+
 					if (!s_Scopes.Contains(scope)) {
 						s_Scopes.Add(scope);
 					}
 				}
 
-				SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+				UIScope lastActive = m_ActiveScopes.LastOrDefault();
+
+				switch (OnEnableBehaviour) {
+					case OnEnablePolicy.Focus:
+						// Skip activation if this frame another scope was activated with higher priority.
+						if (!m_ActiveScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
+							SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+						}
+						break;
+
+					case OnEnablePolicy.FocusWithFramePriority:
+						SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+						break;
+
+					case OnEnablePolicy.FocusIfCurrentIsLowerDepth:
+						if (lastActive == null || lastActive.m_ScopeDepth < m_ScopeDepth) {
+							SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+						}
+						break;
+
+					case OnEnablePolicy.FocusIfCurrentIsLowerOrEqualDepth:
+						if (lastActive == null || lastActive.m_ScopeDepth <= m_ScopeDepth) {
+							SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+						}
+						break;
+
+					case OnEnablePolicy.DontFocus:
+						break;
+
+					default:
+						throw new NotSupportedException(OnEnableBehaviour.ToString());
+				}
 			}
 		}
 
 		void OnDisable()
 		{
+			m_FrameEnabled = -1;
+
 			if (s_ChangingActiveScopes) {
 				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, false));
 				return;
 			}
 
-			UIScope nextDeepestScope = null;
-			bool wasActive = false;
-
-			// HACK: On turning off the game OnDisable() gets called which may call methods on destroyed objects.
-			if (Array.IndexOf(m_ActiveScopes, this) != -1 && !m_GameQuitting) {
-
-				// Try keep the current lowest scope as the target one.
-				if (this != m_ActiveScopes.Last()) {
-					nextDeepestScope = m_ActiveScopes.Last();
-				}
-
-				wasActive = true;
-			}
-
 			s_Scopes.Remove(this);
 
-			if (wasActive && !m_GameQuitting) {
-				// Pick the next lowest (latest) child registered that is still enabled (might be in the process of disabling).
-				nextDeepestScope = nextDeepestScope ?? s_Scopes.LastOrDefault(s => s.enabled);
-				UIScope[] nextScopes = nextDeepestScope
-					? CollectScopes(nextDeepestScope)
+			// HACK: On turning off the game OnDisable() gets called which may call methods on destroyed objects.
+			int activeIndex = Array.IndexOf(m_ActiveScopes, this);
+			if (activeIndex != -1 && !m_GameQuitting) {
+
+				// Proceed only if this is the deepest scope (i.e. the focused one).
+				if (activeIndex != m_ActiveScopes.Length - 1) {
+					var activeScopes = CollectScopes(m_ActiveScopes.Last());
+					SwitchActiveScopes(ref m_ActiveScopes, activeScopes);
+					return;
+				}
+
+				// Something else just activated, don't change the focus.
+				foreach(UIScope scope in s_Scopes) {
+					if (scope.m_FrameEnabled == Time.frameCount) {
+						return;
+					}
+				}
+
+				UIScope nextScope = null;
+				UIScope[] nextScopes;
+
+				switch (OnDisableBehaviour) {
+					case OnDisablePolicy.FocusParentScope:
+						Transform scopeTransform = transform.parent;
+						while(scopeTransform) {
+							UIScope scope = scopeTransform.GetComponent<UIScope>();
+							if (scope && scope.isActiveAndEnabled) {
+								nextScope = scope;
+								break;
+							}
+
+							scopeTransform = scopeTransform.parent;
+						}
+						break;
+
+					case OnDisablePolicy.FocusScopeWithHighestDepth:
+						nextScope = s_Scopes.FirstOrDefault();
+						foreach(UIScope scope in s_Scopes) {
+							if (nextScope.m_ScopeDepth < scope.m_ScopeDepth && scope.isActiveAndEnabled) {
+								nextScope = scope;
+							}
+						}
+						break;
+
+					case OnDisablePolicy.FocusFirstEnabledScopeFromList:
+						nextScope = OnDisableScopes.FirstOrDefault(s => s.isActiveAndEnabled);
+						break;
+
+					case OnDisablePolicy.EmptyFocus:
+						nextScope = null;
+						break;
+
+					default:
+						throw new NotSupportedException(OnDisableBehaviour.ToString());
+				}
+
+				nextScopes = nextScope
+					? CollectScopes(nextScope)
 					: Array.Empty<UIScope>()
 					;
 
@@ -181,14 +308,14 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			// Force full re-initialization of all the scopes.
 			SwitchActiveScopes(ref m_ActiveScopes, new UIScope[0]);
-			lastActive.ForceActiveScope();
+			lastActive.ForceRefocusScope();
 		}
 
 		/// <summary>
 		/// Force selected scope to be active, instead of the last enabled.
 		/// </summary>
 		[ContextMenu("Force activate scope")]
-		public void ForceActiveScope()
+		public void ForceRefocusScope()
 		{
 			if (s_ChangingActiveScopes) {
 				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
@@ -229,7 +356,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				// Force full re-initialization of all the scopes including this one.
 				SwitchActiveScopes(ref m_ActiveScopes, new UIScope[0]);
-				lastActive.ForceActiveScope();
+				lastActive.ForceRefocusScope();
 
 			} else {
 				foreach(IScopeElement scopeElement in m_ScopeElements) {
@@ -401,20 +528,30 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			serializedObject.Update();
 
-			var uiScope = (UIScope)target;
-
 			UnityEditor.EditorGUI.BeginDisabledGroup(true);
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
 			UnityEditor.EditorGUI.EndDisabledGroup();
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("ResetAllActionsOnEnable"));
+			var uiScope = (UIScope)target;
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("EnableUsedInputActions"));
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("PushInputStack"));
-			if (uiScope.PushInputStack) {
-				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("IncludeUIActions"));
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnEnableBehaviour)));
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableBehaviour)));
+
+			if (uiScope.OnDisableBehaviour == UIScope.OnDisablePolicy.FocusFirstEnabledScopeFromList) {
+				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableScopes)));
 			}
 
+#if USE_INPUT_SYSTEM
+			UnityEditor.EditorGUILayout.Space();
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.ResetAllActionsOnEnable)));
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.EnableUsedInputActions)));
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.PushInputStack)));
+			if (uiScope.PushInputStack) {
+				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IncludeUIActions)));
+			}
+#endif
 			serializedObject.ApplyModifiedProperties();
 
 

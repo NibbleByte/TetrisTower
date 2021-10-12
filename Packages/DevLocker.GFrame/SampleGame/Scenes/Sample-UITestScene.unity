@@ -950,6 +950,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -2011,6 +2014,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -2759,7 +2765,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &536400305
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2833,6 +2839,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -2971,6 +2980,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -4215,6 +4227,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -5568,6 +5583,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -6117,6 +6135,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 2
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -7442,7 +7463,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1316358547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7455,6 +7476,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -10218,6 +10242,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -10444,6 +10471,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -11625,8 +11655,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 260, y: -245.39}
-  m_SizeDelta: {x: 500, y: 330.78}
+  m_AnchoredPosition: {x: 260, y: -252.74518}
+  m_SizeDelta: {x: 500, y: 345.4904}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2028708159
 MonoBehaviour:
@@ -11650,7 +11680,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 16
+    m_FontSize: 13
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -11669,29 +11699,36 @@ MonoBehaviour:
 
 
     UIScope is component added to the hierarchy. It scans for
-    any IScopeElements underneath (e.g. hotkeys) and controls them.
+    any child IScopeElements underneath (e.g. hotkeys) and controls them.
 
 
-    You may
-    have multiple UIScopes present in the UI, but only one group active at the same
-    time (which activates the IScopeElements). Here are the activating rules:
+    You
+    may have multiple UIScopes present in the UI, but only one focused at the same
+    time. Focusing a UIScope activates it and all its'' parent scopes, enabling the
+    controlled IScopeElement components.
+
+
+    Here are some rules about focusing
+    scopes:
+
+    - If UIScope gets enabled it will gain focus by default.
 
     -
-    If UIScope gets enabled, it deactivates the previous scopes, groups all parent
-    scopes and activates them.
+    If focused UIScope gets disabled, it will try to focus the deepest enabled scope
+    available, by default.
 
-    - Activated scopes enable the owned IScopeElement
-    components.
+    - Unity OnEnable() and OnDisable() methods are called
+    in RANDOM order, do not rely on the hierarchy!
 
-    - If the deepest active scope gets disabled, the system will
-    activate the next most recent scope (prioritizing parent scopes, bottom to top).
+    - If multiple scopes are
+    enabled at the same time, you can prioritize one of them to get focused in the
+    end.
 
 
-    Dig
-    in the hierarchy and check all UIScope components.
+    Dig in the hierarchy and check all UIScope components.
 
-    Try deactivate and reactivate
-    scopes and see what happens.'
+    Try deactivate
+    and reactivate scopes and see what happens.'
 --- !u!222 &2028708160
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11871,6 +11908,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
