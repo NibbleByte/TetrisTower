@@ -64,6 +64,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			EmptyFocus = 20,
 		}
 
+		[Tooltip("If on, you can choose OnEnable and OnDisable automatic focus behaviour.\n\nIf off, this scope will always be active when enabled and vice versa. You'll have to manually handle this and it will be excluded from any focus schemes (i.e. it can be active while another scope is focused + parents). You'll be responsible for managing conflicts.")]
+		public bool AutomaticFocus = true;
+
 		[Tooltip("What should happen when this scope gets enabled.\n\nFocusWithFramePriority - use when multiple scopes get enabled in the same frame to prioritize this one.")]
 		public OnEnablePolicy OnEnableBehaviour;
 		[Tooltip("What should happen when this scope gets disabled ONLY if this is the FOCUSED (deepest) one.")]
@@ -140,6 +143,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		void OnEnable()
 		{
 			m_FrameEnabled = Time.frameCount;
+
+			if (!AutomaticFocus) {
+				SetScopeState(true);
+				return;
+			}
 
 			if (s_ChangingActiveScopes) {
 				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
@@ -218,6 +226,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			m_FrameEnabled = -1;
 
+			if (!AutomaticFocus) {
+				SetScopeState(false);
+				return;
+			}
+
 			if (s_ChangingActiveScopes) {
 				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, false));
 				return;
@@ -251,7 +264,7 @@ namespace DevLocker.GFrame.Input.UIScope
 						Transform scopeTransform = transform.parent;
 						while(scopeTransform) {
 							UIScope scope = scopeTransform.GetComponent<UIScope>();
-							if (scope && scope.isActiveAndEnabled) {
+							if (scope && scope.isActiveAndEnabled && scope.AutomaticFocus) {
 								nextScope = scope;
 								break;
 							}
@@ -317,6 +330,10 @@ namespace DevLocker.GFrame.Input.UIScope
 		[ContextMenu("Force activate scope")]
 		public void ForceRefocusScope()
 		{
+			if (!AutomaticFocus) {
+				throw new InvalidOperationException($"Trying to focus scope {name} that has set {nameof(AutomaticFocus)} to false. Just enable the scope and it will be active.");
+			}
+
 			if (s_ChangingActiveScopes) {
 				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
 				return;
@@ -359,8 +376,16 @@ namespace DevLocker.GFrame.Input.UIScope
 				lastActive.ForceRefocusScope();
 
 			} else {
-				foreach(IScopeElement scopeElement in m_ScopeElements) {
-					scopeElement.enabled = false;
+
+				if (AutomaticFocus) {
+					foreach (IScopeElement scopeElement in m_ScopeElements) {
+						scopeElement.enabled = false;
+					}
+				} else {
+					// Make sure any new elements were re-initialized properly.
+					SetScopeState(false);
+
+					SetScopeState(true);
 				}
 			}
 		}
@@ -391,7 +416,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			return target
 				.GetComponentsInParent<UIScope>(true)	// Collect all so they get deactivated properly later on.
 				.Reverse()
-				.Where(s => s.enabled)
+				.Where(s => s.enabled && s.AutomaticFocus)
 				.ToArray();
 		}
 
@@ -535,11 +560,14 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			var uiScope = (UIScope)target;
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnEnableBehaviour)));
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableBehaviour)));
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.AutomaticFocus)));
+			if (uiScope.AutomaticFocus) {
+				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnEnableBehaviour)));
+				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableBehaviour)));
 
-			if (uiScope.OnDisableBehaviour == UIScope.OnDisablePolicy.FocusFirstEnabledScopeFromList) {
-				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableScopes)));
+				if (uiScope.OnDisableBehaviour == UIScope.OnDisablePolicy.FocusFirstEnabledScopeFromList) {
+					UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableScopes)));
+				}
 			}
 
 #if USE_INPUT_SYSTEM
