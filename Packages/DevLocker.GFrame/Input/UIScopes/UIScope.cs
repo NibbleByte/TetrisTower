@@ -58,7 +58,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public enum OnDisablePolicy
 		{
 			FocusScopeWithHighestDepth = 0,
-			//FocusPreviousScope = 5, Someday... decide what to do if prev is inactive and what happens if gets disabled the same frame as well.
+			FocusPreviousScope = 5,
 			FocusParentScope = 10,
 			FocusFirstEnabledScopeFromList = 15,
 			EmptyFocus = 20,
@@ -87,6 +87,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool IncludeUIActions = true;
 #endif
 
+		private UIScope m_LastFocusedScope;
 		private int m_FrameEnabled = -1;
 		private int m_ScopeDepth;
 
@@ -143,6 +144,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		void OnEnable()
 		{
 			m_FrameEnabled = Time.frameCount;
+			m_LastFocusedScope = FocusedScope;
 
 			if (!AutomaticFocus) {
 				SetScopeState(true);
@@ -270,6 +272,18 @@ namespace DevLocker.GFrame.Input.UIScope
 							}
 
 							scopeTransform = scopeTransform.parent;
+						}
+						break;
+
+					case OnDisablePolicy.FocusPreviousScope:
+						nextScope = m_LastFocusedScope;
+						var visitedScopes = new HashSet<UIScope>() { nextScope };
+
+						while(nextScope != null && !nextScope.isActiveAndEnabled) {
+							nextScope = visitedScopes.Contains(nextScope.m_LastFocusedScope)
+								? null
+								: nextScope.m_LastFocusedScope
+								;
 						}
 						break;
 
