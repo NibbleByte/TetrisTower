@@ -13,7 +13,6 @@ namespace TetrisTower.Logic
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			int lines = 1;  // Property Label
-			lines ++;       // Size line
 			if (m_Unfolded) {
 				lines += property.FindPropertyRelative("m_Rows").intValue;
 			}
@@ -25,11 +24,12 @@ namespace TetrisTower.Logic
 		{
 			label = EditorGUI.BeginProperty(position, label, property);
 
-			EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+			var prefixedPos = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-			// Label row
-			position.y += EditorGUIUtility.singleLineHeight;
-			position.height -= EditorGUIUtility.singleLineHeight;
+			var foldPos = position;
+			foldPos.width = prefixedPos.x - position.x;
+			foldPos.height = EditorGUIUtility.singleLineHeight;
+			m_Unfolded = EditorGUI.Foldout(foldPos, m_Unfolded, "", true);
 
 			var rowsProp = property.FindPropertyRelative("m_Rows");
 			var columnsProp = property.FindPropertyRelative("m_Columns");
@@ -38,24 +38,22 @@ namespace TetrisTower.Logic
 			int rows = rowsProp.intValue;
 			int columns = columnsProp.intValue;
 
+			int prevIndent = EditorGUI.indentLevel;
+			EditorGUI.indentLevel = 0;
 
 			// Size row.
 			{
-				var sizePos = position;
+				var sizePos = prefixedPos;
 				sizePos.height = EditorGUIUtility.singleLineHeight;
 				GUI.Label(sizePos, "Rows x Columns:");
 
-				sizePos.x += 110f;
+				sizePos.x += 104f;
 				sizePos.width = 40f;
 				rowsProp.intValue = EditorGUI.IntField(sizePos, rowsProp.intValue);
 				sizePos.x += 40;
 				GUI.Label(sizePos, " x ");
 				sizePos.x += 18;
 				columnsProp.intValue = EditorGUI.IntField(sizePos, columnsProp.intValue);
-
-
-				sizePos.x += 60;
-				m_Unfolded = EditorGUI.Foldout(sizePos, m_Unfolded, "Grid");
 
 				position.y += EditorGUIUtility.singleLineHeight;
 				position.height -= EditorGUIUtility.singleLineHeight;
@@ -83,6 +81,7 @@ namespace TetrisTower.Logic
 				}
 			}
 
+			EditorGUI.indentLevel = prevIndent;
 
 			EditorGUI.EndProperty();
 		}

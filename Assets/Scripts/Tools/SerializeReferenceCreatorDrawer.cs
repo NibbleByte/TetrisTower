@@ -22,7 +22,12 @@ namespace TetrisTower.Tools
 		{
 			// This property doesn't have the [SerializeReference] attribute.
 			if (property.propertyType != SerializedPropertyType.ManagedReference) {
+				label = EditorGUI.BeginProperty(position, label, property);
+				EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+
 				EditorGUI.PropertyField(position, property, true);
+
+				EditorGUI.EndProperty();
 				return;
 			}
 
@@ -48,6 +53,9 @@ namespace TetrisTower.Tools
 
 			} else {
 
+				label = EditorGUI.BeginProperty(position, label, property);
+				EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+
 				GUI.backgroundColor = Color.red;
 				if (GUI.Button(clearRect, "Clear")) {
 					property.managedReferenceValue = null;
@@ -55,6 +63,8 @@ namespace TetrisTower.Tools
 				GUI.backgroundColor = prevBackground;
 
 				EditorGUI.PropertyField(position, property, true);
+
+				EditorGUI.EndProperty();
 			}
 
 		}
