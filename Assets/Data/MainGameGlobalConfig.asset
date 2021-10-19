@@ -51,6 +51,7 @@ MonoBehaviour:
           MatchHorizontalLines: 3
           MatchVerticalLines: 3
           MatchDiagonalsLines: 3
+          MatchScoring: -1
           WrapSidesOnMatch: 1
           WrapSidesOnMove: 1
         Grid:
@@ -226,6 +227,8 @@ MonoBehaviour:
           - {fileID: 0}
           - {fileID: 0}
           - {fileID: 0}
+        Score:
+          id: 1
     00000001:
       type: {class: , ns: , asm: }
     00000002:

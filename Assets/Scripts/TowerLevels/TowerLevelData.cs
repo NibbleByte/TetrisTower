@@ -23,6 +23,9 @@ namespace TetrisTower.TowerLevels
 		public GridRules Rules;
 		public BlocksGrid Grid;
 
+		[SerializeReference]
+		public ScoreGrid Score;
+
 		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), column);
 		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);
 	}

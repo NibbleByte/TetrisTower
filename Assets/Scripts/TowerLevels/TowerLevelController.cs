@@ -41,12 +41,21 @@ namespace TetrisTower.TowerLevels
 		{
 			LevelData = m_DebugLevelData = data;
 
+			if (LevelData.Score == null) {
+				LevelData.Score = new ScoreGrid(LevelData.Grid.Rows, LevelData.Grid.Columns, LevelData.Rules);
+			}
+
+			if (LevelData.Rules.MatchScoring == 0) {
+				Debug.LogError($"Initializing a game with no MatchScoring set.", this);
+			}
+
 			if (LevelData.NextShape == null) {
 				LevelData.NextShape = GenerateShape();
 			}
 
 			Grids.Clear();
 			Grids.Add(LevelData.Grid);
+			Grids.Add(LevelData.Score);
 
 			LevelInitialized?.Invoke();
 		}
@@ -67,6 +76,12 @@ namespace TetrisTower.TowerLevels
 				}
 
 				actions = GameGridEvaluation.Evaluate(Grid, LevelData.Rules);
+			}
+
+			// Mark the matching sequence as complete. Used for scoring etc.
+			var finishedSequenceActions = new GridAction[] { new MatchingSequenceFinishAction() };
+			foreach (var grid in Grids) {
+				yield return grid.ApplyActions(finishedSequenceActions);
 			}
 
 			m_FinishedRuns++;
@@ -417,7 +432,7 @@ namespace TetrisTower.TowerLevels
 					}
 
 					if (clearCoords.Count > 0) {
-						var actions = new List<GridAction>() { new ClearMatchedAction() { Coords = clearCoords } };
+						var actions = new List<GridAction>() { new ClearMatchedAction() { MatchedType = MatchScoringType.Horizontal, Coords = clearCoords } };
 						StartCoroutine(RunActions(actions));
 					}
 				}

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Logic;
+using TetrisTower.TowerLevels.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -54,17 +55,19 @@ namespace TetrisTower.Visuals
 		public float MatchBlockDelay = 0.075f;
 		public float MatchActionDelay = 1.2f;
 
+		public MatchSequenceScoreUIController ScoreSequenceUIController;
+
 		public int Rows => m_Blocks.GetLength(0);
 		public int Columns => m_Blocks.GetLength(1);
 
-		public GameObject this[int row, int column] => m_Blocks[row, column];
+		public ConeVisualsBlock this[int row, int column] => m_Blocks[row, column];
 
-		public GameObject this[GridCoords coords] {
+		public ConeVisualsBlock this[GridCoords coords] {
 			get => m_Blocks[coords.Row, coords.Column];
 			private set => m_Blocks[coords.Row, coords.Column] = value;
 		}
 
-		private GameObject[,] m_Blocks;
+		private ConeVisualsBlock[,] m_Blocks;
 
 		public Vector3 ConeApex { get; private set; }
 		public float ConeSectorEulerAngle { get; private set; }
@@ -72,7 +75,10 @@ namespace TetrisTower.Visuals
 
 		private GridShape<GameObject> m_PlacedShapeToBeReused = null;
 
-		public void Init(BlocksGrid grid)
+		private GridRules m_Rules;
+		private ScoreGrid m_ScoreGrid = null;
+
+		public void Init(BlocksGrid grid, GridRules rules)
 		{
 			if (m_Blocks != null) {
 				DestroyInstances();
@@ -83,7 +89,10 @@ namespace TetrisTower.Visuals
 
 			CalculateCone(grid.Columns);
 
-			m_Blocks = new GameObject[grid.Rows, grid.Columns];
+			m_Rules = rules;
+
+			m_Blocks = new ConeVisualsBlock[grid.Rows, grid.Columns];
+			m_ScoreGrid = null;
 
 			for(int row = 0; row < grid.Rows; ++row) {
 				for(int column = 0; column < grid.Columns; ++column) {
@@ -135,7 +144,7 @@ namespace TetrisTower.Visuals
 			for (int row = 0; row < Rows; ++row) {
 				for (int column = 0; column < Columns; ++column) {
 					if (this[row, column]) {
-						GameObject.Destroy(this[row, column]);
+						GameObject.Destroy(this[row, column].gameObject);
 					}
 				}
 			}
@@ -143,6 +152,15 @@ namespace TetrisTower.Visuals
 
 		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
 		{
+			if (m_ScoreGrid == null) {
+				m_ScoreGrid = new ScoreGrid(Rows, Columns, m_Rules);
+			}
+
+			// Count clear hits
+			foreach(var clearCoords in actions.OfType<ClearMatchedAction>().SelectMany(a => a.Coords)) {
+				this[clearCoords].MatchHits++;
+			}
+
 			foreach (var action in MergeActions(actions)) {
 				switch (action) {
 					case PlaceAction placeAction:
@@ -154,21 +172,25 @@ namespace TetrisTower.Visuals
 					case MoveCellsAction moveAction:
 						yield return MoveCells(moveAction);
 						break;
+					case MatchingSequenceFinishAction finishAction:
+						ScoreSequenceUIController.FinishScore(m_ScoreGrid);
+						m_ScoreGrid = null;
+						break;
 				}
 			}
 		}
 
 		private IEnumerable<GridAction> MergeActions(IEnumerable<GridAction> actions)
 		{
-			List<GridCoords> clearedBlocks = new List<GridCoords>();
 			List<KeyValuePair<GridCoords, GridCoords>> mergedMoves = new List<KeyValuePair<GridCoords, GridCoords>>();
 
 			foreach (var action in actions) {
 
 				switch (action) {
-					case ClearMatchedAction clearAction:
-						clearedBlocks.AddRange(clearAction.Coords);
-						break;
+					// Don't merge so we can score them separately + animations.
+					//case ClearMatchedAction clearAction:
+					//	clearedBlocks.AddRange(clearAction.Coords);
+					//	break;
 
 					case MoveCellsAction moveAction:
 						mergedMoves.AddRange(moveAction.MovedCells);
@@ -178,11 +200,6 @@ namespace TetrisTower.Visuals
 						yield return action;
 						break;
 				}
-			}
-
-			// Merge sequences of clear actions so animations play together.
-			if (clearedBlocks.Count > 0) {
-				yield return new ClearMatchedAction() { Coords = clearedBlocks.ToArray() };
 			}
 
 			// Merge sequences of move actions so animations play together.
@@ -213,14 +230,23 @@ namespace TetrisTower.Visuals
 
 		private IEnumerator ClearMatchedCells(ClearMatchedAction action)
 		{
-			foreach (var coord in action.Coords) {
-				// This can happen if the same block is cleared in different matches.
-				//Debug.Assert(this[coord] != null);
-				if (this[coord] == null)
-					continue;
+			m_ScoreGrid.ScoreMatchedCells(action);
 
-				GameObject.Destroy(this[coord]);
-				this[coord] = null;
+			ScoreSequenceUIController?.UpdateScore(m_ScoreGrid);
+
+			foreach (var coord in action.Coords) {
+
+				var visualsBlock = this[coord];
+				Debug.Assert(visualsBlock != null);
+				visualsBlock.MatchHits--;
+
+				if (visualsBlock.MatchHits != 0) {
+					visualsBlock.HighlightHit();
+				} else {
+					GameObject.Destroy(this[coord].gameObject);
+					this[coord] = null;
+				}
+
 				yield return new WaitForSeconds(MatchBlockDelay);
 			}
 
@@ -283,11 +309,12 @@ namespace TetrisTower.Visuals
 
 			reuseVisuals.transform.position = ConeApex;
 			reuseVisuals.transform.rotation = GridColumnToRotation(coords.Column);
+			var visualsBlock = reuseVisuals.AddComponent<ConeVisualsBlock>();
 
 			// Hitting the limit, won't be stored.
 			if (coords.Row < Rows) {
 				Debug.Assert(this[coords] == null);
-				this[coords] = reuseVisuals;
+				this[coords] = visualsBlock;
 
 				reuseVisuals.transform.localScale = GridToScale(coords);
 			} else {

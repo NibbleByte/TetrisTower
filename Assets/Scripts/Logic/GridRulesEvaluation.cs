@@ -1,16 +1,26 @@
+using DevLocker.GFrame.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TetrisTower.Core;
 
 namespace TetrisTower.Logic
 {
+	public enum MatchScoringType
+	{
+		Horizontal = 1 << 0,
+		Vertical = 1 << 1,
+		Diagonals = 1 << 2,
+	}
+
 	[System.Serializable]
 	public struct GridRules
 	{
 		public int MatchHorizontalLines;
 		public int MatchVerticalLines;
 		public int MatchDiagonalsLines;
+
+		[EnumMask]
+		public MatchScoringType MatchScoring;
 
 		// Will wrap around the first and last column when matching and moving.
 		public bool WrapSidesOnMatch;
@@ -39,10 +49,10 @@ namespace TetrisTower.Logic
 		private static void EvaluateMatches(BlocksGrid grid, GridRules rules, List<GridAction> actions)
 		{
 			if (rules.MatchHorizontalLines > 0) {
-				EvaluateMatchesAlongLine(new GridCoords(0, 1), grid, rules.MatchHorizontalLines, rules.WrapSidesOnMatch, actions);
+				EvaluateMatchesAlongLine(new GridCoords(0, 1), grid, rules.MatchHorizontalLines, rules.WrapSidesOnMatch, MatchScoringType.Horizontal, actions);
 			}
 			if (rules.MatchVerticalLines > 0) {
-				EvaluateMatchesAlongLine(new GridCoords(1, 0), grid, rules.MatchVerticalLines, false, actions);
+				EvaluateMatchesAlongLine(new GridCoords(1, 0), grid, rules.MatchVerticalLines, false, MatchScoringType.Vertical, actions);
 			}
 			if (rules.MatchDiagonalsLines > 0) {
 				EvaluateMatchesAlongDiagonal(new GridCoords(-1, -1), grid, rules.MatchDiagonalsLines, rules.WrapSidesOnMatch, actions);
@@ -50,7 +60,7 @@ namespace TetrisTower.Logic
 			}
 		}
 
-		private static void EvaluateMatchesAlongLine(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, List<GridAction> actions)
+		private static void EvaluateMatchesAlongLine(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, MatchScoringType matchType, List<GridAction> actions)
 		{
 			UnityEngine.Debug.Assert(direction.Row == 0 || direction.Column == 0);
 
@@ -73,7 +83,7 @@ namespace TetrisTower.Logic
 
 					if (!wrapMatchPending) {
 						if (matched.Count >= matchCount) {
-							var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
+							var action = new ClearMatchedAction() { MatchedType = matchType, Coords = new List<GridCoords>(matched) };
 							actions.Add(action);
 						}
 					} else {
@@ -119,7 +129,7 @@ namespace TetrisTower.Logic
 					wrapMatchPending = false;
 
 					if (matched.Count >= matchCount) {
-						var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
+						var action = new ClearMatchedAction() { MatchedType = matchType, Coords = new List<GridCoords>(matched) };
 						actions.Add(action);
 					}
 
@@ -174,7 +184,7 @@ namespace TetrisTower.Logic
 					} else {
 
 						if (matched.Count >= matchCount) {
-							var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
+							var action = new ClearMatchedAction() { MatchedType = MatchScoringType.Diagonals, Coords = new List<GridCoords>(matched) };
 							actions.Add(action);
 						}
 
@@ -205,7 +215,7 @@ namespace TetrisTower.Logic
 
 					if (endReached) {
 						if (matched.Count >= matchCount) {
-							var action = new ClearMatchedAction() { Coords = new List<GridCoords>(matched) };
+							var action = new ClearMatchedAction() { MatchedType = MatchScoringType.Diagonals, Coords = new List<GridCoords>(matched) };
 							actions.Add(action);
 						}
 

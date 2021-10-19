@@ -98,10 +98,16 @@ namespace TetrisTower.Logic
 	public class ClearMatchedAction : GridAction
 	{
 		public IReadOnlyCollection<GridCoords> Coords;
+		public MatchScoringType MatchedType;
 	}
 
 	public class MoveCellsAction : GridAction
 	{
 		public IReadOnlyCollection<KeyValuePair<GridCoords, GridCoords>> MovedCells;
+	}
+
+	public class MatchingSequenceFinishAction : GridAction
+	{
+
 	}
 }

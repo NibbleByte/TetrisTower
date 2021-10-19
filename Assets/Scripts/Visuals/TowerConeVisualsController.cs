@@ -59,7 +59,7 @@ namespace TetrisTower.Visuals
 		private void OnLevelInitialized()
 		{
 			TowerLevel.Grids.Add(VisualsGrid);
-			VisualsGrid.Init(LevelData.Grid);
+			VisualsGrid.Init(LevelData.Grid, LevelData.Rules);
 
 			DestroyFallingVisuals();
 
