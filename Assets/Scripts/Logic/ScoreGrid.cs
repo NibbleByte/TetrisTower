@@ -21,8 +21,10 @@ namespace TetrisTower.Logic
 		private int m_Score = 0;
 		public int Score => m_Score;
 
-		public int CurrentSequenceScore { get; private set; }
-		public int CurrentMatchesCount { get; private set; }
+		[JsonProperty] public int TotalClearedBlocksCount { get; private set; }
+
+		public int CurrentClearedBlocksCount { get; private set; }
+		public int CurrentClearActionsCount { get; private set; }
 
 		// For serialization.
 		public ScoreGrid()
@@ -60,16 +62,17 @@ namespace TetrisTower.Logic
 			}
 
 			if ((Rules.MatchScoring & action.MatchedType) != 0) {
-				CurrentSequenceScore += action.Coords.Count;
-				CurrentMatchesCount += 1;
+				CurrentClearedBlocksCount += action.Coords.Count;
+				TotalClearedBlocksCount += action.Coords.Count;
+				CurrentClearActionsCount += 1;
 			}
 		}
 
 		private void MatchingSequenceFinished(MatchingSequenceFinishAction action)
 		{
-			m_Score += CurrentSequenceScore * CurrentMatchesCount;
-			CurrentSequenceScore = 0;
-			CurrentMatchesCount = 0;
+			m_Score += CurrentClearedBlocksCount * CurrentClearActionsCount;
+			CurrentClearedBlocksCount = 0;
+			CurrentClearActionsCount = 0;
 		}
 	}
 }

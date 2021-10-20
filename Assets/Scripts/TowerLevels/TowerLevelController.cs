@@ -20,6 +20,7 @@ namespace TetrisTower.TowerLevels
 		public bool IsPaused => !enabled;
 
 		public event System.Action LevelInitialized;
+		public event System.Action RunningActionsSequenceFinished;
 		public event System.Action PlacingFallingShape;
 		public event System.Action PlacedOutsideGrid;
 		public event System.Action FallingShapeSelected;
@@ -85,6 +86,8 @@ namespace TetrisTower.TowerLevels
 			}
 
 			m_FinishedRuns++;
+
+			RunningActionsSequenceFinished?.Invoke();
 		}
 
 		public void SelectFallingShape()

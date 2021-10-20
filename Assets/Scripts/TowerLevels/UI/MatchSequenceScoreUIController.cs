@@ -8,25 +8,25 @@ namespace TetrisTower.TowerLevels.UI
 {
 	public class MatchSequenceScoreUIController : MonoBehaviour
 	{
-		public Text MatchesCountText;
-		public Text MatchedScoreText;
+		public Text ClearCombosCountText;
+		public Text ClearedBlocksCountText;
 
 		private void Awake()
 		{
-			if (MatchesCountText) MatchesCountText.gameObject.SetActive(false);
-			if (MatchedScoreText) MatchedScoreText.gameObject.SetActive(false);
+			if (ClearCombosCountText) ClearCombosCountText.gameObject.SetActive(false);
+			if (ClearedBlocksCountText) ClearedBlocksCountText.gameObject.SetActive(false);
 		}
 
 		public void UpdateScore(ScoreGrid scoreGrid)
 		{
-			if (MatchesCountText && scoreGrid.CurrentMatchesCount > 1) {
-				MatchesCountText.gameObject.SetActive(true);
-				MatchesCountText.text = "x" + scoreGrid.CurrentMatchesCount.ToString();
+			if (ClearCombosCountText && scoreGrid.CurrentClearActionsCount > 1) {
+				ClearCombosCountText.gameObject.SetActive(true);
+				ClearCombosCountText.text = "x" + scoreGrid.CurrentClearActionsCount.ToString();
 			}
 
-			if (MatchedScoreText) {
-				MatchedScoreText.gameObject.SetActive(true);
-				MatchedScoreText.text = scoreGrid.CurrentSequenceScore.ToString();
+			if (ClearedBlocksCountText) {
+				ClearedBlocksCountText.gameObject.SetActive(true);
+				ClearedBlocksCountText.text = "+" + scoreGrid.CurrentClearedBlocksCount.ToString();
 			}
 		}
 

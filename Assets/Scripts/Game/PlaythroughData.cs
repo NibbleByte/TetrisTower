@@ -10,6 +10,8 @@ namespace TetrisTower.Game
 	public class PlaythroughData
 	{
 		[SerializeReference] public TowerLevelData TowerLevel;
+
+		public int TotalScore = 0;
 	}
 
 #if UNITY_EDITOR

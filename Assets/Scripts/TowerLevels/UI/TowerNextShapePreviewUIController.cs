@@ -27,7 +27,10 @@ namespace TetrisTower.TowerLevels.UI
 			TowerLevel.LevelInitialized += RecreatePreview;
 			TowerLevel.FallingShapeSelected += RecreatePreview;
 
-			RecreatePreview();
+			// TODO: This is bad design.
+			if (LevelData != null) {
+				RecreatePreview();
+			}
 		}
 
 		void OnDisable()
