@@ -11,7 +11,8 @@ namespace TetrisTower.Game
 	{
 		[SerializeReference] public TowerLevelData TowerLevel;
 
-		public int TotalScore = 0;
+		public int ScoreOnLevelStart = 0;
+		public int TotalScore => ScoreOnLevelStart + TowerLevel?.Score.Score ?? 0;
 	}
 
 #if UNITY_EDITOR

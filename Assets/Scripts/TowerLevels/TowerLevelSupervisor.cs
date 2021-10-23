@@ -34,6 +34,7 @@ namespace TetrisTower.TowerLevels
 				gameContext.GameConfig,
 				gameContext.PlayerControls,
 				gameContext.Options,
+				gameContext.CurrentPlaythrough,
 				levelController,
 				uiController
 				);
