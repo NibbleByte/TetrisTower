@@ -31,6 +31,16 @@ namespace DevLocker.GFrame
 	}
 
 	/// <summary>
+	/// Use this interface in your supervisors to notify your scene behaviours and controllers that the level has finished loading or will be unloading.
+	/// This interface is optional and you can make another one that suits your needs.
+	/// </summary>
+	public interface ILevelLoadListener
+	{
+		void OnLevelLoaded(LevelStateContextReferences contextReferences);
+		void OnLevelUnloading();
+	}
+
+	/// <summary>
 	/// Your level supervisor or level state can implement this to get invoked on Unity update.
 	/// </summary>
 	public interface IUpdateListener

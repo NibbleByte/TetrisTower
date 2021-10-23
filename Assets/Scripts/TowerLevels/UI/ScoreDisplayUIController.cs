@@ -1,3 +1,4 @@
+using DevLocker.GFrame;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,11 +6,11 @@ using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
-	public class ScoreDisplayUIController : MonoBehaviour
+	public class ScoreDisplayUIController : MonoBehaviour, ILevelLoadListener
 	{
-		public TowerLevelController TowerLevel;
+		private TowerLevelController m_TowerLevel;
 
-		public TowerLevelData LevelData => TowerLevel.LevelData;
+		private TowerLevelData m_LevelData => m_TowerLevel.LevelData;
 
 		[Header("Prefixes")]
 		public string TotalScorePrefix = "Total: ";
@@ -21,30 +22,25 @@ namespace TetrisTower.TowerLevels.UI
 		public Text CurrentScoreText;
 		public Text RemainingText;
 
-		void OnEnable()
+		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{
-			TowerLevel.LevelInitialized += UpdateScore;
-			TowerLevel.RunningActionsSequenceFinished += UpdateScore;
+			contextReferences.SetByType(out m_TowerLevel);
 
-			// TODO: This is bad design.
-			if (LevelData != null) {
-				UpdateScore();
-			}
+			m_TowerLevel.RunningActionsSequenceFinished += UpdateScore;
+
+			UpdateScore();
 		}
 
-		void OnDisable()
+		public void OnLevelUnloading()
 		{
-			if (TowerLevel) {
-				TowerLevel.LevelInitialized -= UpdateScore;
-				TowerLevel.RunningActionsSequenceFinished -= UpdateScore;
-			}
+			m_TowerLevel.RunningActionsSequenceFinished -= UpdateScore;
 		}
 
 		private void UpdateScore()
 		{
 			TotalScoreText.text = TotalScorePrefix + 0;
-			CurrentScoreText.text = CurrentScorePrefix + LevelData.Score.Score;
-			RemainingText.text = RemainingPrefix + Mathf.Max(LevelData.ClearBlocksEndCount - LevelData.Score.TotalClearedBlocksCount, 0);
+			CurrentScoreText.text = CurrentScorePrefix + m_LevelData.Score.Score;
+			RemainingText.text = RemainingPrefix + Mathf.Max(m_LevelData.ClearBlocksEndCount - m_LevelData.Score.TotalClearedBlocksCount, 0);
 		}
 	}
 

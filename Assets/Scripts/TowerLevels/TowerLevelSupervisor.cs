@@ -2,6 +2,7 @@ using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
 using System;
 using System.Collections;
+using System.Linq;
 using TetrisTower.Game;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -37,6 +38,12 @@ namespace TetrisTower.TowerLevels
 				uiController
 				);
 
+
+			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadListener>();
+			foreach(var listener in levelListeners) {
+				listener.OnLevelLoaded(StatesStack.ContextReferences);
+			}
+
 			yield return StatesStack.SetStateCrt(new TowerPlayState());
 
 			// If save came with available matches, or pending actions, do them.
@@ -48,6 +55,11 @@ namespace TetrisTower.TowerLevels
 
 		public IEnumerator Unload()
 		{
+			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadListener>();
+			foreach (var listener in levelListeners) {
+				listener.OnLevelLoaded(StatesStack.ContextReferences);
+			}
+
 			yield break;
 		}
 	}

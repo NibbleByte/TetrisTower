@@ -1,3 +1,4 @@
+using DevLocker.GFrame;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -5,12 +6,12 @@ using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
-	public class TowerNextShapePreviewUIController : MonoBehaviour
+	public class TowerNextShapePreviewUIController : MonoBehaviour, ILevelLoadListener
 	{
 		public GridLayoutGroup Grid;
 
-		public TowerLevelController TowerLevel;
-		public TowerLevelData LevelData => TowerLevel.LevelData;
+		private TowerLevelController m_TowerLevel;
+		private TowerLevelData m_LevelData => m_TowerLevel.LevelData;
 
 		public TowerNextShapePreviewIcon PreviewIconPrefab;
 
@@ -22,38 +23,33 @@ namespace TetrisTower.TowerLevels.UI
 			}
 		}
 
-		void OnEnable()
+		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{
-			TowerLevel.LevelInitialized += RecreatePreview;
-			TowerLevel.FallingShapeSelected += RecreatePreview;
+			contextReferences.SetByType(out m_TowerLevel);
 
-			// TODO: This is bad design.
-			if (LevelData != null) {
-				RecreatePreview();
-			}
+			m_TowerLevel.FallingShapeSelected += RecreatePreview;
+
+			RecreatePreview();
 		}
 
-		void OnDisable()
+		public void OnLevelUnloading()
 		{
-			if (TowerLevel) {
-				TowerLevel.LevelInitialized -= RecreatePreview;
-				TowerLevel.FallingShapeSelected -= RecreatePreview;
-			}
+			m_TowerLevel.FallingShapeSelected -= RecreatePreview;
 		}
 
 		private void RecreatePreview()
 		{
 			Transform gridTransform = Grid.transform;
 
-			if (LevelData?.NextShape == null) {
+			if (m_LevelData?.NextShape == null) {
 				foreach(Transform child in gridTransform) {
 					DestroyImmediate(child.gameObject);
 				}
 				return;
 			}
 
-			int shapeRows = LevelData.NextShape.Rows;
-			int shapeColumns = LevelData.NextShape.Columns;
+			int shapeRows = m_LevelData.NextShape.Rows;
+			int shapeColumns = m_LevelData.NextShape.Columns;
 			int gridArea = shapeRows * shapeColumns;
 
 			if (gridTransform.childCount != gridArea) {
@@ -74,9 +70,9 @@ namespace TetrisTower.TowerLevels.UI
 
 					Sprite icon = null;
 
-					foreach(var bind in LevelData.NextShape.ShapeCoords) {
+					foreach(var bind in m_LevelData.NextShape.ShapeCoords) {
 
-						var coords = bind.Coords - LevelData.NextShape.MinCoords;
+						var coords = bind.Coords - m_LevelData.NextShape.MinCoords;
 						if (coords.Row == row && coords.Column == column) {
 							icon = bind.Value.Icon;
 							break;
