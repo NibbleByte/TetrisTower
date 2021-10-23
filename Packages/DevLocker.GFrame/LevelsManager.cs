@@ -37,7 +37,7 @@ namespace DevLocker.GFrame
 				updateSupervisor.Update();
 			}
 
-			if (m_LevelStatesStack?.CurrentState is IUpdateListener updateState) {
+			if (m_LevelStatesStack?.CurrentState is IUpdateListener updateState && !m_LevelStatesStack.ChangingStates) {
 				updateState.Update();
 			}
 		}
@@ -48,7 +48,7 @@ namespace DevLocker.GFrame
 				updateSupervisor.FixedUpdate();
 			}
 
-			if (m_LevelStatesStack?.CurrentState is IFixedUpdateListener updateState) {
+			if (m_LevelStatesStack?.CurrentState is IFixedUpdateListener updateState && !m_LevelStatesStack.ChangingStates) {
 				updateState.FixedUpdate();
 			}
 		}
@@ -59,7 +59,7 @@ namespace DevLocker.GFrame
 				updateSupervisor.LateUpdate();
 			}
 
-			if (m_LevelStatesStack?.CurrentState is ILateUpdateListener updateState) {
+			if (m_LevelStatesStack?.CurrentState is ILateUpdateListener updateState && !m_LevelStatesStack.ChangingStates) {
 				updateState.LateUpdate();
 			}
 		}

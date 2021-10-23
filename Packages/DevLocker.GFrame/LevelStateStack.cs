@@ -66,7 +66,7 @@ namespace DevLocker.GFrame
 		private readonly Stack<ILevelState> m_StackedStates = new Stack<ILevelState>();
 
 		// Used when state is changed inside another state change event.
-		private bool m_ChangingStates = false;
+		public bool ChangingStates { get; private set; } = false;
 		private Queue<PendingStateArgs> m_PendingStateChanges = new Queue<PendingStateArgs>();
 
 		/// <summary>
@@ -155,7 +155,7 @@ namespace DevLocker.GFrame
 				UnityEngine.Debug.LogWarning($"You're stacking too many states down. Are you sure? Stacked state: {state}.");
 			}
 
-			if (m_ChangingStates) {
+			if (ChangingStates) {
 				m_PendingStateChanges.Enqueue(new PendingStateArgs(state, stackAction));
 
 				// Wait till all the state switching has finished. That means that you may end up in a state that is not the one you requested.
@@ -164,7 +164,7 @@ namespace DevLocker.GFrame
 				}
 
 			} else {
-				m_ChangingStates = true;
+				ChangingStates = true;
 			}
 
 			if (CurrentState != null) {
@@ -187,7 +187,7 @@ namespace DevLocker.GFrame
 			yield return CurrentState.EnterState(ContextReferences);
 			yield return EnteredStateCrt();
 
-			m_ChangingStates = false;
+			ChangingStates = false;
 
 			// Execute the pending states...
 			if (m_PendingStateChanges.Count > 0) {

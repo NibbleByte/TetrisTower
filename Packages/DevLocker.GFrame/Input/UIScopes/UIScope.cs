@@ -134,9 +134,12 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public virtual void OnValidate()
 		{
-			for(int i = 0; i < OnDisableScopes.Count; ++i) {
-				if (OnDisableScopes[i] == null) {
-					Debug.LogError($"\"{name}\" has missing scope in {nameof(OnDisableScopes)} list at scene \"{gameObject.scene.name}\"", this);
+			// Copy-Paste components have list null.
+			if (OnDisableScopes != null) {
+				for (int i = 0; i < OnDisableScopes.Count; ++i) {
+					if (OnDisableScopes[i] == null) {
+						Debug.LogError($"\"{name}\" has missing scope in {nameof(OnDisableScopes)} list at scene \"{gameObject.scene.name}\"", this);
+					}
 				}
 			}
 		}
