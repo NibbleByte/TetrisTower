@@ -42,9 +42,17 @@ namespace TetrisTower.TowerLevels.UI
 
 		private void UpdateScore()
 		{
-			TotalScoreText.text = TotalScorePrefix + m_PlaythroughData.TotalScore;
-			CurrentScoreText.text = CurrentScorePrefix + m_LevelData.Score.Score;
-			RemainingText.text = RemainingPrefix + m_LevelData.ClearBlocksRemainingCount;
+			if (TotalScoreText) {
+				TotalScoreText.text = TotalScorePrefix + m_PlaythroughData.TotalScore;
+			}
+
+			if (CurrentScoreText) {
+				CurrentScoreText.text = CurrentScorePrefix + m_LevelData.Score.Score;
+			}
+
+			if (RemainingText) {
+				RemainingText.text = RemainingPrefix + m_LevelData.ClearBlocksRemainingCount;
+			}
 		}
 	}
 
