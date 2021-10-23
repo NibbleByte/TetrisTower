@@ -46,6 +46,9 @@ namespace TetrisTower.Visuals
 
 		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{
+			if (!isActiveAndEnabled)
+				return;
+
 			contextReferences.SetByType(out m_TowerLevel);
 
 			m_TowerLevel.PlacingFallingShape += OnPlacingFallingShape;
@@ -217,7 +220,7 @@ namespace TetrisTower.Visuals
 
 		private void UpdateFallingVisualsPosition()
 		{
-			if (FallingVisualsShape == null || m_TowerLevel.AreGridActionsRunning)
+			if (FallingVisualsShape == null || m_TowerLevel.AreGridActionsRunning || !m_LevelData.IsPlaying)
 				return;
 
 			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == m_LevelData.FallingShape.ShapeCoords.Length);

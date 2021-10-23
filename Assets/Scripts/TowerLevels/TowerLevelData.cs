@@ -5,6 +5,13 @@ using UnityEngine;
 
 namespace TetrisTower.TowerLevels
 {
+	public enum TowerLevelRunningState
+	{
+		Running,
+		Won,
+		Lost,
+	}
+
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
 	public class TowerLevelData
@@ -27,6 +34,11 @@ namespace TetrisTower.TowerLevels
 		public ScoreGrid Score;
 
 		public int ClearBlocksEndCount;
+
+		public int ClearBlocksRemainingCount => Mathf.Max(ClearBlocksEndCount - Score.TotalClearedBlocksCount, 0);
+
+		public TowerLevelRunningState RunningState = TowerLevelRunningState.Running;
+		public bool IsPlaying => RunningState == TowerLevelRunningState.Running;
 
 		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), column);
 		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);

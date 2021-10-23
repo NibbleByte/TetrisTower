@@ -22,6 +22,7 @@ namespace TetrisTower.TowerLevels
 		public event System.Action RunningActionsSequenceFinished;
 		public event System.Action PlacingFallingShape;
 		public event System.Action PlacedOutsideGrid;
+		public event System.Action FinishedLevel;
 		public event System.Action FallingShapeSelected;
 
 		public event System.Action FallingColumnChanged;
@@ -85,6 +86,12 @@ namespace TetrisTower.TowerLevels
 			m_FinishedRuns++;
 
 			RunningActionsSequenceFinished?.Invoke();
+
+			if (LevelData.ClearBlocksRemainingCount == 0 && !AreGridActionsRunning) {
+				Debug.Log($"Remaining blocks to clear are 0. Player won.");
+				LevelData.RunningState = TowerLevelRunningState.Won;
+				FinishedLevel?.Invoke();
+			}
 		}
 
 		public void SelectFallingShape()
@@ -300,7 +307,9 @@ namespace TetrisTower.TowerLevels
 				SelectFallingShape();
 			} else {
 				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the grid ({Grid.Rows}, {Grid.Columns}). It will be trimmed!");
+				LevelData.RunningState = TowerLevelRunningState.Lost;
 				PlacedOutsideGrid?.Invoke();
+				FinishedLevel?.Invoke();
 			}
 		}
 
@@ -339,6 +348,9 @@ namespace TetrisTower.TowerLevels
 		{
 			// Wait for level to be initialized.
 			if (LevelData == null)
+				return;
+
+			if (!LevelData.IsPlaying)
 				return;
 
 			if (LevelData.FallingShape != null) {

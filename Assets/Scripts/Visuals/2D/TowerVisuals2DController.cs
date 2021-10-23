@@ -26,6 +26,9 @@ namespace TetrisTower.Visuals2D
 
 		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{
+			if (!isActiveAndEnabled)
+				return;
+
 			contextReferences.SetByType(out m_TowerLevel);
 
 			m_TowerLevel.PlacingFallingShape += OnPlacingFallingShape;
@@ -116,7 +119,7 @@ namespace TetrisTower.Visuals2D
 
 		void Update()
 		{
-			if (FallingVisualsShape != null && !m_TowerLevel.AreGridActionsRunning) {
+			if (FallingVisualsShape != null && !m_TowerLevel.AreGridActionsRunning && m_LevelData.IsPlaying) {
 				float fallDistance = m_LevelData.FallDistanceNormalized * VisualsGrid.BlockSize.y;
 
 				var startCoords = new GridCoords(m_LevelData.Grid.Rows, m_LevelData.FallingColumn);

@@ -44,7 +44,7 @@ namespace TetrisTower.TowerLevels.UI
 		{
 			TotalScoreText.text = TotalScorePrefix + m_PlaythroughData.TotalScore;
 			CurrentScoreText.text = CurrentScorePrefix + m_LevelData.Score.Score;
-			RemainingText.text = RemainingPrefix + Mathf.Max(m_LevelData.ClearBlocksEndCount - m_LevelData.Score.TotalClearedBlocksCount, 0);
+			RemainingText.text = RemainingPrefix + m_LevelData.ClearBlocksRemainingCount;
 		}
 	}
 

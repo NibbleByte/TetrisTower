@@ -8,6 +8,7 @@ namespace TetrisTower.TowerLevels.UI
 		None = 0,
 		Play = 2,
 		Paused = 4,
+		LevelFinished = 6,
 		Options = 8,
 	}
 
