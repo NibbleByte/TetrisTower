@@ -13,7 +13,7 @@ namespace TetrisTower.TowerLevels.UI
 		private TowerLevelController m_TowerLevel;
 		private TowerLevelData m_LevelData => m_TowerLevel.LevelData;
 
-		public TowerNextShapePreviewIcon PreviewIconPrefab;
+		public TowerBlockPreviewIcon PreviewIconPrefab;
 
 		private void Awake()
 		{
@@ -79,7 +79,7 @@ namespace TetrisTower.TowerLevels.UI
 						}
 					}
 
-					var previewIcon = gridTransform.GetChild(row * shapeColumns + column).GetComponentInChildren<TowerNextShapePreviewIcon>();
+					var previewIcon = gridTransform.GetChild(row * shapeColumns + column).GetComponentInChildren<TowerBlockPreviewIcon>();
 					previewIcon.SetIcon(icon);
 				}
 			}

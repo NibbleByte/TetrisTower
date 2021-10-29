@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
-	public class TowerNextShapePreviewIcon : MonoBehaviour
+	public class TowerBlockPreviewIcon : MonoBehaviour
 	{
 		public Image Icon;
 
