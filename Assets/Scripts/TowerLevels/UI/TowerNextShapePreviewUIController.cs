@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
-	public class TowerNextShapePreviewUIController : MonoBehaviour, ILevelLoadListener
+	public class TowerNextShapePreviewUIController : MonoBehaviour, ILevelLoadedListener
 	{
 		public GridLayoutGroup Grid;
 

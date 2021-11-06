@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
-	public class ScoreDisplayUIController : MonoBehaviour, ILevelLoadListener
+	public class ScoreDisplayUIController : MonoBehaviour, ILevelLoadedListener
 	{
 		private TowerLevelController m_TowerLevel;
 

@@ -7,7 +7,7 @@ using DevLocker.GFrame;
 
 namespace TetrisTower.Visuals2D
 {
-	public class TowerVisuals2DController : MonoBehaviour, ILevelLoadListener
+	public class TowerVisuals2DController : MonoBehaviour, ILevelLoadedListener
 	{
 		[Serializable]
 		public class VisualsShape : GridShape<GameObject>

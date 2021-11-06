@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
-	public class TowerSpawnedBlocksDisplayUIController : MonoBehaviour, ILevelLoadListener
+	public class TowerSpawnedBlocksDisplayUIController : MonoBehaviour, ILevelLoadedListener
 	{
 		private TowerLevelController m_TowerLevel;
 		private TowerLevelData m_LevelData => m_TowerLevel.LevelData;

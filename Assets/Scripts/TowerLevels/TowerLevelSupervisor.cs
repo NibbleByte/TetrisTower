@@ -40,8 +40,13 @@ namespace TetrisTower.TowerLevels
 				);
 
 
-			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadListener>();
-			foreach(var listener in levelListeners) {
+			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+
+			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
+				yield return listener.OnLevelLoading(StatesStack.ContextReferences);
+			}
+
+			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
 				listener.OnLevelLoaded(StatesStack.ContextReferences);
 			}
 
@@ -56,9 +61,9 @@ namespace TetrisTower.TowerLevels
 
 		public IEnumerator Unload()
 		{
-			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadListener>();
+			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadedListener>();
 			foreach (var listener in levelListeners) {
-				listener.OnLevelLoaded(StatesStack.ContextReferences);
+				listener.OnLevelUnloading();
 			}
 
 			yield break;

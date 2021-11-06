@@ -31,10 +31,20 @@ namespace DevLocker.GFrame
 	}
 
 	/// <summary>
+	/// Use this interface in your supervisors to notify your scene behaviours and controllers that the level is currently loading.
+	/// The supervisor should wait on the <see cref="OnLevelLoading(LevelStateContextReferences)"/>, as the behaviours can loading on their own.
+	/// This interface is optional and you can make another one that suits your needs.
+	/// </summary>
+	public interface ILevelLoadingListener
+	{
+		IEnumerator OnLevelLoading(LevelStateContextReferences contextReferences);
+	}
+
+	/// <summary>
 	/// Use this interface in your supervisors to notify your scene behaviours and controllers that the level has finished loading or will be unloading.
 	/// This interface is optional and you can make another one that suits your needs.
 	/// </summary>
-	public interface ILevelLoadListener
+	public interface ILevelLoadedListener
 	{
 		void OnLevelLoaded(LevelStateContextReferences contextReferences);
 		void OnLevelUnloading();

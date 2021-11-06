@@ -1,6 +1,7 @@
 using DevLocker.GFrame.SampleGame.Game;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -46,11 +47,27 @@ namespace DevLocker.GFrame.SampleGame.Play
 				uiController
 				);
 
+
+			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+
+			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
+				yield return listener.OnLevelLoading(StatesStack.ContextReferences);
+			}
+
+			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
+				listener.OnLevelLoaded(StatesStack.ContextReferences);
+			}
+
 			yield return StatesStack.SetStateCrt(new SamplePlayJumperState());
 		}
 
 		public IEnumerator Unload()
 		{
+			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadedListener>();
+			foreach (var listener in levelListeners) {
+				listener.OnLevelUnloading();
+			}
+
 			yield break;
 		}
 	}

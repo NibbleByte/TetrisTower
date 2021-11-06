@@ -9,7 +9,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 	/// - Jumper - moves left and right and can jump with gravity pulling it down.
 	/// - Chopper - gravity is disabled and the player can move freely in all directions (i.e. flying).
 	/// </summary>
-	public class SamplePlayerController : MonoBehaviour
+	public class SamplePlayerController : MonoBehaviour, ILevelLoadedListener
 	{
 		public float JumperSpeed = 2f;
 		public float JumperJumpForce = 4f;
@@ -24,6 +24,18 @@ namespace DevLocker.GFrame.SampleGame.Play
 		void Awake()
 		{
 			m_Rigidbody = GetComponent<Rigidbody>();
+		}
+
+		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		{
+			// Implementation for ILevelLoadListener
+			// Add here logic that should happen after the level was loaded.
+		}
+
+		public void OnLevelUnloading()
+		{
+			// Implementation for ILevelLoadListener
+			// Add here logic that should happen before the level was unloaded.
 		}
 
 		#region Jumper
