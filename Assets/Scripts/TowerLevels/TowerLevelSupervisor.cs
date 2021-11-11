@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
+using DevLocker.Utils;
 using System;
 using System.Collections;
 using System.Linq;
@@ -33,9 +34,32 @@ namespace TetrisTower.TowerLevels
 			}
 
 			var levelController = GameObject.FindObjectOfType<TowerLevelController>();
+			if (levelController == null) {
+				var placeholder = GameObject.FindGameObjectWithTag(GameConfig.TowerPlaceholderTag);
+				if (placeholder == null) {
+					throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load level {playthroughData.CurrentLevelIndex} of {playthroughData.Levels.Length}.");
+				}
+
+				// Clean any leftovers in the placeholder (for example, temporary camera).
+				placeholder.transform.DestroyChildren(true);
+
+				levelController = GameObject.Instantiate<TowerLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
+			}
+
 			levelController.Init(playthroughData.TowerLevel);
 
 			var uiController = GameObject.FindObjectOfType<UI.TowerLevelUIController>(true);
+			if (uiController == null) {
+				foreach(GameObject prefab in gameContext.GameConfig.UIPrefabs) {
+					var instance = GameObject.Instantiate<GameObject>(prefab);
+
+					if (uiController == null) {
+						uiController = instance.GetComponent<UI.TowerLevelUIController>();
+					}
+				}
+			}
+
+			var matchSequenceScoreDisplayer = GameObject.FindObjectOfType<UI.MatchSequenceScoreUIController>(true);
 
 			StatesStack = new LevelStateStack(
 				gameContext.GameConfig,
@@ -43,7 +67,8 @@ namespace TetrisTower.TowerLevels
 				gameContext.Options,
 				gameContext.CurrentPlaythrough,
 				levelController,
-				uiController
+				uiController,
+				matchSequenceScoreDisplayer
 				);
 
 

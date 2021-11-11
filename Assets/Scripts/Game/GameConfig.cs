@@ -14,6 +14,11 @@ namespace TetrisTower.Game
 		public GameObject GameInputPrefab;
 		public MessageBox MessageBoxPrefab;
 
+		public const string TowerPlaceholderTag = "TowerPlaceholder";
+		public TowerLevels.TowerLevelController TowerLevelController;
+
+		public GameObject[] UIPrefabs;
+
 		public InputBindingDisplayAsset[] BindingDisplayAssets;
 
 		public float FallSpeedup = 40f;

@@ -56,7 +56,7 @@ namespace TetrisTower.Visuals
 		public float MatchBlockDelay = 0.075f;
 		public float MatchActionDelay = 1.2f;
 
-		public MatchSequenceScoreUIController ScoreSequenceUIController;
+		private IMatchSequenceScoreDisplayer m_MatchSequenceScoreDisplayer;
 
 		public int Rows => m_Blocks.GetLength(0);
 		public int Columns => m_Blocks.GetLength(1);
@@ -79,7 +79,7 @@ namespace TetrisTower.Visuals
 		private GridRules m_Rules;
 		private ScoreGrid m_ScoreGrid = null;
 
-		public void Init(BlocksGrid grid, GridRules rules)
+		public void Init(BlocksGrid grid, GridRules rules, IMatchSequenceScoreDisplayer matchSequenceScoreDisplayer)
 		{
 			if (m_Blocks != null) {
 				DestroyInstances();
@@ -91,6 +91,7 @@ namespace TetrisTower.Visuals
 			CalculateCone(grid.Columns);
 
 			m_Rules = rules;
+			m_MatchSequenceScoreDisplayer = matchSequenceScoreDisplayer;
 
 			m_Blocks = new ConeVisualsBlock[grid.Rows, grid.Columns];
 			m_ScoreGrid = null;
@@ -174,7 +175,7 @@ namespace TetrisTower.Visuals
 						yield return MoveCells(moveAction);
 						break;
 					case MatchingSequenceFinishAction finishAction:
-						ScoreSequenceUIController.FinishScore(m_ScoreGrid);
+						m_MatchSequenceScoreDisplayer?.FinishScore(m_ScoreGrid);
 						m_ScoreGrid = null;
 						break;
 				}
@@ -233,7 +234,7 @@ namespace TetrisTower.Visuals
 		{
 			m_ScoreGrid.ScoreMatchedCells(action);
 
-			ScoreSequenceUIController?.UpdateScore(m_ScoreGrid);
+			m_MatchSequenceScoreDisplayer?.UpdateScore(m_ScoreGrid);
 
 			foreach (var coord in action.Coords) {
 

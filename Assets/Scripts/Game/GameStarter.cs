@@ -53,10 +53,18 @@ namespace TetrisTower.Game
 		{
 			// Boot game from current scene
 			var towerLevelController = GameObject.FindObjectOfType<TowerLevelController>();
-			if (towerLevelController) {
+			if (towerLevelController || GameObject.FindGameObjectWithTag(GameConfig.TowerPlaceholderTag)) {
 
 				if (StartingPlaythroughTemplate) {
-					GameContext.SetCurrentPlaythrough(StartingPlaythroughTemplate);
+
+					PlaythroughData playthroughData = StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
+					string scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
+					if (playthroughData.TowerLevel != null) {
+						playthroughData.TowerLevel.BackgroundScene.ScenePath = scenePath;
+					} else {
+						playthroughData.Levels[playthroughData.CurrentLevelIndex].BackgroundScene.ScenePath = scenePath;
+					}
+					GameContext.SetCurrentPlaythrough(playthroughData);
 				} else {
 					GameContext.SetCurrentPlaythrough(GameConfig.NormalPlaythgrough);
 				}

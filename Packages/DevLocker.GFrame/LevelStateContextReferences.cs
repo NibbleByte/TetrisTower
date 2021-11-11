@@ -41,6 +41,18 @@ namespace DevLocker.GFrame
 		}
 
 		/// <summary>
+		/// Find reference from the current context.
+		/// The level supervisor should have added all the needed references for you.
+		/// </summary>
+		public T FindByType<T>() => m_ContextReferences.OfType<T>().First();
+
+		/// <summary>
+		/// Try to find reference from the current context.
+		/// The level supervisor should have added all the needed references for you.
+		/// </summary>
+		public T TryFindByType<T>() => m_ContextReferences.OfType<T>().FirstOrDefault();
+
+		/// <summary>
 		/// Fill in all your references implicitly via reflection from the current context.
 		/// The process will scan all public and private fields and set them based on their type if appropriate reference exists.
 		/// The level supervisor should have added all the needed references for you.
