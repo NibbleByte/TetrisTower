@@ -1,3 +1,4 @@
+using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
 using TetrisTower.Logic;
@@ -16,6 +17,8 @@ namespace TetrisTower.TowerLevels
 	[JsonObject(MemberSerialization.Fields)]
 	public class TowerLevelData
 	{
+		public SceneReference BackgroundScene;
+
 		[SerializeReference] public BlocksShape NextShape;
 		[SerializeReference] public BlocksShape FallingShape;
 

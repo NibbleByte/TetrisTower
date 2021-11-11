@@ -52,6 +52,9 @@ namespace TetrisTower.Visuals2D
 
 		public void OnLevelUnloading()
 		{
+			if (!isActiveAndEnabled)
+				return;
+
 			m_TowerLevel.PlacingFallingShape -= OnPlacingFallingShape;
 			m_TowerLevel.PlacedOutsideGrid -= DestroyFallingVisuals;
 			m_TowerLevel.FallingShapeSelected -= OnFallingShapeSelected;

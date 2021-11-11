@@ -81,5 +81,25 @@ namespace TetrisTower.TowerLevels.UI
 		{
 			Game.GameManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
 		}
+
+		public void GoToNextLevel()
+		{
+			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
+			Debug.Assert(playthroughData.TowerLevel != null);
+
+			if (playthroughData.TowerLevel.RunningState != TowerLevelRunningState.Won) {
+				Debug.LogError($"Trying to start the next level, while the player hasn't won the current one. Abort.");
+				return;
+			}
+
+			playthroughData.FinishLevel();
+
+			if (playthroughData.HaveFinishedLevels) {
+				ExitToHomeScreen();
+			} else {
+				Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+			}
+
+		}
 	}
 }

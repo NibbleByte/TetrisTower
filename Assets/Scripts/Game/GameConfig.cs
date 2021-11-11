@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TetrisTower.Game
 {
-	[CreateAssetMenu(fileName = "UnknownGameSettings", menuName = "Tetris Tower/Game Settings")]
+	[CreateAssetMenu(fileName = "UnknownGameSettings", menuName = "Tetris Tower/Game Config")]
 	public class GameConfig : ScriptableObject
 	{
 		public AssetsRepository AssetsRepository;
@@ -31,21 +31,6 @@ namespace TetrisTower.Game
 				new GridShapeTemplateConverter(AssetsRepository),
 		};
 
-	[SerializeField] private PlaythroughData m_NewGameData;
-		public PlaythroughData NewGameData
-		{
-			get {
-				var converters = new Newtonsoft.Json.JsonConverter[] {
-					new BlockTypeConverter(AssetsRepository),
-					new GridShapeTemplateConverter(AssetsRepository),
-				};
-
-				// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
-				var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(m_NewGameData, converters);
-
-				return Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(serialized, converters);
-			}
-		}
-
+		public PlaythroughTemplate NormalPlaythgrough;
 	}
 }

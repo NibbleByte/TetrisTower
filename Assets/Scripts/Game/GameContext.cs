@@ -46,9 +46,20 @@ namespace TetrisTower.Game
 
 		public IInputContext InputContext { get; }
 
+		public void SetCurrentPlaythrough(PlaythroughTemplate playthroughTemplate)
+		{
+			PlaythroughData playthroughData = playthroughTemplate.GeneratePlaythroughData(GameConfig);
+			SetCurrentPlaythrough(playthroughData);
+		}
+
 		public void SetCurrentPlaythrough(PlaythroughData playthrough)
 		{
 			CurrentPlaythrough = m_DebugPlaythroughData = playthrough;
+		}
+
+		public void ClearCurrentPlaythrough()
+		{
+			CurrentPlaythrough = m_DebugPlaythroughData = null;
 		}
 
 		public Coroutine StartCoroutine(IEnumerator routine)

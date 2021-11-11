@@ -462,7 +462,8 @@ namespace TetrisTower.TowerLevels
 		public void __DEBUG_Reset()
 		{
 			var context = Game.GameManager.Instance.GameContext;
-			context.SetCurrentPlaythrough(context.GameConfig.NewGameData);
+			// TODO: This isn't a proper reset.
+			context.SetCurrentPlaythrough(context.GameConfig.NormalPlaythgrough);
 			Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
 		}
 

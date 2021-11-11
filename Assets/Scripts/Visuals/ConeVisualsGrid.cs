@@ -36,7 +36,8 @@ namespace TetrisTower.Visuals
 
 		// Validation value - cone visuals require different visual models for each size.
 		// Supported columns count must be equal to the sides of the cone.
-		public int SupportedColumnsCount = 13;
+		[Range(Game.LevelParamData.SupportedColumnsCount, Game.LevelParamData.SupportedColumnsCount)]
+		public int SupportedColumnsCount = Game.LevelParamData.SupportedColumnsCount;
 
 		// Values measured in the model itself.
 		public float FrontFaceTopEdgeLength;

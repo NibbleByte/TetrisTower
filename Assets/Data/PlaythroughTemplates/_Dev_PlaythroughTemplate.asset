@@ -9,32 +9,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41bdc2d5802cd254aa45a1a0cea8c43d, type: 3}
-  m_Name: MainGameGlobalConfig
+  m_Script: {fileID: 11500000, guid: db9374f2e4f65f3469683e1287ce1e80, type: 3}
+  m_Name: _Dev_PlaythroughTemplate
   m_EditorClassIdentifier: 
-  AssetsRepository: {fileID: 11400000, guid: 0a11aa83a595115449c23a7cbdd52e0c, type: 2}
-  GameInputPrefab: {fileID: 7871104455016210303, guid: d3a0ecc1b4ddada4bbca46f54483cd07, type: 3}
-  MessageBoxPrefab: {fileID: 599059138645147366, guid: a29c306ca5846a4438e4578cfdab35e6, type: 3}
-  BindingDisplayAssets:
-  - {fileID: 11400000, guid: 87a8c2df8c89190459836ce1eff525d2, type: 2}
-  - {fileID: 11400000, guid: 4926d9eb3179eaf438b97108b9e54294, type: 2}
-  - {fileID: 11400000, guid: 6a83a60bbb71db54aacc955d0ceb5941, type: 2}
-  FallSpeedup: 40
-  SwipeMaxTime: 0.175
-  SwipeMinDistance: 25
-  AnalogMoveSpeed: 0.025
-  AnalogRotateSpeed: 0.02
-  SwipeConformity: 0.9
-  NormalPlaythgrough: {fileID: 11400000, guid: 689add6d47e824640984d55d631805b4, type: 2}
-  m_NewGameData:
+  m_PlayerData:
     TowerLevel:
       id: 0
+    CurrentLevel: 0
+    Levels: []
     ScoreOnLevelStart: 0
   references:
     version: 1
     00000000:
       type: {class: TowerLevelData, ns: TetrisTower.TowerLevels, asm: Assembly-CSharp}
       data:
+        BackgroundScene:
+          m_SceneAsset: {fileID: 102900000, guid: 9fc0d4010bbf28b4594072e72b8655ab, type: 3}
+          m_IsDirty: 0
+          m_ScenePath: Assets/Scenes/GameScene.unity
         NextShape:
           id: 1
         FallingShape:

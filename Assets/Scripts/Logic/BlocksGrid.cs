@@ -33,6 +33,8 @@ namespace TetrisTower.Logic
 		public BlocksGrid(int rows, int columns)
 		{
 			m_Blocks = new BlockType[rows * columns];
+			m_Rows = rows;
+			m_Columns = columns;
 		}
 
 		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)

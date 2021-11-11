@@ -15,18 +15,25 @@ namespace TetrisTower.TowerLevels
 
 		public IEnumerator Load()
 		{
-			var gameContext = GameManager.Instance.GameContext;
+			GameContext gameContext = GameManager.Instance.GameContext;
+			PlaythroughData playthroughData = gameContext.CurrentPlaythrough;
+			Debug.Assert(playthroughData != null);
 
 			if (MessageBox.Instance) {
 				MessageBox.Instance.ForceCloseAllMessages();
 			}
 
-			if (SceneManager.GetActiveScene().name != "GameScene") {
-				yield return SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Single);
+			if (playthroughData.TowerLevel == null) {
+				playthroughData.TowerLevel = playthroughData.Levels[playthroughData.CurrentLevelIndex].GenerateTowerLevelData();
+			}
+
+			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;
+			if (SceneManager.GetActiveScene().name != backgroundScene.SceneName) {
+				yield return SceneManager.LoadSceneAsync(backgroundScene.ScenePath, LoadSceneMode.Single);
 			}
 
 			var levelController = GameObject.FindObjectOfType<TowerLevelController>();
-			levelController.Init(gameContext.CurrentPlaythrough.TowerLevel);
+			levelController.Init(playthroughData.TowerLevel);
 
 			var uiController = GameObject.FindObjectOfType<UI.TowerLevelUIController>(true);
 

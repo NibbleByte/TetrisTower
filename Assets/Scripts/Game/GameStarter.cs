@@ -14,6 +14,9 @@ namespace TetrisTower.Game
 	{
 		public GameConfig GameConfig;
 
+		[Tooltip("If starting tower level directly, override starting playthrough with this one, if specified.")]
+		public PlaythroughTemplate StartingPlaythroughTemplate;
+
 		[SerializeReference]
 		public GameContext GameContext;
 
@@ -49,14 +52,21 @@ namespace TetrisTower.Game
 		void Start()
 		{
 			// Boot game from current scene
-			if (GameObject.FindObjectOfType<TowerLevelController>()) {
-				GameContext.SetCurrentPlaythrough(GameConfig.NewGameData);
+			var towerLevelController = GameObject.FindObjectOfType<TowerLevelController>();
+			if (towerLevelController) {
+
+				if (StartingPlaythroughTemplate) {
+					GameContext.SetCurrentPlaythrough(StartingPlaythroughTemplate);
+				} else {
+					GameContext.SetCurrentPlaythrough(GameConfig.NormalPlaythgrough);
+				}
+
 				GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
 				return;
 			}
 
 			if (GameObject.FindObjectOfType<HomeScreenController>()) {
-				GameContext.SetCurrentPlaythrough(null);
+				GameContext.ClearCurrentPlaythrough();
 				GameManager.Instance.SwitchLevel(new HomeScreenLevelSupervisor());
 				return;
 			}
