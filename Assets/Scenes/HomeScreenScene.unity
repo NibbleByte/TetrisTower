@@ -468,6 +468,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutomaticFocus: 1
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -487,7 +491,7 @@ GameObject:
   - component: {fileID: 540250532}
   m_Layer: 5
   m_Name: Canvas
-  m_TagString: HomeScreenLevel
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1625,6 +1629,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutomaticFocus: 1
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -1951,6 +1959,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutomaticFocus: 1
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -2235,6 +2247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameConfig: {fileID: 11400000, guid: afd2790b73a91f8468fb087a28f729ac, type: 2}
+  StartingPlaythroughTemplate: {fileID: 0}
   GameContext:
     id: 0
   references:
