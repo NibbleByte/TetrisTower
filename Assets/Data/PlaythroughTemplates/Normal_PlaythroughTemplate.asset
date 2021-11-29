@@ -27,7 +27,6 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
       - {fileID: 11400000, guid: 15b70fb8a10018e419d1ce7ce23e9504, type: 2}
       - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
-      - {fileID: 11400000, guid: 3520e54e21641954fa8087cbd30fd9a5, type: 2}
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
@@ -37,7 +36,7 @@ MonoBehaviour:
         WrapSidesOnMove: 1
       GridRows: 13
       GridColumns: 13
-      ClearBlocksEndCount: 10
+      ClearBlocksEndCount: 30
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 9fc0d4010bbf28b4594072e72b8655ab, type: 3}
         m_IsDirty: 0
@@ -58,7 +57,7 @@ MonoBehaviour:
         WrapSidesOnMove: 1
       GridRows: 13
       GridColumns: 13
-      ClearBlocksEndCount: 20
+      ClearBlocksEndCount: 90
     ScoreOnLevelStart: 0
   references:
     version: 1

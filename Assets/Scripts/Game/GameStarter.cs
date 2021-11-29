@@ -3,6 +3,7 @@ using DevLocker.GFrame.MessageBox;
 using System.Collections;
 using TetrisTower.Core;
 using TetrisTower.HomeScreen;
+using TetrisTower.Logic;
 using TetrisTower.TowerLevels;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -52,7 +53,7 @@ namespace TetrisTower.Game
 		void Start()
 		{
 			// Boot game from current scene
-			var towerLevelController = GameObject.FindObjectOfType<TowerLevelController>();
+			var towerLevelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (towerLevelController || GameObject.FindGameObjectWithTag(GameConfig.TowerPlaceholderTag)) {
 
 				if (StartingPlaythroughTemplate) {
@@ -142,7 +143,7 @@ namespace TetrisTower.Game
 
 
 			if (Keyboard.current.pKey.wasPressedThisFrame) {
-				GameObject.FindObjectOfType<TowerLevelController>().__DEBUG_ToggleFalling();
+				GameObject.FindObjectOfType<GridLevelController>().__DEBUG_ToggleFalling();
 			}
 		}
 

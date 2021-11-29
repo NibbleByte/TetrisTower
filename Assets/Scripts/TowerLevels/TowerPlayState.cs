@@ -3,6 +3,7 @@ using DevLocker.GFrame.MessageBox;
 using System.Collections;
 using TetrisTower.Core.UI;
 using TetrisTower.Game;
+using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,7 +14,7 @@ namespace TetrisTower.TowerLevels
 		private PlayerControls m_PlayerControls;
 		private GameConfig m_GameConfig;
 		private PlayerOptions m_Options;
-		private TowerLevelController m_LevelController;
+		private GridLevelController m_LevelController;
 		private UI.TowerLevelUIController m_UIController;
 
 		private bool m_PointerPressed = false;

@@ -2,6 +2,7 @@ using DevLocker.GFrame;
 using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.Game;
+using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,9 +10,9 @@ namespace TetrisTower.TowerLevels.UI
 {
 	public class ScoreDisplayUIController : MonoBehaviour, ILevelLoadedListener
 	{
-		private TowerLevelController m_TowerLevel;
+		private GridLevelController m_TowerLevel;
 
-		private TowerLevelData m_LevelData => m_TowerLevel.LevelData;
+		private GridLevelData m_LevelData => m_TowerLevel.LevelData;
 
 		private PlaythroughData m_PlaythroughData;
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using TetrisTower.TowerLevels;
 using TetrisTower.Logic;
 using UnityEngine;
 using DevLocker.GFrame;
@@ -15,8 +14,8 @@ namespace TetrisTower.Visuals2D
 		}
 
 		public Visuals2DGrid VisualsGrid;
-		private TowerLevelController m_TowerLevel;
-		private TowerLevelData m_LevelData => m_TowerLevel?.LevelData;
+		private GridLevelController m_TowerLevel;
+		private GridLevelData m_LevelData => m_TowerLevel?.LevelData;
 
 		public VisualsShape FallingVisualsShape { get; private set; }
 		// For debug to be displayed by the Inspector!

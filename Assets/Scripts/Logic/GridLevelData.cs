@@ -1,10 +1,9 @@
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
-using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.TowerLevels
+namespace TetrisTower.Logic
 {
 	public enum TowerLevelRunningState
 	{
@@ -15,7 +14,7 @@ namespace TetrisTower.TowerLevels
 
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class TowerLevelData
+	public class GridLevelData
 	{
 		public SceneReference BackgroundScene;
 
@@ -48,8 +47,8 @@ namespace TetrisTower.TowerLevels
 	}
 
 #if UNITY_EDITOR
-	[UnityEditor.CustomPropertyDrawer(typeof(TowerLevelData))]
-	public class TowerLevelDataDrawer : Tools.SerializeReferenceCreatorDrawer<TowerLevelData>
+	[UnityEditor.CustomPropertyDrawer(typeof(GridLevelData))]
+	public class TowerLevelDataDrawer : Tools.SerializeReferenceCreatorDrawer<GridLevelData>
 	{
 	}
 #endif

@@ -12,7 +12,7 @@ namespace TetrisTower.Game
 	[JsonObject(MemberSerialization.Fields)]
 	public class PlaythroughData
 	{
-		[SerializeReference] public TowerLevelData TowerLevel;
+		[SerializeReference] public GridLevelData TowerLevel;
 
 		public int CurrentLevelIndex = 0;
 		public LevelParamData[] Levels;
@@ -54,9 +54,9 @@ namespace TetrisTower.Game
 
 		public int ClearBlocksEndCount;
 
-		public TowerLevelData GenerateTowerLevelData()
+		public GridLevelData GenerateTowerLevelData()
 		{
-			var levelData = new TowerLevelData() {
+			var levelData = new GridLevelData() {
 				BackgroundScene = BackgroundScene?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = ShapeTemplates.ToArray(),

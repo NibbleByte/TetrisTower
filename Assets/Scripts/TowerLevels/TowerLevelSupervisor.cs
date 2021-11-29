@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using TetrisTower.Game;
+using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -33,7 +34,7 @@ namespace TetrisTower.TowerLevels
 				yield return SceneManager.LoadSceneAsync(backgroundScene.ScenePath, LoadSceneMode.Single);
 			}
 
-			var levelController = GameObject.FindObjectOfType<TowerLevelController>();
+			var levelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (levelController == null) {
 				var placeholder = GameObject.FindGameObjectWithTag(GameConfig.TowerPlaceholderTag);
 				if (placeholder == null) {
@@ -43,7 +44,7 @@ namespace TetrisTower.TowerLevels
 				// Clean any leftovers in the placeholder (for example, temporary camera).
 				placeholder.transform.DestroyChildren(true);
 
-				levelController = GameObject.Instantiate<TowerLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
+				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 			}
 
 			levelController.Init(playthroughData.TowerLevel);

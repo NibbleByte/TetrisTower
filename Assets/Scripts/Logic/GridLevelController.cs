@@ -1,17 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.Core;
-using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace TetrisTower.TowerLevels
+namespace TetrisTower.Logic
 {
-	public class TowerLevelController : MonoBehaviour
+	public class GridLevelController : MonoBehaviour
 	{
-		public TowerLevelData LevelData { get; private set; }
+		public GridLevelData LevelData { get; private set; }
 		// For debug to be displayed by the Inspector!
-		[SerializeReference] private TowerLevelData m_DebugLevelData;
+		[SerializeReference] private GridLevelData m_DebugLevelData;
 
 
 		public List<GameGrid> Grids { get; private set; } = new List<GameGrid>();
@@ -38,7 +37,7 @@ namespace TetrisTower.TowerLevels
 
 		private float m_FallingSpeedup = 0;
 
-		public void Init(TowerLevelData data)
+		public void Init(GridLevelData data)
 		{
 			LevelData = m_DebugLevelData = data;
 
@@ -456,15 +455,15 @@ namespace TetrisTower.TowerLevels
 
 		public void __DEBUG_ToggleFalling()
 		{
-			LevelData.FallSpeedNormalized = LevelData.FallSpeedNormalized == 0f ? 2f : 0f;
+			//LevelData.FallSpeedNormalized = LevelData.FallSpeedNormalized == 0f ? 2f : 0f;
 		}
 
 		public void __DEBUG_Reset()
 		{
-			var context = Game.GameManager.Instance.GameContext;
-			// TODO: This isn't a proper reset.
-			context.SetCurrentPlaythrough(context.GameConfig.NormalPlaythgrough);
-			Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+			//var context = Game.GameManager.Instance.GameContext;
+			//// TODO: This isn't a proper reset.
+			//context.SetCurrentPlaythrough(context.GameConfig.NormalPlaythgrough);
+			//Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
 		}
 
 		#endregion

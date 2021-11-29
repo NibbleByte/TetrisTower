@@ -16,8 +16,8 @@ namespace TetrisTower.Visuals
 		}
 
 		public ConeVisualsGrid VisualsGrid;
-		private TowerLevelController m_TowerLevel;
-		private TowerLevelData m_LevelData => m_TowerLevel?.LevelData;
+		private GridLevelController m_TowerLevel;
+		private GridLevelData m_LevelData => m_TowerLevel?.LevelData;
 
 		public Transform FallingVisualsContainer;
 

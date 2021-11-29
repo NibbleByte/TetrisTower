@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using System;
 using System.Linq;
+using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,8 +11,8 @@ namespace TetrisTower.TowerLevels.UI
 	{
 		public GridLayoutGroup Grid;
 
-		private TowerLevelController m_TowerLevel;
-		private TowerLevelData m_LevelData => m_TowerLevel.LevelData;
+		private GridLevelController m_TowerLevel;
+		private GridLevelData m_LevelData => m_TowerLevel.LevelData;
 
 		public TowerBlockPreviewIcon PreviewIconPrefab;
 
