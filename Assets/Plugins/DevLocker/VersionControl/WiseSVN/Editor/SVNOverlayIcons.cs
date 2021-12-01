@@ -14,7 +14,7 @@ namespace DevLocker.VersionControl.WiseSVN
 	{
 		private static SVNPreferencesManager.PersonalPreferences m_PersonalPrefs => SVNPreferencesManager.Instance.PersonalPrefs;
 
-		private static bool IsActive => m_PersonalPrefs.EnableCoreIntegration && (m_PersonalPrefs.PopulateStatusesDatabase || SVNPreferencesManager.Instance.ProjectPrefs.EnableAutoLocking);
+		private static bool IsActive => m_PersonalPrefs.EnableCoreIntegration && (m_PersonalPrefs.PopulateStatusesDatabase || SVNPreferencesManager.Instance.ProjectPrefs.EnableLockPrompt);
 
 		private static bool m_ShowNormalStatusIcons = false;
 
@@ -45,7 +45,7 @@ namespace DevLocker.VersionControl.WiseSVN
 		private static void InvalidateDatabaseMenu()
 		{
 			SVNStatusesDatabase.Instance.InvalidateDatabase();
-			AutoLocking.SVNAutoLockingDatabase.Instance.ClearKnowledge();
+			LockPrompting.SVNLockPromptDatabase.Instance.ClearKnowledge();
 		}
 
 		private static void OnDatabaseChanged()
@@ -64,7 +64,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			var statusData = SVNStatusesDatabase.Instance.GetKnownStatusData(guid);
 
 			var downloadRepositoryChanges = SVNPreferencesManager.Instance.DownloadRepositoryChanges;
-			var autoLocking = SVNPreferencesManager.Instance.ProjectPrefs.EnableAutoLocking;
+			var lockPrompt = SVNPreferencesManager.Instance.ProjectPrefs.EnableLockPrompt;
 
 			//
 			// Remote Status
@@ -94,7 +94,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			//
 			// Lock Status
 			//
-			if ((downloadRepositoryChanges || autoLocking) && statusData.LockStatus != VCLockStatus.NoLock) {
+			if ((downloadRepositoryChanges || lockPrompt) && statusData.LockStatus != VCLockStatus.NoLock) {
 				var lockStatusIcon = SVNPreferencesManager.Instance.GetLockStatusIconContent(statusData.LockStatus);
 
 				if (lockStatusIcon != null) {
@@ -131,9 +131,9 @@ namespace DevLocker.VersionControl.WiseSVN
 							          $"Lock Status: {ObjectNames.NicifyVariableName(knownStatusData.LockStatus.ToString())}\n" +
 							          $"Owner: {knownStatusData.LockDetails.Owner}\n" +
 							          $"Date: {dateStr}\n" +
-							          $"Message:\n{knownStatusData.LockDetails.Message}";
+							          $"Message:\n{knownStatusData.LockDetails.Message}\n";
 						}
-						EditorUtility.DisplayDialog("SVN Lock Details", details, "Ok");
+						EditorUtility.DisplayDialog("SVN Lock Details", details.TrimEnd('\n'), "Ok");
 					}
 				}
 			}

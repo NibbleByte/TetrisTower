@@ -137,9 +137,23 @@ namespace DevLocker.VersionControl.WiseSVN
 
 
 
-		private static string SVN_Command => string.IsNullOrEmpty(m_ProjectPrefs.PlatformSvnCLIPath)
-			? "svn"
-			: Path.Combine(ProjectRootNative, m_ProjectPrefs.PlatformSvnCLIPath);
+		private static string SVN_Command {
+			get {
+				string userPath = m_PersonalPrefs.SvnCLIPath;
+
+				if (string.IsNullOrWhiteSpace(userPath)) {
+					userPath = m_ProjectPrefs.PlatformSvnCLIPath;
+				}
+
+				if (string.IsNullOrWhiteSpace(userPath))
+					return "svn";
+
+				return userPath.StartsWith("/") || userPath.Contains(":")
+					? userPath // Assume absolute path
+					: Path.Combine(ProjectRootNative, userPath)
+					;
+			}
+		}
 
 		internal const int COMMAND_TIMEOUT = 20000;	// Milliseconds
 		internal const int ONLINE_COMMAND_TIMEOUT = 45000;  // Milliseconds
@@ -594,6 +608,11 @@ namespace DevLocker.VersionControl.WiseSVN
 				// svn: E731001: No such host is known.
 				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
 					return LockOperationResult.UnableToConnectError;
+				
+				// Unable to connect to repository indicating some network or server problems.
+				//svn: warning: W160042: Lock failed: newer version of '...' exists
+				if (result.Error.Contains("W160042"))
+					return LockOperationResult.RemoteHasChanges;
 
 				return LockOperationResult.UnknownError;
 			}
@@ -1743,10 +1762,16 @@ namespace DevLocker.VersionControl.WiseSVN
 				return false;
 			}
 
+			string userPath = m_PersonalPrefs.SvnCLIPath;
+
+			if (string.IsNullOrWhiteSpace(userPath)) {
+				userPath = m_ProjectPrefs.PlatformSvnCLIPath;
+			}
+
 			// System.ComponentModel.Win32Exception (0x80004005): ApplicationName='...', CommandLine='...', Native error= The system cannot find the file specified.
 			// Could not find the command executable. The user hasn't installed their CLI (Command Line Interface) so we're missing an "svn.exe" in the PATH environment.
 			// This is allowed only if there isn't ProjectPreference specified CLI path.
-			if (error.Contains("0x80004005") && string.IsNullOrEmpty(m_ProjectPrefs.PlatformSvnCLIPath)) {
+			if (error.Contains("0x80004005") && string.IsNullOrEmpty(userPath)) {
 				displayMessage = $"SVN CLI (Command Line Interface) not found. " +
 					$"Please install it or specify path to a valid svn.exe in the svn preferences at:\n{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}\n\n" +
 					$"You can also disable the SVN integration.";
@@ -1755,8 +1780,8 @@ namespace DevLocker.VersionControl.WiseSVN
 			}
 
 			// Same as above but the specified svn.exe in the project preferences is missing.
-			if (error.Contains("0x80004005") && !string.IsNullOrEmpty(m_ProjectPrefs.PlatformSvnCLIPath)) {
-				displayMessage = $"Cannot find the specified in the svn project preferences svn.exe:\n{m_ProjectPrefs.PlatformSvnCLIPath}\n\n" +
+			if (error.Contains("0x80004005") && !string.IsNullOrEmpty(userPath)) {
+				displayMessage = $"Cannot find the specified in the svn project preferences svn.exe:\n{userPath}\n\n" +
 					$"You can reconfigure the svn preferences at:\n{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}\n\n" +
 					$"You can also disable the SVN integration.";
 

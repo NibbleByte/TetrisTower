@@ -107,7 +107,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				Depth = SVNStatusDataOptions.SearchDepth.Infinity,
 				RaiseError = false,
 				Timeout = WiseSVNIntegration.ONLINE_COMMAND_TIMEOUT * 2,
-				Offline = !SVNPreferencesManager.Instance.DownloadRepositoryChanges && !SVNPreferencesManager.Instance.ProjectPrefs.EnableAutoLocking,
+				Offline = !SVNPreferencesManager.Instance.DownloadRepositoryChanges && !SVNPreferencesManager.Instance.ProjectPrefs.EnableLockPrompt,
 				FetchLockOwner = true,
 			};
 
@@ -140,8 +140,11 @@ namespace DevLocker.VersionControl.WiseSVN
 			}
 
 			if (statuses.Count >= SanityStatusesLimit) {
-				// If server has many remote changes or locks, don't spam me with overlay icons.
-				statuses = statuses.Where(s => s.Status != VCFileStatus.Normal).ToList();
+				// If server has many remote changes, don't spam me with overlay icons.
+				// Keep showing locked assets or scenes out of date.
+				statuses = statuses
+					.Where(s => s.Status != VCFileStatus.Normal || s.LockStatus != VCLockStatus.NoLock || s.Path.EndsWith(".unity"))
+					.ToList();
 			}
 
 			// HACK: the base class works with the DataType for pending data. Guid won't be used.
@@ -150,6 +153,8 @@ namespace DevLocker.VersionControl.WiseSVN
 				|| s.Status == VCFileStatus.Added
 				|| s.Status == VCFileStatus.Modified
 				|| s.Status == VCFileStatus.Conflicted
+				|| s.LockStatus != VCLockStatus.NoLock
+				|| s.Path.EndsWith(".unity")
 				)
 				.Select(s => new GuidStatusDatasBind() { MergedStatusData = s })
 				.ToArray();
@@ -190,7 +195,7 @@ namespace DevLocker.VersionControl.WiseSVN
 					if (statusData.Status != VCFileStatus.Deleted)
 						continue;
 
-					// HACK: Deleted assets don't have guids, but we still want to keep track of them (Auto-Locking for example).
+					// HACK: Deleted assets don't have guids, but we still want to keep track of them (Lock prompt for example).
 					//		 As long as this is unique it will work.
 					guid = assetPath;
 				}
@@ -203,7 +208,7 @@ namespace DevLocker.VersionControl.WiseSVN
 					)
 					continue;
 
-				SetStatusData(guid, statusData, false, isMeta);
+				SetStatusData(guid, statusData, false, true, isMeta);
 
 				AddModifiedFolders(statusData);
 			}
@@ -241,7 +246,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (GetKnownStatusData(guid).Status == VCFileStatus.Added)
 					return;
 
-				bool moveToNext = SetStatusData(guid, statusData, false, false);
+				bool moveToNext = SetStatusData(guid, statusData, false, true, false);
 
 				// If already exists, upper folders should be added as well.
 				if (!moveToNext)
@@ -294,7 +299,7 @@ namespace DevLocker.VersionControl.WiseSVN
 
 				// Conflicted file got reimported? Fuck this, just refresh.
 				if (statusData.IsConflicted) {
-					SetStatusData(guid, statusData, true, isMeta);
+					SetStatusData(guid, statusData, true, false, isMeta);
 					InvalidateDatabase();
 					return;
 				}
@@ -306,7 +311,10 @@ namespace DevLocker.VersionControl.WiseSVN
 					var knownStatusData = GetKnownStatusData(guid);
 					// Normal might be present in the database if it is locked.
 					if (knownStatusData.Status != VCFileStatus.None && knownStatusData.Status != VCFileStatus.Normal) {
-						RemoveStatusData(guid);
+						if (knownStatusData.LockStatus == VCLockStatus.NoLock && knownStatusData.RemoteStatus == VCRemoteFileStatus.None) {
+							RemoveStatusData(guid);
+						}
+
 						InvalidateDatabase();
 						return;
 					}
@@ -315,7 +323,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				}
 
 				// Every time the user saves a file it will get reimported. If we already know it is modified, don't refresh every time.
-				bool changed = SetStatusData(guid, statusData, true, isMeta);
+				bool changed = SetStatusData(guid, statusData, true, false, isMeta);
 
 				if (changed) {
 					InvalidateDatabase();
@@ -373,7 +381,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			}
 		}
 
-		private bool SetStatusData(string guid, SVNStatusData statusData, bool skipPriorityCheck, bool isMeta)
+		private bool SetStatusData(string guid, SVNStatusData statusData, bool skipPriorityCheck, bool compareOnlineStatuses, bool isMeta)
 		{
 			if (string.IsNullOrEmpty(guid)) {
 				Debug.LogError($"SVN: Trying to add empty guid for \"{statusData.Path}\" with status {statusData.Status}");
@@ -383,10 +391,10 @@ namespace DevLocker.VersionControl.WiseSVN
 			foreach (var bind in m_Data) {
 				if (bind.Key.Equals(guid, StringComparison.Ordinal)) {
 
-					if (!isMeta && bind.AssetStatusData.Equals(statusData))
+					if (!isMeta && bind.AssetStatusData.Equals(statusData, !compareOnlineStatuses))
 						return false;
 
-					if (isMeta && bind.MetaStatusData.Equals(statusData))
+					if (isMeta && bind.MetaStatusData.Equals(statusData, !compareOnlineStatuses))
 						return false;
 
 					if (!isMeta) {

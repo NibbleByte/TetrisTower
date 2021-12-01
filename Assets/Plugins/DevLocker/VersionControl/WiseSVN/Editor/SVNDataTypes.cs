@@ -79,6 +79,7 @@ namespace DevLocker.VersionControl.WiseSVN
 		Success,				// Operation succeeded.
 		LockedByOther,			// File is locked by another working copy (may be the same user). Use Force to enforce the operation.
 		AuthenticationFailed,	// User needs to log in using normal SVN client and save their authentication.
+		RemoteHasChanges,		// Newer version of the asset exists in the server repository. Update first.
 		UnableToConnectError,	// Unable to connect to repository indicating some network or server problems.
 		UnknownError,			// Failed for some reason.
 	}
@@ -171,14 +172,15 @@ namespace DevLocker.VersionControl.WiseSVN
 			PropertiesStatus == VCPropertiesStatus.Conflicted ||
 			TreeConflictStatus == VCTreeConflictStatus.TreeConflict;
 
-		public bool Equals(SVNStatusData other)
+		public bool Equals(SVNStatusData other, bool skipOnline)
 		{
 			return Status == other.Status
 				&& PropertiesStatus == other.PropertiesStatus
 				&& TreeConflictStatus == other.TreeConflictStatus
 				&& SwitchedExternalStatus == other.SwitchedExternalStatus
-				&& LockStatus == other.LockStatus
-				&& RemoteStatus == other.RemoteStatus
+				&& (skipOnline || LockStatus == other.LockStatus)
+				&& (skipOnline || RemoteStatus == other.RemoteStatus)
+				&& (skipOnline || LockDetails.Equals(other.LockDetails))
 				;
 		}
 
@@ -202,6 +204,15 @@ namespace DevLocker.VersionControl.WiseSVN
 		public bool IsValid => !string.IsNullOrEmpty(Path);
 
 		public static LockDetails Empty => new LockDetails() {Path = string.Empty, Owner = string.Empty, Message = string.Empty, Date = string.Empty};
+
+		public bool Equals(LockDetails other)
+		{
+			return Path == other.Path
+			       && Owner == other.Owner
+			       && Message == other.Message
+			       && Date == other.Date
+				;
+		}
 	}
 
 	public struct SVNStatusDataOptions
@@ -322,15 +333,15 @@ namespace DevLocker.VersionControl.WiseSVN
 	}
 
 	/// <summary>
-	/// Rules for auto svn locking on asset modification.
+	/// Rules for lock prompt on asset modification.
 	/// </summary>
 	[Serializable]
-	public struct AutoLockingParameters
+	public struct LockPromptParameters
 	{
-		[Tooltip("Target folder to monitor for auto-locking, relative to the project.\n\nExample: \"Assets/Scenes\"")]
+		[Tooltip("Target folder to monitor for lock prompt, relative to the project.\n\nExample: \"Assets/Scenes\"")]
 		public string TargetFolder;
 
-		[Tooltip("Target asset types to monitor for auto-locking")]
+		[Tooltip("Target asset types to monitor for lock prompt")]
 		public AssetType TargetTypes;
 
 		[Tooltip("Target metas of selected asset types as well.")]
@@ -345,9 +356,9 @@ namespace DevLocker.VersionControl.WiseSVN
 
 		public bool IsValid => !string.IsNullOrEmpty(TargetFolder) && TargetTypes != 0;
 
-		public AutoLockingParameters Sanitized()
+		public LockPromptParameters Sanitized()
 		{
-			var clone = (AutoLockingParameters)MemberwiseClone();
+			var clone = (LockPromptParameters)MemberwiseClone();
 
 			clone.TargetFolder = Preferences.SVNPreferencesManager.SanitizeUnityPath(TargetFolder);
 

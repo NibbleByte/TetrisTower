@@ -6,14 +6,14 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace DevLocker.VersionControl.WiseSVN.AutoLocking
+namespace DevLocker.VersionControl.WiseSVN.LockPrompting
 {
 	/// <summary>
 	/// Listens for newly modified assets and notifies user if they were locked.
 	/// </summary>
-	public class SVNAutoLockingDatabase : Utils.EditorPersistentSingleton<SVNAutoLockingDatabase>
+	public class SVNLockPromptDatabase : Utils.EditorPersistentSingleton<SVNLockPromptDatabase>
 	{
-		public bool IsActive => m_PersonalPrefs.EnableCoreIntegration && m_PersonalPrefs.PopulateStatusesDatabase && m_ProjectPrefs.EnableAutoLocking;
+		public bool IsActive => m_PersonalPrefs.EnableCoreIntegration && m_PersonalPrefs.PopulateStatusesDatabase && m_ProjectPrefs.EnableLockPrompt;
 
 		private List<SVNStatusData> m_KnownData = new List<SVNStatusData>();
 
@@ -50,6 +50,10 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 
 		public bool IsAssetOfType(string assetPath, AssetType assetTypeMask, bool isDeleted)
 		{
+			// All flags are set, skip checks.
+			if ((int)assetTypeMask == ~0)
+				return true;
+
 			if (assetTypeMask.HasFlag(AssetType.Scene) && assetPath.EndsWith(".unity", StringComparison.OrdinalIgnoreCase))
 				return true;
 
@@ -63,22 +67,26 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 				var go = AssetDatabase.LoadMainAssetAtPath(assetPath) as GameObject;
 
 				if (go) {
+					bool match = false;
+
 #if UNITY_2018_1_OR_NEWER
 					var prefabType = PrefabUtility.GetPrefabAssetType(go);
 
 					if (assetTypeMask.HasFlag(AssetType.Prefab))
-						return prefabType == PrefabAssetType.Regular || prefabType == PrefabAssetType.Variant;
+						match |= prefabType == PrefabAssetType.Regular || prefabType == PrefabAssetType.Variant;
 
 					if (assetTypeMask.HasFlag(AssetType.Model))
-						return prefabType == PrefabAssetType.Model;
+						match |= prefabType == PrefabAssetType.Model;
 #else
 					var prefabType = PrefabUtility.GetPrefabType(go);
 					if (assetTypeMask.HasFlag(AssetType.Prefab))
-						return prefabType == PrefabType.Prefab;
+						match |= prefabType == PrefabType.Prefab;
 
 					if (assetTypeMask.HasFlag(AssetType.Model))
-						return prefabType == PrefabType.ModelPrefab;
+						match |= prefabType == PrefabType.ModelPrefab;
 #endif
+
+					return match;
 				}
 
 				if (isDeleted) {
@@ -194,7 +202,7 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 			for(int i = 0; i < m_KnownData.Count; ++i) {
 				var knownData = m_KnownData[i];
 				if (knownData.Path == statusData.Path) {
-					if (knownData.Equals(statusData)) {
+					if (knownData.Equals(statusData, false)) {
 						return false;
 					} else {
 						m_KnownData[i] = statusData;
@@ -206,6 +214,18 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 
 			m_KnownData.Add(statusData);
 			return true;
+		}
+
+		private bool RemoveKnownStatusData(SVNStatusData statusData)
+		{
+			for (int i = 0; i < m_KnownData.Count; ++i) {
+				if (m_KnownData[i].Path == statusData.Path) {
+					m_KnownData.RemoveAt(i);
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private SVNAsyncOperation<LockOperationResult> EnqueueOperation(SVNAsyncOperation<LockOperationResult>.OperationHandler operationHandler)
@@ -229,19 +249,29 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 			}
 		}
 
-		public void ForceLock(IEnumerable<SVNStatusData> lockedByOtherEntries)
+		public void LockEntries(IEnumerable<SVNStatusData> entries, bool forceLock)
 		{
 			var shouldLog = SVNPreferencesManager.Instance.PersonalPrefs.TraceLogs.HasFlag(SVNTraceLogs.SVNOperations);
-			var lockMessage = SVNPreferencesManager.Instance.ProjectPrefs.AutoLockMessage;
+			var lockMessage = SVNPreferencesManager.Instance.ProjectPrefs.LockPromptMessage;
+
+			var entriesList = entries.ToList();
+			if (entriesList.Count == 0)
+				return;
 
 			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-			EnqueueOperation(op => WiseSVNIntegration.LockFiles(lockedByOtherEntries.Select(sd => sd.Path), true, lockMessage, "", targetsFileToUse))
+			EnqueueOperation(op => WiseSVNIntegration.LockFiles(entriesList.Select(sd => sd.Path), forceLock, lockMessage, "", targetsFileToUse))
 			.Completed += (op) => {
-				if (op.Result != LockOperationResult.Success) {
-					Debug.LogError($"Auto-locking by force failed with result {op.Result} for assets:\n{string.Join("\n", lockedByOtherEntries.Select(sd => sd.Path))}.");
-					EditorUtility.DisplayDialog("SVN Auto-Locking", "Stealing lock failed. Check the logs for more info.", "I will!");
+				if (op.Result == LockOperationResult.RemoteHasChanges) {
+					foreach (var failedStatusData in entriesList) {
+						RemoveKnownStatusData(failedStatusData);
+					}
+					Debug.LogWarning($"Locking failed because server repository has newer changes. Please update first. Assets failed to lock:\n{string.Join("\n", entriesList.Select(sd => sd.Path))}");
+					EditorUtility.DisplayDialog("SVN Lock Prompt", "Lock failed. Check the logs for more info.", "I will!");
+				} else if (op.Result != LockOperationResult.Success) {
+					Debug.LogError($"Locking failed with result {op.Result} for assets:\n{string.Join("\n", entriesList.Select(sd => sd.Path))}.");
+					EditorUtility.DisplayDialog("SVN Lock Prompt", "Stealing lock failed. Check the logs for more info.", "I will!");
 				} else if (shouldLog) {
-					Debug.Log($"Auto-locked assets by force:\n{string.Join("\n", lockedByOtherEntries.Select(sd => sd.Path))}");
+					Debug.Log($"Locked assets:\n{string.Join("\n", entriesList.Select(sd => sd.Path))}");
 				}
 			};
 
@@ -269,7 +299,7 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 				}
 			}
 
-			m_KnownData.RemoveAll(known => !statusDatabaseData.Any(unknown => known.Path == unknown.Path));
+			m_KnownData.RemoveAll(known => statusDatabaseData.All(unknown => known.Path != unknown.Path));
 
 			var shouldLock = new List<SVNStatusData>(newEntries.Count);
 			var lockedByOtherEntries = new List<SVNStatusData>(newEntries.Count);
@@ -293,62 +323,67 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 				}
 				assetPath = assetPath.Replace("\\", "/");
 
-				var autoLockingParam = m_ProjectPrefs.AutoLockingParameters
+				var lockPromptParam = m_ProjectPrefs.LockPromptParameters
 					.FirstOrDefault(al => assetPath.StartsWith(al.TargetFolder, StringComparison.OrdinalIgnoreCase));
 
-				if (string.IsNullOrEmpty(autoLockingParam.TargetFolder))
+				if (string.IsNullOrEmpty(lockPromptParam.TargetFolder))
 					continue;
 
-				if (isMeta && !autoLockingParam.IncludeTargetMetas)
+				if (isMeta && !lockPromptParam.IncludeTargetMetas)
 					continue;
 
-				if (SVNPreferencesManager.ShouldExclude(autoLockingParam.Exclude, assetPath))
+				if (SVNPreferencesManager.ShouldExclude(lockPromptParam.Exclude, assetPath))
 					continue;
 
-				bool matched = IsAssetOfType(assetPath, autoLockingParam.TargetTypes, statusData.Status == VCFileStatus.Deleted);
-				if (!matched && !autoLockingParam.TargetTypes.HasFlag(AssetType.OtherTypes))
+				bool matched = IsAssetOfType(assetPath, lockPromptParam.TargetTypes, statusData.Status == VCFileStatus.Deleted);
+				if (!matched && !lockPromptParam.TargetTypes.HasFlag(AssetType.OtherTypes))
 					continue;
 
-				if (statusData.LockStatus == VCLockStatus.NoLock) {
+				if (statusData.LockStatus == VCLockStatus.NoLock && statusData.RemoteStatus == VCRemoteFileStatus.None) {
 					shouldLock.Add(statusData);
-					continue;
-				}
-
-				lockedByOtherEntries.Add(statusData);
-			}
-
-			// Check for old assets to unlock.
-			foreach(var statusData in statusDatabaseData) {
-
-				if (statusData.Status != VCFileStatus.Normal)
-					continue;
-
-				var assetPath = statusData.Path;
-				if (statusData.Path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase)) {
-					assetPath = statusData.Path.Substring(0, statusData.Path.LastIndexOf(".meta"));
-				}
-				assetPath = assetPath.Replace("\\", "/");
-
-				var autoLockingParam = m_ProjectPrefs.AutoLockingParameters
-					.FirstOrDefault(al => assetPath.StartsWith(al.TargetFolder, StringComparison.OrdinalIgnoreCase));
-
-				if (string.IsNullOrEmpty(autoLockingParam.TargetFolder))
-					continue;
-
-				if (SVNPreferencesManager.ShouldExclude(autoLockingParam.Exclude, assetPath))
-					continue;
-
-				bool matched = IsAssetOfType(assetPath, autoLockingParam.TargetTypes, false);
-				if (!matched && !autoLockingParam.TargetTypes.HasFlag(AssetType.OtherTypes))
-					continue;
-
-				if (statusData.LockStatus != VCLockStatus.NoLock && statusData.LockStatus != VCLockStatus.LockedOther) {
-					shouldUnlock.Add(statusData);
+				} else {
+					lockedByOtherEntries.Add(statusData);
 				}
 			}
 
+			if (m_ProjectPrefs.AutoUnlockIfUnmodified) {
+
+				// Check for old assets to unlock.
+				foreach (var statusData in statusDatabaseData) {
+
+					if (statusData.Status != VCFileStatus.Normal)
+						continue;
+
+					var assetPath = statusData.Path;
+					if (statusData.Path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase)) {
+						assetPath = statusData.Path.Substring(0, statusData.Path.LastIndexOf(".meta"));
+					}
+
+					assetPath = assetPath.Replace("\\", "/");
+
+					var lockPromptParam = m_ProjectPrefs.LockPromptParameters
+						.FirstOrDefault(al => assetPath.StartsWith(al.TargetFolder, StringComparison.OrdinalIgnoreCase));
+
+					if (string.IsNullOrEmpty(lockPromptParam.TargetFolder))
+						continue;
+
+					if (SVNPreferencesManager.ShouldExclude(lockPromptParam.Exclude, assetPath))
+						continue;
+
+					bool matched = IsAssetOfType(assetPath, lockPromptParam.TargetTypes, false);
+					if (!matched && !lockPromptParam.TargetTypes.HasFlag(AssetType.OtherTypes))
+						continue;
+
+					if (statusData.LockStatus != VCLockStatus.NoLock && statusData.LockStatus != VCLockStatus.LockedOther) {
+						shouldUnlock.Add(statusData);
+					}
+				}
+			}
 
 			var shouldLog = SVNPreferencesManager.Instance.PersonalPrefs.TraceLogs.HasFlag(SVNTraceLogs.SVNOperations);
+
+			// Auto-locking has been removed. User needs to explicitly select what to lock and what not.
+			/*
 			var lockMessage = SVNPreferencesManager.Instance.ProjectPrefs.AutoLockMessage;
 
 			if (shouldLock.Count > 0) {
@@ -356,13 +391,19 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 				var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
 				EnqueueOperation(op => WiseSVNIntegration.LockFiles(shouldLock.Select(sd => sd.Path), false, lockMessage, "", targetsFileToUse))
 				.Completed += (op) => {
-					if (op.Result != LockOperationResult.Success) {
+					if (op.Result == LockOperationResult.RemoteHasChanges) {
+						foreach (var failedStatusData in shouldLock) {
+							RemoveKnownStatusData(failedStatusData);
+						}
+						Debug.LogWarning($"Auto-locking failed because server repository has newer changes. Please update first. Assets failed to lock:\n{string.Join("\n", shouldLock.Select(sd => sd.Path))}");
+					} else if (op.Result != LockOperationResult.Success) {
 						Debug.LogError($"Auto-locking failed with result {op.Result} for assets:\n{string.Join("\n", shouldLock.Select(sd => sd.Path))}");
 					} else if (shouldLog) {
 						Debug.Log($"Auto-locked assets:\n{string.Join("\n", shouldLock.Select(sd => sd.Path))}");
 					}
 				};
 			}
+			*/
 
 			if (shouldUnlock.Count > 0) {
 				var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
@@ -379,8 +420,8 @@ namespace DevLocker.VersionControl.WiseSVN.AutoLocking
 				};
 			}
 
-			if (lockedByOtherEntries.Count > 0) {
-				SVNAutoLockingForceWindow.PromptForceLock(lockedByOtherEntries);
+			if (shouldLock.Count > 0 || lockedByOtherEntries.Count > 0) {
+				SVNLockPromptWindow.PromptLock(shouldLock, lockedByOtherEntries);
 			}
 
 			if (m_PendingOperations.Count > 0 && m_HasPendingOperations == false) {
