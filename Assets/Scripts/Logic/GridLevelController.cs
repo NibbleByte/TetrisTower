@@ -450,22 +450,5 @@ namespace TetrisTower.Logic
 			}
 #endif
 		}
-
-		#region Debug Stuff
-
-		public void __DEBUG_ToggleFalling()
-		{
-			//LevelData.FallSpeedNormalized = LevelData.FallSpeedNormalized == 0f ? 2f : 0f;
-		}
-
-		public void __DEBUG_Reset()
-		{
-			//var context = Game.GameManager.Instance.GameContext;
-			//// TODO: This isn't a proper reset.
-			//context.SetCurrentPlaythrough(context.GameConfig.NormalPlaythgrough);
-			//Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
-		}
-
-		#endregion
 	}
 }

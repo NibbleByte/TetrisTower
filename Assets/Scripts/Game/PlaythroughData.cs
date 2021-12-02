@@ -23,8 +23,19 @@ namespace TetrisTower.Game
 		public bool IsFinalLevel => CurrentLevelIndex == Levels.Length - 1;
 		public bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;
 
+		public void RetryLevel()
+		{
+			if (TowerLevel == null)
+				throw new InvalidOperationException($"Trying to retry a level when no level is in progress.");
+
+			TowerLevel = null;
+		}
+
 		public void FinishLevel()
 		{
+			if (TowerLevel == null || TowerLevel.RunningState != TowerLevelRunningState.Won)
+				throw new InvalidOperationException($"Trying to finish level when it hasn't finished - {TowerLevel?.RunningState}.");
+
 			ScoreOnLevelStart += TowerLevel.Score.Score;
 
 			TowerLevel = null;

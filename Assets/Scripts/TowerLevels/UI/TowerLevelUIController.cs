@@ -83,6 +83,16 @@ namespace TetrisTower.TowerLevels.UI
 			Game.GameManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
 		}
 
+		public static void RetryLevel()
+		{
+			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
+			Debug.Assert(playthroughData.TowerLevel != null);
+
+			playthroughData.RetryLevel();
+
+			Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+		}
+
 		public void GoToNextLevel()
 		{
 			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;

@@ -62,6 +62,9 @@ namespace TetrisTower.Game
 					string scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
 					if (playthroughData.TowerLevel != null) {
 						playthroughData.TowerLevel.BackgroundScene.ScenePath = scenePath;
+
+						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, GameConfig.Converters);
+
 					} else {
 						playthroughData.Levels[playthroughData.CurrentLevelIndex].BackgroundScene.ScenePath = scenePath;
 					}
@@ -138,12 +141,6 @@ namespace TetrisTower.Game
 					Debug.LogWarning("All devices are processed.");
 					GameContext.PlayerControls.devices = default;
 				}
-			}
-
-
-
-			if (Keyboard.current.pKey.wasPressedThisFrame) {
-				GameObject.FindObjectOfType<GridLevelController>().__DEBUG_ToggleFalling();
 			}
 		}
 
