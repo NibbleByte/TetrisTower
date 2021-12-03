@@ -659,6 +659,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameConfig: {fileID: 11400000, guid: afd2790b73a91f8468fb087a28f729ac, type: 2}
   StartingPlaythroughTemplate: {fileID: 11400000, guid: efdc5531b22032b4dbe51c2c7255b45c, type: 2}
+  StartingRandomSeed: 0
   GameContext:
     id: 0
   references:
@@ -991,10 +992,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4757464411776352298, guid: def9c70e0bed05e4fa5c295abd1f7354, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 205915260}
     - target: {fileID: 5836640994552663826, guid: def9c70e0bed05e4fa5c295abd1f7354, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 

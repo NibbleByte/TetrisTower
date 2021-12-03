@@ -29,6 +29,10 @@ namespace TetrisTower.Logic
 		public GridShapeTemplate[] ShapeTemplates;
 		public BlockType[] SpawnedBlocks;
 
+		[Tooltip("Read-only. Used for debug.")]
+		public int RandomInitialSeed;
+		public System.Random Random = new System.Random();
+
 		public GridRules Rules;
 		public BlocksGrid Grid;
 

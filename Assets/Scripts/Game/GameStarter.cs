@@ -18,6 +18,9 @@ namespace TetrisTower.Game
 		[Tooltip("If starting tower level directly, override starting playthrough with this one, if specified.")]
 		public PlaythroughTemplate StartingPlaythroughTemplate;
 
+		[Tooltip("Leave the starting seed to 0 for random seed every time.")]
+		public int StartingRandomSeed = 0;
+
 		[SerializeReference]
 		public GameContext GameContext;
 
@@ -60,15 +63,26 @@ namespace TetrisTower.Game
 
 					PlaythroughData playthroughData = StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
 					string scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
+
 					if (playthroughData.TowerLevel != null) {
 						playthroughData.TowerLevel.BackgroundScene.ScenePath = scenePath;
+
+						if (StartingRandomSeed != 0) {
+							playthroughData.TowerLevel.Random = new System.Random(StartingRandomSeed);
+						}
 
 						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, GameConfig.Converters);
 
 					} else {
-						playthroughData.Levels[playthroughData.CurrentLevelIndex].BackgroundScene.ScenePath = scenePath;
+						LevelParamData levelParam = playthroughData.Levels[playthroughData.CurrentLevelIndex];
+						levelParam.BackgroundScene.ScenePath = scenePath;
+
+						if (StartingRandomSeed != 0) {
+							levelParam.RandomSeed = StartingRandomSeed;
+						}
 					}
 					GameContext.SetCurrentPlaythrough(playthroughData);
+
 				} else {
 					GameContext.SetCurrentPlaythrough(GameConfig.NormalPlaythgrough);
 				}

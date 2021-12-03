@@ -52,6 +52,9 @@ namespace TetrisTower.Game
 		public GridShapeTemplate[] ShapeTemplates;
 		public BlockType[] SpawnedBlocks;
 
+		[Tooltip("Leave the seed to 0 for random seed every time.")]
+		public int RandomSeed = 0;
+
 		public GridRules Rules;
 
 		[Range(5, 20)]
@@ -67,11 +70,16 @@ namespace TetrisTower.Game
 
 		public GridLevelData GenerateTowerLevelData()
 		{
+			int seed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
+
 			var levelData = new GridLevelData() {
 				BackgroundScene = BackgroundScene?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = ShapeTemplates.ToArray(),
 				SpawnedBlocks = SpawnedBlocks.ToArray(),
+
+				RandomInitialSeed = seed,
+				Random = new System.Random(seed),
 
 				Rules = Rules,
 				Grid = new BlocksGrid(GridRows, GridColumns),

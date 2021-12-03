@@ -314,15 +314,15 @@ namespace TetrisTower.Logic
 
 		public BlocksShape GenerateShape()
 		{
-			GridShapeTemplate template = LevelData.ShapeTemplates[Random.Range(0, LevelData.ShapeTemplates.Length)];
-			return GenerateShape(template, LevelData.SpawnedBlocks);
+			GridShapeTemplate template = LevelData.ShapeTemplates[LevelData.Random.Next(LevelData.ShapeTemplates.Length)];
+			return GenerateShape(template, LevelData.SpawnedBlocks, LevelData.Random);
 		}
 
-		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] spawnBlocks)
+		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] spawnBlocks, System.Random random)
 		{
 			var shapeCoords = new List<BlocksShape.ShapeBind>();
 			foreach(var coords in template.ShapeTemplate) {
-				var blockType = spawnBlocks[Random.Range(0, spawnBlocks.Length)];
+				var blockType = spawnBlocks[random.Next(spawnBlocks.Length)];
 
 				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 					Coords = coords,
