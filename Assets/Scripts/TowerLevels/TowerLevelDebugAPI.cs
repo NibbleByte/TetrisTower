@@ -37,15 +37,6 @@ namespace TetrisTower.TowerLevels
 
 		public void ResetLevel()
 		{
-			var playthroughData = GameManager.Instance.GameContext.CurrentPlaythrough;
-			if (!string.IsNullOrEmpty(__DebugInitialTowerLevel)) {
-				var config = GameManager.Instance.GameContext.GameConfig;
-
-				playthroughData.TowerLevel = Newtonsoft.Json.JsonConvert.DeserializeObject<GridLevelData>(__DebugInitialTowerLevel, config.Converters);
-				GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
-				return;
-			}
-
 			UI.TowerLevelUIController.RetryLevel();
 		}
 
