@@ -123,6 +123,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6721708561544090454}
+  - component: {fileID: 1930589679847404228}
   m_Layer: 0
   m_Name: CameraPlacement
   m_TagString: Untagged
@@ -145,6 +146,70 @@ Transform:
   m_Father: {fileID: 6721708560945066972}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1930589679847404228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6721708561544090455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bdab0e29151f0e4b89f4a186800e320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ZRangeOnMobile: {x: 50, y: 70}
+  RatioToRangeOnMobile:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.56
+      value: 1
+      inSlope: -0.0055094026
+      outSlope: -0.0055094026
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.24787147
+    - serializedVersion: 3
+      time: 0.75
+      value: 0.5
+      inSlope: -0.014277345
+      outSlope: -0.014277345
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3333333
+      value: 0.5
+      inSlope: -0.012047848
+      outSlope: -0.012047848
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.13931957
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.6
+      value: 0
+      inSlope: -1.8749993
+      outSlope: -1.8749993
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &6721708562153812012
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,10 +285,9 @@ MonoBehaviour:
   BlockMoveSpeed: 7
   MatchBlockDelay: 0.075
   MatchActionDelay: 0.5
-  ScoreSequenceUIController: {fileID: 0}
   m_GizmoShowGrid: 0
   m_GizmoShowGridHeader: 1
-  m_GizmoShowOnlyFaced: 1
+  m_GizmoShowOnlyFaced: 0
 --- !u!114 &6721708562153812015
 MonoBehaviour:
   m_ObjectHideFlags: 0
