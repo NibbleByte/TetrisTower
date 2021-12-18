@@ -7,7 +7,11 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 	{
 		public void StartNewGame()
 		{
+#if GFRAME_ASYNC
+			SampleLevelsManager.Instance.SwitchLevelAsync(new Play.SamplePlaySupervisor());
+#else
 			SampleLevelsManager.Instance.SwitchLevel(new Play.SamplePlaySupervisor());
+#endif
 		}
 	}
 

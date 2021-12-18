@@ -1,5 +1,6 @@
 using DevLocker.GFrame.SampleGame.Game;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,7 +16,11 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private SamplePlayerController m_PlayerController;
 		private SamplePlayUIController m_UIController;
 
+#if GFRAME_ASYNC
+		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+#else
 		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
+#endif
 		{
 			contextReferences.SetByType(out m_PlayerControls);
 			contextReferences.SetByType(out m_PlayerController);
@@ -32,15 +37,27 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 			m_UIController.SwitchState(PlayUIState.Play, false);
 
+#if GFRAME_ASYNC
+			return Task.CompletedTask;
+#else
 			yield break;
+#endif
 		}
 
+#if GFRAME_ASYNC
+		public Task ExitStateAsync()
+#else
 		public IEnumerator ExitState()
+#endif
 		{
 			m_PlayerControls.PlayChopper.SetCallbacks(null);
 			m_PlayerControls.InputStack.PopActionsState(this);
 
+#if GFRAME_ASYNC
+			return Task.CompletedTask;
+#else
 			yield break;
+#endif
 		}
 
 		public void OnChopperMovement(InputAction.CallbackContext context)

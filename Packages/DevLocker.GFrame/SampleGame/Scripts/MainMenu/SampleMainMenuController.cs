@@ -47,7 +47,11 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 
 		public void LoadUITester()
 		{
+#if GFRAME_ASYNC
+			Game.SampleLevelsManager.Instance.SwitchLevelAsync(new UITester.SampleUITesterLevelSupervisor());
+#else
 			Game.SampleLevelsManager.Instance.SwitchLevel(new UITester.SampleUITesterLevelSupervisor());
+#endif
 		}
 
 		public void QuitGame()

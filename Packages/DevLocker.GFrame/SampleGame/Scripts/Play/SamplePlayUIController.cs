@@ -92,7 +92,11 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 		public void ExitToMainMenu()
 		{
+#if GFRAME_ASYNC
+			Game.SampleLevelsManager.Instance.SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
+#else
 			Game.SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+#endif
 		}
 	}
 }

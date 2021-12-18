@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DevLocker.GFrame
 {
@@ -11,8 +12,13 @@ namespace DevLocker.GFrame
 	/// </summary>
 	public interface ILevelState
 	{
+#if GFRAME_ASYNC
+		Task EnterStateAsync(LevelStateContextReferences contextReferences);
+		Task ExitStateAsync();
+#else
 		IEnumerator EnterState(LevelStateContextReferences contextReferences);
 		IEnumerator ExitState();
+#endif
 	}
 
 	public enum StackAction
@@ -76,6 +82,175 @@ namespace DevLocker.GFrame
 		{
 			ContextReferences = new LevelStateContextReferences(contextReferences);
 		}
+
+#if GFRAME_ASYNC
+
+		/// <summary>
+		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
+		/// </summary>
+		public async Task PushStateAsync(ILevelState state)
+		{
+			await ChangeStateAsync(state, StackAction.Push);
+		}
+
+		/// <summary>
+		/// Clears the state stack of any other states and pushes the provided one.
+		/// </summary>
+		public async Task SetStateAsync(ILevelState state)
+		{
+			await ChangeStateAsync(state, StackAction.ClearAndPush);
+		}
+
+		/// <summary>
+		/// Pop a single state from the state stack.
+		/// </summary>
+		public async Task PopStateAsync()
+		{
+			await PopStatesAsync(1);
+		}
+
+		/// <summary>
+		/// Pops multiple states from the state stack.
+		/// </summary>
+		public async Task PopStatesAsync(int count)
+		{
+			count = Math.Max(1, count);
+
+			if (StackedStatesCount < count) {
+				UnityEngine.Debug.LogError("Trying to pop states while there aren't any stacked ones.");
+				return;
+			}
+
+			await ExitingStateAsync();
+			await CurrentState.ExitStateAsync();
+			await ExitedStateAsync();
+
+			for (int i = 0; i < count; ++i) {
+				m_StackedStates.Pop();
+			}
+
+			await EnteringStateAsync();
+			await (CurrentState?.EnterStateAsync(ContextReferences) ?? Task.CompletedTask);
+			await EnteredStateAsync();
+		}
+
+		/// <summary>
+		/// Pop and push back the state at the top. Will trigger changing state events.
+		/// </summary>
+		public async Task ReenterCurrentStateAsync()
+		{
+			// Re-insert the top state to trigger changing events.
+			await ChangeStateAsync(CurrentState, StackAction.ReplaceTop);
+		}
+
+		/// <summary>
+		/// Exits the state and leaves the stack empty.
+		/// </summary>
+		public async Task ClearStackAndStateAsync()
+		{
+			await PopStatesAsync(StackedStatesCount);
+		}
+
+		/// <summary>
+		/// Change the current state and add it to the state stack.
+		/// Will notify the state itself.
+		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
+		/// </summary>
+		public async Task ChangeStateAsync(ILevelState state, StackAction stackAction)
+		{
+			// Sanity check.
+			if (m_StackedStates.Count > 7 && stackAction == StackAction.Push) {
+				UnityEngine.Debug.LogWarning($"You're stacking too many states down. Are you sure? Stacked state: {state}.");
+			}
+
+			if (ChangingStates) {
+				m_PendingStateChanges.Enqueue(new PendingStateArgs(state, stackAction));
+
+				// Wait till all the state switching has finished. That means that you may end up in a state that is not the one you requested.
+				while (m_PendingStateChanges.Count > 0) {
+					await Task.Yield();
+				}
+
+			} else {
+				ChangingStates = true;
+			}
+
+			if (CurrentState != null) {
+				await ExitingStateAsync();
+				await CurrentState.ExitStateAsync();
+				await ExitedStateAsync();
+			}
+
+			if (stackAction == StackAction.ClearAndPush) {
+				m_StackedStates.Clear();
+			}
+
+			if (stackAction == StackAction.ReplaceTop && m_StackedStates.Count > 0) {
+				m_StackedStates.Pop();
+			}
+
+			m_StackedStates.Push(state);
+
+			await EnteringStateAsync();
+			await CurrentState.EnterStateAsync(ContextReferences);
+			await EnteredStateAsync();
+
+			ChangingStates = false;
+
+			// Execute the pending states...
+			if (m_PendingStateChanges.Count > 0) {
+				var stateArgs = m_PendingStateChanges.Dequeue();
+
+				await ChangeStateAsync(stateArgs.State, stateArgs.StackAction);
+			}
+		}
+
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual Task ExitingStateAsync()
+		{
+			ExitingState?.Invoke();
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual Task ExitedStateAsync()
+		{
+			ExitedState?.Invoke();
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual Task EnteringStateAsync()
+		{
+			EnteringState?.Invoke();
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Override this according to your needs.
+		/// </summary>
+		protected virtual Task EnteredStateAsync()
+		{
+			EnteredState?.Invoke();
+
+			// In case the scopes were already active when the state kicked in and it pushed
+			// a new state onto the InputActionsStack (resetting the previous actions).
+			Input.UIScope.UIScope.RefocusActiveScopes();
+
+			return Task.CompletedTask;
+		}
+
+#else
 
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
@@ -241,5 +416,7 @@ namespace DevLocker.GFrame
 
 			yield break;
 		}
+#endif
+
 	}
 }

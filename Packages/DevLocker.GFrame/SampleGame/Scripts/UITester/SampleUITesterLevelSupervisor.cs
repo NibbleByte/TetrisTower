@@ -1,5 +1,6 @@
 using DevLocker.GFrame.SampleGame.Game;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
 namespace DevLocker.GFrame.SampleGame.UITester
@@ -11,7 +12,11 @@ namespace DevLocker.GFrame.SampleGame.UITester
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
+#if GFRAME_ASYNC
+		public async Task LoadAsync()
+#else
 		public IEnumerator Load()
+#endif
 		{
 			SampleGameContext gameContext = SampleLevelsManager.Instance.GameContext;
 
@@ -24,12 +29,22 @@ namespace DevLocker.GFrame.SampleGame.UITester
 			if (SceneManager.GetActiveScene().name != "Sample-UITestScene") {
 				// To bypass build settings list.
 				var sceneParam = new LoadSceneParameters() { loadSceneMode = LoadSceneMode.Single, localPhysicsMode = LocalPhysicsMode.None };
+#if GFRAME_ASYNC
+				var loadOp = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode("Packages/devlocker.gframe/SampleGame/Scenes/Sample-UITestScene.unity", sceneParam);
+				while (!loadOp.isDone) await Task.Yield();
+#else
 				yield return UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode("Packages/devlocker.gframe/SampleGame/Scenes/Sample-UITestScene.unity", sceneParam);
+#endif
 			}
 #else
 			// Can pass it on as a parameter to the supervisor, instead of hard-coding it here.
 			if (SceneManager.GetActiveScene().name != "Sample-UITestScene") {
+#if GFRAME_ASYNC
+				var loadOp = SceneManager.LoadSceneAsync("Sample-UITestScene", LoadSceneMode.Single);
+				while (!loadOp.isDone) await Task.Yield();
+#else
 				yield return SceneManager.LoadSceneAsync("Sample-UITestScene", LoadSceneMode.Single);
+#endif
 			}
 #endif
 
@@ -47,11 +62,19 @@ namespace DevLocker.GFrame.SampleGame.UITester
 			gameContext.PlayerControls.UI.Enable();
 		}
 
+#if GFRAME_ASYNC
+		public Task UnloadAsync()
+#else
 		public IEnumerator Unload()
+#endif
 		{
 			SampleLevelsManager.Instance.GameContext.PlayerControls.InputStack.PopActionsState(this);
 
+#if GFRAME_ASYNC
+			return Task.CompletedTask;
+#else
 			yield break;
+#endif
 		}
 	}
 }

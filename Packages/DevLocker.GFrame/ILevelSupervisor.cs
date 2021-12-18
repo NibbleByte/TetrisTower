@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace DevLocker.GFrame
 {
@@ -8,8 +9,13 @@ namespace DevLocker.GFrame
 	/// </summary>
 	public interface ILevelLoadingScreen
 	{
+#if GFRAME_ASYNC
+		Task ShowAsync();
+		Task HideAsync();
+#else
 		IEnumerator Show();
 		IEnumerator Hide();
+#endif
 
 		void ShowInstantly();
 		void HideInstantly();
@@ -25,9 +31,15 @@ namespace DevLocker.GFrame
 	{
 		LevelStateStack StatesStack { get; }
 
+#if GFRAME_ASYNC
+		Task LoadAsync();
+
+		Task UnloadAsync();
+#else
 		IEnumerator Load();
 
 		IEnumerator Unload();
+#endif
 	}
 
 	/// <summary>
@@ -37,7 +49,11 @@ namespace DevLocker.GFrame
 	/// </summary>
 	public interface ILevelLoadingListener
 	{
+#if GFRAME_ASYNC
+		Task OnLevelLoadingAsync(LevelStateContextReferences contextReferences);
+#else
 		IEnumerator OnLevelLoading(LevelStateContextReferences contextReferences);
+#endif
 	}
 
 	/// <summary>
