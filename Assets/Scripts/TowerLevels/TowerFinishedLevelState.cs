@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using System.Collections;
+using System.Threading.Tasks;
 using TetrisTower.Game;
 using UnityEngine.InputSystem;
 
@@ -10,7 +11,7 @@ namespace TetrisTower.TowerLevels
 		private PlayerControls m_PlayerControls;
 		private UI.TowerLevelUIController m_UIController;
 
-		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_UIController);
 			contextReferences.SetByType(out m_PlayerControls);
@@ -20,14 +21,14 @@ namespace TetrisTower.TowerLevels
 
 			m_UIController.SwitchState(UI.TowerLevelUIState.LevelFinished);
 
-			yield break;
+			return Task.CompletedTask;
 		}
 
-		public IEnumerator ExitState()
+		public Task ExitStateAsync()
 		{
 			m_PlayerControls.InputStack.PopActionsState(this);
 
-			yield break;
+			return Task.CompletedTask;
 		}
 	}
 }

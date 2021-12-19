@@ -21,13 +21,11 @@ namespace TetrisTower.Game
 	[Serializable]
 	public sealed class GameContext
 	{
-		public GameContext(GameConfig config, PlayerControls controls, CoroutineScheduler coroutineScheduler)
+		public GameContext(GameConfig config, PlayerControls controls)
 		{
 			GameConfig = config;
 			PlayerControls = controls;
 			PlayerControls.InitStack();
-
-			CoroutineScheduler = coroutineScheduler;
 
 			InputContext = new SinglePlayerInputCollectionContext(PlayerControls, PlayerControls.InputStack, PlayerControls.UI.Get(), GameConfig.BindingDisplayAssets);
 			InputContextManager.SetContext(InputContext);
@@ -41,8 +39,6 @@ namespace TetrisTower.Game
 
 		public PlaythroughData CurrentPlaythrough { get; private set; }
 		[SerializeReference] private PlaythroughData m_DebugPlaythroughData;
-
-		public CoroutineScheduler CoroutineScheduler { get; }
 
 		public IInputContext InputContext { get; }
 
@@ -60,11 +56,6 @@ namespace TetrisTower.Game
 		public void ClearCurrentPlaythrough()
 		{
 			CurrentPlaythrough = m_DebugPlaythroughData = null;
-		}
-
-		public Coroutine StartCoroutine(IEnumerator routine)
-		{
-			return CoroutineScheduler.StartCoroutine(routine);
 		}
 
 		public void Dispose()

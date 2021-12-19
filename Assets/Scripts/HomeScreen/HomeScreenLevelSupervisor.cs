@@ -2,6 +2,7 @@ using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TetrisTower.Game;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,7 +13,7 @@ namespace TetrisTower.HomeScreen
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
-		public IEnumerator Load()
+		public async Task LoadAsync()
 		{
 			var gameContext = GameManager.Instance.GameContext;
 
@@ -21,7 +22,8 @@ namespace TetrisTower.HomeScreen
 			}
 
 			if (SceneManager.GetActiveScene().name != "HomeScreenScene") {
-				yield return SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);
+				var loadOp = SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);
+				while (!loadOp.isDone) await Task.Yield();
 			}
 
 			// StateStack not needed for now.
@@ -39,11 +41,11 @@ namespace TetrisTower.HomeScreen
 			gameContext.PlayerControls.UI.Enable();
 		}
 
-		public IEnumerator Unload()
+		public Task UnloadAsync()
 		{
 			GameManager.Instance.GameContext.PlayerControls.InputStack.PopActionsState(this);
 
-			yield break;
+			return Task.CompletedTask;
 		}
 	}
 }

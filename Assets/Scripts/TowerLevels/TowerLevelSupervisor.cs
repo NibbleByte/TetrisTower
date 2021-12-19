@@ -4,6 +4,7 @@ using DevLocker.Utils;
 using System;
 using System.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace TetrisTower.TowerLevels
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
-		public IEnumerator Load()
+		public async Task LoadAsync()
 		{
 			GameContext gameContext = GameManager.Instance.GameContext;
 			PlaythroughData playthroughData = gameContext.CurrentPlaythrough;
@@ -31,7 +32,8 @@ namespace TetrisTower.TowerLevels
 
 			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;
 			if (SceneManager.GetActiveScene().name != backgroundScene.SceneName) {
-				yield return SceneManager.LoadSceneAsync(backgroundScene.ScenePath, LoadSceneMode.Single);
+				var loadOp = SceneManager.LoadSceneAsync(backgroundScene.ScenePath, LoadSceneMode.Single);
+				while (!loadOp.isDone) await Task.Yield();
 			}
 
 			var levelController = GameObject.FindObjectOfType<GridLevelController>();
@@ -76,30 +78,34 @@ namespace TetrisTower.TowerLevels
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
-				yield return listener.OnLevelLoading(StatesStack.ContextReferences);
+				await listener.OnLevelLoadingAsync(StatesStack.ContextReferences);
 			}
 
 			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
 				listener.OnLevelLoaded(StatesStack.ContextReferences);
 			}
 
-			yield return StatesStack.SetStateCrt(new TowerPlayState());
+			await StatesStack.SetStateAsync(new TowerPlayState());
 
 			// If save came with available matches, or pending actions, do them.
 			var pendingActions = Logic.GameGridEvaluation.Evaluate(gameContext.CurrentPlaythrough.TowerLevel.Grid, gameContext.CurrentPlaythrough.TowerLevel.Rules);
 			if (pendingActions.Count > 0) {
-				yield return levelController.RunActions(pendingActions);
+				levelController.StartCoroutine(levelController.RunActions(pendingActions));
+
+				while(levelController.AreGridActionsRunning) {
+					await Task.Yield();
+				}
 			}
 		}
 
-		public IEnumerator Unload()
+		public Task UnloadAsync()
 		{
 			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadedListener>();
 			foreach (var listener in levelListeners) {
 				listener.OnLevelUnloading();
 			}
 
-			yield break;
+			return Task.CompletedTask;
 		}
 	}
 }

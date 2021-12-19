@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
 using System.Collections;
+using System.Threading.Tasks;
 using TetrisTower.Core.UI;
 using TetrisTower.Game;
 using TetrisTower.Logic;
@@ -26,7 +27,7 @@ namespace TetrisTower.TowerLevels
 
 		private int m_LastUpdateFrame;
 
-		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_PlayerControls);
 			contextReferences.SetByType(out m_LevelController);
@@ -50,10 +51,10 @@ namespace TetrisTower.TowerLevels
 			MessageBox.Instance.MessageShown += m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed += m_LevelController.ResumeLevel;
 
-			yield break;
+			return Task.CompletedTask;
 		}
 
-		public IEnumerator ExitState()
+		public Task ExitStateAsync()
 		{
 			m_LevelController.PauseLevel();
 
@@ -63,7 +64,7 @@ namespace TetrisTower.TowerLevels
 			MessageBox.Instance.MessageShown -= m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed -= m_LevelController.ResumeLevel;
 
-			yield break;
+			return Task.CompletedTask;
 		}
 
 		public void OnMoveShapeLeft(InputAction.CallbackContext context)

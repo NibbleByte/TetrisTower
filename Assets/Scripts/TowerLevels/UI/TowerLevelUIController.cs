@@ -80,7 +80,7 @@ namespace TetrisTower.TowerLevels.UI
 
 		public void ExitToHomeScreen()
 		{
-			Game.GameManager.Instance.SwitchLevel(new HomeScreen.HomeScreenLevelSupervisor());
+			Game.GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());
 		}
 
 		public static void RetryLevel()
@@ -91,7 +91,7 @@ namespace TetrisTower.TowerLevels.UI
 				var config = Game.GameManager.Instance.GameContext.GameConfig;
 
 				playthroughData.TowerLevel = Newtonsoft.Json.JsonConvert.DeserializeObject<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, config.Converters);
-				Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+				Game.GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
 				return;
 			}
 
@@ -99,7 +99,7 @@ namespace TetrisTower.TowerLevels.UI
 
 			playthroughData.RetryLevel();
 
-			Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+			Game.GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
 		}
 
 		public void GoToNextLevel()
@@ -117,7 +117,7 @@ namespace TetrisTower.TowerLevels.UI
 			if (playthroughData.HaveFinishedLevels) {
 				ExitToHomeScreen();
 			} else {
-				Game.GameManager.Instance.SwitchLevel(new TowerLevelSupervisor());
+				Game.GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
 			}
 
 		}

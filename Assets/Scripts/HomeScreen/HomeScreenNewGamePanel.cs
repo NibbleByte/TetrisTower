@@ -11,7 +11,7 @@ namespace TetrisTower.HomeScreen
 
 			gameContext.SetCurrentPlaythrough(gameContext.GameConfig.NormalPlaythgrough);
 
-			GameManager.Instance.SwitchLevel(new TowerLevels.TowerLevelSupervisor());
+			GameManager.Instance.SwitchLevelAsync(new TowerLevels.TowerLevelSupervisor());
 		}
 	}
 
