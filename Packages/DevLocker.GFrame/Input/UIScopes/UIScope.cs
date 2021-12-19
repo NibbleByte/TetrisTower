@@ -120,6 +120,19 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private bool m_GameQuitting = false;
 
+
+		/// <summary>
+		/// Called when assembly reload is disabled.
+		/// </summary>
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+		private static void ClearStaticsCache()
+		{
+			m_ActiveScopes = Array.Empty<UIScope>();
+			s_Scopes = new List<UIScope>();
+			s_ChangingActiveScopes = false;
+			s_PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
+		}
+
 		protected virtual void Awake()
 		{
 			if (!m_HasScannedForElements) {
