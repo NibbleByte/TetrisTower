@@ -10,7 +10,10 @@ namespace TetrisTower.Visuals
 
 		public void HighlightHit()
 		{
-			transform.Translate(Vector3.forward * 0.5f);
+			var db = GetComponentInParent<ConeVisualsMaterialsDatabase>();
+			var renderer = GetComponentInChildren<Renderer>();
+
+			renderer.sharedMaterial = db.GetHighlightSharedMaterial(renderer.sharedMaterial);
 		}
 	}
 }
