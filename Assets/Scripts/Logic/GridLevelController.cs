@@ -313,16 +313,29 @@ namespace TetrisTower.Logic
 				new PlaceAction() { PlaceCoords = placeCoords, PlacedShape = placedShape }
 			};
 
-			yield return RunActions(actions);
-
 			bool placedInside = placeCoords.Row <= LevelData.PlayableSize.Row; // '<=' as placing on the edge is a warning, not direct fail.
 			placedInside &= placeCoords.Row + placedShape.Rows - 1 < Grid.Rows;
 
 			// Limit was reached, game over.
 			if (placedInside) {
+				yield return RunActions(actions);
 				SelectFallingShape();
 			} else {
+
 				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the play area {LevelData.PlayableSize}, grid ({Grid.Rows}, {Grid.Columns}).");
+
+				while (AreGridActionsRunning)
+					yield return null;
+
+				m_NextRunId++;
+
+				// Manually place the shape as we don't want to evaluate and execute normal game-play logic. Just stay visually there.
+				foreach (var grid in Grids) {
+					yield return grid.ApplyActions(actions);
+				}
+
+				m_FinishedRuns++;
+
 				LevelData.RunningState = TowerLevelRunningState.Lost;
 				PlacedOutsideGrid?.Invoke();
 				FinishedLevel?.Invoke();
