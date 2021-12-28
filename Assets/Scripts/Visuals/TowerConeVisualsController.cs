@@ -61,7 +61,7 @@ namespace TetrisTower.Visuals
 			FallingVisualsContainer.localPosition = Vector3.zero;
 
 			m_TowerLevel.Grids.Add(VisualsGrid);
-			VisualsGrid.Init(m_LevelData.Grid, m_LevelData.Rules, contextReferences.TryFindByType<IMatchSequenceScoreDisplayer>());
+			VisualsGrid.Init(m_LevelData.Grid, m_LevelData.Rules, m_LevelData.PlayableSize, contextReferences.TryFindByType<IMatchSequenceScoreDisplayer>());
 
 			DestroyFallingVisuals();
 

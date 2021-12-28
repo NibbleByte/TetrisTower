@@ -104,6 +104,8 @@ namespace TetrisTower.TowerLevels.UI
 
 		public void GoToNextLevel()
 		{
+			TowerLevelDebugAPI.__DebugInitialTowerLevel = string.Empty;
+
 			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
 			Debug.Assert(playthroughData.TowerLevel != null);
 

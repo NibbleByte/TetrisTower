@@ -16,6 +16,12 @@ namespace TetrisTower.TowerLevels
 		private float m_FallSpeedOriginal;
 		private GridLevelController m_TowerLevel;
 
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+		private static void ClearStaticsCache()
+		{
+			__DebugInitialTowerLevel = string.Empty;
+		}
+
 		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_TowerLevel);

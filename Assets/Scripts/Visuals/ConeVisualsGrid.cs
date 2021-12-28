@@ -79,7 +79,9 @@ namespace TetrisTower.Visuals
 		private GridRules m_Rules;
 		private ScoreGrid m_ScoreGrid = null;
 
-		public void Init(BlocksGrid grid, GridRules rules, IMatchSequenceScoreDisplayer matchSequenceScoreDisplayer)
+		private GridCoords m_PlayableArea;
+
+		public void Init(BlocksGrid grid, GridRules rules, GridCoords playableArea, IMatchSequenceScoreDisplayer matchSequenceScoreDisplayer)
 		{
 			if (m_Blocks != null) {
 				DestroyInstances();
@@ -95,6 +97,8 @@ namespace TetrisTower.Visuals
 
 			m_Blocks = new ConeVisualsBlock[grid.Rows, grid.Columns];
 			m_ScoreGrid = null;
+
+			m_PlayableArea = playableArea;
 
 			for(int row = 0; row < grid.Rows; ++row) {
 				for(int column = 0; column < grid.Columns; ++column) {
@@ -243,7 +247,7 @@ namespace TetrisTower.Visuals
 				visualsBlock.MatchHits--;
 
 				if (visualsBlock.MatchHits != 0) {
-					visualsBlock.HighlightHit();
+					visualsBlock.Highlight();
 				} else {
 					GameObject.Destroy(this[coord].gameObject);
 					this[coord] = null;
@@ -292,10 +296,17 @@ namespace TetrisTower.Visuals
 				Debug.Assert(this[movedPair.Key] != null);
 				Debug.Assert(this[movedPair.Value] == null);
 
-				this[movedPair.Value] = this[movedPair.Key];
+				ConeVisualsBlock visualsBlock = this[movedPair.Key];
+				this[movedPair.Value] = visualsBlock;
 				this[movedPair.Key] = null;
 
-				this[movedPair.Value].transform.localScale = GridToScale(movedPair.Value);
+				visualsBlock.transform.localScale = GridToScale(movedPair.Value);
+
+				if (visualsBlock.IsHighlighted && movedPair.Value.Row < m_PlayableArea.Row) {
+					visualsBlock.ClearHighlight();
+				} else if (!visualsBlock.IsHighlighted && movedPair.Value.Row >= m_PlayableArea.Row) {
+					visualsBlock.Highlight();
+				}
 			}
 
 			yield break;
@@ -311,14 +322,21 @@ namespace TetrisTower.Visuals
 
 			reuseVisuals.transform.position = ConeApex;
 			reuseVisuals.transform.rotation = GridColumnToRotation(coords.Column);
-			var visualsBlock = reuseVisuals.AddComponent<ConeVisualsBlock>();
 
 			// Hitting the limit, won't be stored.
 			if (coords.Row < Rows) {
 				Debug.Assert(this[coords] == null);
+
+				var visualsBlock = reuseVisuals.AddComponent<ConeVisualsBlock>();
 				this[coords] = visualsBlock;
 
 				reuseVisuals.transform.localScale = GridToScale(coords);
+
+				// Warn that this is outside play area.
+				if (coords.Row >= m_PlayableArea.Row) {
+					visualsBlock.Highlight();
+				}
+
 			} else {
 				GameObject.Destroy(reuseVisuals);
 			}

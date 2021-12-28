@@ -72,6 +72,10 @@ namespace TetrisTower.Game
 		{
 			int seed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
 
+			// No, we don't need '+1'. 13 + 3 = 16 (0 - 15). Placing on the 13 takes (13, 14, 15).
+			int extraRows = ShapeTemplates.Max(st => st.Rows);
+			int totalRows = GridRows + extraRows * 2;	// Multiply by 2 for future-proofing.
+
 			var levelData = new GridLevelData() {
 				BackgroundScene = BackgroundScene?.Clone() ?? new SceneReference(),
 
@@ -82,7 +86,8 @@ namespace TetrisTower.Game
 				Random = new System.Random(seed),
 
 				Rules = Rules,
-				Grid = new BlocksGrid(GridRows, GridColumns),
+				Grid = new BlocksGrid(totalRows, GridColumns),
+				PlayableSize = new GridCoords(GridRows, GridColumns),
 
 				ClearBlocksEndCount = ClearBlocksEndCount,
 			};

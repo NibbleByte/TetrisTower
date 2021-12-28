@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TetrisTower.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -47,6 +48,19 @@ namespace TetrisTower.Logic
 
 			if (LevelData.Rules.MatchScoring == 0) {
 				Debug.LogError($"Initializing a game with no MatchScoring set.", this);
+			}
+
+			if (LevelData.PlayableSize.Column != LevelData.Grid.Columns) {
+				Debug.LogError($"Playable size columns differ from the grid ones! Overwriting it!", this);
+
+				LevelData.PlayableSize.Column = LevelData.Grid.Columns;
+			}
+
+			if (LevelData.Grid.Rows <= LevelData.PlayableSize.Row) {
+				Debug.LogError($"Playable size rows is larger than grid ones! Overwriting it!", this);
+
+				int extraRows = LevelData.ShapeTemplates.Max(st => st.Rows);
+				LevelData.PlayableSize.Row = LevelData.Grid.Rows - extraRows;
 			}
 
 			if (LevelData.NextShape == null) {
@@ -301,11 +315,14 @@ namespace TetrisTower.Logic
 
 			yield return RunActions(actions);
 
+			bool placedInside = placeCoords.Row <= LevelData.PlayableSize.Row; // '<=' as placing on the edge is a warning, not direct fail.
+			placedInside &= placeCoords.Row + placedShape.Rows - 1 < Grid.Rows;
+
 			// Limit was reached, game over.
-			if (placeCoords.Row + placedShape.Rows - 1 < Grid.Rows) {
+			if (placedInside) {
 				SelectFallingShape();
 			} else {
-				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the grid ({Grid.Rows}, {Grid.Columns}). It will be trimmed!");
+				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the play area {LevelData.PlayableSize}, grid ({Grid.Rows}, {Grid.Columns}).");
 				LevelData.RunningState = TowerLevelRunningState.Lost;
 				PlacedOutsideGrid?.Invoke();
 				FinishedLevel?.Invoke();

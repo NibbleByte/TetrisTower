@@ -36,6 +36,9 @@ namespace TetrisTower.Logic
 		public GridRules Rules;
 		public BlocksGrid Grid;
 
+		// The valid size where blocks can be placed by the player. It should be smaller than the grid itself.
+		public GridCoords PlayableSize;
+
 		[SerializeReference]
 		public ScoreGrid Score;
 

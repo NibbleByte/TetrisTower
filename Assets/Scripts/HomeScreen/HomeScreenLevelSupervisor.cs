@@ -26,6 +26,8 @@ namespace TetrisTower.HomeScreen
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
+			TowerLevels.TowerLevelDebugAPI.__DebugInitialTowerLevel = string.Empty;
+
 			// StateStack not needed for now.
 			//var levelController = GameObject.FindObjectOfType<HomeScreenController>();
 			//

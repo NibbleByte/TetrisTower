@@ -26,6 +26,11 @@ namespace TetrisTower.Visuals
 			return highlight;
 		}
 
+		public Material GetHighlightOriginalMaterial(Material highlight)
+		{
+			return m_HighlightMaterials.FirstOrDefault(pair => pair.Value == highlight).Key;
+		}
+
 		private void OnDestroy()
 		{
 			foreach(Material material in m_HighlightMaterials.Values) {
