@@ -74,7 +74,11 @@ namespace TetrisTower.Game
 
 			// No, we don't need '+1'. 13 + 3 = 16 (0 - 15). Placing on the 13 takes (13, 14, 15).
 			int extraRows = ShapeTemplates.Max(st => st.Rows);
-			int totalRows = GridRows + extraRows * 2;	// Multiply by 2 for future-proofing.
+
+			// The shapes are spawned at the top of the grid (totalRows).
+			// Have twice the shape size padding from the playable area,
+			// to give time for the player to react if shapes are placed on the edge of the playing area (highlighted).
+			int totalRows = GridRows + extraRows * 2 + 1;
 
 			var levelData = new GridLevelData() {
 				BackgroundScene = BackgroundScene?.Clone() ?? new SceneReference(),
