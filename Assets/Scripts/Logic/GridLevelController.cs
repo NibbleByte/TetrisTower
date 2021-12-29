@@ -110,8 +110,7 @@ namespace TetrisTower.Logic
 
 			if (LevelData.ClearBlocksRemainingCount == 0 && !AreGridActionsRunning) {
 				Debug.Log($"Remaining blocks to clear are 0. Player won.");
-				LevelData.RunningState = TowerLevelRunningState.Won;
-				FinishedLevel?.Invoke();
+				FinishLevel(TowerLevelRunningState.Won);
 
 			} else if (LevelData.SpawnBlockTypesCount != spawnBlockTypesCount && LevelData.SpawnedBlocks.Length >= spawnBlockTypesCount) {
 				Debug.Log($"Changing SpawnBlockTypesCount from {LevelData.SpawnBlockTypesCount} to {spawnBlockTypesCount}.", this);
@@ -349,9 +348,8 @@ namespace TetrisTower.Logic
 
 				m_FinishedRuns++;
 
-				LevelData.RunningState = TowerLevelRunningState.Lost;
 				PlacedOutsideGrid?.Invoke();
-				FinishedLevel?.Invoke();
+				FinishLevel(TowerLevelRunningState.Lost);
 			}
 		}
 
@@ -374,6 +372,15 @@ namespace TetrisTower.Logic
 			}
 
 			return new BlocksShape() { ShapeCoords = shapeCoords.ToArray() };
+		}
+
+		public void FinishLevel(TowerLevelRunningState finishState)
+		{
+			if (finishState == TowerLevelRunningState.Running)
+				throw new ArgumentException($"Invalid finish state {finishState}");
+
+			LevelData.RunningState = finishState;
+			FinishedLevel?.Invoke();
 		}
 
 		public void PauseLevel()

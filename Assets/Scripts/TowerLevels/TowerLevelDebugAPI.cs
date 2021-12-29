@@ -46,9 +46,19 @@ namespace TetrisTower.TowerLevels
 			UI.TowerLevelUIController.RetryLevel();
 		}
 
+		public void Win()
+		{
+			m_TowerLevel.FinishLevel(TowerLevelRunningState.Won);
+		}
+
+		public void Lose()
+		{
+			m_TowerLevel.FinishLevel(TowerLevelRunningState.Lost);
+		}
+
 		void Update()
 		{
-			if (Keyboard.current.pKey.wasPressedThisFrame) {
+			if (Keyboard.current.pKey.wasPressedThisFrame || Keyboard.current.fKey.wasPressedThisFrame) {
 				ToggleFalling();
 			}
 		}
