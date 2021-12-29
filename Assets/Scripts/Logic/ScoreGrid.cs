@@ -69,7 +69,7 @@ namespace TetrisTower.Logic
 			}
 
 			// Having 4 or 5 in a row should be considered as 2x3 or 3x3 respectively.
-			CurrentClearedBlocksCount += Mathf.Min(action.Coords.Count, maxMatch);
+			CurrentClearedBlocksCount = Mathf.Max(CurrentClearedBlocksCount, maxMatch);
 			int clearActionsCount = Mathf.Max(action.Coords.Count - maxMatch + 1, 1);
 			CurrentClearActionsCount += clearActionsCount;
 
