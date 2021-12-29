@@ -12,6 +12,8 @@ namespace TetrisTower.Game
 
 		public PlaythroughData GeneratePlaythroughData(GameConfig config)
 		{
+			m_PlayerData.Validate(config.AssetsRepository, this);
+
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
 			var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(m_PlayerData, config.Converters);
 

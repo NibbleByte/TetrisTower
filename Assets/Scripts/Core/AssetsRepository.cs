@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -11,6 +12,11 @@ namespace TetrisTower.Core
 		public T GetAssetById<T>(string blockTypeId) where T : SerializableAsset
 		{
 			return Assets.OfType<T>().FirstOrDefault(sa => sa.SEID == blockTypeId);
+		}
+
+		public bool IsRegistered(SerializableAsset asset)
+		{
+			return Array.IndexOf(Assets, asset) != -1;
 		}
 
 #if UNITY_EDITOR

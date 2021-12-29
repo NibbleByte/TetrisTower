@@ -48,10 +48,6 @@ namespace TetrisTower.Logic
 				LevelData.Score = new ScoreGrid(LevelData.Grid.Rows, LevelData.Grid.Columns, LevelData.Rules);
 			}
 
-			if (LevelData.Rules.ObjectiveType == 0) {
-				Debug.LogError($"Initializing a game with no ObjectiveType set.", this);
-			}
-
 			if (LevelData.PlayableSize.Column != LevelData.Grid.Columns) {
 				Debug.LogError($"Playable size columns differ from the grid ones! Overwriting it!", this);
 

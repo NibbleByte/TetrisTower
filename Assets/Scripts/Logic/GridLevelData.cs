@@ -61,6 +61,26 @@ namespace TetrisTower.Logic
 
 		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), column);
 		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);
+
+		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
+		{
+			if (Rules.ObjectiveType == 0) {
+				Debug.LogError($"{nameof(GridLevelData)} has no ObjectiveType set.", context);
+			}
+
+			for (int i = 0; i < SpawnedBlocks.Length; i++) {
+				var block = SpawnedBlocks[i];
+
+				if (block == null) {
+					Debug.LogError($"Missing {i}-th block from {nameof(SpawnedBlocks)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
+					continue;
+				}
+
+				if (!repo.IsRegistered(block)) {
+					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(SpawnedBlocks)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
+				}
+			}
+		}
 	}
 
 #if UNITY_EDITOR
