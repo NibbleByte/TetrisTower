@@ -36,7 +36,7 @@ namespace TetrisTower.Logic
 		public int SpawnBlockTypesCount = 3;
 
 		// Every x matches done by the player, increase the range of the types count.
-		public int AddSpawnBlockTypePerMatches = 50;
+		public int ScorePerAdditionalSpawnBlockType = 50;
 
 
 		[Tooltip("Read-only. Used for debug.")]
@@ -52,9 +52,9 @@ namespace TetrisTower.Logic
 		[SerializeReference]
 		public ScoreGrid Score;
 
-		public int ClearBlocksEndCount;
+		public int ObjectiveEndCount;
 
-		public int ClearBlocksRemainingCount => Mathf.Max(ClearBlocksEndCount - Score.TotalClearedBlocksCount, 0);
+		public int ObjectiveRemainingCount => Mathf.Max(ObjectiveEndCount - Score.ObjectiveProgress, 0);
 
 		public TowerLevelRunningState RunningState = TowerLevelRunningState.Running;
 		public bool IsPlaying => RunningState == TowerLevelRunningState.Running;

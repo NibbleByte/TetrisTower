@@ -43,13 +43,13 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 3520e54e21641954fa8087cbd30fd9a5, type: 2}
         InitialSpawnBlockTypesCount: 3
         SpawnBlockTypesCount: 3
-        AddSpawnBlockTypePerMatches: 10
+        ScorePerAdditionalSpawnBlockType: 10
         RandomInitialSeed: 0
         Rules:
           MatchHorizontalLines: 3
           MatchVerticalLines: 3
           MatchDiagonalsLines: 3
-          MatchScoring: -1
+          ObjectiveType: -1
           WrapSidesOnMatch: 1
           WrapSidesOnMove: 1
         Grid:
@@ -295,7 +295,7 @@ MonoBehaviour:
           Column: 13
         Score:
           id: 1
-        ClearBlocksEndCount: 90
+        ObjectiveEndCount: 90
         RunningState: 0
     00000001:
       type: {class: , ns: , asm: }

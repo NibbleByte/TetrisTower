@@ -20,7 +20,8 @@ namespace TetrisTower.Logic
 		public int MatchDiagonalsLines;
 
 		[EnumMask]
-		public MatchScoringType MatchScoring;
+		public MatchScoringType ObjectiveType;
+		public bool IsObjectiveAllMatchTypes => ObjectiveType == (MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals);
 
 		// Will wrap around the first and last column when matching and moving.
 		public bool WrapSidesOnMatch;

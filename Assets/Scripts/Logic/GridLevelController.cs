@@ -48,8 +48,8 @@ namespace TetrisTower.Logic
 				LevelData.Score = new ScoreGrid(LevelData.Grid.Rows, LevelData.Grid.Columns, LevelData.Rules);
 			}
 
-			if (LevelData.Rules.MatchScoring == 0) {
-				Debug.LogError($"Initializing a game with no MatchScoring set.", this);
+			if (LevelData.Rules.ObjectiveType == 0) {
+				Debug.LogError($"Initializing a game with no ObjectiveType set.", this);
 			}
 
 			if (LevelData.PlayableSize.Column != LevelData.Grid.Columns) {
@@ -102,13 +102,13 @@ namespace TetrisTower.Logic
 
 			RunningActionsSequenceFinished?.Invoke();
 
-			int spawnBlockTypesProgress = LevelData.AddSpawnBlockTypePerMatches > 0
-				? LevelData.Score.TotalClearedBlocksCount / LevelData.AddSpawnBlockTypePerMatches
+			int spawnBlockTypesProgress = LevelData.ScorePerAdditionalSpawnBlockType > 0
+				? LevelData.Score.Score / LevelData.ScorePerAdditionalSpawnBlockType
 				: 0
 				;
 			int spawnBlockTypesCount = LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress;
 
-			if (LevelData.ClearBlocksRemainingCount == 0 && !AreGridActionsRunning) {
+			if (LevelData.ObjectiveRemainingCount == 0 && !AreGridActionsRunning) {
 				Debug.Log($"Remaining blocks to clear are 0. Player won.");
 				FinishLevel(TowerLevelRunningState.Won);
 

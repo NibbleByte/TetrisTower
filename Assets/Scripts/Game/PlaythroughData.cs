@@ -56,7 +56,7 @@ namespace TetrisTower.Game
 		public int InitialSpawnBlockTypesCount = 3;
 
 		// Every x matches done by the player, increase the range of the types count.
-		public int AddSpawnBlockTypePerMatches = 50;
+		public int ScorePerAdditionalSpawnBlockType = 50;
 
 
 		[Tooltip("Leave the seed to 0 for random seed every time.")]
@@ -73,7 +73,7 @@ namespace TetrisTower.Game
 		[Range(SupportedColumnsCount, SupportedColumnsCount)]
 		public int GridColumns = SupportedColumnsCount;
 
-		public int ClearBlocksEndCount;
+		public int ObjectiveEndCount;
 
 		public GridLevelData GenerateTowerLevelData()
 		{
@@ -95,7 +95,7 @@ namespace TetrisTower.Game
 
 				InitialSpawnBlockTypesCount = InitialSpawnBlockTypesCount,
 				SpawnBlockTypesCount = InitialSpawnBlockTypesCount,
-				AddSpawnBlockTypePerMatches = AddSpawnBlockTypePerMatches,
+				ScorePerAdditionalSpawnBlockType = ScorePerAdditionalSpawnBlockType,
 
 				RandomInitialSeed = seed,
 				Random = new System.Random(seed),
@@ -104,7 +104,7 @@ namespace TetrisTower.Game
 				Grid = new BlocksGrid(totalRows, GridColumns),
 				PlayableSize = new GridCoords(GridRows, GridColumns),
 
-				ClearBlocksEndCount = ClearBlocksEndCount,
+				ObjectiveEndCount = ObjectiveEndCount,
 			};
 
 			return levelData;

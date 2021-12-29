@@ -21,7 +21,7 @@ namespace TetrisTower.Logic
 		private int m_Score = 0;
 		public int Score => m_Score;
 
-		[JsonProperty] public int TotalClearedBlocksCount { get; private set; }
+		[JsonProperty] public int ObjectiveProgress { get; private set; }
 
 		public int CurrentClearedBlocksCount { get; private set; }
 		public int CurrentClearActionsCount { get; private set; }
@@ -61,10 +61,24 @@ namespace TetrisTower.Logic
 				Debug.LogError($"{nameof(ClearMatchedAction)} doesn't have a MatchedType set.");
 			}
 
-			if ((Rules.MatchScoring & action.MatchedType) != 0) {
-				CurrentClearedBlocksCount += action.Coords.Count;
-				TotalClearedBlocksCount += action.Coords.Count;
-				CurrentClearActionsCount += 1;
+			int maxMatch = 0;
+			switch(action.MatchedType) {
+				case MatchScoringType.Horizontal: maxMatch = Rules.MatchHorizontalLines; break;
+				case MatchScoringType.Vertical: maxMatch = Rules.MatchVerticalLines; break;
+				case MatchScoringType.Diagonals: maxMatch = Rules.MatchDiagonalsLines; break;
+			}
+
+			// Having 4 or 5 in a row should be considered as 2x3 or 3x3 respectively.
+			CurrentClearedBlocksCount += Mathf.Min(action.Coords.Count, maxMatch);
+			int clearActionsCount = Mathf.Max(action.Coords.Count - maxMatch + 1, 1);
+			CurrentClearActionsCount += clearActionsCount;
+
+			if ((Rules.ObjectiveType & action.MatchedType) != 0) {
+				if (Rules.IsObjectiveAllMatchTypes) {
+					ObjectiveProgress += action.Coords.Count;
+				} else {
+					ObjectiveProgress += clearActionsCount;
+				}
 			}
 		}
 

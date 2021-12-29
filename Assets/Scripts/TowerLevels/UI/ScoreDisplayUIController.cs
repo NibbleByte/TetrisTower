@@ -52,7 +52,7 @@ namespace TetrisTower.TowerLevels.UI
 			}
 
 			if (RemainingText) {
-				RemainingText.text = RemainingPrefix + m_LevelData.ClearBlocksRemainingCount;
+				RemainingText.text = RemainingPrefix + m_LevelData.ObjectiveRemainingCount;
 			}
 		}
 	}
