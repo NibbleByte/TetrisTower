@@ -29,6 +29,16 @@ namespace TetrisTower.Logic
 		public GridShapeTemplate[] ShapeTemplates;
 		public BlockType[] SpawnedBlocks;
 
+		// Initial spawn blocks from the array.
+		public int InitialSpawnBlockTypesCount = 3;
+
+		// Spawn blocks from the array in range [0, TypesCount).
+		public int SpawnBlockTypesCount = 3;
+
+		// Every x matches done by the player, increase the range of the types count.
+		public int AddSpawnBlockTypePerMatches = 50;
+
+
 		[Tooltip("Read-only. Used for debug.")]
 		public int RandomInitialSeed;
 		public System.Random Random = new System.Random();

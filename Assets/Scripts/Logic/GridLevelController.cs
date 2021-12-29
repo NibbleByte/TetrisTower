@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,14 +20,15 @@ namespace TetrisTower.Logic
 
 		public bool IsPaused => !enabled;
 
-		public event System.Action RunningActionsSequenceFinished;
-		public event System.Action PlacingFallingShape;
-		public event System.Action PlacedOutsideGrid;
-		public event System.Action FinishedLevel;
-		public event System.Action FallingShapeSelected;
+		public event Action RunningActionsSequenceFinished;
+		public event Action SpawnBlockTypesCountChanged;
+		public event Action PlacingFallingShape;
+		public event Action PlacedOutsideGrid;
+		public event Action FinishedLevel;
+		public event Action FallingShapeSelected;
 
-		public event System.Action FallingColumnChanged;
-		public event System.Action FallingShapeRotated;
+		public event Action FallingColumnChanged;
+		public event Action FallingShapeRotated;
 
 		private int m_NextRunId = 0;
 		private int m_FinishedRuns = 0;
@@ -100,10 +102,21 @@ namespace TetrisTower.Logic
 
 			RunningActionsSequenceFinished?.Invoke();
 
+			int spawnBlockTypesProgress = LevelData.AddSpawnBlockTypePerMatches > 0
+				? LevelData.Score.TotalClearedBlocksCount / LevelData.AddSpawnBlockTypePerMatches
+				: 0
+				;
+			int spawnBlockTypesCount = LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress;
+
 			if (LevelData.ClearBlocksRemainingCount == 0 && !AreGridActionsRunning) {
 				Debug.Log($"Remaining blocks to clear are 0. Player won.");
 				LevelData.RunningState = TowerLevelRunningState.Won;
 				FinishedLevel?.Invoke();
+
+			} else if (LevelData.SpawnBlockTypesCount != spawnBlockTypesCount && LevelData.SpawnedBlocks.Length >= spawnBlockTypesCount) {
+				Debug.Log($"Changing SpawnBlockTypesCount from {LevelData.SpawnBlockTypesCount} to {spawnBlockTypesCount}.", this);
+				LevelData.SpawnBlockTypesCount = spawnBlockTypesCount;
+				SpawnBlockTypesCountChanged?.Invoke();
 			}
 		}
 
@@ -345,14 +358,14 @@ namespace TetrisTower.Logic
 		public BlocksShape GenerateShape()
 		{
 			GridShapeTemplate template = LevelData.ShapeTemplates[LevelData.Random.Next(LevelData.ShapeTemplates.Length)];
-			return GenerateShape(template, LevelData.SpawnedBlocks, LevelData.Random);
+			return GenerateShape(template, new ArraySegment<BlockType>(LevelData.SpawnedBlocks, 0, LevelData.SpawnBlockTypesCount), LevelData.Random);
 		}
 
-		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] spawnBlocks, System.Random random)
+		private static BlocksShape GenerateShape(GridShapeTemplate template, ArraySegment<BlockType> spawnBlocks, System.Random random)
 		{
 			var shapeCoords = new List<BlocksShape.ShapeBind>();
 			foreach(var coords in template.ShapeTemplate) {
-				var blockType = spawnBlocks[random.Next(spawnBlocks.Length)];
+				var blockType = spawnBlocks.Array[spawnBlocks.Offset + random.Next(spawnBlocks.Count)];
 
 				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 					Coords = coords,

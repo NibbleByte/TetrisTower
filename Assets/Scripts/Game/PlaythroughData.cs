@@ -52,6 +52,13 @@ namespace TetrisTower.Game
 		public GridShapeTemplate[] ShapeTemplates;
 		public BlockType[] SpawnedBlocks;
 
+		// Spawn blocks from the array in range [0, TypesCount).
+		public int InitialSpawnBlockTypesCount = 3;
+
+		// Every x matches done by the player, increase the range of the types count.
+		public int AddSpawnBlockTypePerMatches = 50;
+
+
 		[Tooltip("Leave the seed to 0 for random seed every time.")]
 		public int RandomSeed = 0;
 
@@ -85,6 +92,10 @@ namespace TetrisTower.Game
 
 				ShapeTemplates = ShapeTemplates.ToArray(),
 				SpawnedBlocks = SpawnedBlocks.ToArray(),
+
+				InitialSpawnBlockTypesCount = InitialSpawnBlockTypesCount,
+				SpawnBlockTypesCount = InitialSpawnBlockTypesCount,
+				AddSpawnBlockTypePerMatches = AddSpawnBlockTypePerMatches,
 
 				RandomInitialSeed = seed,
 				Random = new System.Random(seed),

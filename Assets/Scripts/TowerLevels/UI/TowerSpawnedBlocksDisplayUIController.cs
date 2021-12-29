@@ -26,19 +26,19 @@ namespace TetrisTower.TowerLevels.UI
 		{
 			contextReferences.SetByType(out m_TowerLevel);
 
-			// TODO: Subscribe for added block types
+			m_TowerLevel.SpawnBlockTypesCountChanged += RecreatePreview;
 
 			RecreatePreview();
 		}
 
 		public void OnLevelUnloading()
 		{
-			// TODO: Unsubscribe for added block types
+			m_TowerLevel.SpawnBlockTypesCountChanged -= RecreatePreview;
 		}
 
 		private void RecreatePreview()
 		{
-			for(int i = transform.childCount; i < m_LevelData.SpawnedBlocks.Length; ++i) {
+			for(int i = transform.childCount; i < m_LevelData.SpawnBlockTypesCount; ++i) {
 				var previewIcon = GameObject.Instantiate(PreviewIconPrefab, transform);
 
 				previewIcon.SetIcon(m_LevelData.SpawnedBlocks[i].Icon);
