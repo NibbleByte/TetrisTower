@@ -53,6 +53,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a1de118f1806ee4fad56afc72380c6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugDisplayInfo: {fileID: 1335164696079105622}
+  ProfilerStatsPrefab: {fileID: 9112629582626267729, guid: d22f7c0aba46a164680db0d576a949bf, type: 3}
 --- !u!114 &56571267136355363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -737,10 +739,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3461787854058463479}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1806572309572900460}
+        m_TargetAssemblyTypeName: TetrisTower.TowerLevels.TowerLevelDebugAPI, Assembly-CSharp
+        m_MethodName: ToggleDebug
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

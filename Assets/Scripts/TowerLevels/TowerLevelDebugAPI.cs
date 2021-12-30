@@ -1,9 +1,6 @@
 using DevLocker.GFrame;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.Tools;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +9,11 @@ namespace TetrisTower.TowerLevels
 	public class TowerLevelDebugAPI : MonoBehaviour, ILevelLoadedListener
 	{
 		public static string __DebugInitialTowerLevel;
+
+		public DebugInfoDisplay DebugDisplayInfo;
+		public GameObject ProfilerStatsPrefab;
+
+		private GameObject m_ProfilerStatsObject;
 
 		private float m_FallSpeedOriginal;
 		private GridLevelController m_TowerLevel;
@@ -54,6 +56,30 @@ namespace TetrisTower.TowerLevels
 		public void Lose()
 		{
 			m_TowerLevel.FinishLevel(TowerLevelRunningState.Lost);
+		}
+
+		public void ToggleDebug()
+		{
+			if (m_ProfilerStatsObject == null && ProfilerStatsPrefab) {
+				m_ProfilerStatsObject = Instantiate(ProfilerStatsPrefab);
+				return;
+			}
+
+			if (m_ProfilerStatsObject == null) {
+				DebugDisplayInfo.gameObject.SetActive(!DebugDisplayInfo.gameObject.activeSelf);
+				return;
+			}
+
+			if (!DebugDisplayInfo.gameObject.activeSelf && !m_ProfilerStatsObject.activeSelf) {
+				m_ProfilerStatsObject.SetActive(true);
+
+			} else if (m_ProfilerStatsObject.activeSelf) {
+				m_ProfilerStatsObject.SetActive(false);
+				DebugDisplayInfo.gameObject.SetActive(true);
+			} else {
+				DebugDisplayInfo.gameObject.SetActive(false);
+			}
+
 		}
 
 		void Update()
