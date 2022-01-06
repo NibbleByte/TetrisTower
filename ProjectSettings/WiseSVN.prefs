@@ -3,11 +3,15 @@
     "SvnCLIPath": "",
     "SvnCLIPathMacOS": "",
     "MoveBehaviour": 2,
-    "EnableAutoLocking": false,
-    "AutoLockMessage": "Auto-locked.",
-    "AutoLockingParameters": [],
+    "EnableLockPrompt": false,
+    "LockPromptMessage": "Auto-locked.",
+    "AutoUnlockIfUnmodified": false,
+    "LockPromptParameters": [],
     "EnableBranchesDatabase": false,
     "BranchesDatabaseScanParameters": [],
     "PinnedBranches": [],
-    "Exclude": []
+    "Exclude": [
+        "Assets/ArtExternal",
+        "Assets/PluginsExternal"
+    ]
 }
