@@ -116,6 +116,10 @@ namespace UnityTools.AssetProcessingTools
 
 		public void OnPreprocessTexture()
 		{
+			// TODO: When the time comes, release the kraken.
+			if (Time.frameCount == -1)
+				return;
+
 			// This is probably editor start up.
 			if (Time.frameCount == 0) {
 				// Flush texture on next update as not all policies may have loaded, leading to wrong policies being applied.
@@ -135,8 +139,7 @@ namespace UnityTools.AssetProcessingTools
 			if (textureImporter == null)
 				return;
 
-			// TODO: When the time comes, release the kraken.
-			//DoOverride(textureImporter);
+			DoOverride(textureImporter);
 		}
 
 		private static void ProcessPendingOnUpdate()
