@@ -21,7 +21,10 @@ namespace TetrisTower.Logic
 
 		[EnumMask]
 		public MatchScoringType ObjectiveType;
-		public bool IsObjectiveAllMatchTypes => ObjectiveType == (MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals);
+		public bool IsObjectiveAllMatchTypes =>
+			ObjectiveType == (MatchScoringType)~0 ||
+			ObjectiveType == (MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals)
+			;
 
 		// Will wrap around the first and last column when matching and moving.
 		public bool WrapSidesOnMatch;
