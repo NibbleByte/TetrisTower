@@ -1,4 +1,6 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.MessageBox;
+using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.Tools;
 using UnityEngine;
@@ -18,6 +20,8 @@ namespace TetrisTower.TowerLevels
 		private float m_FallSpeedOriginal;
 		private GridLevelController m_TowerLevel;
 
+		private GameContext m_Context;
+
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		private static void ClearStaticsCache()
 		{
@@ -27,6 +31,7 @@ namespace TetrisTower.TowerLevels
 		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_TowerLevel);
+			contextReferences.SetByType(out m_Context);
 		}
 
 		public void OnLevelUnloading()
@@ -58,6 +63,41 @@ namespace TetrisTower.TowerLevels
 			m_TowerLevel.FinishLevel(TowerLevelRunningState.Lost);
 		}
 
+		public void Save()
+		{
+			SaveGame(m_Context);
+		}
+
+		public void Load()
+		{
+			LoadGame(m_Context);
+		}
+
+		public static void SaveGame(GameContext context)
+		{
+			if (context.CurrentPlaythrough != null) {
+				string savedData = Newtonsoft.Json.JsonConvert.SerializeObject(context.CurrentPlaythrough, context.GameConfig.Converters);
+				PlayerPrefs.SetString("Debug_SavedGame", savedData);
+				PlayerPrefs.Save();
+				Debug.Log(savedData);
+			} else {
+				Debug.Log("No game in progress.");
+			}
+		}
+
+		public static void LoadGame(GameContext context)
+		{
+			string savedData = PlayerPrefs.GetString("Debug_SavedGame");
+			if (string.IsNullOrEmpty(savedData)) {
+				Debug.Log("No save found.");
+				return;
+			}
+
+			var playthrough = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(savedData, context.GameConfig.Converters);
+			context.SetCurrentPlaythrough(playthrough);
+			GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
+		}
+
 		public void ToggleDebug()
 		{
 			if (m_ProfilerStatsObject == null && ProfilerStatsPrefab) {
@@ -86,6 +126,51 @@ namespace TetrisTower.TowerLevels
 		{
 			if (Keyboard.current.pKey.wasPressedThisFrame || Keyboard.current.fKey.wasPressedThisFrame) {
 				ToggleFalling();
+			}
+
+			if (Keyboard.current.f5Key.wasPressedThisFrame) {
+				MessageBox.Instance.ShowInput(
+					"Save?",
+					"Are you sure you want to save?",
+					"Savegame-001",
+					null,
+					MessageBoxIcon.Question,
+					MessageBoxButtons.YesNo,
+					(res) => { if (res.ConfirmResponse) Save(); },
+					this
+					);
+				//Serialize();
+			}
+
+			if (Keyboard.current.f6Key.wasPressedThisFrame) {
+				MessageBox.Instance.ShowSimple(
+					"Load?",
+					"Are you sure you want to load?\nAll current progress will be lost!",
+					MessageBoxIcon.Warning,
+					MessageBoxButtons.YesNo,
+					Load,
+					this
+					);
+
+				//Deserialize();
+			}
+
+			if (Keyboard.current.f7Key.wasPressedThisFrame) {
+				MessageBox.Instance.ForceConfirmShownMessage();
+			}
+
+			if (Keyboard.current.f8Key.wasPressedThisFrame) {
+				MessageBox.Instance.ForceDenyShownMessage();
+			}
+
+			if (Keyboard.current.f4Key.wasPressedThisFrame) {
+				if (!m_Context.PlayerControls.devices.HasValue) {
+					Debug.LogWarning("Forcing pointer exclusive input!");
+					m_Context.PlayerControls.devices = new InputDevice[] { (InputDevice)Touchscreen.current ?? Mouse.current };
+				} else {
+					Debug.LogWarning("All devices are processed.");
+					m_Context.PlayerControls.devices = default;
+				}
 			}
 		}
 	}

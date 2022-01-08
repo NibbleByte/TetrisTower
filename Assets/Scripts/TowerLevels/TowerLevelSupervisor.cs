@@ -65,6 +65,7 @@ namespace TetrisTower.TowerLevels
 			var matchSequenceScoreDisplayer = GameObject.FindObjectOfType<UI.MatchSequenceScoreUIController>(true);
 
 			StatesStack = new LevelStateStack(
+				gameContext,
 				gameContext.GameConfig,
 				gameContext.PlayerControls,
 				gameContext.Options,

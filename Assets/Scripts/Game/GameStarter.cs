@@ -1,12 +1,7 @@
-using DevLocker.GFrame;
-using DevLocker.GFrame.MessageBox;
-using System.Collections;
-using TetrisTower.Core;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
 namespace TetrisTower.Game
@@ -103,84 +98,5 @@ namespace TetrisTower.Game
 				m_Instance = null;
 			}
 		}
-
-		#region Debug Stuff
-
-
-#if UNITY_EDITOR
-		private void Update()
-		{
-			if (Keyboard.current.f5Key.wasPressedThisFrame) {
-				MessageBox.Instance.ShowInput(
-					"Save?",
-					"Are you sure you want to save?",
-					"Savegame-001",
-					null,
-					MessageBoxIcon.Question,
-					MessageBoxButtons.YesNo,
-					(res) => { if (res.ConfirmResponse) Serialize(); },
-					this
-					);
-				//Serialize();
-			}
-
-			if (Keyboard.current.f6Key.wasPressedThisFrame) {
-				MessageBox.Instance.ShowSimple(
-					"Load?",
-					"Are you sure you want to load?\nAll current progress will be lost!",
-					MessageBoxIcon.Warning,
-					MessageBoxButtons.YesNo,
-					Deserialize,
-					this
-					);
-
-				//Deserialize();
-			}
-
-			if (Keyboard.current.f7Key.wasPressedThisFrame) {
-				MessageBox.Instance.ForceConfirmShownMessage();
-			}
-
-			if (Keyboard.current.f8Key.wasPressedThisFrame) {
-				MessageBox.Instance.ForceDenyShownMessage();
-			}
-
-			if (Keyboard.current.f4Key.wasPressedThisFrame) {
-				if (!GameContext.PlayerControls.devices.HasValue) {
-					Debug.LogWarning("Forcing pointer exclusive input!");
-					GameContext.PlayerControls.devices = new InputDevice[] { (InputDevice)Touchscreen.current ?? Mouse.current};
-				} else {
-					Debug.LogWarning("All devices are processed.");
-					GameContext.PlayerControls.devices = default;
-				}
-			}
-		}
-
-		string m_DebugSave;
-		void Serialize()
-		{
-
-			if (GameContext.CurrentPlaythrough != null) {
-				m_DebugSave = Newtonsoft.Json.JsonConvert.SerializeObject(GameContext.CurrentPlaythrough, GameConfig.Converters);
-				Debug.Log(m_DebugSave);
-			} else {
-				Debug.Log("No game in progress.");
-			}
-		}
-
-		void Deserialize()
-		{
-			if (string.IsNullOrEmpty(m_DebugSave)) {
-				Debug.Log("No save found.");
-				return;
-			}
-
-			var playthrough = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(m_DebugSave, GameConfig.Converters);
-			GameContext.SetCurrentPlaythrough(playthrough);
-			GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
-		}
-#endif
-
-		#endregion
 	}
 }
