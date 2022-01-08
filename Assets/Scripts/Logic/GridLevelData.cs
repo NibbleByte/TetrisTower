@@ -59,7 +59,8 @@ namespace TetrisTower.Logic
 		public TowerLevelRunningState RunningState = TowerLevelRunningState.Running;
 		public bool IsPlaying => RunningState == TowerLevelRunningState.Running;
 
-		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Ceiling(FallDistanceNormalized), column);
+		// Use Math.Floor() + 1, instead of Math.Ceiling() as initial value may be exactly 0 giving bad results.
+		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Floor(FallDistanceNormalized) - 1, column);
 		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);
 
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
