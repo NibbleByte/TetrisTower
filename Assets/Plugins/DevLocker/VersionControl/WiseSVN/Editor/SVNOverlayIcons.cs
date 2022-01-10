@@ -17,6 +17,10 @@ namespace DevLocker.VersionControl.WiseSVN
 		private static bool IsActive => m_PersonalPrefs.EnableCoreIntegration && (m_PersonalPrefs.PopulateStatusesDatabase || SVNPreferencesManager.Instance.ProjectPrefs.EnableLockPrompt);
 
 		private static bool m_ShowNormalStatusIcons = false;
+		private static bool m_ShowExcludeStatusIcons = false;
+		private static string[] m_ExcludedPaths = new string[0];
+
+		private static GUIContent m_DataIsIncompleteWarning;
 
 		static SVNOverlayIcons()
 		{
@@ -33,6 +37,8 @@ namespace DevLocker.VersionControl.WiseSVN
 				EditorApplication.projectWindowItemOnGUI += ItemOnGUI;
 
 				m_ShowNormalStatusIcons = SVNPreferencesManager.Instance.PersonalPrefs.ShowNormalStatusOverlayIcon;
+				m_ShowExcludeStatusIcons = SVNPreferencesManager.Instance.PersonalPrefs.ShowExcludedStatusOverlayIcon;
+				m_ExcludedPaths = SVNPreferencesManager.Instance.ProjectPrefs.Exclude.ToArray();
 			} else {
 				EditorApplication.projectWindowItemOnGUI -= ItemOnGUI;
 			}
@@ -53,13 +59,40 @@ namespace DevLocker.VersionControl.WiseSVN
 			EditorApplication.RepaintProjectWindow();
 		}
 
+		internal static GUIContent GetDataIsIncompleteWarning()
+		{
+			if (m_DataIsIncompleteWarning == null) {
+				string warningTooltip = "Some or all SVN overlay icons are skipped as you have too many changes to display.\n" +
+					"If you have a lot of unversioned files consider adding them to a svn ignore list.\n" +
+					"If the server repository has a lot of changes, consider updating.";
+
+				m_DataIsIncompleteWarning = EditorGUIUtility.IconContent("console.warnicon.sml");
+				m_DataIsIncompleteWarning.tooltip = warningTooltip;
+			}
+
+			return m_DataIsIncompleteWarning;
+		}
+
 		private static void ItemOnGUI(string guid, Rect selectionRect)
 		{
-			if (string.IsNullOrEmpty(guid) || guid.StartsWith("00000000", StringComparison.Ordinal))
+			if (string.IsNullOrEmpty(guid) || guid.StartsWith("00000000", StringComparison.Ordinal)) {
+
+				if (SVNStatusesDatabase.Instance.DataIsIncomplete && guid.Equals(SVNStatusesDatabase.ASSETS_FOLDER_GUID, StringComparison.OrdinalIgnoreCase)) {
+
+					var iconRect = new Rect(selectionRect);
+					iconRect.height = 20;
+					iconRect.x += iconRect.width - iconRect.height - 8f;
+					iconRect.width = iconRect.height;
+					iconRect.y -= 2f;
+
+					GUI.Label(iconRect, GetDataIsIncompleteWarning());
+				}
+
 				// Cause what are the chances of having a guid starting with so many zeroes?!
 				//|| guid.Equals(INVALID_GUID, StringComparison.Ordinal)
 				//|| guid.Equals(ASSETS_FOLDER_GUID, StringComparison.Ordinal)
 				return;
+			}
 
 			var statusData = SVNStatusesDatabase.Instance.GetKnownStatusData(guid);
 
@@ -152,14 +185,30 @@ namespace DevLocker.VersionControl.WiseSVN
 					break;
 			}
 
+			// Handle unknown statuses.
 			if (m_ShowNormalStatusIcons && !statusData.IsValid) {
 				fileStatus = VCFileStatus.Normal;
+
+				if (m_ExcludedPaths.Length > 0) {
+					string path = AssetDatabase.GUIDToAssetPath(guid);
+					foreach (string excludedPath in m_ExcludedPaths) {
+						if (path.StartsWith(excludedPath, StringComparison.OrdinalIgnoreCase)) {
+							fileStatus = m_ShowExcludeStatusIcons ? VCFileStatus.Excluded : VCFileStatus.None;
+							break;
+						}
+					}
+				}
 			}
 
 			GUIContent fileStatusIcon = SVNPreferencesManager.Instance.GetFileStatusIconContent(fileStatus);
 
 			// Entries with normal status are present when there is other data to show. Skip the icon if disabled.
 			if (!m_ShowNormalStatusIcons && fileStatus == VCFileStatus.Normal) {
+				fileStatusIcon = null;
+			}
+
+			// Excluded items are added explicitly - their status exists (is known).
+			if (!m_ShowExcludeStatusIcons && fileStatus == VCFileStatus.Excluded) {
 				fileStatusIcon = null;
 			}
 

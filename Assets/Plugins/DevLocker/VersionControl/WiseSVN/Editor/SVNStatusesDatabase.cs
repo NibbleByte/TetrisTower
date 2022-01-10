@@ -40,8 +40,8 @@ namespace DevLocker.VersionControl.WiseSVN
 	/// </summary>
 	public class SVNStatusesDatabase : Utils.DatabasePersistentSingleton<SVNStatusesDatabase, GuidStatusDatasBind>
 	{
-		private const string INVALID_GUID = "00000000000000000000000000000000";
-		private const string ASSETS_FOLDER_GUID = "00000000000000001000000000000000";
+		public const string INVALID_GUID = "00000000000000000000000000000000";
+		public const string ASSETS_FOLDER_GUID = "00000000000000001000000000000000";
 
 
 		// Note: not all of these are rendered. Check the Database icons.
@@ -60,6 +60,12 @@ namespace DevLocker.VersionControl.WiseSVN
 		};
 
 		private SVNPreferencesManager.PersonalPreferences m_PersonalPrefs => SVNPreferencesManager.Instance.PersonalPrefs;
+		private SVNPreferencesManager.ProjectPreferences m_ProjectPrefs => SVNPreferencesManager.Instance.ProjectPrefs;
+
+		private SVNPreferencesManager.PersonalPreferences m_PersonalCachedPrefs;
+		private SVNPreferencesManager.ProjectPreferences m_ProjectCachedPrefs;
+		private bool m_DownloadRepositoryChangesCached = false;
+
 
 		/// <summary>
 		/// The database update can be enabled, but the SVN integration to be disabled as a whole.
@@ -73,6 +79,14 @@ namespace DevLocker.VersionControl.WiseSVN
 		public override bool DoTraceLogs => (m_PersonalPrefs.TraceLogs & SVNTraceLogs.DatabaseUpdates) != 0;
 
 		public override double RefreshInterval => m_PersonalPrefs.AutoRefreshDatabaseInterval;
+
+		// Any assets contained in these folders are considered unversioned.
+		private string[] m_UnversionedFolders = new string[0];
+
+		/// <summary>
+		/// The collected statuses are not complete due to some reason (for example, they were too many).
+		/// </summary>
+		public bool DataIsIncomplete { get; private set; }
 
 		//
 		//=============================================================================
@@ -90,6 +104,20 @@ namespace DevLocker.VersionControl.WiseSVN
 			base.Initialize(freshlyCreated);
 		}
 
+		protected override void RefreshActive()
+		{
+			base.RefreshActive();
+
+			if (!IsActive) {
+				DataIsIncomplete = false;
+			}
+
+			// Copy them so they can be safely accessed from the worker thread.
+			m_PersonalCachedPrefs = m_PersonalPrefs.Clone();
+			m_ProjectCachedPrefs = m_ProjectPrefs.Clone();
+			m_DownloadRepositoryChangesCached = SVNPreferencesManager.Instance.DownloadRepositoryChanges;
+		}
+
 		#endregion
 
 
@@ -99,44 +127,27 @@ namespace DevLocker.VersionControl.WiseSVN
 		#region Populate Data
 
 		private const int SanityStatusesLimit = 600;
+		private const int SanityUnversionedFoldersLimit = 250;
 
 		// Executed in a worker thread.
 		protected override GuidStatusDatasBind[] GatherDataInThread()
 		{
-			var statusOptions = new SVNStatusDataOptions() {
-				Depth = SVNStatusDataOptions.SearchDepth.Infinity,
-				RaiseError = false,
-				Timeout = WiseSVNIntegration.ONLINE_COMMAND_TIMEOUT * 2,
-				Offline = !SVNPreferencesManager.Instance.DownloadRepositoryChanges && !SVNPreferencesManager.Instance.ProjectPrefs.EnableLockPrompt,
-				FetchLockOwner = true,
-			};
-
-			// Will get statuses of all added / modified / deleted / conflicted / unversioned files. Only normal files won't be listed.
-			var statuses = WiseSVNIntegration.GetStatuses("Assets", statusOptions)
+			List<SVNStatusData> statuses = new List<SVNStatusData>();
+			List<string> unversionedFolders = new List<string>();
+			GatherDataInThreadRecursive("Assets", statuses, unversionedFolders);
 #if UNITY_2018_4_OR_NEWER
-				.Concat(WiseSVNIntegration.GetStatuses("Packages", statusOptions))
+			GatherDataInThreadRecursive("Packages", statuses, unversionedFolders);
 #endif
-				.Where(s => s.Status != VCFileStatus.Missing)
-				.ToList();
+			// Add excluded items explicitly so their icon shows even when "Normal status green icon" is disabled.
+			foreach(string excludedPath in m_ProjectCachedPrefs.Exclude) {
+				statuses.Add(new SVNStatusData() { Path = excludedPath, Status = VCFileStatus.Excluded, LockDetails = LockDetails.Empty });
+			}
 
-			for (int i = 0, count = statuses.Count; i < count; ++i) {
-				var statusData = statuses[i];
+			DataIsIncomplete = unversionedFolders.Count >= SanityUnversionedFoldersLimit || statuses.Count >= SanityStatusesLimit;
 
-				// Statuses for entries under unversioned directories are not returned. Add them manually.
-				if (statusData.Status == VCFileStatus.Unversioned && Directory.Exists(statusData.Path)) {
-					try {
-						var paths = Directory.EnumerateFileSystemEntries(statusData.Path, "*", SearchOption.AllDirectories)
-							.Where(path => !WiseSVNIntegration.IsHiddenPath(path))
-							;
-
-						statuses.AddRange(paths
-							.Select(path => path.Replace(WiseSVNIntegration.ProjectRootNative, ""))
-							.Select(path => new SVNStatusData() { Status = VCFileStatus.Unversioned, Path = path, LockDetails = LockDetails.Empty })
-							);
-					} catch(Exception) {
-						// Files must have changed while scanning. Nothing we can do.
-					}
-				}
+			// Just in case...
+			if (unversionedFolders.Count >= SanityUnversionedFoldersLimit) {
+				unversionedFolders.Clear();
 			}
 
 			if (statuses.Count >= SanityStatusesLimit) {
@@ -146,6 +157,8 @@ namespace DevLocker.VersionControl.WiseSVN
 					.Where(s => s.Status != VCFileStatus.Normal || s.LockStatus != VCLockStatus.NoLock || s.Path.EndsWith(".unity"))
 					.ToList();
 			}
+
+			m_UnversionedFolders = unversionedFolders.ToArray();
 
 			// HACK: the base class works with the DataType for pending data. Guid won't be used.
 			return statuses
@@ -160,11 +173,53 @@ namespace DevLocker.VersionControl.WiseSVN
 				.ToArray();
 		}
 
+		private void GatherDataInThreadRecursive(string repositoryPath, List<SVNStatusData> foundStatuses, List<string> foundUnversionedFolders)
+		{
+			var statusOptions = new SVNStatusDataOptions() {
+				Depth = SVNStatusDataOptions.SearchDepth.Infinity,
+				RaiseError = false,
+				Timeout = WiseSVNIntegration.ONLINE_COMMAND_TIMEOUT * 2,
+				Offline = !m_DownloadRepositoryChangesCached && !m_ProjectCachedPrefs.EnableLockPrompt,
+				FetchLockOwner = true,
+			};
+
+			// Will get statuses of all added / modified / deleted / conflicted / unversioned files. Only normal files won't be listed.
+			var statuses = WiseSVNIntegration.GetStatuses(repositoryPath, statusOptions)
+				.Where(s => !m_ProjectCachedPrefs.Exclude.Any(e => s.Path.StartsWith(e, StringComparison.OrdinalIgnoreCase)))
+				.Where(s => s.Status != VCFileStatus.Missing)
+				.ToList();
+
+			for (int i = 0; i < statuses.Count; ++i) {
+				var statusData = statuses[i];
+
+				// Statuses for entries under unversioned directories are not returned so we need to keep track of them.
+				if (statusData.Status == VCFileStatus.Unversioned && Directory.Exists(statusData.Path)) {
+
+					// Nested repositories return unknown status, but are hidden in the TortoiseSVN commit window.
+					// Add their statuses to support them. Also removing this folder should display it as normal status.
+					if (Directory.Exists($"{statusData.Path}/.svn")) {
+						GatherDataInThreadRecursive(statusData.Path, foundStatuses, foundUnversionedFolders);
+						statuses.RemoveAt(i);
+						--i;
+						continue;
+					}
+
+					foundUnversionedFolders.Add(statusData.Path);
+				}
+
+				foundStatuses.Add(statusData);
+			}
+		}
+
 		protected override void WaitAndFinishDatabaseUpdate(GuidStatusDatasBind[] pendingData)
 		{
 			// Sanity check!
 			if (pendingData.Length > SanityStatusesLimit) {
-				Debug.LogWarning($"SVNStatusDatabase gathered {pendingData.Length} changes which is waay to much. Ignoring gathered changes to avoid slowing down the editor!");
+				// No more logging, displaying an icon.
+				if (DoTraceLogs) {
+					Debug.LogWarning($"SVNStatusDatabase gathered {pendingData.Length} changes which is waay to much. Ignoring gathered changes to avoid slowing down the editor!");
+				}
+
 				return;
 			}
 
@@ -349,11 +404,21 @@ namespace DevLocker.VersionControl.WiseSVN
 		{
 			if (string.IsNullOrEmpty(guid)) {
 				Debug.LogError($"Asking for status with empty guid");
+				return new SVNStatusData() { Status = VCFileStatus.None };
 			}
 
 			foreach (var bind in m_Data) {
 				if (bind.Key.Equals(guid, StringComparison.Ordinal))
 					return bind.MergedStatusData;
+			}
+
+			if (m_UnversionedFolders.Length > 0) {
+				string path = AssetDatabase.GUIDToAssetPath(guid);
+
+				foreach (string unversionedFolder in m_UnversionedFolders) {
+					if (path.StartsWith(unversionedFolder, StringComparison.OrdinalIgnoreCase))
+						return new SVNStatusData() { Path = path, Status = VCFileStatus.Unversioned, LockDetails = LockDetails.Empty };
+				}
 			}
 
 			return new SVNStatusData() { Status = VCFileStatus.None };
