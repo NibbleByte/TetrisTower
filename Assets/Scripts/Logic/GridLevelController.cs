@@ -102,13 +102,13 @@ namespace TetrisTower.Logic
 				? LevelData.Score.Score / LevelData.ScorePerAdditionalSpawnBlockType
 				: 0
 				;
-			int spawnBlockTypesCount = LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress;
+			int spawnBlockTypesCount = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.SpawnedBlocks.Length);
 
 			if (LevelData.ObjectiveRemainingCount == 0 && !AreGridActionsRunning) {
 				Debug.Log($"Remaining blocks to clear are 0. Player won.");
 				FinishLevel(TowerLevelRunningState.Won);
 
-			} else if (LevelData.SpawnBlockTypesCount != spawnBlockTypesCount && LevelData.SpawnedBlocks.Length >= spawnBlockTypesCount) {
+			} else if (LevelData.SpawnBlockTypesCount != spawnBlockTypesCount) {
 				Debug.Log($"Changing SpawnBlockTypesCount from {LevelData.SpawnBlockTypesCount} to {spawnBlockTypesCount}.", this);
 				LevelData.SpawnBlockTypesCount = spawnBlockTypesCount;
 				SpawnBlockTypesCountChanged?.Invoke();

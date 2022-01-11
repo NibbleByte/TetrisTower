@@ -16,7 +16,7 @@ namespace DevLocker.GFrame
 
 		public LevelStateContextReferences(IEnumerable<object> contextReferences)
 		{
-			m_ContextReferences = contextReferences.ToList();
+			m_ContextReferences = contextReferences.Where(obj => obj != null).ToList();
 		}
 
 		/// <summary>
