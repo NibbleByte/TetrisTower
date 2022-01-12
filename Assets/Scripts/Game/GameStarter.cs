@@ -50,7 +50,7 @@ namespace TetrisTower.Game
 		{
 			// Boot game from current scene
 			var towerLevelController = GameObject.FindObjectOfType<GridLevelController>();
-			if (towerLevelController || GameObject.FindGameObjectWithTag(GameConfig.TowerPlaceholderTag)) {
+			if (towerLevelController || GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag)) {
 
 				if (StartingPlaythroughTemplate) {
 

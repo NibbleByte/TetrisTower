@@ -14,7 +14,6 @@ namespace TetrisTower.Game
 		public GameObject GameInputPrefab;
 		public MessageBox MessageBoxPrefab;
 
-		public const string TowerPlaceholderTag = "TowerPlaceholder";
 		public GridLevelController TowerLevelController;
 
 		public GameObject[] UIPrefabs;

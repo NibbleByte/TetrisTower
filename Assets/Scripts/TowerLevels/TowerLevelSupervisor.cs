@@ -36,11 +36,19 @@ namespace TetrisTower.TowerLevels
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
+			Light overrideBlocksLight = null;
+
 			var levelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (levelController == null) {
-				var placeholder = GameObject.FindGameObjectWithTag(GameConfig.TowerPlaceholderTag);
+				var placeholder = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
 				if (placeholder == null) {
 					throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load level {playthroughData.CurrentLevelIndex} of {playthroughData.Levels.Length}.");
+				}
+
+				// Will use it as overrides in a bit. Keep it alive.
+				overrideBlocksLight = placeholder.transform.GetComponentInChildren<Light>();
+				if (overrideBlocksLight) {
+					overrideBlocksLight.transform.parent = null;
 				}
 
 				// Clean any leftovers in the placeholder (for example, temporary camera).
@@ -48,6 +56,8 @@ namespace TetrisTower.TowerLevels
 
 				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 			}
+
+			SetupLights(levelController, overrideBlocksLight);
 
 			levelController.Init(playthroughData.TowerLevel);
 
@@ -106,6 +116,34 @@ namespace TetrisTower.TowerLevels
 			}
 
 			return Task.CompletedTask;
+		}
+
+		private static void SetupLights(GridLevelController levelController, Light overrideBlocksLight)
+		{
+			var blocksLight = levelController.GetComponentInChildren<Light>();
+
+			if (blocksLight) {
+				if (overrideBlocksLight) {
+					blocksLight.color = overrideBlocksLight.color;
+					if (overrideBlocksLight.useColorTemperature) {
+						blocksLight.useColorTemperature = overrideBlocksLight.useColorTemperature;
+						blocksLight.colorTemperature = overrideBlocksLight.colorTemperature;
+					}
+					blocksLight.intensity = overrideBlocksLight.intensity;
+
+					GameObject.DestroyImmediate(overrideBlocksLight.gameObject);
+				}
+
+				blocksLight.cullingMask = GameLayers.BlocksMask;
+				blocksLight.lightmapBakeType = LightmapBakeType.Realtime;
+
+				var levelLights = GameObject.FindObjectsOfType<Light>();
+				foreach(Light light in levelLights) {
+					if (light != blocksLight) {
+						light.cullingMask &= ~GameLayers.BlocksMask;
+					}
+				}
+			}
 		}
 	}
 }
