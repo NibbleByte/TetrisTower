@@ -124,14 +124,10 @@ namespace TetrisTower.TowerLevels
 
 			if (blocksLight) {
 				if (overrideBlocksLight) {
-					blocksLight.color = overrideBlocksLight.color;
-					if (overrideBlocksLight.useColorTemperature) {
-						blocksLight.useColorTemperature = overrideBlocksLight.useColorTemperature;
-						blocksLight.colorTemperature = overrideBlocksLight.colorTemperature;
-					}
-					blocksLight.intensity = overrideBlocksLight.intensity;
+					overrideBlocksLight.transform.parent = blocksLight.transform.parent;
+					GameObject.DestroyImmediate(blocksLight.gameObject);
 
-					GameObject.DestroyImmediate(overrideBlocksLight.gameObject);
+					blocksLight = overrideBlocksLight;
 				}
 
 				blocksLight.cullingMask = GameLayers.BlocksMask;
