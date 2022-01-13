@@ -70,7 +70,7 @@ namespace UnityTools.AssetProcessingTools
 		public static double ProcessTextures(IList<string> texturePaths)
 		{
 			double crunchingTime = 0;
-
+			/*
 			for (int i = 0; i < texturePaths.Count; ++i) {
 				var assetPath = texturePaths[i];
 
@@ -108,7 +108,7 @@ namespace UnityTools.AssetProcessingTools
 			var startTime = EditorApplication.timeSinceStartup;
 			AssetDatabase.Refresh();
 			crunchingTime += EditorApplication.timeSinceStartup - startTime;
-
+			*/
 			return crunchingTime;
 		}
 
