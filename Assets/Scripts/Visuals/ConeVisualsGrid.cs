@@ -321,7 +321,7 @@ namespace TetrisTower.Visuals
 			}
 
 			reuseVisuals.transform.position = ConeApex;
-			reuseVisuals.transform.rotation = GridColumnToRotation(coords.Column);
+			reuseVisuals.transform.localRotation = GridColumnToRotation(coords.Column);
 
 			// Hitting the limit, won't be stored.
 			if (coords.Row < Rows) {

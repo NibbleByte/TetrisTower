@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6721708562153812014}
   - component: {fileID: 3255927157751169292}
   - component: {fileID: 6721708562153812015}
+  - component: {fileID: 4948856275446005849}
   m_Layer: 0
   m_Name: TowerLevelController
   m_TagString: Untagged
@@ -114,6 +115,20 @@ MonoBehaviour:
     version: 1
     00000000:
       type: {class: , ns: , asm: }
+--- !u!114 &4948856275446005849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6721708562153812012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0326b11fc03c1e840887e2ba801d5e78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VisualsGrid: {fileID: 6721708562153812014}
+  BlockPreviewPrefab: {fileID: 7670063039985428827, guid: c4816b539c44b3947acaaf5f1a8879f5, type: 3}
 --- !u!1001 &4716939350790068265
 PrefabInstance:
   m_ObjectHideFlags: 0

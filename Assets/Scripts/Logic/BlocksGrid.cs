@@ -6,6 +6,10 @@ using System.Linq;
 
 namespace TetrisTower.Logic
 {
+	/// <summary>
+	/// Logical grid that marks occupied cells.
+	/// Rows from bottom to top go from 0 to n (up direction).
+	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
 	public class BlocksGrid : GameGrid

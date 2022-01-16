@@ -8,7 +8,7 @@ using DevLocker.GFrame;
 
 namespace TetrisTower.Visuals
 {
-	public class TowerConeVisualsController : MonoBehaviour, ILevelLoadedListener
+	public class TowerConeVisualsController : MonoBehaviour
 	{
 		[Serializable]
 		public class VisualsShape : GridShape<GameObject>
@@ -44,7 +44,7 @@ namespace TetrisTower.Visuals
 		private Tuple<int, int, bool>[] m_RotatingFallingShapeCoordsChange;
 		private float m_RotatingFallingShapeAnalogLastProgress;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void Init(LevelStateContextReferences contextReferences)
 		{
 			if (!isActiveAndEnabled)
 				return;
@@ -71,7 +71,7 @@ namespace TetrisTower.Visuals
 			OnFallingShapeSelected();
 		}
 
-		public void OnLevelUnloading()
+		public void Deinit()
 		{
 			if (!isActiveAndEnabled)
 				return;

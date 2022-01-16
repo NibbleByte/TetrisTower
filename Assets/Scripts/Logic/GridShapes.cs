@@ -33,6 +33,11 @@ namespace TetrisTower.Logic
 		[SerializeField] private T[] m_Blocks;
 	}
 
+	/// <summary>
+	/// Shape described by <see cref="GridCoords"/> and <see cref="T"/>.
+	/// Rows from bottom to top go from 0 to n (up direction).
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public class GridShape<T>
 	{
 		[Serializable]

@@ -18,6 +18,7 @@ namespace TetrisTower.Logic
 	{
 		public SceneReference BackgroundScene;
 
+		// Rows from bottom to top go from 0 to n (up direction).
 		[SerializeReference] public BlocksShape NextShape;
 		[SerializeReference] public BlocksShape FallingShape;
 
@@ -44,6 +45,8 @@ namespace TetrisTower.Logic
 		public System.Random Random = new System.Random();
 
 		public GridRules Rules;
+
+		// Rows from bottom to top go from 0 to n (up direction).
 		public BlocksGrid Grid;
 
 		// The valid size where blocks can be placed by the player. It should be smaller than the grid itself.

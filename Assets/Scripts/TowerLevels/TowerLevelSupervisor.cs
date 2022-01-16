@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.Visuals;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -91,6 +92,9 @@ namespace TetrisTower.TowerLevels
 				await listener.OnLevelLoadingAsync(StatesStack.ContextReferences);
 			}
 
+			// Other visuals depend on this, so init it first.
+			behaviours.OfType<TowerConeVisualsController>().First().Init(StatesStack.ContextReferences);
+
 			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
 				listener.OnLevelLoaded(StatesStack.ContextReferences);
 			}
@@ -110,10 +114,13 @@ namespace TetrisTower.TowerLevels
 
 		public Task UnloadAsync()
 		{
-			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadedListener>();
-			foreach (var listener in levelListeners) {
+			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+
+			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
 				listener.OnLevelUnloading();
 			}
+
+			behaviours.OfType<TowerConeVisualsController>().First().Deinit();
 
 			return Task.CompletedTask;
 		}
