@@ -35,11 +35,11 @@ namespace TetrisTower.Visuals
 			m_PreviewRenderer.name = "-- Fall Preview Block --";
 			m_PreviewMaterial = m_PreviewRenderer.material = new Material(m_PreviewRenderer.sharedMaterial);
 			m_PreviewMaterial.SetFloat("BlockHeight", VisualsGrid.BlockHeight);
+			m_PreviewMaterial.SetFloat("BlockWidth", (VisualsGrid.FrontFaceTopEdgeLength + VisualsGrid.FrontFaceBottomEdgeLength) / 2f);
 			m_PreviewMaterial.SetFloat("TowerHeight", VisualsGrid.ConeHeight);
 
 			contextReferences.SetByType(out m_TowerLevel);
 
-			m_TowerLevel.FallingShapeRotated += OnFallingShapeRotated;
 			m_TowerLevel.FallingColumnChanged += OnFallingColumnChanged;
 			m_TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
 
@@ -57,40 +57,18 @@ namespace TetrisTower.Visuals
 
 			GameObject.DestroyImmediate(m_PreviewRenderer.gameObject);
 
-			m_TowerLevel.FallingShapeRotated -= OnFallingShapeRotated;
 			m_TowerLevel.FallingColumnChanged -= OnFallingColumnChanged;
 			m_TowerLevel.FallingShapeSelected -= OnFallingShapeSelected;
 		}
 
-		private void OnFallingShapeRotated()
-		{
-			UpdatePreviewRendering();
-		}
-
 		private void OnFallingShapeSelected()
 		{
-			UpdatePreviewRendering();
 			UpdatePreviewPosition();
 		}
 
 		private void OnFallingColumnChanged()
 		{
 			UpdatePreviewPosition();
-		}
-
-		private void UpdatePreviewRendering()
-		{
-			var lowestBind = m_LevelData.FallingShape.ShapeCoords[0];
-
-			foreach (var bind in m_LevelData.FallingShape.ShapeCoords) {
-				if (bind.Coords.Row < lowestBind.Coords.Row) {
-					lowestBind = bind;
-				}
-			}
-
-			var sourceMaterial = lowestBind.Value.Prefab3D.GetComponent<Renderer>().sharedMaterial;
-
-			m_PreviewMaterial.mainTexture = sourceMaterial.mainTexture;
 		}
 
 		private void UpdatePreviewPosition()
