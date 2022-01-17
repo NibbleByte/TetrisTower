@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,9 +23,9 @@ namespace TetrisTower.TowerLevels.UI
 		public string RemainingPrefix = "Remaining: ";
 
 		[Header("UI Texts")]
-		public Text TotalScoreText;
-		public Text CurrentScoreText;
-		public Text RemainingText;
+		public TextMeshProUGUI TotalScoreText;
+		public TextMeshProUGUI CurrentScoreText;
+		public TextMeshProUGUI RemainingText;
 
 		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{

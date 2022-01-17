@@ -1,6 +1,6 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
@@ -9,13 +9,13 @@ namespace TetrisTower.TowerLevels.UI
 		[SerializeField]
 		private float m_FlashDuration;
 
-		private Text m_Text;
+		private TextMeshProUGUI m_Text;
 
 		private float m_FlashStarted;
 
 		private void Awake()
 		{
-			m_Text = GetComponent<Text>();
+			m_Text = GetComponent<TextMeshProUGUI>();
 			m_Text.text = string.Empty;
 			gameObject.SetActive(false);
 		}

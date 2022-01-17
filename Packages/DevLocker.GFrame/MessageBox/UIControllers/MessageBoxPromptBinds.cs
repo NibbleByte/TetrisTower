@@ -37,7 +37,7 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 		public Text UGUIText;
 
 #if USE_TEXT_MESH_PRO
-		public TMPro.TextMeshPro TextMeshProText;
+		public TMPro.TextMeshProUGUI TextMeshProText;
 #endif
 
 		public string Text {

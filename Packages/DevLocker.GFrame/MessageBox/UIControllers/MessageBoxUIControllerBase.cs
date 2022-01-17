@@ -171,7 +171,7 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 				}
 
 #if USE_TEXT_MESH_PRO
-				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshPro>();
+				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshProUGUI>();
 				if (textMeshProlabel) {
 					m_ButtonsOriginalLabels.Add(pair.Key, textMeshProlabel.text);
 					// Cache those every time in case the texts changed due to switched localization.
@@ -193,7 +193,7 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 				}
 
 #if USE_TEXT_MESH_PRO
-				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshPro>();
+				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshProUGUI>();
 				if (textMeshProlabel) {
 					textMeshProlabel.text = m_ButtonsOriginalLabels[pair.Key];
 					continue;

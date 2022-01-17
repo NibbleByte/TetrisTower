@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using TetrisTower.Logic;
 using TetrisTower.Visuals;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +10,8 @@ namespace TetrisTower.TowerLevels.UI
 {
 	public class MatchSequenceScoreUIController : MonoBehaviour, IMatchSequenceScoreDisplayer
 	{
-		public Text ClearCombosCountText;
-		public Text ClearedBlocksCountText;
+		public TextMeshProUGUI ClearCombosCountText;
+		public TextMeshProUGUI ClearedBlocksCountText;
 
 		private void Awake()
 		{
