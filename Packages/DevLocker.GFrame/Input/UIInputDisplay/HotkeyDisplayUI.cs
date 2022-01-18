@@ -73,6 +73,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public Image Icon;
 		public Text Text;
 
+#if USE_TEXT_MESH_PRO
+		public TMPro.TextMeshProUGUI TextMeshProText;
+#endif
+
 		public bool UseShortText = true;
 
 		[Tooltip("Optional - enter how the hotkey text should be displayed. Use \"{Hotkey}\" to be replaced with the matched text.\nLeave empty to skip.")]
@@ -121,6 +125,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 						if (!DisplayMode.KeepDisplayingLastDevice) {
 							if (Icon) Icon.gameObject.SetActive(false);
 							if (Text) Text.gameObject.SetActive(false);
+#if USE_TEXT_MESH_PRO
+							if (TextMeshProText) TextMeshProText.gameObject.SetActive(false);
+#endif
 							return;
 						}
 
@@ -139,6 +146,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 						if (!DisplayMode.KeepDisplayingLastDevice) {
 							if (Icon) Icon.gameObject.SetActive(false);
 							if (Text) Text.gameObject.SetActive(false);
+#if USE_TEXT_MESH_PRO
+							if (TextMeshProText) TextMeshProText.gameObject.SetActive(false);
+#endif
 							return;
 						}
 
@@ -192,15 +202,32 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				Icon.sprite = CurrentlyDisplayedData.Icon;
 			}
 
+#if USE_TEXT_MESH_PRO
+			if (Text || TextMeshProText) {
+#else
 			if (Text) {
+#endif
 				bool textIsPriority = ShowPriority == ShowPrioritySelection.TextIsPriority || ShowPriority == ShowPrioritySelection.ShowBoth || !CurrentlyDisplayedData.HasIcon;
 
 				string usedText = UseShortText ? CurrentlyDisplayedData.ShortText : CurrentlyDisplayedData.Text;
-				Text.gameObject.SetActive(CurrentlyDisplayedData.HasText && textIsPriority);
-				Text.text = string.IsNullOrWhiteSpace(FormatText)
-					? usedText
-					: FormatText.Replace("{Hotkey}", usedText)
-					;
+				bool show = CurrentlyDisplayedData.HasText && textIsPriority;
+
+				if (!string.IsNullOrWhiteSpace(FormatText)) {
+					usedText = FormatText.Replace("{Hotkey}", usedText);
+				}
+
+				if (Text) {
+					Text.gameObject.SetActive(show);
+					Text.text = usedText;
+				}
+
+#if USE_TEXT_MESH_PRO
+				if (TextMeshProText) {
+					TextMeshProText.gameObject.SetActive(show);
+					TextMeshProText.text = usedText;
+				}
+#endif
+
 			}
 		}
 
@@ -238,6 +265,12 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			if (Text) {
 				Text.gameObject.SetActive(false);
 			}
+
+#if USE_TEXT_MESH_PRO
+			if (TextMeshProText) {
+				TextMeshProText.gameObject.SetActive(false);
+			}
+#endif
 		}
 
 		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)
@@ -264,7 +297,11 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			Utils.Validation.ValidateMissingObject(this, Icon, nameof(Icon));
 			Utils.Validation.ValidateMissingObject(this, Text, nameof(Text));
 
-			if ((Icon && Icon.gameObject == gameObject) || (Text && Text.gameObject == gameObject)) {
+#if USE_TEXT_MESH_PRO
+			Utils.Validation.ValidateMissingObject(this, TextMeshProText, nameof(TMPro.TextMeshProUGUI));
+#endif
+
+			if ((Icon && Icon.gameObject == gameObject) || (Text && Text.gameObject == gameObject) || (TextMeshProText && TextMeshProText.gameObject == gameObject)) {
 				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
 			}
 

@@ -1,15 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace TetrisTower.Tools
 {
 	public class DebugInfoDisplay : MonoBehaviour
 	{
-		public Text DisplayText;
+		public TextMeshProUGUI DisplayText;
 
 		public bool DisplayScreenInfo = true;
 
@@ -26,7 +26,7 @@ namespace TetrisTower.Tools
 		void Awake()
 		{
 			if (DisplayText == null) {
-				DisplayText = GetComponent<Text>();
+				DisplayText = GetComponent<TextMeshProUGUI>();
 			}
 		}
 
