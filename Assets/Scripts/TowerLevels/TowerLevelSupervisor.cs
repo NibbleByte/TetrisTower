@@ -138,7 +138,6 @@ namespace TetrisTower.TowerLevels
 				}
 
 				blocksLight.cullingMask = GameLayers.BlocksMask;
-				blocksLight.lightmapBakeType = LightmapBakeType.Realtime;
 
 				var levelLights = GameObject.FindObjectsOfType<Light>();
 				foreach(Light light in levelLights) {
