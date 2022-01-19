@@ -21,6 +21,7 @@ namespace TetrisTower.TowerLevels
 		private GridLevelController m_TowerLevel;
 
 		private GameContext m_Context;
+		private UI.FlashMessageUIController m_FlashMessage;
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		private static void ClearStaticsCache()
@@ -32,6 +33,7 @@ namespace TetrisTower.TowerLevels
 		{
 			contextReferences.SetByType(out m_TowerLevel);
 			contextReferences.SetByType(out m_Context);
+			contextReferences.SetByType(out m_FlashMessage);
 		}
 
 		public void OnLevelUnloading()
@@ -40,6 +42,8 @@ namespace TetrisTower.TowerLevels
 
 		public void ToggleFalling()
 		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Toggle Falling");
+
 			if (m_TowerLevel.LevelData.FallSpeedNormalized == 0f) {
 				m_TowerLevel.LevelData.FallSpeedNormalized = m_FallSpeedOriginal;
 			} else {
@@ -50,26 +54,36 @@ namespace TetrisTower.TowerLevels
 
 		public void ResetLevel()
 		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Retry Level");
+
 			UI.TowerLevelUIController.RetryLevel();
 		}
 
 		public void Win()
 		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Win Level");
+
 			m_TowerLevel.FinishLevel(TowerLevelRunningState.Won);
 		}
 
 		public void Lose()
 		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Lose Level");
+
 			m_TowerLevel.FinishLevel(TowerLevelRunningState.Lost);
 		}
 
 		public void Save()
 		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Game Saved");
+
 			SaveGame(m_Context);
 		}
 
 		public void Load()
 		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Game Loaded");
+
 			LoadGame(m_Context);
 		}
 
@@ -100,6 +114,8 @@ namespace TetrisTower.TowerLevels
 
 		public void ToggleDebug()
 		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Debug Toggle");
+
 			if (m_ProfilerStatsObject == null && ProfilerStatsPrefab) {
 				m_ProfilerStatsObject = Instantiate(ProfilerStatsPrefab);
 				return;
