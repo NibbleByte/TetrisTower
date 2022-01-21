@@ -259,6 +259,12 @@ namespace TetrisTower.Visuals
 				m_RotatingFallingShapeAnalog = false;
 				m_RotatingFallingShape = true;
 
+				// Make sure that visuals are synced to the data. When ClearFallingShapeAnalogRotateOffset() with 0 rotation, this may get missed.
+				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
+					ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
+					shapeCoords.Coords = m_LevelData.FallingShape.ShapeCoords[i].Coords;
+				}
+
 				// Simulate normal rotation, from hotkey.
 				m_RotatingFallingShapeStarted = Time.time - ChangeRotationDuration * m_RotatingFallingShapeAnalogLastProgress;
 			}

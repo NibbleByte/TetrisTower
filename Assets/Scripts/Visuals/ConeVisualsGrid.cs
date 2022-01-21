@@ -226,6 +226,10 @@ namespace TetrisTower.Visuals
 				var coords = action.PlaceCoords + pair.Coords;
 				coords.WrapColumn(this);
 
+				if (reusedVisuals) {
+					Debug.Assert(reusedVisuals.name.Contains(pair.Value.Prefab3D.name));
+				}
+
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
 			}
 
