@@ -37,6 +37,7 @@ namespace TetrisTower.Logic
 
 		public float FallingColumnAnalogOffset { get; private set; } = float.NaN;
 		public float FallingShapeAnalogRotateOffset { get; private set; } = float.NaN;
+		public float FallingShapeAnalogRotateOffsetBeforeClear { get; private set; } = float.NaN;	// Hacky, I know.
 
 		private float m_FallingSpeedup = 0;
 
@@ -276,6 +277,7 @@ namespace TetrisTower.Logic
 			if (float.IsNaN(FallingShapeAnalogRotateOffset))
 				return false;
 
+			FallingShapeAnalogRotateOffsetBeforeClear = FallingShapeAnalogRotateOffset;
 			int roundDirection = Mathf.RoundToInt(FallingShapeAnalogRotateOffset);
 
 			FallingShapeAnalogRotateOffset = float.NaN;

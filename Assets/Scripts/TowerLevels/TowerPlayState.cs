@@ -268,7 +268,7 @@ namespace TetrisTower.TowerLevels
 				// Avoid starting another drag operation if the last one was interrupted.
 				} else if (!m_PointerDragConsumed) {
 
-					if (dragFullDistance.magnitude > 20f * InputMetrics.InputPrecision) {
+					if (dragFullDistance.magnitude > 10f * InputMetrics.InputPrecision) {
 						m_PointerDragConsumed = true;
 						m_PlayerControls.TowerLevelPlay.PointerFallSpeedUp.Reset();
 

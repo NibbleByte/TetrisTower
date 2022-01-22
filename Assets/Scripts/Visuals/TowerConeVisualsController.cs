@@ -237,6 +237,7 @@ namespace TetrisTower.Visuals
 					m_RotatingFallingShapeCoordsChange = new Tuple<int, int, bool>[FallingVisualsShape.ShapeCoords.Length];
 				}
 
+				// NOTE: Copy-pasted below.
 				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
 					ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
 					shapeCoords.Coords = m_LevelData.FallingShape.ShapeCoords[i].Coords;
@@ -259,10 +260,26 @@ namespace TetrisTower.Visuals
 				m_RotatingFallingShapeAnalog = false;
 				m_RotatingFallingShape = true;
 
+				int fallingRows = m_LevelData.FallingShape.Rows;
+
 				// Make sure that visuals are synced to the data. When ClearFallingShapeAnalogRotateOffset() with 0 rotation, this may get missed.
+				// NOTE: Copy-pasted from above... but uses FallingShapeAnalogRotateOffsetBeforeClear!
 				for (int i = 0; i < FallingVisualsShape.ShapeCoords.Length; ++i) {
 					ref var shapeCoords = ref FallingVisualsShape.ShapeCoords[i];
 					shapeCoords.Coords = m_LevelData.FallingShape.ShapeCoords[i].Coords;
+
+					// Configure data as if we are rotating towards the current row.
+					// This will help a smooth transition when player releases drag and animation falls back to the current row.
+					int nextRow = shapeCoords.Coords.Row;
+					// HACK: Use FallingShapeAnalogRotateOffsetBeforeClear because we don't have the normal value anymore.
+					//		 It is important to use up to date value (not just the last frame one), because while clearing,
+					//		 final offset may have updated and wrapped [-0.5, 0.5] the fall shape coords -
+					//		 visuals wouldn't know this happened and keep transition to the wrong value.
+					//		 This will keep visuals resume correctly. Test with releasing mouse on FallingShapeAnalogRotateOffset = 0.48 with 1 pixel drag.
+					int startRow = MathUtils.WrapValue(nextRow + (int)Mathf.Sign(m_TowerLevel.FallingShapeAnalogRotateOffsetBeforeClear), fallingRows);
+					bool isWrapped = Mathf.Abs(nextRow - startRow) > 1;
+
+					m_RotatingFallingShapeCoordsChange[i] = new Tuple<int, int, bool>(startRow, nextRow, isWrapped);
 				}
 
 				// Simulate normal rotation, from hotkey.
