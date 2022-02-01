@@ -12,6 +12,7 @@ namespace TetrisTower.Tools
 		public TextMeshProUGUI DisplayText;
 
 		public bool DisplayScreenInfo = true;
+		public bool DisplayRenderInfo = true;
 
 		public bool DisplayPointerInfo = true;
 
@@ -36,6 +37,14 @@ namespace TetrisTower.Tools
 
 			if (DisplayScreenInfo) {
 				text.AppendLine($"Screen: {Screen.width} x {Screen.height} ({Screen.dpi} dpi)");
+			}
+
+			if (DisplayRenderInfo) {
+				text.AppendLine($"GPU: {SystemInfo.graphicsDeviceVersion}");
+				text.AppendLine($"GPU Name: {SystemInfo.graphicsDeviceName}");
+				text.AppendLine($"Shaders: {SystemInfo.graphicsShaderLevel}");
+				text.AppendLine($"Instancing: {SystemInfo.supportsInstancing}");
+				text.AppendLine($"GPU Mem: {SystemInfo.graphicsMemorySize} MB");
 			}
 
 			if (DisplayPointerInfo && Touchscreen.current != null) {

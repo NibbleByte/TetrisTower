@@ -140,7 +140,7 @@ namespace TetrisTower.TowerLevels
 
 		void Update()
 		{
-			if (Keyboard.current.pKey.wasPressedThisFrame || Keyboard.current.fKey.wasPressedThisFrame) {
+			if (Keyboard.current.fKey.wasPressedThisFrame) {
 				ToggleFalling();
 			}
 
