@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using TetrisTower.Logic;
-using TetrisTower.TowerLevels;
 using UnityEngine;
 
 namespace TetrisTower.Game
@@ -60,6 +59,8 @@ namespace TetrisTower.Game
 	{
 		public SceneReference BackgroundScene;
 
+		public SceneReference BackgroundSceneMobile;
+
 		public GridShapeTemplate[] ShapeTemplates;
 		public BlockType[] SpawnedBlocks;
 
@@ -86,6 +87,15 @@ namespace TetrisTower.Game
 
 		public int ObjectiveEndCount;
 
+		public SceneReference GetAppropriateBackgroundScene()
+		{
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+			return BackgroundSceneMobile.IsEmpty ? BackgroundScene : BackgroundSceneMobile;
+#else
+			return BackgroundScene;
+#endif
+		}
+
 		public GridLevelData GenerateTowerLevelData()
 		{
 			int seed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
@@ -99,7 +109,7 @@ namespace TetrisTower.Game
 			int totalRows = GridRows + extraRows * 2 + 1;
 
 			var levelData = new GridLevelData() {
-				BackgroundScene = BackgroundScene?.Clone() ?? new SceneReference(),
+				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = ShapeTemplates.ToArray(),
 				SpawnedBlocks = SpawnedBlocks.ToArray(),
@@ -131,12 +141,12 @@ namespace TetrisTower.Game
 				var block = SpawnedBlocks[i];
 
 				if (block == null) {
-					Debug.LogError($"Missing {i}-th block from {nameof(SpawnedBlocks)} in this {nameof(PlaythroughData)} \"{BackgroundScene}\". {context}", context);
+					Debug.LogError($"Missing {i}-th block from {nameof(SpawnedBlocks)} in this {nameof(PlaythroughData)} \"{GetAppropriateBackgroundScene()}\". {context}", context);
 					continue;
 				}
 
 				if (!repo.IsRegistered(block)) {
-					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(SpawnedBlocks)} in this {nameof(PlaythroughData)} \"{BackgroundScene}\". {context}", context);
+					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(SpawnedBlocks)} in this {nameof(PlaythroughData)} \"{GetAppropriateBackgroundScene()}\". {context}", context);
 				}
 			}
 		}
