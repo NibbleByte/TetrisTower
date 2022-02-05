@@ -34,9 +34,6 @@ namespace TetrisTower.Visuals
 			m_PreviewRenderer.gameObject.SetActive(false);
 			m_PreviewRenderer.name = "-- Fall Preview Block --";
 			m_PreviewMaterial = m_PreviewRenderer.material = new Material(m_PreviewRenderer.sharedMaterial);
-			m_PreviewMaterial.SetFloat("BlockHeight", VisualsGrid.BlockHeight);
-			m_PreviewMaterial.SetFloat("BlockWidth", (VisualsGrid.FrontFaceTopEdgeLength + VisualsGrid.FrontFaceBottomEdgeLength) / 2f);
-			m_PreviewMaterial.SetFloat("TowerHeight", VisualsGrid.ConeHeight);
 
 			contextReferences.SetByType(out m_TowerLevel);
 
