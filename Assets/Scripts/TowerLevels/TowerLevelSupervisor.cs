@@ -28,7 +28,26 @@ namespace TetrisTower.TowerLevels
 			}
 
 			if (playthroughData.TowerLevel == null) {
+				if (playthroughData.CurrentLevelIndex >= playthroughData.Levels.Length) {
+					Debug.LogError($"Current level {playthroughData.CurrentLevelIndex} is out of range {playthroughData.Levels.Length}. Abort!");
+					CriticalError($"No available level {playthroughData.CurrentLevelIndex}.\nLevels count {playthroughData.Levels.Length}.", true);
+					return;
+				}
+
 				playthroughData.TowerLevel = playthroughData.Levels[playthroughData.CurrentLevelIndex].GenerateTowerLevelData();
+
+				if (playthroughData.TowerLevel.BackgroundScene.IsEmpty) {
+					Debug.LogError($"No appropriate scene found in level param {playthroughData.CurrentLevelIndex}! Setting dev one.");
+					playthroughData.TowerLevel.BackgroundScene = new SceneReference("Assets/Scenes/_DevTowerScene.unity");
+
+					bool isValidFallback = SceneUtility.GetBuildIndexByScenePath(playthroughData.TowerLevel.BackgroundScene.ScenePath) >= 0;
+
+					CriticalError($"Level {playthroughData.CurrentLevelIndex} did not have scene specified. Loading fallback.", !isValidFallback);
+
+					if (!isValidFallback) {
+						return;
+					}
+				}
 			}
 
 			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;
@@ -120,7 +139,7 @@ namespace TetrisTower.TowerLevels
 				listener.OnLevelUnloading();
 			}
 
-			behaviours.OfType<TowerConeVisualsController>().First().Deinit();
+			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
 
 			return Task.CompletedTask;
 		}
@@ -146,6 +165,21 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 			}
+		}
+
+		private void CriticalError(string errorMessage, bool fallbackToHomescreen)
+		{
+			MessageBox.Instance.ShowSimple(
+				"Level Error",
+				errorMessage,
+				MessageBoxIcon.Error,
+				MessageBoxButtons.OK,
+				() => {
+					if (fallbackToHomescreen)
+						GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());
+				},
+				this
+			);
 		}
 	}
 }
