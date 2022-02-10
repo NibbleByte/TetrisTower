@@ -92,6 +92,8 @@ namespace TetrisTower.TowerLevels
 				}
 			}
 
+			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+
 			StatesStack = new LevelStateStack(
 				gameContext,
 				gameContext.GameConfig,
@@ -100,12 +102,13 @@ namespace TetrisTower.TowerLevels
 				gameContext.CurrentPlaythrough,
 				levelController,
 				uiController,
-				GameObject.FindObjectOfType<UI.MatchSequenceScoreUIController>(true),
-				GameObject.FindObjectOfType<UI.FlashMessageUIController>(true)
+				behaviours.OfType<UI.MatchSequenceScoreUIController>().FirstOrDefault(),
+				behaviours.OfType<UI.FlashMessageUIController>().FirstOrDefault(),
+				behaviours.OfType<ConeVisualsGrid>().First(),
+				behaviours.OfType<TowerConeVisualsController>().First(),
+				behaviours.OfType<ILostAnimationExecutor>().ToArray()	// Tower level prefab OR scene ones.
 				);
 
-
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 				await listener.OnLevelLoadingAsync(StatesStack.ContextReferences);
@@ -120,13 +123,15 @@ namespace TetrisTower.TowerLevels
 
 			await StatesStack.SetStateAsync(new TowerPlayState());
 
-			// If save came with available matches, or pending actions, do them.
-			var pendingActions = Logic.GameGridEvaluation.Evaluate(gameContext.CurrentPlaythrough.TowerLevel.Grid, gameContext.CurrentPlaythrough.TowerLevel.Rules);
-			if (pendingActions.Count > 0) {
-				levelController.StartCoroutine(levelController.RunActions(pendingActions));
+			if (gameContext.CurrentPlaythrough.TowerLevel.IsPlaying) {
+				// If save came with available matches, or pending actions, do them.
+				var pendingActions = GameGridEvaluation.Evaluate(gameContext.CurrentPlaythrough.TowerLevel.Grid, gameContext.CurrentPlaythrough.TowerLevel.Rules);
+				if (pendingActions.Count > 0) {
+					levelController.StartCoroutine(levelController.RunActions(pendingActions));
 
-				while(levelController.AreGridActionsRunning) {
-					await Task.Yield();
+					while (levelController.AreGridActionsRunning) {
+						await Task.Yield();
+					}
 				}
 			}
 		}

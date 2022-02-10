@@ -205,7 +205,14 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_LevelController.LevelData != null && !m_LevelController.LevelData.IsPlaying) {
 				// Check for this in Update, rather than the event, in case the level finished while in another state.
-				GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+				switch (m_LevelController.LevelData.RunningState) {
+					case TowerLevelRunningState.Won:
+						GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+						break;
+					case TowerLevelRunningState.Lost:
+						GameManager.Instance.PushLevelState(new TowerLostState());
+						break;
+				}
 				return;
 			}
 
