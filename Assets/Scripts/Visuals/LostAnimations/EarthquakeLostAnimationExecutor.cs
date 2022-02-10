@@ -23,17 +23,22 @@ namespace TetrisTower.Visuals.LostAnimations
 		public Vector2 TorqueRange = new Vector2(-10, 10);
 		public ForceMode TorqueMode = ForceMode.Impulse;
 
-		private Coroutine m_CameraCoroutine;
+		private bool m_Interrupted = false;
 
 		public IEnumerator Execute(ConeVisualsGrid visualsGrid, Transform fallingVisualsContainer, List<KeyValuePair<GridCoords, ConeVisualsBlock>> blocks)
 		{
-			m_CameraCoroutine = StartCoroutine(OperateCamera(fallingVisualsContainer));
+			m_Interrupted = false;
+
+			StartCoroutine(OperateCamera(fallingVisualsContainer));
 
 			var camera = fallingVisualsContainer.GetComponentInChildren<Camera>().transform;
 
 			float startTime = Time.time;
 
 			while(Time.time < startTime + StartDelay) {
+				if (m_Interrupted)
+					yield break;
+
 				camera.localPosition = new Vector3(Random.Range(CameraShakeRange.x, CameraShakeRange.y), Random.Range(CameraShakeRange.x, CameraShakeRange.y), 0f);
 				yield return null;
 			}
@@ -61,13 +66,15 @@ namespace TetrisTower.Visuals.LostAnimations
 
 		public void Interrupt()
 		{
-			StopCoroutine(m_CameraCoroutine);
-			m_CameraCoroutine = null;
+			m_Interrupted = true;
 		}
 
 		private IEnumerator OperateCamera(Transform fallingVisualsContainer)
 		{
 			while(true) {
+				if (m_Interrupted)
+					yield break;
+
 				var eulerAngles = fallingVisualsContainer.eulerAngles;
 				eulerAngles.y += CameraRotateSpeed * Time.deltaTime;
 				fallingVisualsContainer.eulerAngles = eulerAngles;

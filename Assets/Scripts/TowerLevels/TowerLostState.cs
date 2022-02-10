@@ -33,7 +33,9 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.UI.Enable();
 			m_PlayerControls.CommonHotkeys.SetCallbacks(this);
 			m_PlayerControls.CommonHotkeys.Enable();
-			// TODO: Make it work for touch screen?
+			// HACK: Listen for touch-screen tapping as they don't have CommonHotkeys (back button is not ideal).
+			m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
+			m_PlayerControls.TowerLevelPlay.PointerPress.Enable();
 
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
 
@@ -60,6 +62,7 @@ namespace TetrisTower.TowerLevels
 
 		public Task ExitStateAsync()
 		{
+			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnPointerPressed;
 			m_PlayerControls.CommonHotkeys.SetCallbacks(null);
 			m_PlayerControls.InputStack.PopActionsState(this);
 
@@ -105,6 +108,16 @@ namespace TetrisTower.TowerLevels
 		}
 
 		public void OnConfirm(InputAction.CallbackContext context)
+		{
+			if (!m_Interrupted) {
+				m_Interrupted = true;
+				m_CurrentAnimation.Interrupt();
+			}
+
+			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+		}
+
+		private void OnPointerPressed(InputAction.CallbackContext obj)
 		{
 			if (!m_Interrupted) {
 				m_Interrupted = true;
