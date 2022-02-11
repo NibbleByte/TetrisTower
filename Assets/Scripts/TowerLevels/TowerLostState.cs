@@ -37,6 +37,9 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
 			m_PlayerControls.TowerLevelPlay.PointerPress.Enable();
 
+			// These are still active (Menu hotkey).
+			m_PlayerControls.TowerLevelShared.Disable();
+
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
 
 			var lostAnimations = contextReferences.TryFindByType<ILostAnimationExecutor[]>();
