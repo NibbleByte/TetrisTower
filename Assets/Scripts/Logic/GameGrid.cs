@@ -57,7 +57,7 @@ namespace TetrisTower.Logic
 			return false;
 		}
 
-
+		public static GridCoords Zero => new GridCoords();
 
 		public override string ToString()
 		{

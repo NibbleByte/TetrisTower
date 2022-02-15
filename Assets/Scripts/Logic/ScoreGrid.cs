@@ -26,6 +26,8 @@ namespace TetrisTower.Logic
 		public int CurrentClearedBlocksCount { get; private set; }
 		public int CurrentClearActionsCount { get; private set; }
 
+		public int BonusScore { get; private set; } = 0;
+
 		// For serialization.
 		public ScoreGrid()
 		{
@@ -87,6 +89,17 @@ namespace TetrisTower.Logic
 			m_Score += CurrentClearedBlocksCount * CurrentClearActionsCount;
 			CurrentClearedBlocksCount = 0;
 			CurrentClearActionsCount = 0;
+		}
+
+		public void IncrementWonBonusScore()
+		{
+			BonusScore++;
+		}
+
+		public void ConsumeBonusScore()
+		{
+			m_Score += BonusScore;
+			BonusScore = 0;
 		}
 	}
 }

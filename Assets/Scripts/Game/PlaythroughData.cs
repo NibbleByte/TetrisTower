@@ -35,6 +35,9 @@ namespace TetrisTower.Game
 			if (TowerLevel == null || TowerLevel.RunningState != TowerLevelRunningState.Won)
 				throw new InvalidOperationException($"Trying to finish level when it hasn't finished - {TowerLevel?.RunningState}.");
 
+			// NOTE: This may be done earlier to show the score to the user. In that case, this should do nothing.
+			TowerLevel.Score.ConsumeBonusScore();
+
 			ScoreOnLevelStart += TowerLevel.Score.Score;
 
 			TowerLevel = null;

@@ -16,6 +16,9 @@ namespace TetrisTower.Game
 
 		public GridLevelController TowerLevelController;
 
+		[Tooltip("Block to be used for bonus blocks in the won animation at the end.")]
+		public BlockType WonBonusBlock;
+
 		public GameObject[] UIPrefabs;
 
 		public InputBindingDisplayAsset[] BindingDisplayAssets;

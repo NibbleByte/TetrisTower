@@ -41,6 +41,9 @@ namespace TetrisTower.TowerLevels.UI
 
 		private void OnFallingShapeSelected()
 		{
+			if (!m_LevelData.IsPlaying)
+				return;
+
 			BlocksShape shape = m_LevelData.NextShape;
 
 			if (shape == null) {

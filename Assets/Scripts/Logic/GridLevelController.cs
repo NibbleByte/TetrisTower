@@ -99,33 +99,46 @@ namespace TetrisTower.Logic
 
 			RunningActionsSequenceFinished?.Invoke();
 
-			int spawnBlockTypesProgress = LevelData.ScorePerAdditionalSpawnBlockType > 0
-				? LevelData.Score.Score / LevelData.ScorePerAdditionalSpawnBlockType
-				: 0
-				;
-			int spawnBlockTypesCount = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.SpawnedBlocks.Length);
+			if (LevelData.IsPlaying) {
 
-			if (LevelData.ObjectiveRemainingCount == 0 && !AreGridActionsRunning) {
-				Debug.Log($"Remaining blocks to clear are 0. Player won.");
-				FinishLevel(TowerLevelRunningState.Won);
+				int spawnBlockTypesProgress = LevelData.ScorePerAdditionalSpawnBlockType > 0
+					? LevelData.Score.Score / LevelData.ScorePerAdditionalSpawnBlockType
+					: 0
+					;
+				int spawnBlockTypesCount = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.SpawnedBlocks.Length);
 
-			} else if (LevelData.SpawnBlockTypesCount != spawnBlockTypesCount) {
-				Debug.Log($"Changing SpawnBlockTypesCount from {LevelData.SpawnBlockTypesCount} to {spawnBlockTypesCount}.", this);
-				LevelData.SpawnBlockTypesCount = spawnBlockTypesCount;
-				SpawnBlockTypesCountChanged?.Invoke();
+				if (LevelData.ObjectiveRemainingCount == 0 && !AreGridActionsRunning) {
+					Debug.Log($"Remaining blocks to clear are 0. Player won.");
+					FinishLevel(TowerLevelRunningState.Won);
+
+				} else if (LevelData.SpawnBlockTypesCount != spawnBlockTypesCount) {
+					Debug.Log($"Changing SpawnBlockTypesCount from {LevelData.SpawnBlockTypesCount} to {spawnBlockTypesCount}.", this);
+					LevelData.SpawnBlockTypesCount = spawnBlockTypesCount;
+					SpawnBlockTypesCountChanged?.Invoke();
+				}
 			}
 		}
 
-		public void SelectFallingShape()
+		private void SelectFallingShape()
 		{
 			if (LevelData.NextShape == null) {
 				LevelData.NextShape = GenerateShape();
 			}
 
-			LevelData.FallingShape = LevelData.NextShape;
-			LevelData.FallDistanceNormalized = 0f;
-
+			BlocksShape selectedShape = LevelData.NextShape;
 			LevelData.NextShape = GenerateShape();
+
+			SelectFallingShape(selectedShape);
+		}
+
+
+		public void SelectFallingShape(BlocksShape shape)
+		{
+			if (LevelData.FallingShape != null)
+				throw new InvalidOperationException("Trying to select shape while another is already selected");
+
+			LevelData.FallingShape = shape;
+			LevelData.FallDistanceNormalized = 0f;
 
 			if (!LevelData.Rules.WrapSidesOnMove) {
 				if (LevelData.FallingColumn + LevelData.FallingShape.MaxColumn > Grid.Columns) {
@@ -136,6 +149,14 @@ namespace TetrisTower.Logic
 					LevelData.FallingColumn = 0 - LevelData.FallingShape.MinColumn;
 				}
 			}
+
+			FallingShapeSelected?.Invoke();
+		}
+
+		public void ClearSelectedShape()
+		{
+			LevelData.FallingShape = null;
+			LevelData.FallDistanceNormalized = 0f;
 
 			FallingShapeSelected?.Invoke();
 		}
@@ -329,7 +350,11 @@ namespace TetrisTower.Logic
 			// Limit was reached, game over.
 			if (placedInside) {
 				yield return RunActions(actions);
-				SelectFallingShape();
+
+				// Could finish level inside RunActions.
+				if (LevelData.IsPlaying) {
+					SelectFallingShape();
+				}
 			} else {
 
 				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the play area {LevelData.PlayableSize}, grid ({Grid.Rows}, {Grid.Columns}).");
@@ -378,6 +403,19 @@ namespace TetrisTower.Logic
 				throw new ArgumentException($"Invalid finish state {finishState}");
 
 			LevelData.RunningState = finishState;
+
+			if (LevelData.RunningState == TowerLevelRunningState.Won) {
+
+				for (int row = 0; row < LevelData.Grid.Rows; ++row) {
+					for (int column = 0; column < LevelData.Grid.Columns; ++column) {
+						if (LevelData.Grid[row, column] == null) {
+							LevelData.Score.IncrementWonBonusScore();
+						}
+					}
+				}
+			}
+
+			ClearSelectedShape();
 			FinishedLevel?.Invoke();
 		}
 
@@ -397,13 +435,10 @@ namespace TetrisTower.Logic
 			if (LevelData == null)
 				return;
 
-			if (!LevelData.IsPlaying)
-				return;
-
 			if (LevelData.FallingShape != null) {
 				UpdateFallShape();
 
-			} else if (!AreGridActionsRunning && CanSelectNextShape()) {
+			} else if (!AreGridActionsRunning && LevelData.IsPlaying && CanSelectNextShape()) {
 				SelectFallingShape();
 			}
 
@@ -417,7 +452,7 @@ namespace TetrisTower.Logic
 
 		private bool CanSelectNextShape()
 		{
-			if (LevelData.NextShape == null)
+			if (LevelData.NextShape == null || LevelData.FallingShape != null)
 				return false;
 
 			// Search if the bottom of the next shape can be spawned.

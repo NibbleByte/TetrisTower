@@ -223,7 +223,7 @@ namespace TetrisTower.Visuals
 
 		private void UpdateFallingVisualsPosition()
 		{
-			if (FallingVisualsShape == null || m_TowerLevel.AreGridActionsRunning || !m_LevelData.IsPlaying)
+			if (FallingVisualsShape == null || m_TowerLevel.AreGridActionsRunning)
 				return;
 
 			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == m_LevelData.FallingShape.ShapeCoords.Length);

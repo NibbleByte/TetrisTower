@@ -46,8 +46,6 @@ namespace TetrisTower.TowerLevels
 
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
 
-			m_LevelController.ResumeLevel();
-
 			MessageBox.Instance.MessageShown += m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed += m_LevelController.ResumeLevel;
 
@@ -56,8 +54,6 @@ namespace TetrisTower.TowerLevels
 
 		public Task ExitStateAsync()
 		{
-			m_LevelController.PauseLevel();
-
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
 			m_PlayerControls.InputStack.PopActionsState(this);
 
@@ -207,7 +203,7 @@ namespace TetrisTower.TowerLevels
 				// Check for this in Update, rather than the event, in case the level finished while in another state.
 				switch (m_LevelController.LevelData.RunningState) {
 					case TowerLevelRunningState.Won:
-						GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+						GameManager.Instance.PushLevelState(new TowerWonState());
 						break;
 					case TowerLevelRunningState.Lost:
 						GameManager.Instance.PushLevelState(new TowerLostState());

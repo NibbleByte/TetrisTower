@@ -25,16 +25,19 @@ namespace TetrisTower.TowerLevels.UI
 			m_Text.text = string.Empty;
 		}
 
-		public void ShowMessage(string message)
+		public void ShowMessage(string message, bool logMessage = true)
 		{
 			m_Text.text = message;
 			m_FlashStarted = Time.time;
 
 			gameObject.SetActive(true);
-			Debug.Log($"Flash message: \"{message}\"", this);
+
+			if (logMessage) {
+				Debug.Log($"Flash message: \"{message}\"", this);
+			}
 		}
 
-		public void AppendMessage(string message, bool resetTimer = true)
+		public void AppendMessage(string message, bool resetTimer = true, bool logMessage = true)
 		{
 			if (string.IsNullOrEmpty(m_Text.text)) {
 				m_Text.text = message;
@@ -46,7 +49,10 @@ namespace TetrisTower.TowerLevels.UI
 			}
 
 			gameObject.SetActive(true);
-			Debug.Log($"Flash message: \"{message}\"", this);
+
+			if (logMessage) {
+				Debug.Log($"Flash message: \"{message}\"", this);
+			}
 		}
 
 		public void ClearMessage()

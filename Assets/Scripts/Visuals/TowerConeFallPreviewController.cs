@@ -60,6 +60,9 @@ namespace TetrisTower.Visuals
 
 		private void OnFallingShapeSelected()
 		{
+			if (!m_LevelData.IsPlaying)
+				return;
+
 			UpdatePreviewPosition();
 		}
 
@@ -88,7 +91,7 @@ namespace TetrisTower.Visuals
 			if (m_LevelData == null || m_PreviewRenderer == null)
 				return;
 
-			if (m_LevelData.FallingShape == null) {
+			if (m_LevelData.FallingShape == null || !m_LevelData.IsPlaying) {
 				if (m_PreviewRenderer.gameObject.activeSelf) {
 					m_PreviewRenderer.gameObject.SetActive(false);
 				}

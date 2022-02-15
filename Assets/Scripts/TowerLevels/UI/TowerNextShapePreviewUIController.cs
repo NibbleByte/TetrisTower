@@ -42,7 +42,7 @@ namespace TetrisTower.TowerLevels.UI
 		{
 			Transform gridTransform = Grid.transform;
 
-			if (m_LevelData?.NextShape == null) {
+			if (m_LevelData?.NextShape == null || !m_LevelData.IsPlaying) {
 				foreach(Transform child in gridTransform) {
 					DestroyImmediate(child.gameObject);
 				}

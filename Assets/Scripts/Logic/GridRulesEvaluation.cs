@@ -80,7 +80,7 @@ namespace TetrisTower.Logic
 			for (int i = 0; i < totalBlocks; ++i) {
 				BlockType currentType = grid[coords];
 
-				if (currentType == lastMatched && currentType != null) {
+				if (currentType == lastMatched && currentType != null && currentType.CanBeMatched) {
 					matched.Add(coords);
 
 				} else {
@@ -182,7 +182,7 @@ namespace TetrisTower.Logic
 
 					BlockType currentType = grid[coords];
 
-					if (currentType == lastMatched && currentType != null) {
+					if (currentType == lastMatched && currentType != null && currentType.CanBeMatched) {
 						matched.Add(coords);
 
 					} else {
