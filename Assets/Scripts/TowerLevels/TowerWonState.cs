@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.UI;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
@@ -19,6 +20,8 @@ namespace TetrisTower.TowerLevels
 		private FlashMessageUIController m_FlashMessage;
 
 		private int m_BonusBlocksCount = 0;
+
+		private float m_BonusFillUpTime = float.NaN;
 
 		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 		{
@@ -56,6 +59,8 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnPointerPressed;
 			m_PlayerControls.CommonHotkeys.SetCallbacks(null);
 			m_PlayerControls.InputStack.PopActionsState(this);
+
+			m_FlashMessage.ClearMessage();
 
 			return Task.CompletedTask;
 		}
@@ -125,6 +130,14 @@ namespace TetrisTower.TowerLevels
 
 		public void Update()
 		{
+			if (!float.IsNaN(m_BonusFillUpTime)) {
+				if (m_BonusFillUpTime + 2f < Time.time) {
+					GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+				}
+
+				return;
+			}
+
 			if (m_LevelData.FallingShape != null)
 				return;
 
@@ -132,7 +145,7 @@ namespace TetrisTower.TowerLevels
 				m_LevelData.Score.ConsumeBonusScore();
 				m_LevelController.ClearSelectedShape();
 
-				GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+				m_BonusFillUpTime = Time.time;
 				return;
 			}
 
