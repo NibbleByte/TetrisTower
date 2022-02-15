@@ -406,7 +406,7 @@ namespace TetrisTower.Logic
 
 			if (LevelData.RunningState == TowerLevelRunningState.Won) {
 
-				for (int row = 0; row < LevelData.Grid.Rows; ++row) {
+				for (int row = 0; row < LevelData.PlayableSize.Row; ++row) {
 					for (int column = 0; column < LevelData.Grid.Columns; ++column) {
 						if (LevelData.Grid[row, column] == null) {
 							LevelData.Score.IncrementWonBonusScore();
