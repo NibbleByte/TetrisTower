@@ -375,6 +375,7 @@ namespace TetrisTower.Logic
 
 				// Could finish level inside RunActions.
 				if (LevelData.IsPlaying) {
+					LevelData.FallSpeedNormalized += LevelData.FallSpeedupPerAction;
 					SelectFallingShape();
 				}
 			} else {

@@ -16,6 +16,9 @@ namespace TetrisTower.Game
 		[Tooltip("Blocks to be used along the playthrough. The index decides the order of appearance. If empty, blocks in config will be used.")]
 		public BlockType[] Blocks;
 
+		public float FallSpeedNormalized = 2f;
+		public float FallSpeedupPerAction = 0.01f;
+
 		public int CurrentLevelIndex = 0;
 		public LevelParamData[] Levels;
 
@@ -139,6 +142,9 @@ namespace TetrisTower.Game
 
 				ShapeTemplates = ShapeTemplates.ToArray(),
 				BlocksPool = blocks,
+
+				FallSpeedNormalized = playthrough.FallSpeedNormalized,
+				FallSpeedupPerAction = playthrough.FallSpeedupPerAction,
 
 				InitialSpawnBlockTypesCount = InitialSpawnBlockTypesCount,
 				SpawnBlockTypesRange = new Vector2Int(0, InitialSpawnBlockTypesCount),
