@@ -28,7 +28,7 @@ namespace TetrisTower.Game
 				for(int column = 0; column < m_PlayerData.TowerLevel.Grid.Columns; ++column) {
 
 					var blockType = row < m_PlayerData.TowerLevel.Grid.Rows - 5
-						? m_PlayerData.TowerLevel.SpawnedBlocks[(column + row % 2) % m_PlayerData.TowerLevel.SpawnedBlocks.Length]
+						? m_PlayerData.TowerLevel.BlocksPool[(column + row % 2) % m_PlayerData.TowerLevel.BlocksPool.Length]
 						: null
 						;
 

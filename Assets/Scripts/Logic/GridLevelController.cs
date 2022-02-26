@@ -101,19 +101,41 @@ namespace TetrisTower.Logic
 
 			if (LevelData.IsPlaying) {
 
-				int spawnBlockTypesProgress = LevelData.ScorePerAdditionalSpawnBlockType > 0
-					? LevelData.Score.Score / LevelData.ScorePerAdditionalSpawnBlockType
+				int spawnBlockTypesProgress = LevelData.ScoreToModifySpawnedBlocksRange > 0
+					? LevelData.Score.Score / LevelData.ScoreToModifySpawnedBlocksRange
 					: 0
 					;
-				int spawnBlockTypesCount = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.SpawnedBlocks.Length);
+
+				Vector2Int blocksRange = new Vector2Int();
+
+				switch(LevelData.ModifyBlocksRangeType) {
+					case ModifyBlocksRangeType.AddRemoveAlternating:
+						int lowerCap = LevelData.BlocksPool.Length - LevelData.InitialSpawnBlockTypesCount - 1;
+						blocksRange.x = spawnBlockTypesProgress / 2;
+
+						// Unlikely to happen, but if game goes for too long, start adding blocks in reverse.
+						if (blocksRange.x > lowerCap) {
+							blocksRange.x = lowerCap - (blocksRange.x - lowerCap);
+							blocksRange.x = Mathf.Max(blocksRange.x, 0);
+						}
+
+						blocksRange.y = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + (spawnBlockTypesProgress + 1) / 2, LevelData.BlocksPool.Length);
+						break;
+
+					case ModifyBlocksRangeType.AddBlocks:
+						blocksRange.y = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.BlocksPool.Length);
+						break;
+
+					default: throw new NotSupportedException(LevelData.ModifyBlocksRangeType.ToString());
+				}
 
 				if (LevelData.ObjectiveRemainingCount == 0 && !AreGridActionsRunning) {
 					Debug.Log($"Remaining blocks to clear are 0. Player won.");
 					FinishLevel(TowerLevelRunningState.Won);
 
-				} else if (LevelData.SpawnBlockTypesCount != spawnBlockTypesCount) {
-					Debug.Log($"Changing SpawnBlockTypesCount from {LevelData.SpawnBlockTypesCount} to {spawnBlockTypesCount}.", this);
-					LevelData.SpawnBlockTypesCount = spawnBlockTypesCount;
+				} else if (LevelData.SpawnBlockTypesRange != blocksRange) {
+					Debug.Log($"Changing blocks range from {LevelData.SpawnBlockTypesRange} to {blocksRange}.", this);
+					LevelData.SpawnBlockTypesRange = blocksRange;
 					SpawnBlockTypesCountChanged?.Invoke();
 				}
 			}
@@ -379,14 +401,14 @@ namespace TetrisTower.Logic
 		public BlocksShape GenerateShape()
 		{
 			GridShapeTemplate template = LevelData.ShapeTemplates[LevelData.Random.Next(LevelData.ShapeTemplates.Length)];
-			return GenerateShape(template, new ArraySegment<BlockType>(LevelData.SpawnedBlocks, 0, LevelData.SpawnBlockTypesCount), LevelData.Random);
+			return GenerateShape(template, LevelData.BlocksPool, LevelData.SpawnBlockTypesRange, LevelData.Random);
 		}
 
-		private static BlocksShape GenerateShape(GridShapeTemplate template, ArraySegment<BlockType> spawnBlocks, System.Random random)
+		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] blocksPool, Vector2Int range, System.Random random)
 		{
 			var shapeCoords = new List<BlocksShape.ShapeBind>();
 			foreach(var coords in template.ShapeTemplate) {
-				var blockType = spawnBlocks.Array[spawnBlocks.Offset + random.Next(spawnBlocks.Count)];
+				var blockType = blocksPool[random.Next(range.x, range.y)];
 
 				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 					Coords = coords,

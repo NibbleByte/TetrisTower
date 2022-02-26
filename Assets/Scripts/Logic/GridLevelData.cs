@@ -12,6 +12,12 @@ namespace TetrisTower.Logic
 		Lost,
 	}
 
+	public enum ModifyBlocksRangeType
+	{
+		AddRemoveAlternating = 0,
+		AddBlocks = 4,
+	}
+
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
 	public class GridLevelData
@@ -28,16 +34,19 @@ namespace TetrisTower.Logic
 		public float FallSpeedNormalized = 2f;		// Speed of falling.
 
 		public GridShapeTemplate[] ShapeTemplates;
-		public BlockType[] SpawnedBlocks;
+		public BlockType[] BlocksPool;
 
 		// Initial spawn blocks from the array.
 		public int InitialSpawnBlockTypesCount = 3;
 
 		// Spawn blocks from the array in range [0, TypesCount).
-		public int SpawnBlockTypesCount = 3;
+		public Vector2Int SpawnBlockTypesRange = new Vector2Int(0, 3);
 
-		// Every x matches done by the player, increase the range of the types count.
-		public int ScorePerAdditionalSpawnBlockType = 50;
+		// Every x matches done by the player, increase the range of the spawned types.
+		public int ScoreToModifySpawnedBlocksRange = 150;
+
+		// Selects what should happen when score to modify is reached.
+		public ModifyBlocksRangeType ModifyBlocksRangeType;
 
 
 		[Tooltip("Read-only. Used for debug.")]
@@ -72,16 +81,16 @@ namespace TetrisTower.Logic
 				Debug.LogError($"{nameof(GridLevelData)} has no ObjectiveType set.", context);
 			}
 
-			for (int i = 0; i < SpawnedBlocks.Length; i++) {
-				var block = SpawnedBlocks[i];
+			for (int i = 0; i < BlocksPool.Length; i++) {
+				var block = BlocksPool[i];
 
 				if (block == null) {
-					Debug.LogError($"Missing {i}-th block from {nameof(SpawnedBlocks)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
+					Debug.LogError($"Missing {i}-th block from {nameof(BlocksPool)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
 					continue;
 				}
 
 				if (!repo.IsRegistered(block)) {
-					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(SpawnedBlocks)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
+					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(BlocksPool)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
 				}
 			}
 		}

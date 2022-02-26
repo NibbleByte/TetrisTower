@@ -15,6 +15,7 @@ MonoBehaviour:
   m_PlayerData:
     TowerLevel:
       id: 0
+    Blocks: []
     CurrentLevelIndex: 0
     Levels:
     - BackgroundScene:
@@ -27,12 +28,9 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
       ShapeTemplates:
       - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
-      SpawnedBlocks:
-      - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
-      - {fileID: 11400000, guid: 15b70fb8a10018e419d1ce7ce23e9504, type: 2}
-      - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
       InitialSpawnBlockTypesCount: 3
-      ScorePerAdditionalSpawnBlockType: 0
+      ScoreToModifySpawnedBlocksRange: 0
+      ModifyBlocksRangeType: 0
       RandomSeed: 0
       Rules:
         MatchHorizontalLines: 3
@@ -54,17 +52,9 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
       ShapeTemplates:
       - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
-      SpawnedBlocks:
-      - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
-      - {fileID: 11400000, guid: 15b70fb8a10018e419d1ce7ce23e9504, type: 2}
-      - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
-      - {fileID: 11400000, guid: 3520e54e21641954fa8087cbd30fd9a5, type: 2}
-      - {fileID: 11400000, guid: 0e00212edd934554fafc119bddc44a23, type: 2}
-      - {fileID: 11400000, guid: 99c1453350908cb468f836290c75ef65, type: 2}
-      - {fileID: 11400000, guid: e646ed67d52aa82448e435ae2a4dfecc, type: 2}
-      - {fileID: 11400000, guid: bcdd01b568cf9ee488f886acf9491cc6, type: 2}
       InitialSpawnBlockTypesCount: 3
-      ScorePerAdditionalSpawnBlockType: 45
+      ScoreToModifySpawnedBlocksRange: 50
+      ModifyBlocksRangeType: 0
       RandomSeed: 0
       Rules:
         MatchHorizontalLines: 3

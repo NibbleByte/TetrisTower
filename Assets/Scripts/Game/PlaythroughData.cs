@@ -85,8 +85,11 @@ namespace TetrisTower.Game
 		// Spawn blocks from the array in range [0, TypesCount).
 		public int InitialSpawnBlockTypesCount = 3;
 
-		// Every x matches done by the player, increase the range of the types count.
-		public int ScorePerAdditionalSpawnBlockType = 50;
+		// Every x matches done by the player, increase the range of the spawned types.
+		public int ScoreToModifySpawnedBlocksRange = 50;
+
+		// Selects what should happen when score to modify is reached.
+		public ModifyBlocksRangeType ModifyBlocksRangeType;
 
 
 		[Tooltip("Leave the seed to 0 for random seed every time.")]
@@ -135,11 +138,12 @@ namespace TetrisTower.Game
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = ShapeTemplates.ToArray(),
-				SpawnedBlocks = blocks,
+				BlocksPool = blocks,
 
 				InitialSpawnBlockTypesCount = InitialSpawnBlockTypesCount,
-				SpawnBlockTypesCount = InitialSpawnBlockTypesCount,
-				ScorePerAdditionalSpawnBlockType = ScorePerAdditionalSpawnBlockType,
+				SpawnBlockTypesRange = new Vector2Int(0, InitialSpawnBlockTypesCount),
+				ScoreToModifySpawnedBlocksRange = ScoreToModifySpawnedBlocksRange,
+				ModifyBlocksRangeType = ModifyBlocksRangeType,
 
 				RandomInitialSeed = seed,
 				Random = new System.Random(seed),

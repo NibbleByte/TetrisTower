@@ -49,10 +49,10 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 
-			} else if (playthroughData.TowerLevel.SpawnedBlocks.Length == 0) {
+			} else if (playthroughData.TowerLevel.BlocksPool.Length == 0) {
 
 				// For debug saves, blocks may be missing. Fill them up with the defaults.
-				playthroughData.TowerLevel.SpawnedBlocks = playthroughData.Blocks.Length == 0
+				playthroughData.TowerLevel.BlocksPool = playthroughData.Blocks.Length == 0
 					? gameContext.GameConfig.Blocks.ToArray()
 					: playthroughData.Blocks.ToArray()
 					;

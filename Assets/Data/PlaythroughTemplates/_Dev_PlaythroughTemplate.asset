@@ -37,10 +37,11 @@ MonoBehaviour:
         FallSpeedNormalized: 2
         ShapeTemplates:
         - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
-        SpawnedBlocks: []
+        BlocksPool: []
         InitialSpawnBlockTypesCount: 3
-        SpawnBlockTypesCount: 3
-        ScorePerAdditionalSpawnBlockType: 10
+        SpawnBlockTypesRange: {x: 0, y: 3}
+        ScoreToModifySpawnedBlocksRange: 10
+        ModifyBlocksRangeType: 0
         RandomInitialSeed: 0
         Rules:
           MatchHorizontalLines: 3
