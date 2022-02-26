@@ -15,6 +15,7 @@ MonoBehaviour:
   m_PlayerData:
     TowerLevel:
       id: 0
+    Blocks: []
     CurrentLevelIndex: 0
     Levels: []
     ScoreOnLevelStart: 0
@@ -36,11 +37,7 @@ MonoBehaviour:
         FallSpeedNormalized: 2
         ShapeTemplates:
         - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
-        SpawnedBlocks:
-        - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
-        - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
-        - {fileID: 11400000, guid: 15b70fb8a10018e419d1ce7ce23e9504, type: 2}
-        - {fileID: 11400000, guid: 3520e54e21641954fa8087cbd30fd9a5, type: 2}
+        SpawnedBlocks: []
         InitialSpawnBlockTypesCount: 3
         SpawnBlockTypesCount: 3
         ScorePerAdditionalSpawnBlockType: 10

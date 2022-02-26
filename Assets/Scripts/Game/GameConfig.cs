@@ -16,6 +16,9 @@ namespace TetrisTower.Game
 
 		public GridLevelController TowerLevelController;
 
+		[Tooltip("Blocks to be used along the playthroughs. The index decides the order of appearance. Can be overridden by the playthrough template.")]
+		public BlockType[] Blocks;
+
 		[Tooltip("Block to be used for bonus blocks in the won animation at the end.")]
 		public BlockType WonBonusBlock;
 
@@ -40,5 +43,21 @@ namespace TetrisTower.Game
 		};
 
 		public PlaythroughTemplate NormalPlaythgrough;
+
+		void OnValidate()
+		{
+			for (int i = 0; i < Blocks.Length; i++) {
+				var block = Blocks[i];
+
+				if (block == null) {
+					Debug.LogError($"Missing {i}-th block from {nameof(Blocks)} in {nameof(GameConfig)} at {name}", this);
+					continue;
+				}
+
+				if (!AssetsRepository.IsRegistered(block)) {
+					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(Blocks)} in {nameof(GameConfig)} at {name}", this);
+				}
+			}
+		}
 	}
 }

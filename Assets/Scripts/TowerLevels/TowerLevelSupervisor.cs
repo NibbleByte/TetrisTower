@@ -34,7 +34,7 @@ namespace TetrisTower.TowerLevels
 					return;
 				}
 
-				playthroughData.TowerLevel = playthroughData.Levels[playthroughData.CurrentLevelIndex].GenerateTowerLevelData();
+				playthroughData.TowerLevel = playthroughData.Levels[playthroughData.CurrentLevelIndex].GenerateTowerLevelData(gameContext.GameConfig, playthroughData);
 
 				if (playthroughData.TowerLevel.BackgroundScene.IsEmpty) {
 					Debug.LogError($"No appropriate scene found in level param {playthroughData.CurrentLevelIndex}! Setting dev one.");
@@ -48,6 +48,14 @@ namespace TetrisTower.TowerLevels
 						return;
 					}
 				}
+
+			} else if (playthroughData.TowerLevel.SpawnedBlocks.Length == 0) {
+
+				// For debug saves, blocks may be missing. Fill them up with the defaults.
+				playthroughData.TowerLevel.SpawnedBlocks = playthroughData.Blocks.Length == 0
+					? gameContext.GameConfig.Blocks.ToArray()
+					: playthroughData.Blocks.ToArray()
+					;
 			}
 
 			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;

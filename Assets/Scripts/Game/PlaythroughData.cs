@@ -13,6 +13,9 @@ namespace TetrisTower.Game
 	{
 		[SerializeReference] public GridLevelData TowerLevel;
 
+		[Tooltip("Blocks to be used along the playthrough. The index decides the order of appearance. If empty, blocks in config will be used.")]
+		public BlockType[] Blocks;
+
 		public int CurrentLevelIndex = 0;
 		public LevelParamData[] Levels;
 
@@ -50,7 +53,20 @@ namespace TetrisTower.Game
 				TowerLevel.Validate(repo, context);
 			}
 
-			foreach(var level in Levels) {
+			for (int i = 0; i < Blocks.Length; i++) {
+				var block = Blocks[i];
+
+				if (block == null) {
+					Debug.LogError($"Missing {i}-th block from {nameof(Blocks)} in {nameof(PlaythroughData)} at {context}", context);
+					continue;
+				}
+
+				if (!repo.IsRegistered(block)) {
+					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(Blocks)} in {nameof(PlaythroughData)} at {context}", context);
+				}
+			}
+
+			foreach (var level in Levels) {
 				level.Validate(repo, context);
 			}
 		}
@@ -65,7 +81,6 @@ namespace TetrisTower.Game
 		public SceneReference BackgroundSceneMobile;
 
 		public GridShapeTemplate[] ShapeTemplates;
-		public BlockType[] SpawnedBlocks;
 
 		// Spawn blocks from the array in range [0, TypesCount).
 		public int InitialSpawnBlockTypesCount = 3;
@@ -99,9 +114,14 @@ namespace TetrisTower.Game
 #endif
 		}
 
-		public GridLevelData GenerateTowerLevelData()
+		public GridLevelData GenerateTowerLevelData(GameConfig config, PlaythroughData playthrough)
 		{
 			int seed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
+
+			if (playthrough.Blocks.Length != 0 && config.Blocks.Length != playthrough.Blocks.Length) {
+				Debug.LogError($"Playthrough blocks count {playthrough.Blocks.Length} doesn't match the ones in the game config {config.Blocks.Length}");
+			}
+			BlockType[] blocks = playthrough.Blocks.Length != 0	? playthrough.Blocks : config.Blocks;
 
 			// No, we don't need '+1'. 13 + 3 = 16 (0 - 15). Placing on the 13 takes (13, 14, 15).
 			int extraRows = ShapeTemplates.Max(st => st.Rows);
@@ -115,7 +135,7 @@ namespace TetrisTower.Game
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = ShapeTemplates.ToArray(),
-				SpawnedBlocks = SpawnedBlocks.ToArray(),
+				SpawnedBlocks = blocks,
 
 				InitialSpawnBlockTypesCount = InitialSpawnBlockTypesCount,
 				SpawnBlockTypesCount = InitialSpawnBlockTypesCount,
@@ -138,19 +158,6 @@ namespace TetrisTower.Game
 		{
 			if (Rules.ObjectiveType == 0) {
 				Debug.LogError($"{nameof(PlaythroughData)} has no ObjectiveType set.", context);
-			}
-
-			for (int i = 0; i < SpawnedBlocks.Length; i++) {
-				var block = SpawnedBlocks[i];
-
-				if (block == null) {
-					Debug.LogError($"Missing {i}-th block from {nameof(SpawnedBlocks)} in this {nameof(PlaythroughData)} \"{GetAppropriateBackgroundScene()}\". {context}", context);
-					continue;
-				}
-
-				if (!repo.IsRegistered(block)) {
-					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(SpawnedBlocks)} in this {nameof(PlaythroughData)} \"{GetAppropriateBackgroundScene()}\". {context}", context);
-				}
 			}
 		}
 	}
