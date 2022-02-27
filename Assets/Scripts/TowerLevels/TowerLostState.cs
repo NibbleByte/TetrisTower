@@ -14,6 +14,7 @@ namespace TetrisTower.TowerLevels
 	public class TowerLostState : ILevelState, PlayerControls.ICommonHotkeysActions
 	{
 		private PlayerControls m_PlayerControls;
+		private GridLevelController m_LevelController;
 		private UI.TowerLevelUIController m_UIController;
 		private ConeVisualsGrid m_VisualsGrid;
 		private TowerConeVisualsController m_VisualsController;
@@ -27,6 +28,7 @@ namespace TetrisTower.TowerLevels
 		{
 			contextReferences.SetByType(out m_UIController);
 			contextReferences.SetByType(out m_PlayerControls);
+			contextReferences.SetByType(out m_LevelController);
 			contextReferences.SetByType(out m_VisualsGrid);
 			contextReferences.SetByType(out m_VisualsController);
 
@@ -43,6 +45,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelShared.Disable();
 
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
+			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
 			m_StartTime = Time.time;
 

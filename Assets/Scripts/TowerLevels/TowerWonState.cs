@@ -46,6 +46,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelShared.Disable();
 
 			m_UIController.SwitchState(TowerLevelUIState.Play);
+			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
 			m_StartTime = Time.time;
 

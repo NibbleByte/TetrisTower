@@ -45,6 +45,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.UI.Navigate.Disable();
 
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
+			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
 			MessageBox.Instance.MessageShown += m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed += m_LevelController.ResumeLevel;

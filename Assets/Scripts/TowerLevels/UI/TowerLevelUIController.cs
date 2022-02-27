@@ -26,6 +26,9 @@ namespace TetrisTower.TowerLevels.UI
 
 		public StatePanelBinds[] StatePanels;
 
+		[Tooltip("Elements needed only when game is playing (i.e. not won / lost animation).")]
+		public GameObject[] PlayingOnlyElements;
+
 		void Awake()
 		{
 			foreach (var bind in StatePanels) {
@@ -62,6 +65,12 @@ namespace TetrisTower.TowerLevels.UI
 		}
 
 
+		public void SetIsLevelPlaying(bool isPlaying)
+		{
+			foreach(var element in PlayingOnlyElements) {
+				element.SetActive(isPlaying);
+			}
+		}
 
 		public void PauseLevel()
 		{
