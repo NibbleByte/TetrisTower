@@ -109,6 +109,7 @@ namespace TetrisTower.Game
 		[Range(SupportedColumnsCount, SupportedColumnsCount)]
 		public int GridColumns = SupportedColumnsCount;
 
+		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
 		public int ObjectiveEndCount;
 
 		public SceneReference GetAppropriateBackgroundScene()

@@ -65,7 +65,11 @@ namespace TetrisTower.Logic
 		[SerializeReference]
 		public ScoreGrid Score;
 
+		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
 		public int ObjectiveEndCount;
+
+		// Endless games don't have end objective count. When player reaches the top, he wins, instead of loosing.
+		public bool IsEndlessGame => ObjectiveEndCount == 0;
 
 		public int ObjectiveRemainingCount => Mathf.Max(ObjectiveEndCount - Score.ObjectiveProgress, 0);
 

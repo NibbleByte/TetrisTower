@@ -53,7 +53,7 @@ namespace TetrisTower.TowerLevels.UI
 			}
 
 			if (RemainingText) {
-				RemainingText.text = RemainingPrefix + m_LevelData.ObjectiveRemainingCount;
+				RemainingText.text = RemainingPrefix + (m_LevelData.IsEndlessGame ? "Endless" : m_LevelData.ObjectiveRemainingCount.ToString());
 			}
 		}
 	}

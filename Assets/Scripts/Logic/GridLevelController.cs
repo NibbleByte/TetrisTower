@@ -69,6 +69,13 @@ namespace TetrisTower.Logic
 			Grids.Clear();
 			Grids.Add(LevelData.Grid);
 			Grids.Add(LevelData.Score);
+
+			// In case this instance is reused when loading the same scene.
+			StopAllCoroutines();	// Already done on LevelSupervisor unload method.
+			m_NextRunId = m_FinishedRuns = 0;
+			FallingColumnAnalogOffset = float.NaN;
+			FallingShapeAnalogRotateOffset = float.NaN;
+			FallingShapeAnalogRotateOffsetBeforeClear = float.NaN;
 		}
 
 		public IEnumerator RunActions(IList<GridAction> actions)
@@ -86,7 +93,10 @@ namespace TetrisTower.Logic
 					yield return grid.ApplyActions(actions);
 				}
 
-				actions = GameGridEvaluation.Evaluate(Grid, LevelData.Rules);
+				// This will make sure no matches happen while not playing (won or lost strate).
+				// For example: endless game wins on placing any blocks outside, but they could be matching.
+				GridRules rules = LevelData.IsPlaying ? LevelData.Rules : new GridRules();
+				actions = GameGridEvaluation.Evaluate(Grid, rules);
 			}
 
 			// Mark the matching sequence as complete. Used for scoring etc.
@@ -129,7 +139,7 @@ namespace TetrisTower.Logic
 					default: throw new NotSupportedException(LevelData.ModifyBlocksRangeType.ToString());
 				}
 
-				if (LevelData.ObjectiveRemainingCount == 0 && !AreGridActionsRunning) {
+				if (LevelData.ObjectiveRemainingCount == 0 && !LevelData.IsEndlessGame && !AreGridActionsRunning) {
 					Debug.Log($"Remaining blocks to clear are 0. Player won.");
 					FinishLevel(TowerLevelRunningState.Won);
 
@@ -395,7 +405,7 @@ namespace TetrisTower.Logic
 				m_FinishedRuns++;
 
 				PlacedOutsideGrid?.Invoke();
-				FinishLevel(TowerLevelRunningState.Lost);
+				FinishLevel(LevelData.IsEndlessGame ? TowerLevelRunningState.Won : TowerLevelRunningState.Lost);
 			}
 		}
 

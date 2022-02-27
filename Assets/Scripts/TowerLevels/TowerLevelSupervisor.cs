@@ -148,8 +148,14 @@ namespace TetrisTower.TowerLevels
 		{
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
-			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
-				listener.OnLevelUnloading();
+			foreach (var behaviour in behaviours) {
+				var listener = behaviour as ILevelLoadedListener;
+				if (listener != null) {
+					listener.OnLevelUnloading();
+				}
+
+				// Make sure no coroutines leak to the next level (in case target scene is the same, objects won't be reloaded).
+				behaviour.StopAllCoroutines();
 			}
 
 			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
