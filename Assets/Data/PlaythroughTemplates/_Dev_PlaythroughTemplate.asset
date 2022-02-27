@@ -16,6 +16,12 @@ MonoBehaviour:
     TowerLevel:
       id: 0
     Blocks: []
+    FallSpeedNormalized: 2
+    FallSpeedupPerAction: 0.01
+    MatchesToModifySpawnedBlocksRange: 160
+    ModifyBlocksRangeType: 0
+    RandomSeed: 0
+    RandomInitialSeed: 0
     CurrentLevelIndex: 0
     Levels: []
     ScoreOnLevelStart: 0
@@ -35,14 +41,15 @@ MonoBehaviour:
         FallingColumn: 0
         FallDistanceNormalized: 4
         FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.01
         ShapeTemplates:
         - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
         BlocksPool: []
         InitialSpawnBlockTypesCount: 3
         SpawnBlockTypesRange: {x: 0, y: 3}
-        ScoreToModifySpawnedBlocksRange: 10
+        MatchesToModifySpawnedBlocksRange: 50
         ModifyBlocksRangeType: 0
-        RandomInitialSeed: 0
+        RandomInitialLevelSeed: 0
         Rules:
           MatchHorizontalLines: 3
           MatchVerticalLines: 3
@@ -293,7 +300,7 @@ MonoBehaviour:
           Column: 13
         Score:
           id: 1
-        ObjectiveEndCount: 90
+        ObjectiveEndCount: 100
         RunningState: 0
     00000001:
       type: {class: , ns: , asm: }

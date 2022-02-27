@@ -18,10 +18,72 @@ MonoBehaviour:
     Blocks: []
     FallSpeedNormalized: 2
     FallSpeedupPerAction: 0.01
-    MatchesToModifySpawnedBlocksRange: 150
+    MatchesToModifySpawnedBlocksRange: 160
     ModifyBlocksRangeType: 0
+    RandomSeed: 0
+    RandomInitialSeed: 0
     CurrentLevelIndex: 0
     Levels:
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      InitialSpawnBlockTypesCount: 3
+      ObjectiveEndCount: 100
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 3
+      ObjectiveEndCount: 150
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 3
+      ObjectiveEndCount: 200
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
@@ -36,10 +98,9 @@ MonoBehaviour:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: -1
+        ObjectiveType: 1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      RandomSeed: 0
       GridRows: 13
       GridColumns: 13
       ShapeTemplates: []
@@ -52,7 +113,7 @@ MonoBehaviour:
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
       InitialSpawnBlockTypesCount: 3
-      ObjectiveEndCount: 90
+      ObjectiveEndCount: 300
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
@@ -60,7 +121,106 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      RandomSeed: 0
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 40
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: 2
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 400
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 50
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: 4
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 500
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 13
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      InitialSpawnBlockTypesCount: 5
+      ObjectiveEndCount: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
       GridRows: 13
       GridColumns: 13
       ShapeTemplates: []
