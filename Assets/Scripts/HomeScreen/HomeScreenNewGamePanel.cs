@@ -5,11 +5,11 @@ namespace TetrisTower.HomeScreen
 {
 	public class HomeScreenNewGamePanel : MonoBehaviour
 	{
-		public void StartNewGame()
+		public void StartNewGame(PlaythroughTemplate template)
 		{
 			var gameContext = GameManager.Instance.GameContext;
 
-			gameContext.SetCurrentPlaythrough(gameContext.GameConfig.NormalPlaythgrough);
+			gameContext.SetCurrentPlaythrough(template);
 
 			GameManager.Instance.SwitchLevelAsync(new TowerLevels.TowerLevelSupervisor());
 		}
