@@ -26,6 +26,7 @@ namespace TetrisTower.TowerLevels.UI
 		public TextMeshProUGUI TotalScoreText;
 		public TextMeshProUGUI CurrentScoreText;
 		public TextMeshProUGUI RemainingText;
+		public TextMeshProUGUI RulesText;
 
 		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
 		{
@@ -54,6 +55,24 @@ namespace TetrisTower.TowerLevels.UI
 
 			if (RemainingText) {
 				RemainingText.text = RemainingPrefix + (m_LevelData.IsEndlessGame ? "Endless" : m_LevelData.ObjectiveRemainingCount.ToString());
+			}
+
+			if (RulesText) {
+				RulesText.text = "";
+
+				if (!m_LevelData.Rules.IsObjectiveAllMatchTypes) {
+					if (m_LevelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Horizontal)) {
+						RulesText.text += "Horizontal ";
+					}
+					if (m_LevelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Vertical)) {
+						RulesText.text += "Vertical ";
+					}
+					if (m_LevelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Diagonals)) {
+						RulesText.text += "Diagonals ";
+					}
+
+					RulesText.text += "Only!";
+				}
 			}
 		}
 	}

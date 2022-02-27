@@ -131,6 +131,8 @@ namespace TetrisTower.TowerLevels
 
 			await StatesStack.SetStateAsync(new TowerPlayState());
 
+			ShowRulesMessage(playthroughData.TowerLevel);
+
 			if (gameContext.CurrentPlaythrough.TowerLevel.IsPlaying) {
 				// If save came with available matches, or pending actions, do them.
 				var pendingActions = GameGridEvaluation.Evaluate(gameContext.CurrentPlaythrough.TowerLevel.Grid, gameContext.CurrentPlaythrough.TowerLevel.Rules);
@@ -183,6 +185,27 @@ namespace TetrisTower.TowerLevels
 						light.cullingMask &= ~GameLayers.BlocksMask;
 					}
 				}
+			}
+		}
+
+		private void ShowRulesMessage(GridLevelData levelData)
+		{
+			var flashMessagesController = StatesStack.ContextReferences.TryFindByType<UI.FlashMessageUIController>();
+			if (flashMessagesController && !levelData.Rules.IsObjectiveAllMatchTypes) {
+				string message = "";
+				if (levelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Horizontal)) {
+					message += "Horizontal ";
+				}
+				if (levelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Vertical)) {
+					message += "Vertical ";
+				}
+				if (levelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Diagonals)) {
+					message += "Diagonals ";
+				}
+
+				message += "Only!";
+
+				flashMessagesController.ShowMessage(message, false);
 			}
 		}
 
