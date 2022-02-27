@@ -21,6 +21,8 @@ namespace TetrisTower.TowerLevels
 		private ILostAnimationExecutor m_CurrentAnimation;
 		private bool m_Interrupted;
 
+		private float m_StartTime;
+
 		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_UIController);
@@ -41,6 +43,8 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelShared.Disable();
 
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
+
+			m_StartTime = Time.time;
 
 			var lostAnimations = contextReferences.TryFindByType<ILostAnimationExecutor[]>();
 			if (lostAnimations == null || lostAnimations.Length == 0) {
@@ -77,6 +81,20 @@ namespace TetrisTower.TowerLevels
 			return Task.CompletedTask;
 		}
 
+		private void RequestFinishUpState()
+		{
+			if (Time.time - m_StartTime < 2f)
+				return;
+
+
+			if (!m_Interrupted) {
+				m_Interrupted = true;
+				m_CurrentAnimation.Interrupt();
+			}
+
+			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+		}
+
 		private IEnumerator LostAnimationCoroutine()
 		{
 			var visualBlocks = new List<KeyValuePair<GridCoords, ConeVisualsBlock>>();
@@ -102,32 +120,17 @@ namespace TetrisTower.TowerLevels
 
 		public void OnBack(InputAction.CallbackContext context)
 		{
-			if (!m_Interrupted) {
-				m_Interrupted = true;
-				m_CurrentAnimation.Interrupt();
-			}
-
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			RequestFinishUpState();
 		}
 
 		public void OnConfirm(InputAction.CallbackContext context)
 		{
-			if (!m_Interrupted) {
-				m_Interrupted = true;
-				m_CurrentAnimation.Interrupt();
-			}
-
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			RequestFinishUpState();
 		}
 
 		private void OnPointerPressed(InputAction.CallbackContext obj)
 		{
-			if (!m_Interrupted) {
-				m_Interrupted = true;
-				m_CurrentAnimation.Interrupt();
-			}
-
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			RequestFinishUpState();
 		}
 
 		public void OnNextSection(InputAction.CallbackContext context)

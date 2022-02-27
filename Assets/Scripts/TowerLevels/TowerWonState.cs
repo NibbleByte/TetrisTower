@@ -23,6 +23,8 @@ namespace TetrisTower.TowerLevels
 
 		private float m_BonusFillUpTime = float.NaN;
 
+		private float m_StartTime;
+
 		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_GameConfig);
@@ -45,6 +47,8 @@ namespace TetrisTower.TowerLevels
 
 			m_UIController.SwitchState(TowerLevelUIState.Play);
 
+			m_StartTime = Time.time;
+
 			if (m_LevelData.FallingShape != null) {
 				// HACK: This happens only via cheats. This will eventually the currently displayed falling shape.
 				m_LevelData.FallingShape = null;
@@ -65,22 +69,28 @@ namespace TetrisTower.TowerLevels
 			return Task.CompletedTask;
 		}
 
-		public void OnBack(InputAction.CallbackContext context)
+		private void RequestFinishUpState()
 		{
+			if (Time.time - m_StartTime < 2f)
+				return;
+
 			InterruptAnimation();
 			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+		}
+
+		public void OnBack(InputAction.CallbackContext context)
+		{
+			RequestFinishUpState();
 		}
 
 		public void OnConfirm(InputAction.CallbackContext context)
 		{
-			InterruptAnimation();
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			RequestFinishUpState();
 		}
 
 		private void OnPointerPressed(InputAction.CallbackContext obj)
 		{
-			InterruptAnimation();
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			RequestFinishUpState();
 		}
 
 		public void OnNextSection(InputAction.CallbackContext context)
