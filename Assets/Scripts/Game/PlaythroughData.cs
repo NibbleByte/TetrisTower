@@ -25,6 +25,13 @@ namespace TetrisTower.Game
 		[Tooltip("Selects what should happen when score to modify is reached.")]
 		public ModifyBlocksRangeType ModifyBlocksRangeType;
 
+		[Tooltip("Leave the seed to 0 for random seed every time.")]
+		public int RandomSeed = 0;
+		public System.Random Random = null;
+
+		[Tooltip("Read-only. Used for debug.")]
+		public int RandomInitialSeed;
+
 		public int CurrentLevelIndex = 0;
 		public LevelParamData[] Levels;
 
@@ -54,6 +61,16 @@ namespace TetrisTower.Game
 
 			TowerLevel = null;
 			CurrentLevelIndex++;
+		}
+
+		public void CreateRandomGenerator()
+		{
+			if (Random != null) {
+				throw new InvalidOperationException();
+			}
+
+			RandomInitialSeed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
+			Random = new System.Random(RandomInitialSeed);
 		}
 
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
@@ -97,9 +114,6 @@ namespace TetrisTower.Game
 
 		public GridRules Rules;
 
-		[Tooltip("Leave the seed to 0 for random seed every time.")]
-		public int RandomSeed = 0;
-
 		[Range(5, 20)]
 		public int GridRows = 13;
 
@@ -122,7 +136,10 @@ namespace TetrisTower.Game
 
 		public GridLevelData GenerateTowerLevelData(GameConfig config, PlaythroughData playthrough)
 		{
-			int seed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
+			if (playthrough.Random == null) {
+				playthrough.CreateRandomGenerator();
+			}
+			int seed = playthrough.Random.Next();
 
 			if (playthrough.Blocks.Length != 0 && config.Blocks.Length != playthrough.Blocks.Length) {
 				Debug.LogError($"Playthrough blocks count {playthrough.Blocks.Length} doesn't match the ones in the game config {config.Blocks.Length}");
@@ -131,7 +148,7 @@ namespace TetrisTower.Game
 			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0	? ShapeTemplates : config.ShapeTemplates;
 
 			// No, we don't need '+1'. 13 + 3 = 16 (0 - 15). Placing on the 13 takes (13, 14, 15).
-			int extraRows = ShapeTemplates.Max(st => st.Rows);
+			int extraRows = shapeTemplates.Max(st => st.Rows);
 
 			// The shapes are spawned at the top of the grid (totalRows).
 			// Have twice the shape size padding from the playable area,
@@ -141,7 +158,7 @@ namespace TetrisTower.Game
 			var levelData = new GridLevelData() {
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
 
-				ShapeTemplates = ShapeTemplates.ToArray(),
+				ShapeTemplates = shapeTemplates.ToArray(),
 				BlocksPool = blocks,
 
 				FallSpeedNormalized = playthrough.FallSpeedNormalized,
@@ -152,7 +169,7 @@ namespace TetrisTower.Game
 				MatchesToModifySpawnedBlocksRange = playthrough.MatchesToModifySpawnedBlocksRange,
 				ModifyBlocksRangeType = playthrough.ModifyBlocksRangeType,
 
-				RandomInitialSeed = seed,
+				RandomInitialLevelSeed = seed,
 				Random = new System.Random(seed),
 
 				Rules = Rules,

@@ -9,6 +9,11 @@ namespace TetrisTower.Core
 	{
 		public override void WriteJson(JsonWriter writer, Random value, JsonSerializer serializer)
 		{
+			if (value == null) {
+				writer.WriteNull();
+				return;
+			}
+
 			var binaryFormatter = new BinaryFormatter();
 			using (var temp = new MemoryStream()) {
 				binaryFormatter.Serialize(temp, value);
@@ -18,6 +23,12 @@ namespace TetrisTower.Core
 
 		public override Random ReadJson(JsonReader reader, Type objectType, Random existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
+			if (hasExistingValue)
+				return existingValue;
+
+			if (reader.Value == null)
+				return null;
+
 			byte[] bytes = Convert.FromBase64String((string)reader.Value);
 
 			var binaryFormatter = new BinaryFormatter();

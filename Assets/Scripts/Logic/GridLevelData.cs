@@ -51,8 +51,10 @@ namespace TetrisTower.Logic
 
 
 		[Tooltip("Read-only. Used for debug.")]
-		public int RandomInitialSeed;
-		public System.Random Random = new System.Random();
+		public int RandomInitialLevelSeed;
+
+		// NOTE: This is not the same object as in PlaythroughData. Serializing doesn't work (easily) with references.
+		public System.Random Random = null;
 
 		public GridRules Rules;
 

@@ -61,8 +61,12 @@ namespace TetrisTower.Game
 						playthroughData.TowerLevel.BackgroundScene.ScenePath = scenePath;
 
 						if (StartingRandomSeed != 0) {
-							playthroughData.TowerLevel.Random = new System.Random(StartingRandomSeed);
+							playthroughData.RandomSeed = StartingRandomSeed;
 						}
+
+						playthroughData.CreateRandomGenerator();
+						playthroughData.TowerLevel.RandomInitialLevelSeed = playthroughData.Random.Next();
+						playthroughData.TowerLevel.Random = new System.Random(playthroughData.TowerLevel.RandomInitialLevelSeed);
 
 						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, GameConfig.Converters);
 
@@ -71,7 +75,7 @@ namespace TetrisTower.Game
 						levelParam.BackgroundScene.ScenePath = scenePath;
 
 						if (StartingRandomSeed != 0) {
-							levelParam.RandomSeed = StartingRandomSeed;
+							playthroughData.RandomSeed = StartingRandomSeed;
 						}
 					}
 					GameContext.SetCurrentPlaythrough(playthroughData);
