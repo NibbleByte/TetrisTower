@@ -16,6 +16,9 @@ namespace TetrisTower.Game
 
 		public GridLevelController TowerLevelController;
 
+		[Tooltip("Shape template to use along the playthroughs. Can be overridden by the playthrough template.")]
+		public GridShapeTemplate[] ShapeTemplates;
+
 		[Tooltip("Blocks to be used along the playthroughs. The index decides the order of appearance. Can be overridden by the playthrough template.")]
 		public BlockType[] Blocks;
 

@@ -21,6 +21,7 @@ namespace TetrisTower.Logic
 		private int m_Score = 0;
 		public int Score => m_Score;
 
+		[JsonProperty] public int TotalMatched { get; private set; }
 		[JsonProperty] public int ObjectiveProgress { get; private set; }
 
 		public int CurrentClearedBlocksCount { get; private set; }
@@ -62,6 +63,8 @@ namespace TetrisTower.Logic
 			if (action.MatchedType == 0) {
 				Debug.LogError($"{nameof(ClearMatchedAction)} doesn't have a MatchedType set.");
 			}
+
+			TotalMatched += action.Coords.Count;
 
 			int maxMatch = 0;
 			switch(action.MatchedType) {

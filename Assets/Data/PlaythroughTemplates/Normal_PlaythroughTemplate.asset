@@ -16,6 +16,10 @@ MonoBehaviour:
     TowerLevel:
       id: 0
     Blocks: []
+    FallSpeedNormalized: 2
+    FallSpeedupPerAction: 0.01
+    MatchesToModifySpawnedBlocksRange: 150
+    ModifyBlocksRangeType: 0
     CurrentLevelIndex: 0
     Levels:
     - BackgroundScene:
@@ -26,12 +30,8 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
-      ShapeTemplates:
-      - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
       InitialSpawnBlockTypesCount: 3
-      ScoreToModifySpawnedBlocksRange: 0
-      ModifyBlocksRangeType: 0
-      RandomSeed: 0
+      ObjectiveEndCount: 30
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
@@ -39,9 +39,10 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
+      RandomSeed: 0
       GridRows: 13
       GridColumns: 13
-      ObjectiveEndCount: 30
+      ShapeTemplates: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
@@ -50,12 +51,8 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
-      ShapeTemplates:
-      - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
       InitialSpawnBlockTypesCount: 3
-      ScoreToModifySpawnedBlocksRange: 50
-      ModifyBlocksRangeType: 0
-      RandomSeed: 0
+      ObjectiveEndCount: 90
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
@@ -63,9 +60,10 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
+      RandomSeed: 0
       GridRows: 13
       GridColumns: 13
-      ObjectiveEndCount: 90
+      ShapeTemplates: []
     ScoreOnLevelStart: 0
   references:
     version: 1

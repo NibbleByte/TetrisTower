@@ -43,10 +43,10 @@ namespace TetrisTower.Logic
 		// Spawn blocks from the array in range [0, TypesCount).
 		public Vector2Int SpawnBlockTypesRange = new Vector2Int(0, 3);
 
-		// Every x matches done by the player, increase the range of the spawned types.
-		public int ScoreToModifySpawnedBlocksRange = 150;
+		[Tooltip("Every x matches done by the player, increase the range of the spawned types. 0 means ranges won't be modified.")]
+		public int MatchesToModifySpawnedBlocksRange = 150;
 
-		// Selects what should happen when score to modify is reached.
+		[Tooltip("Selects what should happen when score to modify is reached.")]
 		public ModifyBlocksRangeType ModifyBlocksRangeType;
 
 

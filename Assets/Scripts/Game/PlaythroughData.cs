@@ -19,6 +19,12 @@ namespace TetrisTower.Game
 		public float FallSpeedNormalized = 2f;
 		public float FallSpeedupPerAction = 0.01f;
 
+		[Tooltip("Every x matches done by the player, increase the range of the spawned types. 0 means ranges won't be modified.")]
+		public int MatchesToModifySpawnedBlocksRange = 150;
+
+		[Tooltip("Selects what should happen when score to modify is reached.")]
+		public ModifyBlocksRangeType ModifyBlocksRangeType;
+
 		public int CurrentLevelIndex = 0;
 		public LevelParamData[] Levels;
 
@@ -83,22 +89,16 @@ namespace TetrisTower.Game
 
 		public SceneReference BackgroundSceneMobile;
 
-		public GridShapeTemplate[] ShapeTemplates;
-
 		// Spawn blocks from the array in range [0, TypesCount).
 		public int InitialSpawnBlockTypesCount = 3;
 
-		// Every x matches done by the player, increase the range of the spawned types.
-		public int ScoreToModifySpawnedBlocksRange = 50;
+		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
+		public int ObjectiveEndCount;
 
-		// Selects what should happen when score to modify is reached.
-		public ModifyBlocksRangeType ModifyBlocksRangeType;
-
+		public GridRules Rules;
 
 		[Tooltip("Leave the seed to 0 for random seed every time.")]
 		public int RandomSeed = 0;
-
-		public GridRules Rules;
 
 		[Range(5, 20)]
 		public int GridRows = 13;
@@ -109,8 +109,7 @@ namespace TetrisTower.Game
 		[Range(SupportedColumnsCount, SupportedColumnsCount)]
 		public int GridColumns = SupportedColumnsCount;
 
-		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
-		public int ObjectiveEndCount;
+		public GridShapeTemplate[] ShapeTemplates;
 
 		public SceneReference GetAppropriateBackgroundScene()
 		{
@@ -129,6 +128,7 @@ namespace TetrisTower.Game
 				Debug.LogError($"Playthrough blocks count {playthrough.Blocks.Length} doesn't match the ones in the game config {config.Blocks.Length}");
 			}
 			BlockType[] blocks = playthrough.Blocks.Length != 0	? playthrough.Blocks : config.Blocks;
+			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0	? ShapeTemplates : config.ShapeTemplates;
 
 			// No, we don't need '+1'. 13 + 3 = 16 (0 - 15). Placing on the 13 takes (13, 14, 15).
 			int extraRows = ShapeTemplates.Max(st => st.Rows);
@@ -149,8 +149,8 @@ namespace TetrisTower.Game
 
 				InitialSpawnBlockTypesCount = InitialSpawnBlockTypesCount,
 				SpawnBlockTypesRange = new Vector2Int(0, InitialSpawnBlockTypesCount),
-				ScoreToModifySpawnedBlocksRange = ScoreToModifySpawnedBlocksRange,
-				ModifyBlocksRangeType = ModifyBlocksRangeType,
+				MatchesToModifySpawnedBlocksRange = playthrough.MatchesToModifySpawnedBlocksRange,
+				ModifyBlocksRangeType = playthrough.ModifyBlocksRangeType,
 
 				RandomInitialSeed = seed,
 				Random = new System.Random(seed),
