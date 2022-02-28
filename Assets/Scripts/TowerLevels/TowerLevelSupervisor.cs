@@ -79,10 +79,19 @@ namespace TetrisTower.TowerLevels
 					overrideBlocksLight.transform.parent = null;
 				}
 
+				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
+
+				var overrideCamera = placeholder.GetComponentInChildren<Camera>();
+				if (overrideCamera) {
+					var camera = levelController.GetComponentInChildren<Camera>();
+					overrideCamera.transform.parent = camera.transform.parent;
+					overrideCamera.transform.localPosition = camera.transform.localPosition;
+					overrideCamera.transform.localRotation = camera.transform.localRotation;
+					GameObject.DestroyImmediate(camera.gameObject);
+				}
+
 				// Clean any leftovers in the placeholder (for example, temporary camera).
 				placeholder.transform.DestroyChildren(true);
-
-				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 			}
 
 			SetupLights(levelController, overrideBlocksLight);
