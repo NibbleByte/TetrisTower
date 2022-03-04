@@ -32,6 +32,7 @@ namespace TetrisTower.Visuals.LostAnimations
 			StartCoroutine(OperateCamera(fallingVisualsContainer));
 
 			var camera = fallingVisualsContainer.GetComponentInChildren<Camera>().transform;
+			Vector3 cameraInitialPos = camera.localPosition;
 
 			float startTime = Time.time;
 
@@ -39,11 +40,11 @@ namespace TetrisTower.Visuals.LostAnimations
 				if (m_Interrupted)
 					yield break;
 
-				camera.localPosition = new Vector3(Random.Range(CameraShakeRange.x, CameraShakeRange.y), Random.Range(CameraShakeRange.x, CameraShakeRange.y), 0f);
+				camera.localPosition = cameraInitialPos + new Vector3(Random.Range(CameraShakeRange.x, CameraShakeRange.y), Random.Range(CameraShakeRange.x, CameraShakeRange.y), 0f);
 				yield return null;
 			}
 
-			camera.localPosition = Vector3.zero;
+			camera.localPosition = cameraInitialPos;
 
 			var templateRigidbody = GetComponent<Rigidbody>();
 

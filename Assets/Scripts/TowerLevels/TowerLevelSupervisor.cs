@@ -64,8 +64,6 @@ namespace TetrisTower.TowerLevels
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
-			Light overrideBlocksLight = null;
-
 			var levelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (levelController == null) {
 				var placeholder = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
@@ -73,28 +71,41 @@ namespace TetrisTower.TowerLevels
 					throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load level {playthroughData.CurrentLevelIndex} of {playthroughData.Levels.Length}.");
 				}
 
-				// Will use it as overrides in a bit. Keep it alive.
-				overrideBlocksLight = placeholder.transform.GetComponentInChildren<Light>();
+				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
+
+				var overrideBlocksLight = placeholder.transform.GetComponentInChildren<Light>();
 				if (overrideBlocksLight) {
-					overrideBlocksLight.transform.parent = null;
+					var blocksLight = levelController.GetComponentInChildren<Light>();
+					overrideBlocksLight.transform.SetParent(blocksLight.transform.parent, false);
+					GameObject.DestroyImmediate(blocksLight);
 				}
 
-				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 
 				var overrideCamera = placeholder.GetComponentInChildren<Camera>();
 				if (overrideCamera) {
 					var camera = levelController.GetComponentInChildren<Camera>();
-					overrideCamera.transform.parent = camera.transform.parent;
-					overrideCamera.transform.localPosition = camera.transform.localPosition;
-					overrideCamera.transform.localRotation = camera.transform.localRotation;
+					overrideCamera.transform.SetParent(camera.transform.parent, false);
 					GameObject.DestroyImmediate(camera.gameObject);
+				}
+
+				Transform[] overrideDecors = placeholder.transform.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
+				if (overrideDecors.Length != 0) {
+					Transform[] decors = levelController.transform.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
+
+					foreach(Transform overrideDecor in overrideDecors) {
+						overrideDecor.SetParent(levelController.transform, true);
+					}
+
+					foreach(Transform decor in decors) {
+						GameObject.DestroyImmediate(decor.gameObject);
+					}
 				}
 
 				// Clean any leftovers in the placeholder (for example, temporary camera).
 				placeholder.transform.DestroyChildren(true);
 			}
 
-			SetupLights(levelController, overrideBlocksLight);
+			SetupLights(levelController);
 
 			levelController.Init(playthroughData.TowerLevel);
 
@@ -174,18 +185,11 @@ namespace TetrisTower.TowerLevels
 			return Task.CompletedTask;
 		}
 
-		private static void SetupLights(GridLevelController levelController, Light overrideBlocksLight)
+		private static void SetupLights(GridLevelController levelController)
 		{
 			var blocksLight = levelController.GetComponentInChildren<Light>();
 
 			if (blocksLight) {
-				if (overrideBlocksLight) {
-					overrideBlocksLight.transform.parent = blocksLight.transform.parent;
-					GameObject.DestroyImmediate(blocksLight.gameObject);
-
-					blocksLight = overrideBlocksLight;
-				}
-
 				blocksLight.cullingMask = GameLayers.BlocksMask;
 
 				var levelLights = GameObject.FindObjectsOfType<Light>();
