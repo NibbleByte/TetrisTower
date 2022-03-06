@@ -44,6 +44,12 @@ namespace TetrisTower.Game
 
 			var supervisorManager = gameObject.AddComponent<GameManager>();
 			supervisorManager.SetGameContext(GameContext);
+
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+			Application.targetFrameRate = 30;
+#else
+			Application.targetFrameRate = 60;
+#endif
 		}
 
 		void Start()
