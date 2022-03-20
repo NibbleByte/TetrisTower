@@ -398,6 +398,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ziggurat
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 06186b3321d49c945896d724e3af5429, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06186b3321d49c945896d724e3af5429, type: 3}
 --- !u!4 &40692410 stripped
@@ -2439,6 +2443,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 197672632}
+  - {fileID: 1708628395}
   m_Father: {fileID: 1094782421}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4873,6 +4878,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3fba72d4e0321b0478d55eae0de19d80, type: 3}
   m_PrefabInstance: {fileID: 1696874834}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1708628394
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1006631881}
+    m_Modifications:
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.0014687
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 73.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9129299
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.40811643
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -48.173
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2995713115629005817, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+      propertyPath: m_Name
+      value: Ziggurat-Veso
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+--- !u!4 &1708628395 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2511101594124939587, guid: dddfd5fa109713841ba2bd7dab0cde31, type: 3}
+  m_PrefabInstance: {fileID: 1708628394}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1724174889
 PrefabInstance:
