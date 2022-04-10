@@ -50,6 +50,7 @@ namespace DevLocker.VersionControl.WiseSVN
 		[MenuItem(InvalidateDatabaseMenuText, false, 195)]
 		private static void InvalidateDatabaseMenu()
 		{
+			SVNStatusesDatabase.Instance.m_GlobalIgnoresCollected = false;
 			SVNStatusesDatabase.Instance.InvalidateDatabase();
 			LockPrompting.SVNLockPromptDatabase.Instance.ClearKnowledge();
 		}
@@ -175,7 +176,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			//
 			// File Status
 			//
-			var fileStatus = statusData.Status;
+			VCFileStatus fileStatus = statusData.Status;
 			switch(statusData.PropertiesStatus) {
 				case VCPropertiesStatus.Conflicted:
 					fileStatus = VCFileStatus.Conflicted;
@@ -208,7 +209,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			}
 
 			// Excluded items are added explicitly - their status exists (is known).
-			if (!m_ShowExcludeStatusIcons && fileStatus == VCFileStatus.Excluded) {
+			if (!m_ShowExcludeStatusIcons && (fileStatus == VCFileStatus.Excluded || fileStatus == VCFileStatus.Ignored)) {
 				fileStatusIcon = null;
 			}
 

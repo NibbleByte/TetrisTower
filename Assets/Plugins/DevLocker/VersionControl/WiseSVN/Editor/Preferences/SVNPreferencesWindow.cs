@@ -115,6 +115,7 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 					// When turning on the integration do instant refresh.
 					// Works when editor started with disabled integration. Doing it here to avoid circle dependency.
 					if (m_PersonalPrefs.EnableCoreIntegration) {
+						SVNStatusesDatabase.Instance.m_GlobalIgnoresCollected = false;
 						SVNStatusesDatabase.Instance.InvalidateDatabase();
 						SVNBranchesDatabase.Instance.InvalidateDatabase();
 						SVNLockPromptDatabaseStarter.TryStartIfNeeded();
@@ -225,8 +226,9 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 			}
 			EditorGUI.BeginDisabledGroup(!m_PersonalPrefs.PopulateStatusesDatabase);
 
+			m_PersonalPrefs.PopulateIgnoresDatabase = EditorGUILayout.Toggle(new GUIContent("Scan for svn-ignores", "Enables svn-ignore overlay icons in the project windows. If disabled, svn-ignored items will be considered as Normal status (green icon)."), m_PersonalPrefs.PopulateIgnoresDatabase);
 			m_PersonalPrefs.ShowNormalStatusOverlayIcon = EditorGUILayout.Toggle(new GUIContent("Show Normal status green icon", "Normal status is versioned asset that doesn't have any changes."), m_PersonalPrefs.ShowNormalStatusOverlayIcon);
-			m_PersonalPrefs.ShowExcludedStatusOverlayIcon = EditorGUILayout.Toggle(new GUIContent("Show Excluded gray icon", "Show gray icon over the items added in the Exclude list in the Project tab of these preferences. These are non-recursive."), m_PersonalPrefs.ShowExcludedStatusOverlayIcon);
+			m_PersonalPrefs.ShowExcludedStatusOverlayIcon = EditorGUILayout.Toggle(new GUIContent("Show Ignore & Excluded gray icon", "Show gray icon over the items that are svn-ignored or added in the Exclude list in the Project tab of these preferences. These are non-recursive."), m_PersonalPrefs.ShowExcludedStatusOverlayIcon);
 			m_PersonalPrefs.AutoRefreshDatabaseInterval = EditorGUILayout.IntField(new GUIContent("Overlay icons refresh interval", "How much seconds to wait for the next overlay icons refresh.\nNOTE: -1 will deactivate it - only file changes will trigger refresh."), m_PersonalPrefs.AutoRefreshDatabaseInterval);
 
 			m_PersonalPrefs.DownloadRepositoryChanges =
