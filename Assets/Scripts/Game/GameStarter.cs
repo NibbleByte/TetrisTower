@@ -46,7 +46,8 @@ namespace TetrisTower.Game
 			supervisorManager.SetGameContext(GameContext);
 
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-			Application.targetFrameRate = 30;
+			Application.targetFrameRate = Screen.currentResolution.refreshRate;		// Max possible FPS.
+			//Application.targetFrameRate = -1;										// Defaults to 30 FPS to save battery.
 #else
 			Application.targetFrameRate = 60;
 #endif
@@ -72,7 +73,7 @@ namespace TetrisTower.Game
 
 						playthroughData.CreateRandomGenerator();
 						playthroughData.TowerLevel.RandomInitialLevelSeed = playthroughData.Random.Next();
-						playthroughData.TowerLevel.Random = new System.Random(playthroughData.TowerLevel.RandomInitialLevelSeed);
+						playthroughData.TowerLevel.Random = new Xoshiro.PRNG32.XoShiRo128starstar(playthroughData.TowerLevel.RandomInitialLevelSeed);
 
 						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, GameConfig.Converters);
 

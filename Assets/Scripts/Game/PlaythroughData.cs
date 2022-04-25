@@ -70,7 +70,7 @@ namespace TetrisTower.Game
 			}
 
 			RandomInitialSeed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
-			Random = new System.Random(RandomInitialSeed);
+			Random = new Xoshiro.PRNG32.XoShiRo128starstar(RandomInitialSeed);
 		}
 
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
@@ -170,7 +170,7 @@ namespace TetrisTower.Game
 				ModifyBlocksRangeType = playthrough.ModifyBlocksRangeType,
 
 				RandomInitialLevelSeed = seed,
-				Random = new System.Random(seed),
+				Random = new Xoshiro.PRNG32.XoShiRo128starstar(seed),
 
 				Rules = Rules,
 				Grid = new BlocksGrid(totalRows, GridColumns),
