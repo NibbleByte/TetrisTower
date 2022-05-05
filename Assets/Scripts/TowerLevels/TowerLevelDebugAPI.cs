@@ -112,6 +112,17 @@ namespace TetrisTower.TowerLevels
 			GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
 		}
 
+		public void ToggleBirds()
+		{
+			foreach(var birdController in GameObject.FindObjectsOfType<FlockController>(true)) {
+				birdController.gameObject.SetActive(!birdController.gameObject.activeSelf);
+			}
+
+			foreach(var landingSpotController in GameObject.FindObjectsOfType<LandingSpotController>(true)) {
+				landingSpotController.gameObject.SetActive(!landingSpotController.gameObject.activeSelf);
+			}
+		}
+
 		public void ToggleDebug()
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Debug Toggle");
