@@ -224,6 +224,17 @@ namespace DevLocker.VersionControl.WiseSVN
 				m_HasErrors = false;
 			}
 
+			public void ClearLogsAndErrorFlag()
+			{
+				string line;
+				while (m_CombinedOutput.TryDequeue(out line)) {
+				}
+
+				//m_CombinedOutput.Clear();	// Not supported in 2018.
+
+				ResetErrorFlag();
+			}
+
 			public void Dispose()
 			{
 				if (!m_CombinedOutput.IsEmpty) {
@@ -616,6 +627,12 @@ namespace DevLocker.VersionControl.WiseSVN
 				// svn: E731001: No such host is known.
 				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
 					return LockOperationResult.UnableToConnectError;
+
+				// Locking is not supported by the repository (for example, it is a github emulated svn).
+				// svn: warning: W160042: Path 'package.json' doesn't exist in HEAD revision (405 Method Not Allowed)
+				// svn: E200009: One or more locks could not be obtained
+				if (result.Error.Contains("405 Method Not Allowed"))
+					return LockOperationResult.NotSupported;
 
 				// Unable to connect to repository indicating some network or server problems.
 				//svn: warning: W160042: Lock failed: newer version of '...' exists
@@ -1681,8 +1698,17 @@ namespace DevLocker.VersionControl.WiseSVN
 			using (var reporter = CreateReporter()) {
 
 				var result = ShellUtils.ExecuteCommand(SVN_Command, $"delete --force \"{SVNFormatPath(path)}\"", COMMAND_TIMEOUT, reporter);
-				if (result.HasErrors)
+				if (result.HasErrors) {
+
+					// svn: E125001: '...' does not exist
+					// Unversioned file got deleted or is missing. Let someone else show the error if any.
+					if (result.Error.Contains("E125001")) {
+						reporter.ClearLogsAndErrorFlag();
+						return AssetDeleteResult.DidNotDelete;
+					}
+
 					return AssetDeleteResult.FailedDelete;
+				}
 
 				result = ShellUtils.ExecuteCommand(SVN_Command, $"delete --force \"{SVNFormatPath(path + ".meta")}\"", COMMAND_TIMEOUT, reporter);
 				if (result.HasErrors)

@@ -40,7 +40,7 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 		};
 
 		public const string PROJECT_PREFERENCES_MENU = "Assets/SVN/SVN Preferences";
-		[MenuItem(PROJECT_PREFERENCES_MENU, false, 200)]
+		[MenuItem(PROJECT_PREFERENCES_MENU, false, SVNContextMenusManager.MenuItemPriorityStart + 130)]
 		public static void ShowProjectPreferences()
 		{
 			ShowProjectPreferences(PreferencesTab.Personal);
@@ -238,6 +238,11 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 
 			bool downloadChangesEnabled = m_PersonalPrefs.DownloadRepositoryChanges == SVNPreferencesManager.BoolPreference.Enabled ||
 										  m_PersonalPrefs.DownloadRepositoryChanges == SVNPreferencesManager.BoolPreference.SameAsProjectPreference && m_ProjectPrefs.DownloadRepositoryChanges;
+
+
+			EditorGUI.BeginDisabledGroup(!m_ProjectPrefs.EnableLockPrompt);
+			m_PersonalPrefs.AutoLockOnModified = EditorGUILayout.Toggle(new GUIContent("Auto lock when modified", SVNPreferencesManager.PersonalPreferences.AutoLockOnModifiedHint + "\n\nWorks only when lock prompts are enabled in the Project preferences tab."), m_PersonalPrefs.AutoLockOnModified);
+			EditorGUI.EndDisabledGroup();
 
 			EditorGUI.BeginDisabledGroup(!downloadChangesEnabled);
 			m_PersonalPrefs.WarnForPotentialConflicts = EditorGUILayout.Toggle(new GUIContent("SceneView overlay for conflicts", "Display warning in the SceneView when the current scene or edited prefab is out of date or locked."), m_PersonalPrefs.WarnForPotentialConflicts);
