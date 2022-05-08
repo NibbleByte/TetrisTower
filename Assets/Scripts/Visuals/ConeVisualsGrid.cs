@@ -46,6 +46,7 @@ namespace TetrisTower.Visuals
 		public float BlockHeight = 2.5f;
 		public float BlockDepth = 2.84f;
 		public float ConeOuterRadius = 15f;
+		public float ConeInnerRadius = 12f;
 
 		// This is used to locate the apex of the cone.
 		// The position of this object will be considered the center of the base.
@@ -55,6 +56,8 @@ namespace TetrisTower.Visuals
 
 		public float MatchBlockDelay = 0.075f;
 		public float MatchActionDelay = 1.2f;
+
+		public ParticleSystem FallEffect;
 
 		private IMatchSequenceScoreDisplayer m_MatchSequenceScoreDisplayer;
 
@@ -125,7 +128,20 @@ namespace TetrisTower.Visuals
 		public Quaternion GridColumnToRotation(int column) => Quaternion.Euler(0f, -ConeSectorEulerAngle * column /* Negative because rotation works the other way*/, 0f);
 
 
-		public Vector3 GridToWorldVertex(GridCoords coords)
+		// Back bottom left vertex of the block.
+		public Vector3 GridToWorldBackVertex(GridCoords coords)
+		{
+			var baseVertex = transform.position
+				+ Quaternion.Euler(0f, -ConeSectorEulerAngle * coords.Column + ConeSectorEulerAngle / 2f, 0f)
+				* transform.forward * ConeInnerRadius
+				;
+
+			var coneEdgeFullDist = baseVertex - ConeApex;
+			return ConeApex + coneEdgeFullDist * GridToScale(coords).x;
+		}
+
+		// Front bottom left vertex of the block.
+		public Vector3 GridToWorldFrontVertex(GridCoords coords)
 		{
 			var baseVertex = transform.position
 				+ Quaternion.Euler(0f, -ConeSectorEulerAngle * coords.Column + ConeSectorEulerAngle / 2f, 0f)
@@ -136,11 +152,28 @@ namespace TetrisTower.Visuals
 			return ConeApex + coneEdgeFullDist * GridToScale(coords).x;
 		}
 
-		public Vector3 GridToWorldSideMidpoint(GridCoords coords)
+		public Vector3 GridToWorldBaseBackSideMidpoint(GridCoords coords)
 		{
-			var vertexStart = GridToWorldVertex(coords);
+			var vertexStart = GridToWorldBackVertex(coords);
 			coords.Column++;
-			var vertexEnd = GridToWorldVertex(coords);
+			var vertexEnd = GridToWorldBackVertex(coords);
+
+			return vertexStart + (vertexEnd - vertexStart) / 2f;
+		}
+
+		public Vector3 GridToWorldFrontSideMidpoint(GridCoords coords)
+		{
+			var vertexStart = GridToWorldFrontVertex(coords);
+			coords.Column++;
+			var vertexEnd = GridToWorldFrontVertex(coords);
+
+			return vertexStart + (vertexEnd - vertexStart) / 2f;
+		}
+
+		public Vector3 GridToWorldBottomCenter(GridCoords coords)
+		{
+			var vertexStart = GridToWorldBaseBackSideMidpoint(coords);
+			var vertexEnd = GridToWorldFrontSideMidpoint(coords);
 
 			return vertexStart + (vertexEnd - vertexStart) / 2f;
 		}
@@ -216,6 +249,12 @@ namespace TetrisTower.Visuals
 
 		private IEnumerator PlaceShape(PlaceAction action)
 		{
+			Dictionary<int, int> lowestRows = GetLowestRows(action.PlacedShape.ShapeCoords.Select((bind) => {
+				GridCoords coords = action.PlaceCoords + bind.Coords;
+				coords.WrapColumn(this);
+				return coords;
+			}));
+
 			foreach (var pair in action.PlacedShape.ShapeCoords) {
 
 				var reusedVisuals = m_PlacedShapeToBeReused?.ShapeCoords
@@ -231,6 +270,10 @@ namespace TetrisTower.Visuals
 				}
 
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
+
+				if (lowestRows[coords.Column] == coords.Row) {
+					EmitFallEffectAt(GridToWorldBottomCenter(coords));
+				}
 			}
 
 			m_PlacedShapeToBeReused = null;
@@ -295,6 +338,7 @@ namespace TetrisTower.Visuals
 				}
 			}
 
+			Dictionary<int, int> lowestRows = GetLowestRows(action.MovedCells.Select(pair => pair.Value));
 
 			foreach (var movedPair in action.MovedCells) {
 				Debug.Assert(this[movedPair.Key] != null);
@@ -305,6 +349,10 @@ namespace TetrisTower.Visuals
 				this[movedPair.Key] = null;
 
 				visualsBlock.transform.localScale = GridToScale(movedPair.Value);
+
+				if (lowestRows[movedPair.Value.Column] == movedPair.Value.Row) {
+					EmitFallEffectAt(GridToWorldBottomCenter(movedPair.Value));
+				}
 
 				if (visualsBlock.IsHighlighted && movedPair.Value.Row < m_PlayableArea.Row) {
 					visualsBlock.ClearHighlight();
@@ -353,6 +401,43 @@ namespace TetrisTower.Visuals
 		public void SetPlacedShapeToBeReused(GridShape<GameObject> shape)
 		{
 			m_PlacedShapeToBeReused = shape;
+		}
+
+
+		private void EmitFallEffectAt(Vector3 worldPosition)
+		{
+			FallEffect.transform.position = worldPosition;
+			Vector3 direction = worldPosition - transform.position;
+			direction.y = 0;
+			FallEffect.transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+
+			var burst = FallEffect.emission.GetBurst(0);
+
+			int count = (int)burst.count.constant;
+			if (burst.count.mode == ParticleSystemCurveMode.TwoConstants) {
+				count = (int)Random.Range(burst.count.constantMin, burst.count.constantMax);
+			}
+
+			FallEffect.Emit(count);
+		}
+
+		// Gather the lowest found rows so we can spawn particles underneath.
+		// Dictionary<column, lowest row>
+		private Dictionary<int, int> GetLowestRows(IEnumerable<GridCoords> coords)
+		{
+			Dictionary<int, int> lowestRows = new Dictionary<int, int>();
+			foreach (GridCoords coord in coords) {
+				int row;
+				if (!lowestRows.TryGetValue(coord.Column, out row)) {
+					row = int.MaxValue;
+				}
+
+				if (coord.Row < row) {
+					lowestRows[coord.Column] = coord.Row;
+				}
+			}
+
+			return lowestRows;
 		}
 
 
@@ -425,7 +510,7 @@ namespace TetrisTower.Visuals
 					if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
 						continue;
 
-					var position = GridToWorldSideMidpoint(coords);
+					var position = GridToWorldFrontSideMidpoint(coords);
 					position.y -= 1f;
 
 					UnityEditor.Handles.Label(position, coords.Column.ToString(), m_GizmoCoordsStyle);
@@ -439,9 +524,9 @@ namespace TetrisTower.Visuals
 						if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
 							continue;
 
-						var vertexStart = GridToWorldVertex(coords);
-						var vertexEndNextColumn = GridToWorldVertex(new GridCoords(coords.Row, coords.Column + 1));
-						var vertexEndNextRow = GridToWorldVertex(new GridCoords(coords.Row + 1, coords.Column));
+						var vertexStart = GridToWorldFrontVertex(coords);
+						var vertexEndNextColumn = GridToWorldFrontVertex(new GridCoords(coords.Row, coords.Column + 1));
+						var vertexEndNextRow = GridToWorldFrontVertex(new GridCoords(coords.Row + 1, coords.Column));
 
 						UnityEditor.Handles.color = new Color(0, 0, 0, 0.4f);
 						UnityEditor.Handles.DrawLine(vertexStart, vertexEndNextColumn);
