@@ -77,7 +77,7 @@ namespace TetrisTower.TowerLevels
 				if (overrideBlocksLight) {
 					var blocksLight = levelController.GetComponentInChildren<Light>();
 					overrideBlocksLight.transform.SetParent(blocksLight.transform.parent, false);
-					GameObject.DestroyImmediate(blocksLight);
+					GameObject.DestroyImmediate(blocksLight.gameObject);
 				}
 
 
