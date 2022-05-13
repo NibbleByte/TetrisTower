@@ -1,10 +1,11 @@
+using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels;
 using UnityEngine;
 using UnityEngine.InputSystem.UI;
 
-namespace TetrisTower.Game
+namespace TetrisTower.GameStarter
 {
 	public class GameStarter : MonoBehaviour
 	{

@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Utils;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
@@ -192,7 +193,7 @@ namespace TetrisTower.Game
 
 #if UNITY_EDITOR
 	[UnityEditor.CustomPropertyDrawer(typeof(PlaythroughData))]
-	public class PlaythroughDataDrawer : Tools.SerializeReferenceCreatorDrawer<PlaythroughData>
+	public class PlaythroughDataDrawer : SerializeReferenceCreatorDrawer<PlaythroughData>
 	{
 	}
 #endif

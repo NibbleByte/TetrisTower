@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Utils;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
@@ -105,7 +106,7 @@ namespace TetrisTower.Logic
 
 #if UNITY_EDITOR
 	[UnityEditor.CustomPropertyDrawer(typeof(GridLevelData))]
-	public class TowerLevelDataDrawer : Tools.SerializeReferenceCreatorDrawer<GridLevelData>
+	public class TowerLevelDataDrawer : SerializeReferenceCreatorDrawer<GridLevelData>
 	{
 	}
 #endif

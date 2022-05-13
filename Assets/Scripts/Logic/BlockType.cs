@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Utils;
 using System;
 using TetrisTower.Core;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace TetrisTower.Logic
 
 #if UNITY_EDITOR
 	[UnityEditor.CustomPropertyDrawer(typeof(BlocksShape))]
-	public class BlocksShapeDrawer : Tools.SerializeReferenceCreatorDrawer<BlocksShape>
+	public class BlocksShapeDrawer : SerializeReferenceCreatorDrawer<BlocksShape>
 	{
 	}
 #endif

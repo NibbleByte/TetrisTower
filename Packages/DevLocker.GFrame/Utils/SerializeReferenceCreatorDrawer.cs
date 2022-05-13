@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace TetrisTower.Tools
+namespace DevLocker.GFrame.Utils
 {
 #if UNITY_EDITOR
 	public class SerializeReferenceCreatorDrawer<T> : PropertyDrawer where T: new()

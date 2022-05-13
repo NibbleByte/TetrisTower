@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
+using System.Collections.Generic;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.Tools;
@@ -199,6 +200,38 @@ namespace TetrisTower.TowerLevels
 					m_Context.PlayerControls.devices = default;
 				}
 			}
+
+			DebugClearRow();
+		}
+
+		private void DebugClearRow()
+		{
+#if UNITY_EDITOR
+			if (Keyboard.current == null)
+				return;
+
+			// Temporary disable.
+			for (Key key = Key.Digit1; key <= Key.Digit0; ++key) {
+
+				int keyRow = (key - Key.Digit1 + 1) % 10;
+
+				if (Keyboard.current[key].wasPressedThisFrame && keyRow < m_TowerLevel.Grid.Rows) {
+
+					List<GridCoords> clearCoords = new List<GridCoords>();
+					for (int column = 0; column < m_TowerLevel.Grid.Columns; ++column) {
+						var coords = new GridCoords(keyRow, column);
+						if (m_TowerLevel.Grid[coords]) {
+							clearCoords.Add(coords);
+						}
+					}
+
+					if (clearCoords.Count > 0) {
+						var actions = new List<GridAction>() { new ClearMatchedAction() { MatchedType = MatchScoringType.Horizontal, Coords = clearCoords } };
+						StartCoroutine(m_TowerLevel.RunActions(actions));
+					}
+				}
+			}
+#endif
 		}
 	}
 }

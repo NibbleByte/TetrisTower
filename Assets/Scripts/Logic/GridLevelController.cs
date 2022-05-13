@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Core;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace TetrisTower.Logic
 {
@@ -474,8 +473,6 @@ namespace TetrisTower.Logic
 			} else if (!AreGridActionsRunning && LevelData.IsPlaying && CanSelectNextShape()) {
 				SelectFallingShape();
 			}
-
-			DebugClearRow();
 		}
 
 		void LateUpdate()
@@ -537,34 +534,6 @@ namespace TetrisTower.Logic
 			}
 		}
 
-		private void DebugClearRow()
-		{
-#if UNITY_EDITOR
-			if (Keyboard.current == null)
-				return;
 
-			// Temporary disable.
-			for (Key key = Key.Digit1; key <= Key.Digit0; ++key) {
-
-				int keyRow = (key - Key.Digit1 + 1) % 10;
-
-				if (Keyboard.current[key].wasPressedThisFrame && keyRow < Grid.Rows) {
-
-					List<GridCoords> clearCoords = new List<GridCoords>();
-					for (int column = 0; column < Grid.Columns; ++column) {
-						var coords = new GridCoords(keyRow, column);
-						if (Grid[coords]) {
-							clearCoords.Add(coords);
-						}
-					}
-
-					if (clearCoords.Count > 0) {
-						var actions = new List<GridAction>() { new ClearMatchedAction() { MatchedType = MatchScoringType.Horizontal, Coords = clearCoords } };
-						StartCoroutine(RunActions(actions));
-					}
-				}
-			}
-#endif
-		}
 	}
 }
