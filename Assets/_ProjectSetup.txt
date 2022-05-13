@@ -27,17 +27,18 @@
 	- https://assetstore.unity.com/packages/3d/environments/fantasy-landscape-103573?aid=1011ld79j - Trees are broken on URP.
 2. Migrate the assets to URP if needed. Check each asset's instruction.
 3. Move the imported assets to "Assets/ArtExternal" folder. It is svn-ignored so it shouldn't get in the way.
-4. Import the following commercial plugins:
+4. Import the following commercial plugins and move them to "Assets/PluginsExternal", unless other folder is specified:
+   (destination folders are svn-ignored so it shouldn't get in the way)
 	- https://assetstore.unity.com/packages/tools/terrain/terrain-to-mesh-2021-195349
 	- https://assetstore.unity.com/packages/tools/terrain/r-a-m-2019-river-auto-material-2019-145937
 	- https://assetstore.unity.com/packages/vfx/shaders/advanced-vegetation-shader-hdrp-urp-brp-82425
-	- https://assetstore.unity.com/packages/3d/characters/animals/birds/bird-flock-crow-4022
+	- https://assetstore.unity.com/packages/3d/characters/animals/birds/bird-flock-crow-4022 => "Packages/BirdFlocks"
 
 	- (optional) https://assetstore.unity.com/packages/tools/utilities/editor-console-pro-11889
 	- (optional) https://assetstore.unity.com/packages/tools/utilities/rainbow-folders-2-143526
-5. Move the imported plugins to "Assets/PluginsExternal" folder. It is svn-ignored so it shouldn't get in the way.
-6. Start the game by running the "HomeScreenScene".
-7. Run the "_DevTowerScene" to quickly jump into the game.
+
+5. Start the game by running the "HomeScreenScene".
+6. Run the "_DevTowerScene" to quickly jump into the game.
 
 === More info ===
 Why do this? Two reasons:

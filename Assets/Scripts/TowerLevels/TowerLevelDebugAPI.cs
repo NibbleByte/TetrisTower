@@ -115,13 +115,15 @@ namespace TetrisTower.TowerLevels
 
 		public void ToggleBirds()
 		{
-			foreach(var birdController in GameObject.FindObjectsOfType<FlockController>(true)) {
+#if USE_BIRD_FLOCKS
+			foreach (var birdController in GameObject.FindObjectsOfType<FlockController>(true)) {
 				birdController.gameObject.SetActive(!birdController.gameObject.activeSelf);
 			}
 
 			foreach(var landingSpotController in GameObject.FindObjectsOfType<LandingSpotController>(true)) {
 				landingSpotController.gameObject.SetActive(!landingSpotController.gameObject.activeSelf);
 			}
+#endif
 		}
 
 		public void ToggleDebug()
