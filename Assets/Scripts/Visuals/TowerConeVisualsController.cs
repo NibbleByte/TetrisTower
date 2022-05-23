@@ -26,6 +26,7 @@ namespace TetrisTower.Visuals
 		public float ChangeRotationDuration = 0.25f;
 
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
+		public Effects.FallTrailEffectsManager WonFallTrailEffectsManager;
 
 		public VisualsShape FallingVisualsShape { get; private set; }
 
@@ -91,8 +92,17 @@ namespace TetrisTower.Visuals
 
 		private void OnFallingShapeSpeedUp()
 		{
-			if (FallTrailEffectsManager) {
-				FallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value));
+			if (m_LevelData.RunningState == TowerLevelRunningState.Won) {
+				// Rotation happens for the next block, so shouldn't affect the last one.
+				if (WonFallTrailEffectsManager) {
+					WonFallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value), FallingVisualsContainer);
+				}
+
+			} else {
+				// You can rotate the falling shape, the trail should follow.
+				if (FallTrailEffectsManager) {
+					FallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value), FallingVisualsContainer);
+				}
 			}
 		}
 

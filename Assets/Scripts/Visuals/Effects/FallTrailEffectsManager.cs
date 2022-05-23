@@ -15,8 +15,10 @@ namespace TetrisTower.Visuals.Effects
 
 		private class BlocksGroup : List<EffectBlockEntry>
 		{
+			public bool ParentSameAsOriginal;
 			public float StartBottomScale = 0;
 			public float LastBottomScale = 0;
+			public Quaternion LastBottomRotation = Quaternion.identity;
 
 			public void Destroy()
 			{
@@ -48,13 +50,17 @@ namespace TetrisTower.Visuals.Effects
 			m_AlphaPropID = Shader.PropertyToID("_Alpha");
 		}
 
-		public void StartFallTrailEffect(IEnumerable<GameObject> blocks)
+		public void StartFallTrailEffect(IEnumerable<GameObject> blocks, Transform parent = null)
 		{
 			var group = new BlocksGroup();
 
+			if (parent == null) {
+				parent = transform;
+			}
+
 			foreach(GameObject block in blocks) {
 
-				GameObject effectGO = Instantiate(block, block.transform.position, block.transform.rotation, block.transform.parent);
+				GameObject effectGO = Instantiate(block, block.transform.position, block.transform.rotation, parent);
 				ConeVisualsBlock effectBlock = effectGO.GetComponent<ConeVisualsBlock>();
 
 				if (effectBlock == null) {
@@ -90,6 +96,7 @@ namespace TetrisTower.Visuals.Effects
 			group.Sort((left, right) => left.OriginalBlockGO.transform.localScale.y.CompareTo(right.OriginalBlockGO.transform.localScale.y));
 
 			group.StartBottomScale = group[group.Count - 1].OriginalBlockGO.transform.localScale.y;
+			group.ParentSameAsOriginal = group[0].OriginalBlockGO.transform.parent == parent;
 
 			m_BlockGroups.Add(group);
 		}
@@ -105,7 +112,8 @@ namespace TetrisTower.Visuals.Effects
 			m_BlockGroups.Clear();
 		}
 
-		void Update()
+		// LateUpdate() so it gets executed after the GridLevelController that shoots Won animation. Hacky hacky. Sergey was right.
+		void LateUpdate()
 		{
 			for(int groupIndex = 0; groupIndex < m_BlockGroups.Count; ++groupIndex) {
 				BlocksGroup group = m_BlockGroups[groupIndex];
@@ -113,12 +121,15 @@ namespace TetrisTower.Visuals.Effects
 				EffectBlockEntry groupBottomEntry = group[group.Count - 1];
 
 				float groupBottomScale = group.LastBottomScale;
+				Quaternion groupBottomRotation = group.LastBottomRotation;
 				if (groupBottomEntry.OriginalBlockGO) {
 					groupBottomScale = groupBottomEntry.OriginalBlockGO.transform.localScale.y;
+					groupBottomRotation = groupBottomEntry.OriginalBlockGO.transform.rotation;
 				}
 
-				bool hasChanges = group.LastBottomScale != groupBottomScale;
+				bool hasChanges = group.LastBottomScale != groupBottomScale || group.LastBottomRotation != groupBottomRotation;
 				group.LastBottomScale = groupBottomScale;
+				group.LastBottomRotation = groupBottomRotation;
 
 				group.StartBottomScale = Mathf.Lerp(group.StartBottomScale, groupBottomScale, DampSpeed);
 				float alpha = AlphaCurve.Evaluate(groupBottomScale - group.StartBottomScale);
@@ -137,6 +148,15 @@ namespace TetrisTower.Visuals.Effects
 
 					if (entry.OriginalBlockGO) {
 						entry.EffectBlock.transform.localScale = entry.OriginalBlockGO.transform.localScale + new Vector3(AddSideScale, 0f, 0f);
+
+						if (group.ParentSameAsOriginal && entry.OriginalBlockGO.transform.parent != entry.EffectBlock.transform.parent) {
+							entry.EffectBlock.transform.SetParent(entry.OriginalBlockGO.transform.parent);
+						}
+					} else {
+						// If original parent was rotating and we lost the object, we most likely don't want to continue rotating (fixes won animation).
+						if (group.ParentSameAsOriginal && entry.EffectBlock.transform.parent) {
+							entry.EffectBlock.transform.SetParent(null);
+						}
 					}
 
 					float topScale = 1f - (group.Count - 1 - (entryIndex - 1)) * scalePerPoint;

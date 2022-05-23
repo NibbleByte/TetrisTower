@@ -173,9 +173,82 @@ Transform:
   - {fileID: 6319611747889203588}
   - {fileID: 3059490512306237293}
   - {fileID: 446492285716113904}
+  - {fileID: 7503096221486056390}
   m_Father: {fileID: 6721708562153812008}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4998801500978640588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7503096221486056390}
+  - component: {fileID: 1935189443773925898}
+  m_Layer: 0
+  m_Name: FallTrailEffect_WonFallingShape
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7503096221486056390
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4998801500978640588}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3283914893800456393}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1935189443773925898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4998801500978640588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c0f956426d56f2418bd35c283409f4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AddSideScale: 0.025
+  AddForwardOffset: 0.1
+  DampSpeed: 0.18
+  FinishDistance: 0.003
+  AlphaCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 13.257372
+      outSlope: 13.257372
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.07961166
+    - serializedVersion: 3
+      time: 0.1
+      value: 0.6
+      inSlope: -1.5683767
+      outSlope: -1.5683767
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.09902902
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &6503070364726236162
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,7 +360,7 @@ MonoBehaviour:
   ConeOuterRadius: 15
   ConeInnerRadius: 12
   ConeHeight: 100
-  BlockMoveSpeed: 7
+  BlockMoveSpeed: 10
   MatchBlockDelay: 0.075
   MatchActionDelay: 0.5
   FallHitEffect: {fileID: 2881285498467698915}
@@ -326,6 +399,7 @@ MonoBehaviour:
   ChangeColumnDuration: 0.1
   ChangeRotationDuration: 0.3
   FallTrailEffectsManager: {fileID: 4207455659143253716}
+  WonFallTrailEffectsManager: {fileID: 1935189443773925898}
   m_DebugFallingVisualsShape:
     rid: -2
   references:
