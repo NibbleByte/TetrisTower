@@ -28,6 +28,7 @@ namespace TetrisTower.Logic
 
 		public event Action FallingColumnChanged;
 		public event Action FallingShapeRotated;
+		public event Action FallingShapeSpeedUp;
 
 		private int m_NextRunId = 0;
 		private int m_FinishedRuns = 0;
@@ -348,6 +349,8 @@ namespace TetrisTower.Logic
 				return false;
 
 			m_FallingSpeedup = speedUp;
+
+			FallingShapeSpeedUp?.Invoke();
 
 			return true;
 		}

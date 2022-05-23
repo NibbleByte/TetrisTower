@@ -4,7 +4,7 @@ using UnityEngine;
 using DevLocker.GFrame;
 using TetrisTower.Core;
 
-namespace TetrisTower.Visuals
+namespace TetrisTower.Visuals.Effects
 {
 	public class TowerConeFallPreviewController : MonoBehaviour, ILevelLoadedListener
 	{

@@ -5,6 +5,7 @@ using TetrisTower.Logic;
 using UnityEngine;
 using TetrisTower.Core;
 using DevLocker.GFrame;
+using System.Linq;
 
 namespace TetrisTower.Visuals
 {
@@ -23,6 +24,8 @@ namespace TetrisTower.Visuals
 
 		public float ChangeColumnDuration = 0.1f;
 		public float ChangeRotationDuration = 0.25f;
+
+		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 
 		public VisualsShape FallingVisualsShape { get; private set; }
 
@@ -56,6 +59,7 @@ namespace TetrisTower.Visuals
 			m_TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
 
 			m_TowerLevel.FallingShapeRotated += OnFallingShapeRotated;
+			m_TowerLevel.FallingShapeSpeedUp += OnFallingShapeSpeedUp;
 
 			FallingVisualsContainer.SetParent(transform);
 			FallingVisualsContainer.localPosition = Vector3.zero;
@@ -81,7 +85,15 @@ namespace TetrisTower.Visuals
 			m_TowerLevel.FallingShapeSelected -= OnFallingShapeSelected;
 
 			m_TowerLevel.FallingShapeRotated -= OnFallingShapeRotated;
+			m_TowerLevel.FallingShapeSpeedUp -= OnFallingShapeSpeedUp;
 
+		}
+
+		private void OnFallingShapeSpeedUp()
+		{
+			if (FallTrailEffectsManager) {
+				FallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value));
+			}
 		}
 
 		private void OnPlacingFallingShape()

@@ -106,7 +106,7 @@ namespace TetrisTower.TowerLevels
 				for(int column = 0; column < m_VisualsGrid.Columns; ++column) {
 					ConeVisualsBlock visualBlock = m_VisualsGrid[row, column];
 					if (visualBlock) {
-						visualBlock.ClearHighlight();
+						visualBlock.RestoreToNormal();
 						visualBlocks.Add(new KeyValuePair<GridCoords, ConeVisualsBlock>(new GridCoords(row, column), visualBlock));
 					}
 				}

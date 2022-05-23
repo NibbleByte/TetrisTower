@@ -185,6 +185,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3001810036290782175, guid: 2b59a8c1d09714844a44eb68e14ef2a0, type: 3}
   m_PrefabInstance: {fileID: 10032563}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &117083879 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5675625223234767302, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+  m_PrefabInstance: {fileID: 5104962156762854421}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &244615268
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -340,6 +345,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1478127737}
+  - {fileID: 390159544}
   - {fileID: 356756780}
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -446,7 +452,7 @@ GameObject:
   - component: {fileID: 356756782}
   - component: {fileID: 356756781}
   m_Layer: 5
-  m_Name: HighlightOffBtn
+  m_Name: ClearBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -466,7 +472,7 @@ RectTransform:
   m_Children:
   - {fileID: 1331402251}
   m_Father: {fileID: 329629134}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -517,9 +523,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 613792017}
-        m_TargetAssemblyTypeName: TetrisTower.Visuals.ConeVisualsTester, TetrisTower
-        m_MethodName: ClearBlockHighlights
+      - m_Target: {fileID: 613792021}
+        m_TargetAssemblyTypeName: TetrisTower.Visuals.Effects.ConeVisualsTester,
+          TetrisTower
+        m_MethodName: RestoreToNormalBlocks
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -567,17 +574,217 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 356756779}
   m_CullTransparentMesh: 1
---- !u!114 &613792017 stripped
+--- !u!1 &390159543
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 390159544}
+  - component: {fileID: 390159547}
+  - component: {fileID: 390159546}
+  - component: {fileID: 390159545}
+  m_Layer: 5
+  m_Name: 'FallSpeedEffectBtn '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &390159544
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390159543}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 821591864}
+  m_Father: {fileID: 329629134}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -65, y: 78}
+  m_SizeDelta: {x: 75, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &390159545
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390159543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 390159546}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 613792021}
+        m_TargetAssemblyTypeName: TetrisTower.Visuals.Effects.ConeVisualsTester,
+          TetrisTower
+        m_MethodName: FallTrailEffectPreview
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &390159546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390159543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &390159547
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390159543}
+  m_CullTransparentMesh: 1
+--- !u!1 &560387402 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 775621933493829839, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
   m_PrefabInstance: {fileID: 5104962156762854421}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+--- !u!114 &613792020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117083879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c0f956426d56f2418bd35c283409f4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AddSideScale: 0.025
+  AddForwardOffset: 0.1
+  DampSpeed: 0.02
+  FinishDistance: 0.006
+  AlphaCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.8515754
+      outSlope: 0.8515754
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.093203895
+    - serializedVersion: 3
+      time: 0.1
+      value: 0.6
+      inSlope: -1.5683767
+      outSlope: -1.5683767
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.09902902
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &613792021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117083879}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3aaeed7e55e3d2840ad30512cdbdf67f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FallSpeed: 0.675
+  FallTrailEffectPreviewBlocks:
+  - {fileID: 1813549367}
+  - {fileID: 1029722765}
+  - {fileID: 560387402}
+--- !u!114 &613792022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117083879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98a7e66412bf7f44fb060634bd3c0347, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HighlightShader: {fileID: -6465566751694194690, guid: 4aae06a10810d9a4ba4ea4717d795be7, type: 3}
+  FallTrailEffectShader: {fileID: -6465566751694194690, guid: 6b409a2e029e9d24188594f4804715c1, type: 3}
 --- !u!1 &633608002
 GameObject:
   m_ObjectHideFlags: 0
@@ -774,6 +981,86 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!1 &821591863
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 821591864}
+  - component: {fileID: 821591866}
+  - component: {fileID: 821591865}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &821591864
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821591863}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 390159544}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &821591865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821591863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Fall Effect
+--- !u!222 &821591866
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821591863}
+  m_CullTransparentMesh: 1
 --- !u!1 &956372778
 GameObject:
   m_ObjectHideFlags: 0
@@ -866,6 +1153,11 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+--- !u!1 &1029722765 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3323794962001036297, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+  m_PrefabInstance: {fileID: 5104962156762854421}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1077355282
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1289,7 +1581,7 @@ GameObject:
   - component: {fileID: 1478127739}
   - component: {fileID: 1478127738}
   m_Layer: 5
-  m_Name: HighlightOnBtn
+  m_Name: HighlightBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1360,8 +1652,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 613792017}
-        m_TargetAssemblyTypeName: TetrisTower.Visuals.ConeVisualsTester, TetrisTower
+      - m_Target: {fileID: 613792021}
+        m_TargetAssemblyTypeName: TetrisTower.Visuals.Effects.ConeVisualsTester,
+          TetrisTower
         m_MethodName: HighlightBlocks
         m_Mode: 1
         m_Arguments:
@@ -1410,6 +1703,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1478127736}
   m_CullTransparentMesh: 1
+--- !u!1 &1813549367 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7304180265648091234, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+  m_PrefabInstance: {fileID: 5104962156762854421}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1978854329
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1645,6 +1943,138 @@ PrefabInstance:
     - target: {fileID: 1305033909077702653, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: m_Name
       value: TowerLevelPlaceholder
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeed
+      value: 0.672
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDuration
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectPreviewBlocks.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallTrailEffectPreviewBlocks.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectPreviewBlocks.Array.data[0]
+      value: 
+      objectReference: {fileID: 1813549367}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectPreviewBlocks.Array.data[1]
+      value: 
+      objectReference: {fileID: 1029722765}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectPreviewBlocks.Array.data[2]
+      value: 
+      objectReference: {fileID: 560387402}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallTrailEffectPreviewBlocks.Array.data[0]
+      value: 
+      objectReference: {fileID: 1813549367}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallTrailEffectPreviewBlocks.Array.data[1]
+      value: 
+      objectReference: {fileID: 1029722765}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallTrailEffectPreviewBlocks.Array.data[2]
+      value: 
+      objectReference: {fileID: 560387402}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[1].time
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[2].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[1].value
+      value: 0.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[2].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[0].inSlope
+      value: -0.03999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[1].inSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[2].inSlope
+      value: 0.10241504
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[0].outSlope
+      value: -0.03999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[1].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[1].outSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[2].inWeight
+      value: 0.17087376
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[2].outSlope
+      value: 0.10241504
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[0].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[1].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[0].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[1].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 3006647388865778902, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallSpeedEffectDamping.m_Curve.Array.data[2].tangentMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3532021750638514815, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: FallTrailEffectShader
+      value: 
+      objectReference: {fileID: -6465566751694194690, guid: 6b409a2e029e9d24188594f4804715c1, type: 3}
+    - target: {fileID: 4231011693206724721, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8972576443092570405, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}

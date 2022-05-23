@@ -57,7 +57,7 @@ namespace TetrisTower.Visuals
 		public float MatchBlockDelay = 0.075f;
 		public float MatchActionDelay = 1.2f;
 
-		public ParticleSystem FallEffect;
+		public ParticleSystem FallHitEffect;
 
 		private IMatchSequenceScoreDisplayer m_MatchSequenceScoreDisplayer;
 
@@ -84,6 +84,8 @@ namespace TetrisTower.Visuals
 
 		private GridCoords m_PlayableArea;
 
+		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
+
 		public void Init(BlocksGrid grid, GridRules rules, GridCoords playableArea, IMatchSequenceScoreDisplayer matchSequenceScoreDisplayer)
 		{
 			if (m_Blocks != null) {
@@ -103,7 +105,7 @@ namespace TetrisTower.Visuals
 
 			m_PlayableArea = playableArea;
 
-			for(int row = 0; row < grid.Rows; ++row) {
+			for (int row = 0; row < grid.Rows; ++row) {
 				for(int column = 0; column < grid.Columns; ++column) {
 					var coords = new GridCoords(row, column);
 					var blockType = grid[coords];
@@ -200,6 +202,15 @@ namespace TetrisTower.Visuals
 				this[clearCoords].MatchHits++;
 			}
 
+			if (FallTrailEffectsManager) {
+				foreach (var action in actions) {
+					MoveCellsAction moveAction = action as MoveCellsAction;
+					if (moveAction != null) {
+						FallTrailEffectsManager.StartFallTrailEffect(moveAction.MovedCells.Select(pair => this[pair.Key].gameObject));
+					}
+				}
+			}
+
 			foreach (var action in MergeActions(actions)) {
 				switch (action) {
 					case PlaceAction placeAction:
@@ -217,6 +228,7 @@ namespace TetrisTower.Visuals
 						break;
 				}
 			}
+
 		}
 
 		private IEnumerable<GridAction> MergeActions(IEnumerable<GridAction> actions)
@@ -272,7 +284,7 @@ namespace TetrisTower.Visuals
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
 
 				if (lowestRows[coords.Column] == coords.Row) {
-					EmitFallEffectAt(GridToWorldBottomCenter(coords));
+					EmitFallHitEffectAt(GridToWorldBottomCenter(coords));
 				}
 			}
 
@@ -294,7 +306,7 @@ namespace TetrisTower.Visuals
 				visualsBlock.MatchHits--;
 
 				if (visualsBlock.MatchHits != 0) {
-					visualsBlock.Highlight();
+					visualsBlock.SetHighlight();
 				} else {
 					GameObject.Destroy(this[coord].gameObject);
 					this[coord] = null;
@@ -351,13 +363,13 @@ namespace TetrisTower.Visuals
 				visualsBlock.transform.localScale = GridToScale(movedPair.Value);
 
 				if (lowestRows[movedPair.Value.Column] == movedPair.Value.Row) {
-					EmitFallEffectAt(GridToWorldBottomCenter(movedPair.Value));
+					EmitFallHitEffectAt(GridToWorldBottomCenter(movedPair.Value));
 				}
 
 				if (visualsBlock.IsHighlighted && movedPair.Value.Row < m_PlayableArea.Row) {
-					visualsBlock.ClearHighlight();
+					visualsBlock.RestoreToNormal(VisualsBlockState.Highlighted);
 				} else if (!visualsBlock.IsHighlighted && movedPair.Value.Row >= m_PlayableArea.Row) {
-					visualsBlock.Highlight();
+					visualsBlock.SetHighlight();
 				}
 			}
 
@@ -386,7 +398,7 @@ namespace TetrisTower.Visuals
 
 				// Warn that this is outside play area.
 				if (coords.Row >= m_PlayableArea.Row) {
-					visualsBlock.Highlight();
+					visualsBlock.SetHighlight();
 				}
 
 			} else {
@@ -404,21 +416,21 @@ namespace TetrisTower.Visuals
 		}
 
 
-		private void EmitFallEffectAt(Vector3 worldPosition)
+		private void EmitFallHitEffectAt(Vector3 worldPosition)
 		{
-			FallEffect.transform.position = worldPosition;
+			FallHitEffect.transform.position = worldPosition;
 			Vector3 direction = worldPosition - transform.position;
 			direction.y = 0;
-			FallEffect.transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+			FallHitEffect.transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
 
-			var burst = FallEffect.emission.GetBurst(0);
+			var burst = FallHitEffect.emission.GetBurst(0);
 
 			int count = (int)burst.count.constant;
 			if (burst.count.mode == ParticleSystemCurveMode.TwoConstants) {
 				count = (int)Random.Range(burst.count.constantMin, burst.count.constantMax);
 			}
 
-			FallEffect.Emit(count);
+			FallHitEffect.Emit(count);
 		}
 
 		// Gather the lowest found rows so we can spawn particles underneath.
