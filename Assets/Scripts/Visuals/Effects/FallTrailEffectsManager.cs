@@ -71,7 +71,7 @@ namespace TetrisTower.Visuals.Effects
 				effectBlock.SetFallTrailEffect();
 				effectBlock.gameObject.name = $"_{block.name}_Effect";
 				effectBlock.transform.localScale = block.transform.localScale + new Vector3(AddSideScale, 0f, 0f);
-				effectBlock.transform.localPosition = block.transform.localPosition + new Vector3(0f, 0f, AddForwardOffset);
+				effectBlock.transform.position = block.transform.position + block.transform.forward * AddForwardOffset;
 
 				var entry = new EffectBlockEntry() {
 					OriginalBlockGO = block,
