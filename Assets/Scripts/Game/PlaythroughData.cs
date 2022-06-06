@@ -116,7 +116,7 @@ namespace TetrisTower.Game
 		public GridRules Rules;
 
 		[Range(5, 20)]
-		public int GridRows = 13;
+		public int GridRows = 9;
 
 		// Validation value - cone visuals require different visual models for each size.
 		// We don't support any other values for now.
@@ -148,13 +148,13 @@ namespace TetrisTower.Game
 			BlockType[] blocks = playthrough.Blocks.Length != 0	? playthrough.Blocks : config.Blocks;
 			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0	? ShapeTemplates : config.ShapeTemplates;
 
-			// No, we don't need '+1'. 13 + 3 = 16 (0 - 15). Placing on the 13 takes (13, 14, 15).
+			// No, we don't need '+1'. 9 + 3 = 12 (0 - 11). Placing on the 9 takes (9, 10, 11).
 			int extraRows = shapeTemplates.Max(st => st.Rows);
 
 			// The shapes are spawned at the top of the grid (totalRows).
-			// Have twice the shape size padding from the playable area,
-			// to give time for the player to react if shapes are placed on the edge of the playing area (highlighted).
-			int totalRows = GridRows + extraRows * 2 + 1;
+			// We need twice the shape size, to accommodate for shape placed ON TOP of the playable area
+			// (e.g. 3 blocks flashing) + another shape on top for game over.
+			int totalRows = GridRows + extraRows * 2;
 
 			var levelData = new GridLevelData() {
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),

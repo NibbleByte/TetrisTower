@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PlayerData:
     TowerLevel:
-      id: 0
+      rid: -2
     Blocks: []
     FallSpeedNormalized: 2
     FallSpeedupPerAction: 0.01
@@ -41,7 +41,7 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -61,7 +61,7 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -81,7 +81,7 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -101,7 +101,7 @@ MonoBehaviour:
         ObjectiveType: 1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -121,7 +121,7 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -141,7 +141,7 @@ MonoBehaviour:
         ObjectiveType: 2
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -161,7 +161,7 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -181,7 +181,7 @@ MonoBehaviour:
         ObjectiveType: 4
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -201,7 +201,7 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     - BackgroundScene:
@@ -221,11 +221,12 @@ MonoBehaviour:
         ObjectiveType: -1
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
-      GridRows: 13
+      GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
     ScoreOnLevelStart: 0
   references:
-    version: 1
-    00000000:
+    version: 2
+    RefIds:
+    - rid: -2
       type: {class: , ns: , asm: }

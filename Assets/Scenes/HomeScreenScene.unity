@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.3708985, g: 0.3783704, b: 0.35722548, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -248,6 +248,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1221062997}
   m_RootOrder: 0
@@ -382,6 +383,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1624517865}
   m_RootOrder: 0
@@ -517,6 +519,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1109564869}
   - {fileID: 3073588794875672572}
@@ -699,6 +702,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 533048043}
   - {fileID: 1221062997}
@@ -837,6 +841,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1624517865}
   m_RootOrder: 1
@@ -1041,6 +1046,7 @@ Transform:
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -1342,7 +1348,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: TetrisTower.HomeScreen.HomeScreenNewGamePanel, Assembly-CSharp
+      value: TetrisTower.HomeScreen.HomeScreenNewGamePanel, TetrisTower
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
@@ -1350,7 +1356,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 2162966bc91da954291384e1534ec3a2, type: 2}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: TetrisTower.Game.PlaythroughTemplate, Assembly-CSharp
+      value: TetrisTower.Game.PlaythroughTemplate, TetrisTower.Game
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832821, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_Pivot.x
@@ -1633,6 +1639,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 533048043}
   m_RootOrder: 0
@@ -2048,6 +2055,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 205328976}
   - {fileID: 1603745642}
@@ -2393,6 +2401,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 499219361}
   - {fileID: 753235476}
@@ -2750,10 +2759,11 @@ MonoBehaviour:
   StartingPlaythroughTemplate: {fileID: 0}
   StartingRandomSeed: 0
   GameContext:
-    id: 0
+    rid: -2
   references:
-    version: 1
-    00000000:
+    version: 2
+    RefIds:
+    - rid: -2
       type: {class: , ns: , asm: }
 --- !u!4 &1819720000
 Transform:
@@ -2765,6 +2775,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15.853024, y: 13.29811, z: -36.64624}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -2848,6 +2859,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -3197,7 +3209,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: TetrisTower.HomeScreen.HomeScreenNewGamePanel, Assembly-CSharp
+      value: TetrisTower.HomeScreen.HomeScreenNewGamePanel, TetrisTower
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
@@ -3205,7 +3217,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 689add6d47e824640984d55d631805b4, type: 2}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: TetrisTower.Game.PlaythroughTemplate, Assembly-CSharp
+      value: TetrisTower.Game.PlaythroughTemplate, TetrisTower.Game
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832821, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_Pivot.x

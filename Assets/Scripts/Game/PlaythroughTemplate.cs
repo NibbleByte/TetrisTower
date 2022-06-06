@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using TetrisTower.Logic;
 using UnityEngine;
 
@@ -24,11 +25,27 @@ namespace TetrisTower.Game
 		[ContextMenu("Stack up!")]
 		void StackUp()
 		{
-			for(int row = 0; row < m_PlayerData.TowerLevel.Grid.Rows; ++row) {
+			BlockType[] blocksPool = m_PlayerData.TowerLevel.BlocksPool;
+			if (blocksPool == null || blocksPool.Length == 0) {
+				GameConfig gameConfig = UnityEditor.AssetDatabase.FindAssets($"t:{nameof(GameConfig)}")
+					.Select(UnityEditor.AssetDatabase.GUIDToAssetPath)
+					.Select(UnityEditor.AssetDatabase.LoadAssetAtPath<GameConfig>)
+					.FirstOrDefault()
+					;
+
+				if (!gameConfig) {
+					Debug.LogError("Specify pool of blocks or have at least one GameConfig in the project.", this);
+					return;
+				}
+
+				blocksPool = gameConfig.Blocks.ToArray();
+			}
+
+			for (int row = 0; row < m_PlayerData.TowerLevel.Grid.Rows; ++row) {
 				for(int column = 0; column < m_PlayerData.TowerLevel.Grid.Columns; ++column) {
 
-					var blockType = row < m_PlayerData.TowerLevel.Grid.Rows - 5
-						? m_PlayerData.TowerLevel.BlocksPool[(column + row % 2) % m_PlayerData.TowerLevel.BlocksPool.Length]
+					var blockType = row < m_PlayerData.TowerLevel.Grid.Rows - 3
+						? blocksPool[(column + row % 2) % blocksPool.Length]
 						: null
 						;
 

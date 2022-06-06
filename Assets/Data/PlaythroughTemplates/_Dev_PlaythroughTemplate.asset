@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PlayerData:
     TowerLevel:
-      id: 0
+      rid: 0
     Blocks: []
     FallSpeedNormalized: 2
     FallSpeedupPerAction: 0.01
@@ -26,8 +26,11 @@ MonoBehaviour:
     Levels: []
     ScoreOnLevelStart: 0
   references:
-    version: 1
-    00000000:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 0
       type: {class: GridLevelData, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
       data:
         BackgroundScene:
@@ -35,9 +38,9 @@ MonoBehaviour:
           m_IsDirty: 0
           m_ScenePath: Assets/Scenes/_DevTowerScene.unity
         NextShape:
-          id: 1
+          rid: -2
         FallingShape:
-          id: 2
+          rid: 2
         FallingColumn: 0
         FallDistanceNormalized: 4
         FallSpeedNormalized: 2
@@ -58,7 +61,7 @@ MonoBehaviour:
           WrapSidesOnMatch: 1
           WrapSidesOnMove: 1
         Grid:
-          m_Rows: 18
+          m_Rows: 15
           m_Columns: 13
           m_Blocks:
           - {fileID: 0}
@@ -256,55 +259,14 @@ MonoBehaviour:
           - {fileID: 0}
           - {fileID: 0}
           - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
         PlayableSize:
-          Row: 13
+          Row: 9
           Column: 13
         Score:
-          id: 1
+          rid: -2
         ObjectiveEndCount: 100
         RunningState: 0
-    00000001:
-      type: {class: , ns: , asm: }
-    00000002:
+    - rid: 2
       type: {class: BlocksShape, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
       data:
         ShapeCoords:
