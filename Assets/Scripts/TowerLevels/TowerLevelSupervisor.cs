@@ -83,9 +83,10 @@ namespace TetrisTower.TowerLevels
 
 				var overrideCamera = placeholder.GetComponentInChildren<Camera>();
 				if (overrideCamera) {
+					// Move the parent object, since it's position is updated on changing screen orientation.
 					var camera = levelController.GetComponentInChildren<Camera>();
-					overrideCamera.transform.SetParent(camera.transform.parent, false);
-					GameObject.DestroyImmediate(camera.gameObject);
+					overrideCamera.transform.parent.SetParent(camera.transform.parent.parent, false);
+					GameObject.DestroyImmediate(camera.transform.parent.gameObject);
 				}
 
 				Transform[] overrideDecors = placeholder.transform.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
