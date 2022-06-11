@@ -209,7 +209,7 @@ namespace TetrisTower.TowerLevels
 		private void DebugClearRow()
 		{
 #if UNITY_EDITOR
-			if (Keyboard.current == null)
+			if (Keyboard.current == null || Keyboard.current.altKey.isPressed || Keyboard.current.ctrlKey.isPressed || Keyboard.current.shiftKey.isPressed)
 				return;
 
 			// Temporary disable.
