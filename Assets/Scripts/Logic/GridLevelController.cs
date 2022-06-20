@@ -512,6 +512,9 @@ namespace TetrisTower.Logic
 
 		private void UpdateFallShape()
 		{
+			if (LevelData.FallFrozen && m_FallingSpeedup == 0f)
+				return;
+
 			// Clamp to avoid skipping over a cell on hiccups.
 			LevelData.FallDistanceNormalized += Mathf.Clamp01(Time.deltaTime * (LevelData.FallSpeedNormalized + m_FallingSpeedup));
 

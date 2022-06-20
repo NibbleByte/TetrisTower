@@ -83,6 +83,10 @@ namespace TetrisTower.Logic
 		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Floor(FallDistanceNormalized) - 1, column);
 		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);
 
+		// Used for debug / cheat.
+		[NonSerialized]
+		public bool FallFrozen = false;
+
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
 			if (Rules.ObjectiveType == 0) {

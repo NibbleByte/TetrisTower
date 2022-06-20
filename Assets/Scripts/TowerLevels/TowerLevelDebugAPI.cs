@@ -18,7 +18,6 @@ namespace TetrisTower.TowerLevels
 
 		private GameObject m_ProfilerStatsObject;
 
-		private float m_FallSpeedOriginal;
 		private GridLevelController m_TowerLevel;
 
 		private GameContext m_Context;
@@ -45,12 +44,7 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Toggle Falling");
 
-			if (m_TowerLevel.LevelData.FallSpeedNormalized == 0f) {
-				m_TowerLevel.LevelData.FallSpeedNormalized = m_FallSpeedOriginal;
-			} else {
-				m_FallSpeedOriginal = m_TowerLevel.LevelData.FallSpeedNormalized;
-				m_TowerLevel.LevelData.FallSpeedNormalized = 0f;
-			}
+			m_TowerLevel.LevelData.FallFrozen = !m_TowerLevel.LevelData.FallFrozen;
 		}
 
 		public void ResetLevel()
