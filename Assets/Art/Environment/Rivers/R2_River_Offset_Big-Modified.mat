@@ -2,15 +2,21 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: R2_River_Offset_Big-Modified
   m_Shader: {fileID: 4800000, guid: afbb1d8a9ff99304691b993b80fbc309, type: 3}
-  m_ShaderKeywords: UseFlowMapping _BLENDMODE_ALPHA _DOUBLESIDED_ON _SURFACE_TYPE_TRANSPARENT
-    _USEFLOWMAPPING_ON
+  m_ValidKeywords:
+  - _SPECULAR_SETUP
+  - _SURFACE_TYPE_TRANSPARENT
+  m_InvalidKeywords:
+  - UseFlowMapping
+  - _BLENDMODE_ALPHA
+  - _DOUBLESIDED_ON
+  - _USEFLOWMAPPING_ON
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
@@ -204,10 +210,12 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - Big_Cascade_Foam_Falloff: 2.86
     - MacroWaveTessScale: 0.05
     - _AOPower: 1
+    - _AlphaClip: 0
     - _AlphaCutoffEnable: 0
     - _AlphaDstBlend: 10
     - _AlphaSrcBlend: 1
@@ -228,6 +236,7 @@ Material:
     - _BigCascadeTransparency: 0.002
     - _BigCascadeWaterNormalScale: 0.9
     - _BigCascadeWaterTessScale: 0.2
+    - _Blend: 0
     - _BlendMode: 0
     - _CascadeFalloff: 0.84
     - _CascadeFalloffSlow: 5.86
@@ -242,10 +251,12 @@ Material:
     - _CascadeWaterNormalScale: 0.9
     - _CascadeWaterTessScale: 0.06
     - _CascadesNoisePower: 2.71
+    - _CastShadows: 1
     - _ChromaticAberration: 0.1
     - _CleanFalloffMultiply: 0.8
     - _CleanFalloffPower: 0.28
     - _ClearWaterFalloff: 10
+    - _Cull: 0
     - _CullMode: 0
     - _CullModeForward: 0
     - _Cutoff: 0.5
@@ -307,6 +318,9 @@ Material:
     - _MicrowaveScale: 0.5
     - _NormalScale: 0.25
     - _Occlusion: 0.48
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
     - _ReceivesSSR: 1
     - _Reflection: 0.66
     - _ReflectionPower: 0.083
@@ -343,7 +357,7 @@ Material:
     - _Smoothness: 0.9
     - _Specular: 0.1
     - _SpecularHighlights: 1
-    - _SrcBlend: 1
+    - _SrcBlend: 5
     - _StencilRef: 2
     - _StencilRefDepth: 0
     - _StencilRefDistortionVec: 64
@@ -354,6 +368,7 @@ Material:
     - _StencilWriteMaskDistortionVec: 64
     - _StencilWriteMaskGBuffer: 51
     - _StencilWriteMaskMV: 176
+    - _Surface: 1
     - _SurfaceType: 1
     - _TessMax: 11
     - _TessMaxDisp: 11
@@ -400,10 +415,13 @@ Material:
     - _WaveTranslucencyMultiply: 0.1
     - _WaveTranslucencyPower: 2.32
     - _WavesVertexOffsetALPHA: 0
+    - _WorkflowMode: 0
+    - _ZTest: 4
     - _ZTestDepthEqualForOpaque: 4
     - _ZTestGBuffer: 4
     - _ZTestTransparent: 4
     - _ZWrite: 1
+    - _ZWriteControl: 1
     - __dirty: 0
     - _test: 0.35
     m_Colors:
