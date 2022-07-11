@@ -29,6 +29,10 @@ namespace TetrisTower.Logic
 		[UnityEngine.SerializeField] private int m_Columns;
 		[UnityEngine.SerializeField] private BlockType[] m_Blocks;
 
+		// Used for debug / cheat.
+		[NonSerialized]
+		public bool MatchingFrozen = false;
+
 		// For serialization.
 		public BlocksGrid()
 		{

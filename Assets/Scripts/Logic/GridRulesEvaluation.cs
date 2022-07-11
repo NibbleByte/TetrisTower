@@ -37,7 +37,9 @@ namespace TetrisTower.Logic
 		{
 			List<GridAction> actions = new List<GridAction>();
 
-			EvaluateMatches(grid, rules, actions);
+			if (!grid.MatchingFrozen) {
+				EvaluateMatches(grid, rules, actions);
+			}
 
 			if (actions.Count > 0)
 				return actions;

@@ -47,6 +47,13 @@ namespace TetrisTower.TowerLevels
 			m_TowerLevel.LevelData.FallFrozen = !m_TowerLevel.LevelData.FallFrozen;
 		}
 
+		public void ToggleMatching()
+		{
+			if (m_FlashMessage) m_FlashMessage.AppendMessage("Toggle Matching");
+
+			m_TowerLevel.Grid.MatchingFrozen = !m_TowerLevel.Grid.MatchingFrozen;
+		}
+
 		public void ResetLevel()
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Retry Level");
@@ -150,6 +157,10 @@ namespace TetrisTower.TowerLevels
 		{
 			if (Keyboard.current.fKey.wasPressedThisFrame) {
 				ToggleFalling();
+			}
+
+			if (Keyboard.current.mKey.wasPressedThisFrame) {
+				ToggleMatching();
 			}
 
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {
