@@ -59,7 +59,9 @@ namespace TetrisTower.Visuals
 
 		public ParticleSystem FallHitEffect;
 
-		private IMatchSequenceScoreDisplayer m_MatchSequenceScoreDisplayer;
+		public delegate void ScoreEventHandler(ScoreGrid scoreGrid);
+		public event ScoreEventHandler ScoreUpdated;
+		public event ScoreEventHandler ScoreFinished;
 
 		public int Rows => m_Blocks.GetLength(0);
 		public int Columns => m_Blocks.GetLength(1);
@@ -86,7 +88,7 @@ namespace TetrisTower.Visuals
 
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 
-		public void Init(BlocksGrid grid, GridRules rules, GridCoords playableArea, IMatchSequenceScoreDisplayer matchSequenceScoreDisplayer)
+		public void Init(BlocksGrid grid, GridRules rules, GridCoords playableArea)
 		{
 			if (m_Blocks != null) {
 				DestroyInstances();
@@ -98,7 +100,6 @@ namespace TetrisTower.Visuals
 			CalculateCone(grid.Columns);
 
 			m_Rules = rules;
-			m_MatchSequenceScoreDisplayer = matchSequenceScoreDisplayer;
 
 			m_Blocks = new ConeVisualsBlock[grid.Rows, grid.Columns];
 			m_ScoreGrid = null;
@@ -223,7 +224,7 @@ namespace TetrisTower.Visuals
 						yield return MoveCells(moveAction);
 						break;
 					case MatchingSequenceFinishAction finishAction:
-						m_MatchSequenceScoreDisplayer?.FinishScore(m_ScoreGrid);
+						ScoreFinished?.Invoke(m_ScoreGrid);
 						m_ScoreGrid = null;
 						break;
 				}
@@ -297,7 +298,7 @@ namespace TetrisTower.Visuals
 		{
 			m_ScoreGrid.ScoreMatchedCells(action);
 
-			m_MatchSequenceScoreDisplayer?.UpdateScore(m_ScoreGrid);
+			ScoreUpdated?.Invoke(m_ScoreGrid);
 
 			foreach (var coord in action.Coords) {
 

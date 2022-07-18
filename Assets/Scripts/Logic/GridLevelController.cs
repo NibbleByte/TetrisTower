@@ -479,6 +479,10 @@ namespace TetrisTower.Logic
 			} else if (!AreGridActionsRunning && LevelData.IsPlaying && CanSelectNextShape()) {
 				SelectFallingShape();
 			}
+
+			if (LevelData.IsPlaying) {
+				LevelData.PlayTime += Time.deltaTime;
+			}
 		}
 
 		void LateUpdate()

@@ -1,17 +1,36 @@
+using DevLocker.GFrame;
 using System;
 using System.Linq;
 using TetrisTower.Logic;
 using TetrisTower.Visuals;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TetrisTower.TowerLevels.UI
 {
-	public class MatchSequenceScoreUIController : MonoBehaviour, IMatchSequenceScoreDisplayer
+	public class MatchSequenceScoreUIController : MonoBehaviour, ILevelLoadedListener
 	{
 		public TextMeshProUGUI ClearCombosCountText;
 		public TextMeshProUGUI ClearedBlocksCountText;
+
+		private ConeVisualsGrid m_VisualsGrid;
+
+		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		{
+			contextReferences.SetByType(out m_VisualsGrid);
+
+			m_VisualsGrid.ScoreUpdated += OnUpdateScore;
+			m_VisualsGrid.ScoreFinished += OnFinishScore;
+
+		}
+
+		public void OnLevelUnloading()
+		{
+			m_VisualsGrid.ScoreUpdated -= OnUpdateScore;
+			m_VisualsGrid.ScoreFinished -= OnFinishScore;
+
+			m_VisualsGrid = null;
+		}
 
 		private void Awake()
 		{
@@ -19,7 +38,7 @@ namespace TetrisTower.TowerLevels.UI
 			if (ClearedBlocksCountText) ClearedBlocksCountText.gameObject.SetActive(false);
 		}
 
-		public void UpdateScore(ScoreGrid scoreGrid)
+		public void OnUpdateScore(ScoreGrid scoreGrid)
 		{
 			if (ClearCombosCountText && scoreGrid.CurrentClearActionsCount > 1) {
 				ClearCombosCountText.gameObject.SetActive(true);
@@ -32,7 +51,7 @@ namespace TetrisTower.TowerLevels.UI
 			}
 		}
 
-		public void FinishScore(ScoreGrid scoreGrid)
+		public void OnFinishScore(ScoreGrid scoreGrid)
 		{
 			Awake();
 		}

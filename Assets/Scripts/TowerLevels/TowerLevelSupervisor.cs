@@ -131,7 +131,6 @@ namespace TetrisTower.TowerLevels
 				gameContext.CurrentPlaythrough,
 				levelController,
 				uiController,
-				behaviours.OfType<UI.MatchSequenceScoreUIController>().FirstOrDefault(),
 				behaviours.OfType<UI.FlashMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<ConeVisualsGrid>().First(),
 				behaviours.OfType<TowerConeVisualsController>().First(),

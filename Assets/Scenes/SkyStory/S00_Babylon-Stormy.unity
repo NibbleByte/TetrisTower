@@ -26659,3 +26659,65 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1cb9ee1aed52f1c42a8c6c37d8772635, type: 3}
+--- !u!1 &1868753961023664862 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1868753962111010816, guid: 1cb9ee1aed52f1c42a8c6c37d8772635, type: 3}
+  m_PrefabInstance: {fileID: 1868753961023664861}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1868753961023664863 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1868753962111010819, guid: 1cb9ee1aed52f1c42a8c6c37d8772635, type: 3}
+  m_PrefabInstance: {fileID: 1868753961023664861}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868753961023664862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10f3486bc79b0ce489a3603abd8c4c34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1868753961023664865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868753961023664862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e3581cbb8241347a3fd35ba353d7a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Effects: {fileID: 1868753961023664863}
+  Loop: 0
+  LightningSecondsSinceStart:
+  - 0.2
+  - 0.6
+  - 0.7
+--- !u!114 &1868753961023664866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868753961023664862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7181092c2fa1ef408dcf2ee0ab0b76e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Effects: {fileID: 1868753961023664863}
+  ComboMultiplier: 3
+--- !u!114 &1868753961023664868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868753961023664862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 334a09f9186927d43b5b90881dca7c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Effects: {fileID: 1868753961023664863}
+  SkipChance: 0
