@@ -1,0 +1,49 @@
+using DevLocker.GFrame;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using TetrisTower.Game;
+using TetrisTower.Logic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace TetrisTower.TowerLevels.UI
+{
+	public class PlayTimeDisplayUIController : MonoBehaviour, ILevelLoadedListener
+	{
+		private GridLevelController m_TowerLevel;
+
+		private GridLevelData m_LevelData => m_TowerLevel.LevelData;
+
+		private PlaythroughData m_PlaythroughData;
+
+		[Tooltip("Use the C# TimeStamp formatting. Use {totalSeconds} to display time in seconds (no minutes).\nNOTE: use '' for arbitrary text.")]
+		public string DisplayFormat = @"'Play time: 'mm\:ss\.fff";
+
+		[Tooltip("If true will display total play through instead of just current level play time.")]
+		public bool PlaythroughTime = false;
+
+		public TextMeshProUGUI DisplayText;
+
+		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		{
+			contextReferences.SetByType(out m_TowerLevel);
+			contextReferences.SetByType(out m_PlaythroughData);
+		}
+
+		public void OnLevelUnloading()
+		{
+		}
+
+		void Update()
+		{
+			float seconds = PlaythroughTime ? m_PlaythroughData.TotalPlayTime : m_LevelData.PlayTime;
+			TimeSpan ts = new TimeSpan(0, 0, 0, (int) seconds, (int) Mathf.Round((seconds % 1) * 1000));
+
+			string format = DisplayFormat.Replace("{totalSeconds}", $"'{((int)seconds)}'");
+			DisplayText.text = ts.ToString(format);
+		}
+	}
+
+}

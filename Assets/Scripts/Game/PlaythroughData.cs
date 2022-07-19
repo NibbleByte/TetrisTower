@@ -39,6 +39,9 @@ namespace TetrisTower.Game
 		public int ScoreOnLevelStart = 0;
 		public int TotalScore => ScoreOnLevelStart + TowerLevel?.Score.Score ?? 0;
 
+		public float PlayTimeOnLevelStart = 0f;
+		public float TotalPlayTime => PlayTimeOnLevelStart + TowerLevel?.PlayTime ?? 0;
+
 		public bool IsFinalLevel => CurrentLevelIndex == Levels.Length - 1;
 		public bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;
 
@@ -59,6 +62,7 @@ namespace TetrisTower.Game
 			TowerLevel.Score.ConsumeBonusScore();
 
 			ScoreOnLevelStart += TowerLevel.Score.Score;
+			PlayTimeOnLevelStart += TowerLevel.PlayTime;
 
 			TowerLevel = null;
 			CurrentLevelIndex++;
