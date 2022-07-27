@@ -32,4 +32,9 @@ namespace TetrisTower.Logic
 			}
 		}
 	}
+
+	public class BlocksSetConverter : SerializableAssetConverter<BlocksSet>
+	{
+		public BlocksSetConverter(AssetsRepository repository) : base(repository) { }
+	}
 }

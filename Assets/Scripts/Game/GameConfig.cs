@@ -37,6 +37,7 @@ namespace TetrisTower.Game
 
 		public Newtonsoft.Json.JsonConverter[] Converters => new Newtonsoft.Json.JsonConverter[] {
 				new BlockTypeConverter(AssetsRepository),
+				new BlocksSetConverter(AssetsRepository),
 				new GridShapeTemplateConverter(AssetsRepository),
 				new RandomXoShiRo128starstarJsonConverter(),
 		};
