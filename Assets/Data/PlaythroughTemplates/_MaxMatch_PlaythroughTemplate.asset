@@ -15,7 +15,7 @@ MonoBehaviour:
   m_PlayerData:
     TowerLevel:
       rid: 0
-    Blocks: []
+    BlocksSet: {fileID: 0}
     FallSpeedNormalized: 2
     FallSpeedupPerAction: 0.01
     MatchesToModifySpawnedBlocksRange: 150
@@ -25,6 +25,7 @@ MonoBehaviour:
     CurrentLevelIndex: 0
     Levels: []
     ScoreOnLevelStart: 0
+    PlayTimeOnLevelStart: 0
   references:
     version: 2
     RefIds:
@@ -45,9 +46,10 @@ MonoBehaviour:
         FallDistanceNormalized: 4
         FallSpeedNormalized: 2
         FallSpeedupPerAction: 0.01
+        PlayTime: 0
         ShapeTemplates:
         - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
-        BlocksPool: []
+        BlocksSet: {fileID: 0}
         InitialSpawnBlockTypesCount: 3
         SpawnBlockTypesRange: {x: 0, y: 3}
         MatchesToModifySpawnedBlocksRange: 150

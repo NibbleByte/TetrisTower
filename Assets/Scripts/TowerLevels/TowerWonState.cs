@@ -116,7 +116,7 @@ namespace TetrisTower.TowerLevels
 					if (m_LevelData.Grid[row, column] == null) {
 						shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 							Coords = new GridCoords(row, column),
-							Value = m_GameConfig.WonBonusBlock,
+							Value = m_LevelData.BlocksSet.WonBonusBlock,
 						});
 					}
 				}
@@ -182,7 +182,7 @@ namespace TetrisTower.TowerLevels
 
 				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 					Coords = new GridCoords(blocksCount, 0),
-					Value = m_GameConfig.WonBonusBlock,
+					Value = m_LevelData.BlocksSet.WonBonusBlock,
 				});
 
 				blocksCount++;

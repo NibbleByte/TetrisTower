@@ -49,13 +49,10 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 
-			} else if (playthroughData.TowerLevel.BlocksPool.Length == 0) {
+			} else if (playthroughData.TowerLevel.BlocksSet == null) {
 
 				// For debug saves, blocks may be missing. Fill them up with the defaults.
-				playthroughData.TowerLevel.BlocksPool = playthroughData.Blocks.Length == 0
-					? gameContext.GameConfig.Blocks.ToArray()
-					: playthroughData.Blocks.ToArray()
-					;
+				playthroughData.TowerLevel.BlocksSet = playthroughData.BlocksSet ?? gameContext.GameConfig.DefaultBlocksSet;
 			}
 
 			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;

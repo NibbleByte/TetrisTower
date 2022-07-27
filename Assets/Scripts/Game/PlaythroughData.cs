@@ -14,8 +14,8 @@ namespace TetrisTower.Game
 	{
 		[SerializeReference] public GridLevelData TowerLevel;
 
-		[Tooltip("Blocks to be used along the playthrough. The index decides the order of appearance. If empty, blocks in config will be used.")]
-		public BlockType[] Blocks;
+		[Tooltip("Blocks to be used. If empty, default set from the game config is used.")]
+		public BlocksSet BlocksSet;
 
 		public float FallSpeedNormalized = 2f;
 		public float FallSpeedupPerAction = 0.01f;
@@ -84,17 +84,8 @@ namespace TetrisTower.Game
 				TowerLevel.Validate(repo, context);
 			}
 
-			for (int i = 0; i < Blocks.Length; i++) {
-				var block = Blocks[i];
-
-				if (block == null) {
-					Debug.LogError($"Missing {i}-th block from {nameof(Blocks)} in {nameof(PlaythroughData)} at {context}", context);
-					continue;
-				}
-
-				if (!repo.IsRegistered(block)) {
-					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(Blocks)} in {nameof(PlaythroughData)} at {context}", context);
-				}
+			if (BlocksSet) {
+				BlocksSet.Validate(repo, context);
 			}
 
 			foreach (var level in Levels) {
@@ -146,10 +137,10 @@ namespace TetrisTower.Game
 			}
 			int seed = playthrough.Random.Next();
 
-			if (playthrough.Blocks.Length != 0 && config.Blocks.Length != playthrough.Blocks.Length) {
-				Debug.LogError($"Playthrough blocks count {playthrough.Blocks.Length} doesn't match the ones in the game config {config.Blocks.Length}");
+			if (playthrough.BlocksSet && config.DefaultBlocksSet.Blocks.Length != playthrough.BlocksSet.Blocks.Length) {
+				Debug.LogError($"Playthrough blocks count {playthrough.BlocksSet.Blocks.Length} doesn't match the ones in the game config {config.DefaultBlocksSet.Blocks.Length}");
 			}
-			BlockType[] blocks = playthrough.Blocks.Length != 0	? playthrough.Blocks : config.Blocks;
+			BlocksSet blocks = playthrough.BlocksSet ?? config.DefaultBlocksSet;
 			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0	? ShapeTemplates : config.ShapeTemplates;
 
 			// No, we don't need '+1'. 9 + 3 = 12 (0 - 11). Placing on the 9 takes (9, 10, 11).
@@ -164,7 +155,7 @@ namespace TetrisTower.Game
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = shapeTemplates.ToArray(),
-				BlocksPool = blocks,
+				BlocksSet = blocks,
 
 				FallSpeedNormalized = playthrough.FallSpeedNormalized,
 				FallSpeedupPerAction = playthrough.FallSpeedupPerAction,

@@ -38,7 +38,7 @@ namespace TetrisTower.Game
 					return;
 				}
 
-				blocksPool = gameConfig.Blocks.ToArray();
+				blocksPool = gameConfig.DefaultBlocksSet.Blocks.ToArray();
 			}
 
 			for (int row = 0; row < m_PlayerData.TowerLevel.Grid.Rows; ++row) {

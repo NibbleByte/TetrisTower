@@ -38,7 +38,8 @@ namespace TetrisTower.Logic
 		public float PlayTime = 0;					// In seconds;
 
 		public GridShapeTemplate[] ShapeTemplates;
-		public BlockType[] BlocksPool;
+		public BlocksSet BlocksSet;
+		public BlockType[] BlocksPool => BlocksSet.Blocks;
 
 		// Initial spawn blocks from the array.
 		public int InitialSpawnBlockTypesCount = 3;
@@ -95,17 +96,8 @@ namespace TetrisTower.Logic
 				Debug.LogError($"{nameof(GridLevelData)} has no ObjectiveType set.", context);
 			}
 
-			for (int i = 0; i < BlocksPool.Length; i++) {
-				var block = BlocksPool[i];
-
-				if (block == null) {
-					Debug.LogError($"Missing {i}-th block from {nameof(BlocksPool)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
-					continue;
-				}
-
-				if (!repo.IsRegistered(block)) {
-					Debug.LogError($"Block {block.name} is not registered for serialization, from {nameof(BlocksPool)} in this {nameof(GridLevelData)} \"{BackgroundScene}\". {context}", context);
-				}
+			if (BlocksSet) {
+				BlocksSet.Validate(repo, context);
 			}
 		}
 	}
