@@ -22,6 +22,7 @@ MonoBehaviour:
     ModifyBlocksRangeType: 0
     RandomSeed: 0
     RandomInitialSeed: 0
+    WildBlockChance: 0.15
     CurrentLevelIndex: 0
     Levels:
     - BackgroundScene:
@@ -34,6 +35,7 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
       InitialSpawnBlockTypesCount: 3
       ObjectiveEndCount: 0
+      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3

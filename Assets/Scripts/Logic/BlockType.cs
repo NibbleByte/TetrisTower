@@ -5,10 +5,17 @@ using UnityEngine;
 
 namespace TetrisTower.Logic
 {
+	public enum MatchType
+	{
+		None,
+		MatchSame,
+		MatchAny,
+	}
+
 	[CreateAssetMenu(fileName = "Unknown_Block", menuName = "Tetris Tower/Block")]
 	public class BlockType : SerializableAsset
 	{
-		public bool CanBeMatched = true;
+		public MatchType MatchType = MatchType.MatchSame;
 		public Sprite Icon;
 		public GameObject Prefab3D;
 		public GameObject Prefab2D;

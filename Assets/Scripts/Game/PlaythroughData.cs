@@ -33,6 +33,9 @@ namespace TetrisTower.Game
 		[Tooltip("Read-only. Used for debug.")]
 		public int RandomInitialSeed;
 
+		[Range(0f, 2f)]
+		public float WildBlockChance = 0.15f;
+
 		public int CurrentLevelIndex = 0;
 		public LevelParamData[] Levels;
 
@@ -108,6 +111,9 @@ namespace TetrisTower.Game
 		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
 		public int ObjectiveEndCount;
 
+		[Tooltip("If true WildBlocks will be spawned with chance configured above. They match with any other type of block.")]
+		public bool SpawnWildBlocks = false;
+
 		public GridRules Rules;
 
 		[Range(5, 20)]
@@ -167,6 +173,8 @@ namespace TetrisTower.Game
 
 				RandomInitialLevelSeed = seed,
 				Random = new Xoshiro.PRNG32.XoShiRo128starstar(seed),
+
+				SpawnWildBlocksChance = SpawnWildBlocks ? playthrough.WildBlockChance : 0f,
 
 				Rules = Rules,
 				Grid = new BlocksGrid(totalRows, GridColumns),

@@ -417,14 +417,27 @@ namespace TetrisTower.Logic
 		public BlocksShape GenerateShape()
 		{
 			GridShapeTemplate template = LevelData.ShapeTemplates[LevelData.Random.Next(LevelData.ShapeTemplates.Length)];
-			return GenerateShape(template, LevelData.BlocksPool, LevelData.SpawnBlockTypesRange, LevelData.Random);
+			return GenerateShape(template);
 		}
 
-		private static BlocksShape GenerateShape(GridShapeTemplate template, BlockType[] blocksPool, Vector2Int range, System.Random random)
+		private BlocksShape GenerateShape(GridShapeTemplate template)
 		{
 			var shapeCoords = new List<BlocksShape.ShapeBind>();
-			foreach(var coords in template.ShapeTemplate) {
-				var blockType = blocksPool[random.Next(range.x, range.y)];
+			Vector2Int blocksRange = LevelData.SpawnBlockTypesRange;
+
+			double totalRange = blocksRange.y - blocksRange.x;
+			if (LevelData.SpawnWildBlocksChance > 0f) {
+				totalRange += LevelData.SpawnWildBlocksChance;
+			}
+
+
+			foreach (GridCoords coords in template.ShapeTemplate) {
+				double blockIndex = LevelData.Random.NextDouble() * totalRange;
+
+				BlockType blockType = blockIndex < blocksRange.y
+					? LevelData.BlocksPool[blocksRange.x + (int)blockIndex]
+					: LevelData.BlocksSet.WildBlock
+					;
 
 				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 					Coords = coords,

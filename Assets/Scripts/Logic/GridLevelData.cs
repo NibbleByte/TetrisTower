@@ -60,6 +60,8 @@ namespace TetrisTower.Logic
 		// NOTE: This is not the same object as in PlaythroughData. Serializing doesn't work (easily) with references.
 		public System.Random Random = null;
 
+		public float SpawnWildBlocksChance = 0f;
+
 		public GridRules Rules;
 
 		// Rows from bottom to top go from 0 to n (up direction).

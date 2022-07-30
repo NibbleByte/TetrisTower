@@ -53,6 +53,7 @@ namespace TetrisTower.TowerLevels
 
 				// For debug saves, blocks may be missing. Fill them up with the defaults.
 				playthroughData.TowerLevel.BlocksSet = playthroughData.BlocksSet ?? gameContext.GameConfig.DefaultBlocksSet;
+				playthroughData.TowerLevel.BlocksSet.Validate(gameContext.GameConfig.AssetsRepository, gameContext.GameConfig);
 			}
 
 			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;
@@ -151,8 +152,9 @@ namespace TetrisTower.TowerLevels
 			ShowRulesMessage(playthroughData.TowerLevel);
 
 			if (gameContext.CurrentPlaythrough.TowerLevel.IsPlaying) {
+				GridLevelData levelData = gameContext.CurrentPlaythrough.TowerLevel;
 				// If save came with available matches, or pending actions, do them.
-				var pendingActions = GameGridEvaluation.Evaluate(gameContext.CurrentPlaythrough.TowerLevel.Grid, gameContext.CurrentPlaythrough.TowerLevel.Rules);
+				var pendingActions = GameGridEvaluation.Evaluate(levelData.Grid, levelData.Rules);
 				if (pendingActions.Count > 0) {
 					levelController.StartCoroutine(levelController.RunActions(pendingActions));
 

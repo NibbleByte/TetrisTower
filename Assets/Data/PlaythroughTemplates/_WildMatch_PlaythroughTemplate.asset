@@ -1,0 +1,288 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9374f2e4f65f3469683e1287ce1e80, type: 3}
+  m_Name: _WildMatch_PlaythroughTemplate
+  m_EditorClassIdentifier: 
+  m_PlayerData:
+    TowerLevel:
+      rid: 0
+    BlocksSet: {fileID: 0}
+    FallSpeedNormalized: 2
+    FallSpeedupPerAction: 0.01
+    MatchesToModifySpawnedBlocksRange: 150
+    ModifyBlocksRangeType: 0
+    RandomSeed: 0
+    RandomInitialSeed: 0
+    WildBlockChance: 0
+    CurrentLevelIndex: 0
+    Levels: []
+    ScoreOnLevelStart: 0
+    PlayTimeOnLevelStart: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 0
+      type: {class: GridLevelData, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
+      data:
+        BackgroundScene:
+          m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+          m_IsDirty: 0
+          m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+        NextShape:
+          rid: -2
+        FallingShape:
+          rid: 2
+        FallingColumn: 0
+        FallDistanceNormalized: 4
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.01
+        PlayTime: 0
+        ShapeTemplates:
+        - {fileID: 11400000, guid: 6a0de140dc3bb2646b70b27b86ae5eff, type: 2}
+        BlocksSet: {fileID: 0}
+        InitialSpawnBlockTypesCount: 3
+        SpawnBlockTypesRange: {x: 0, y: 3}
+        MatchesToModifySpawnedBlocksRange: 150
+        ModifyBlocksRangeType: 0
+        RandomInitialLevelSeed: 0
+        SpawnWildBlocksChance: 1
+        Rules:
+          MatchHorizontalLines: 3
+          MatchVerticalLines: 3
+          MatchDiagonalsLines: 3
+          ObjectiveType: -1
+          WrapSidesOnMatch: 1
+          WrapSidesOnMove: 1
+        Grid:
+          m_Rows: 15
+          m_Columns: 13
+          m_Blocks:
+          - {fileID: 0}
+          - {fileID: 11400000, guid: d10f8892d66435c459c6f962442cb895, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: d10f8892d66435c459c6f962442cb895, type: 2}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: fff9b60f3f53d1249a8528975591c739, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: d10f8892d66435c459c6f962442cb895, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 15b70fb8a10018e419d1ce7ce23e9504, type: 2}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 15b70fb8a10018e419d1ce7ce23e9504, type: 2}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+        PlayableSize:
+          Row: 9
+          Column: 13
+        Score:
+          rid: -2
+        ObjectiveEndCount: 90
+        RunningState: 0
+    - rid: 2
+      type: {class: BlocksShape, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
+      data:
+        ShapeCoords:
+        - Coords:
+            Row: 0
+            Column: 0
+          Value: {fileID: 11400000, guid: fff9b60f3f53d1249a8528975591c739, type: 2}
+        - Coords:
+            Row: 1
+            Column: 0
+          Value: {fileID: 11400000, guid: fff9b60f3f53d1249a8528975591c739, type: 2}
+        - Coords:
+            Row: 2
+            Column: 0
+          Value: {fileID: 11400000, guid: 15b70fb8a10018e419d1ce7ce23e9504, type: 2}

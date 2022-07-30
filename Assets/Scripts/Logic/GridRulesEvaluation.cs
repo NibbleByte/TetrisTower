@@ -66,6 +66,43 @@ namespace TetrisTower.Logic
 			}
 		}
 
+		private static bool BlocksMatchSafe(BlockType block1, BlockType block2)
+		{
+			if (block1 == null || block2 == null)
+				return false;
+
+			MatchType type = block1.MatchType;
+			if (block2.MatchType > type && type != MatchType.None) {
+				type = block2.MatchType;
+			}
+
+			switch (type) {
+				case MatchType.None:
+					return false;
+				case MatchType.MatchSame:
+					return block1 == block2;
+				case MatchType.MatchAny:
+					return true;
+				default:
+					throw new NotSupportedException(block2.MatchType.ToString());
+			}
+		}
+
+		private static void BacktrackOrClearMatched(BlocksGrid grid, List<GridCoords> matched)
+		{
+			// Instead of clearing the matched list, back track all the wild blocks so we can resume with them.
+			int removeToIndex;
+			for(removeToIndex = matched.Count - 1; removeToIndex >= 0; removeToIndex--) {
+				BlockType block = grid[matched[removeToIndex]];
+
+				if (block.MatchType != MatchType.MatchAny) {
+					break;
+				}
+			}
+
+			matched.RemoveRange(0, removeToIndex + 1);
+		}
+
 		private static void EvaluateMatchesAlongLine(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, MatchScoringType matchType, List<GridAction> actions)
 		{
 			UnityEngine.Debug.Assert(direction.Row == 0 || direction.Column == 0);
@@ -82,8 +119,17 @@ namespace TetrisTower.Logic
 			for (int i = 0; i < totalBlocks; ++i) {
 				BlockType currentType = grid[coords];
 
-				if (currentType == lastMatched && currentType != null && currentType.CanBeMatched) {
+				if (currentType && currentType.MatchType == MatchType.None) {
+					currentType = null;
+				}
+
+				if (BlocksMatchSafe(lastMatched, currentType)) {
 					matched.Add(coords);
+
+					// If match starts with wild block, it wouldn't know it's actual match type we're looking for. First non-wild block found selects the type.
+					if (lastMatched.MatchType == MatchType.MatchAny) {
+						lastMatched = currentType;
+					}
 
 				} else {
 
@@ -98,14 +144,15 @@ namespace TetrisTower.Logic
 					}
 					wrapMatchPending = false;
 
-					matched.Clear();
+					BacktrackOrClearMatched(grid, matched);
+
 					if (currentType != null) {
 						matched.Add(coords);
 					}
 					lastMatched = currentType;
 
 					// Don't match sequence if it will be matched by wrapping the end of the row.
-					if (wrapColumns && coords.Column == 0 && currentType != null && grid[coords.Row - direction.Row, grid.Columns - 1] == currentType) {
+					if (wrapColumns && coords.Column == 0 && BlocksMatchSafe(grid[coords.Row - direction.Row, grid.Columns - 1], currentType)) {
 						wrapMatchPending = true;
 					}
 				}
@@ -130,7 +177,41 @@ namespace TetrisTower.Logic
 
 				if (endReached) {
 
-					matched.AddRange(toBeWrappedMatch);
+					if (toBeWrappedMatch.Count > 0) {
+						// Find out what the wrapped match block type is. If all matched blocks are wild ones, no wrapped type is available.
+						BlockType wrappedType = toBeWrappedMatch.Select(c => grid[c]).FirstOrDefault(b => b.MatchType == MatchType.MatchSame);
+
+						if (wrappedType == null) {
+							// Just add in all wild blocks.
+							matched.AddRange(toBeWrappedMatch);
+
+						} else {
+
+							int mbi; // Match Breaking Index. On the right of it should be cleared together with the wrapped ones. The rest on the left are match on their own.
+							for (mbi = matched.Count - 1; mbi >= 0; --mbi) {
+								if (!BlocksMatchSafe(grid[matched[mbi]], wrappedType))
+									break;
+							}
+
+							// -1 means all is matching.
+							//		 0
+							// B W B | W W B	<-- toBeWrappedMatch
+							// B W W | W W B
+							// C W W | W W B
+							// C C W | W W B
+							// C C B | W W B
+							toBeWrappedMatch.InsertRange(0, matched.GetRange(mbi + 1, matched.Count - (mbi + 1)));
+
+							if (toBeWrappedMatch.Count >= matchCount) {
+								var action = new ClearMatchedAction() { MatchedType = matchType, Coords = new List<GridCoords>(toBeWrappedMatch) };
+								actions.Add(action);
+							}
+
+							matched.RemoveRange(mbi + 1, matched.Count - (mbi + 1));
+						}
+					}
+
+
 					toBeWrappedMatch.Clear();
 					wrapMatchPending = false;
 
@@ -184,8 +265,17 @@ namespace TetrisTower.Logic
 
 					BlockType currentType = grid[coords];
 
-					if (currentType == lastMatched && currentType != null && currentType.CanBeMatched) {
+					if (currentType && currentType.MatchType == MatchType.None) {
+						currentType = null;
+					}
+
+					if (BlocksMatchSafe(lastMatched, currentType)) {
 						matched.Add(coords);
+
+						// If match starts with wild block, it wouldn't know it's actual match type we're looking for. First non-wild block found selects the type.
+						if (lastMatched.MatchType == MatchType.MatchAny) {
+							lastMatched = currentType;
+						}
 
 					} else {
 
@@ -194,7 +284,8 @@ namespace TetrisTower.Logic
 							actions.Add(action);
 						}
 
-						matched.Clear();
+						BacktrackOrClearMatched(grid, matched);
+
 						if (currentType != null) {
 							matched.Add(coords);
 						}

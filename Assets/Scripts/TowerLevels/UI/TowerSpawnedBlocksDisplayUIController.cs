@@ -66,6 +66,11 @@ namespace TetrisTower.TowerLevels.UI
 
 			foreach (var shapeCoord in shape.ShapeCoords) {
 				int blockIndex = Array.IndexOf(m_LevelData.BlocksPool, shapeCoord.Value);
+
+				// Wild or other special block that is not displayed as normal.
+				if (blockIndex == -1)
+					continue;
+
 				GameObject previewIcon = transform.GetChild(blockIndex).gameObject;
 
 				if (!previewIcon.activeSelf && ShouldBeActive(blockIndex)) {
