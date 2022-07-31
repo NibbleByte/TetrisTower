@@ -3,6 +3,7 @@ using DevLocker.GFrame.Input.UIInputDisplay;
 using TetrisTower.Core;
 using TetrisTower.Logic;
 using UnityEngine;
+using System.Linq;
 
 namespace TetrisTower.Game
 {
@@ -52,5 +53,13 @@ namespace TetrisTower.Game
 				Debug.LogError($"No default block set for game config {name}", this);
 			}
 		}
+
+#if UNITY_EDITOR
+		public static GameConfig FindDefaultConfig() => UnityEditor.AssetDatabase.FindAssets($"t:{nameof(GameConfig)}")
+					.Select(UnityEditor.AssetDatabase.GUIDToAssetPath)
+					.Select(UnityEditor.AssetDatabase.LoadAssetAtPath<GameConfig>)
+					.FirstOrDefault()
+					;
+#endif
 	}
 }

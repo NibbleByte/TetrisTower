@@ -27,11 +27,7 @@ namespace TetrisTower.Game
 		{
 			BlockType[] blocksPool = m_PlayerData.TowerLevel.BlocksPool;
 			if (blocksPool == null || blocksPool.Length == 0) {
-				GameConfig gameConfig = UnityEditor.AssetDatabase.FindAssets($"t:{nameof(GameConfig)}")
-					.Select(UnityEditor.AssetDatabase.GUIDToAssetPath)
-					.Select(UnityEditor.AssetDatabase.LoadAssetAtPath<GameConfig>)
-					.FirstOrDefault()
-					;
+				GameConfig gameConfig = GameConfig.FindDefaultConfig();
 
 				if (!gameConfig) {
 					Debug.LogError("Specify pool of blocks or have at least one GameConfig in the project.", this);
