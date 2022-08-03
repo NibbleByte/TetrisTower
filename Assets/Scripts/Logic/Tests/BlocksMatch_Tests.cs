@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using NUnit.Framework;
 using TetrisTower.Game;
@@ -89,10 +90,10 @@ namespace TetrisTower.Logic
 			};
 		}
 
-		private IEnumerator SetupGrid(BlockType[,] blocks)
+		private IEnumerator SetupGrid(BlockType[,] blocks, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
-			Assert.LessOrEqual(blocks.GetLength(0), MaxRows, "Wrong rows count.");
-			Assert.LessOrEqual(blocks.GetLength(1), MaxColumns, "Wrong columns count.");
+			Assert.LessOrEqual(blocks.GetLength(0), MaxRows, $"Wrong rows count.\n{caller}:{lineNumber}");
+			Assert.LessOrEqual(blocks.GetLength(1), MaxColumns, $"Wrong columns count.\n{caller}:{lineNumber}");
 
 			m_Grid = new BlocksGrid(MaxRows, MaxColumns);
 
@@ -158,7 +159,7 @@ namespace TetrisTower.Logic
 			Debug.Log(output.ToString());
 		}
 
-		private void AssertGrid(BlockType[,] blocks)
+		private void AssertGrid(BlockType[,] blocks, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
 			for (int row = 0; row < MaxRows; ++row) {
 
@@ -173,12 +174,12 @@ namespace TetrisTower.Logic
 						System.Diagnostics.Debugger.Break();
 					}
 
-					Assert.AreEqual(block, m_Grid[row, column], $"Blocks[{blocksRow}, {column}] != Grid[{row}, {column}]");
+					Assert.AreEqual(block, m_Grid[row, column], $"Blocks[{blocksRow}, {column}] != Grid[{row}, {column}]\n{caller}:{lineNumber}");
 				}
 			}
 		}
 
-		private void AssertNoActions(GridRules rules)
+		private void AssertNoActions(GridRules rules, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
 			List<GridAction> pendingActions = GameGridEvaluation.Evaluate(m_Grid, rules);
 
@@ -187,7 +188,7 @@ namespace TetrisTower.Logic
 				System.Diagnostics.Debugger.Break();
 			}
 
-			Assert.AreEqual(0, pendingActions.Count, $"Grid Actions left: {pendingActions.Count}.");
+			Assert.AreEqual(0, pendingActions.Count, $"Grid Actions left: {pendingActions.Count}.\n{caller}:{lineNumber}");
 		}
 
 		private static BlockType[,] Mirror(BlockType[,] blocks)
@@ -201,6 +202,34 @@ namespace TetrisTower.Logic
 			}
 
 			return mirror;
+		}
+
+		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, int applyActionsCount, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+		{
+			yield return SetupGrid(blocks, lineNumber, caller);
+
+			for(int i = 0; i < applyActionsCount; ++i) {
+				var actions = GameGridEvaluation.Evaluate(m_Grid, DefaultRules);
+				Assert.AreNotEqual(0, actions.Count, $"No actions available.\n{caller}:{lineNumber}");
+
+				yield return m_Grid.ApplyActions(actions);
+			}
+
+			AssertNoActions(DefaultRules, lineNumber, caller);
+			AssertGrid(blocksDone, lineNumber, caller);
+
+			//
+			// Mirrored
+			//
+
+			yield return SetupGrid(Mirror(blocks), lineNumber, caller);
+
+			for (int i = 0; i < applyActionsCount; ++i) {
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+			}
+
+			AssertNoActions(DefaultRules, lineNumber, caller);
+			AssertGrid(Mirror(blocksDone), lineNumber, caller);
 		}
 
 		#endregion
@@ -265,14 +294,7 @@ namespace TetrisTower.Logic
 				{ N, N, N, N, R, N, N, S, S, S, N, N, B },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 2);
 		}
 
 		[UnityTest]
@@ -292,18 +314,11 @@ namespace TetrisTower.Logic
 				{ N, N, B, N, N, N, N, B, N, S, N, S, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 2);
 		}
 
 		[UnityTest]
-		public IEnumerator Basics_Diagonals1()
+		public IEnumerator Basics_Diagonals()
 		{
 			BlockType[,] blocks = new BlockType[,] {
 				{ N, N, N, N, N, N, N, N, N, N, N, R, N },
@@ -320,42 +335,7 @@ namespace TetrisTower.Logic
 				{ N, S, S, S, R, R, N, G, G, N, N, N, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
-		}
-
-		[UnityTest]
-		public IEnumerator Basics_Diagonals2()
-		{
-			BlockType[,] blocks = new BlockType[,] {
-				{ N, R, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, R, N, N, N, N, N, N, N, N, B, G },
-				{ G, N, N, R, N, B, N, N, N, S, B, R, B },
-				{ B, G, N, N, G, N, B, R, N, S, S, B, R },
-				{ R, B, N, N, N, G, N, B, R, S, S, S, B },
-			};
-
-			BlockType[,] blocksDone = new BlockType[,] {
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, N, N, N, N, N, N, N, S, N, N, N },
-				{ N, N, N, N, N, N, N, N, N, S, S, N, N },
-				{ N, N, N, N, G, G, N, R, R, S, S, S, N },
-			};
-
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 2);
 		}
 
 		[UnityTest]
@@ -375,41 +355,21 @@ namespace TetrisTower.Logic
 				{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 1);
 		}
 
 		[UnityTest]
 		public IEnumerator Basics_WholeRow()
 		{
 			BlockType[,] blocks = new BlockType[,] {
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				{ R, R, R, R, R, R, R, R, R, R, R, R, R },
 			};
 
 			BlockType[,] blocksDone = new BlockType[,] {
 				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 1);
 		}
 
 		[UnityTest]
@@ -435,14 +395,7 @@ namespace TetrisTower.Logic
 				{ N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 1);
 		}
 
 		#endregion
@@ -475,14 +428,7 @@ namespace TetrisTower.Logic
 				{ S, S, S, B, S, S, S, N, W, W, W, W, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 2);
 		}
 
 		[UnityTest]
@@ -529,14 +475,7 @@ namespace TetrisTower.Logic
 				{ W, S, S, S, S, B, W, S, B, N, N, N, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 2);
 		}
 
 		[UnityTest]
@@ -554,14 +493,7 @@ namespace TetrisTower.Logic
 				{ N, N, N, N, N, N, S, N, N, N, N, N, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 1);
 		}
 
 		[UnityTest]
@@ -575,14 +507,7 @@ namespace TetrisTower.Logic
 				{ N, R, N, N, N, N, R, W, N, B, B, N, N },
 			};
 
-			yield return SetupGrid(blocks);
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-			AssertNoActions(DefaultRules);
-			AssertGrid(blocksDone);
+			yield return EvaluateGrid(blocks, blocksDone, 1);
 		}
 
 		[UnityTest]
@@ -603,36 +528,7 @@ namespace TetrisTower.Logic
 					{ S, B, B, N, N, N, N, N, N, N, S, R, S },
 				};
 
-				yield return SetupGrid(blocks);
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(blocksDone);
-
-
-				//
-				// Mirrored
-				//
-
-				yield return SetupGrid(Mirror(blocks));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(Mirror(blocksDone));
+				yield return EvaluateGrid(blocks, blocksDone, 4);
 			}
 
 			{
@@ -645,23 +541,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return SetupGrid(blocks);
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(blocksDone);
-
-				//
-				// Mirrored
-				//
-
-				yield return SetupGrid(Mirror(blocks));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(Mirror(blocksDone));
+				yield return EvaluateGrid(blocks, blocksDone, 1);
 			}
 
 			{
@@ -674,23 +554,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return SetupGrid(blocks);
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(blocksDone);
-
-				//
-				// Mirrored
-				//
-
-				yield return SetupGrid(Mirror(blocks));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(Mirror(blocksDone));
+				yield return EvaluateGrid(blocks, blocksDone, 1);
 			}
 
 			{
@@ -703,23 +567,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return SetupGrid(blocks);
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(blocksDone);
-
-				//
-				// Mirrored
-				//
-
-				yield return SetupGrid(Mirror(blocks));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(Mirror(blocksDone));
+				yield return EvaluateGrid(blocks, blocksDone, 1);
 			}
 
 			{
@@ -732,23 +580,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return SetupGrid(blocks);
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(blocksDone);
-
-				//
-				// Mirrored
-				//
-
-				yield return SetupGrid(Mirror(blocks));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(Mirror(blocksDone));
+				yield return EvaluateGrid(blocks, blocksDone, 1);
 			}
 
 			{
@@ -760,25 +592,11 @@ namespace TetrisTower.Logic
 					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
 				};
 
-				yield return SetupGrid(blocks);
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(blocksDone);
-
-				//
-				// Mirrored
-				//
-
-				yield return SetupGrid(Mirror(blocks));
-
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
-
-				AssertNoActions(DefaultRules);
-				AssertGrid(Mirror(blocksDone));
+				yield return EvaluateGrid(blocks, blocksDone, 0);
 			}
 		}
+
+		// TODO: Add Wild block diagonal matching tests.
 
 		#endregion
 	}
