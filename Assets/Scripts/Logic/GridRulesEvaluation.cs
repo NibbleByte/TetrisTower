@@ -134,7 +134,8 @@ namespace TetrisTower.Logic
 				} else {
 
 					if (!wrapMatchPending) {
-						if (matched.Count >= matchCount) {
+						// Exclude matches with only wild blocks.
+						if (matched.Count >= matchCount && lastMatched && lastMatched.MatchType != MatchType.MatchAny) {
 							var action = new ClearMatchedAction() { MatchedType = matchType, Coords = new List<GridCoords>(matched) };
 							actions.Add(action);
 						}
@@ -144,7 +145,11 @@ namespace TetrisTower.Logic
 					}
 					wrapMatchPending = false;
 
-					BacktrackOrClearMatched(grid, matched);
+					if (currentType) {
+						BacktrackOrClearMatched(grid, matched);
+					} else {
+						matched.Clear();
+					}
 
 					if (currentType != null) {
 						matched.Add(coords);
@@ -181,9 +186,12 @@ namespace TetrisTower.Logic
 						// Find out what the wrapped match block type is. If all matched blocks are wild ones, no wrapped type is available.
 						BlockType wrappedType = toBeWrappedMatch.Select(c => grid[c]).FirstOrDefault(b => b.MatchType == MatchType.MatchSame);
 
-						if (wrappedType == null) {
-							// Just add in all wild blocks.
+						if (wrappedType == null || wrappedType == lastMatched || lastMatched.MatchType == MatchType.MatchAny) {
+							// wrappedType == null								=> Everything on the right is wild blocks.
+							// lastMatched.MatchType == MatchType.MatchAny		=> Everything on the left is wild blocks.
+							// wrappedType == lastMatched						=> Both sides have the same type, everything matches.
 							matched.AddRange(toBeWrappedMatch);
+							lastMatched = wrappedType ?? lastMatched;	// In case of wild blocks on the left, still needs a proper type to be considered a bit later.
 
 						} else {
 
@@ -193,8 +201,14 @@ namespace TetrisTower.Logic
 									break;
 							}
 
+							int tbmbi; // To Be Matched Index. Same but with the other collection.
+							for (tbmbi = 0; tbmbi < toBeWrappedMatch.Count; ++tbmbi) {
+								if (!BlocksMatchSafe(grid[toBeWrappedMatch[tbmbi]], lastMatched))
+									break;
+							}
+
 							// -1 means all is matching.
-							//		 0
+							//	  12   0
 							// B W B | W W B	<-- toBeWrappedMatch
 							// B W W | W W B
 							// C W W | W W B
@@ -207,7 +221,8 @@ namespace TetrisTower.Logic
 								actions.Add(action);
 							}
 
-							matched.RemoveRange(mbi + 1, matched.Count - (mbi + 1));
+							// tbmbi can't be toBeWrappedMatch.Count as match types are different (check above) and at least 1 element on the right is not matchable.
+							matched.AddRange(toBeWrappedMatch.GetRange(0, tbmbi));
 						}
 					}
 
@@ -215,7 +230,8 @@ namespace TetrisTower.Logic
 					toBeWrappedMatch.Clear();
 					wrapMatchPending = false;
 
-					if (matched.Count >= matchCount) {
+					// lastMatched can be null if only wild blocks present. Exclude matches with only wild blocks.
+					if (matched.Count >= matchCount && lastMatched && lastMatched.MatchType != MatchType.MatchAny) {
 						var action = new ClearMatchedAction() { MatchedType = matchType, Coords = new List<GridCoords>(matched) };
 						actions.Add(action);
 					}
@@ -279,12 +295,17 @@ namespace TetrisTower.Logic
 
 					} else {
 
-						if (matched.Count >= matchCount) {
+						// Exclude matches with only wild blocks.
+						if (matched.Count >= matchCount && lastMatched && lastMatched.MatchType != MatchType.MatchAny) {
 							var action = new ClearMatchedAction() { MatchedType = MatchScoringType.Diagonals, Coords = new List<GridCoords>(matched) };
 							actions.Add(action);
 						}
 
-						BacktrackOrClearMatched(grid, matched);
+						if (currentType) {
+							BacktrackOrClearMatched(grid, matched);
+						} else {
+							matched.Clear();
+						}
 
 						if (currentType != null) {
 							matched.Add(coords);
@@ -311,7 +332,8 @@ namespace TetrisTower.Logic
 
 
 					if (endReached) {
-						if (matched.Count >= matchCount) {
+						// lastMatched can be null if only wild blocks present. Exclude matches with only wild blocks.
+						if (matched.Count >= matchCount && lastMatched && lastMatched.MatchType != MatchType.MatchAny) {
 							var action = new ClearMatchedAction() { MatchedType = MatchScoringType.Diagonals, Coords = new List<GridCoords>(matched) };
 							actions.Add(action);
 						}

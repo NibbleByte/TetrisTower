@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using NUnit.Framework;
 using TetrisTower.Game;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace TetrisTower.Logic
 
 		private BlockType N; // "null" block
 
-		private const int MaxRows = 9;
+		private const int MaxRows = 13;
 		private const int MaxColumns = 13;
 
 		private static readonly GridRules DefaultRules = new GridRules {
@@ -90,6 +91,9 @@ namespace TetrisTower.Logic
 
 		private IEnumerator SetupGrid(BlockType[,] blocks)
 		{
+			Assert.LessOrEqual(blocks.GetLength(0), MaxRows, "Wrong rows count.");
+			Assert.LessOrEqual(blocks.GetLength(1), MaxColumns, "Wrong columns count.");
+
 			m_Grid = new BlocksGrid(MaxRows, MaxColumns);
 
 			yield return m_Grid.ApplyActions(new GridAction[] { SetupPlaceAction(blocks) });
@@ -105,6 +109,55 @@ namespace TetrisTower.Logic
 
 		#region Utils
 
+		private void PrintGrid()
+		{
+			string GetBlockSymbol(BlockType block)
+			{
+				if (block == R) return nameof(R);
+				if (block == G) return nameof(G);
+				if (block == B) return nameof(B);
+
+				if (block == W) return nameof(W);
+				if (block == S) return nameof(S);
+
+				if (block == N) return nameof(N);
+
+				throw new System.NotSupportedException(block?.name);
+			}
+
+
+			var output = new StringBuilder();
+
+			output.AppendLine("Grid: ");
+
+			for (int row = m_Grid.Rows - 1; row >= 0; --row) {
+
+				output.Append($"{row}  [ ");
+
+				for (int column = 0; column < m_Grid.Columns; ++column) {
+					output.Append(GetBlockSymbol(m_Grid[row, column]));
+
+					if (column != m_Grid.Columns - 1) {
+						output.Append(", ");
+					}
+				}
+
+				output.AppendLine(" ]");
+			}
+
+			// Header columns
+			//output.Append("      ");
+			//for (int column = 0; column < m_Grid.Columns; ++column) {
+			//	output.Append($"{column}\t");
+			//}
+			//
+			//output.AppendLine();
+
+			output.AppendLine("       0  1   2   3  4  5   6   7   8  9  10 11 12");	// Tabs are too wide.
+
+			Debug.Log(output.ToString());
+		}
+
 		private void AssertGrid(BlockType[,] blocks)
 		{
 			for (int row = 0; row < MaxRows; ++row) {
@@ -116,6 +169,7 @@ namespace TetrisTower.Logic
 					BlockType gridBlock = m_Grid[row, column];
 
 					if (block != gridBlock) {
+						PrintGrid();
 						System.Diagnostics.Debugger.Break();
 					}
 
@@ -127,7 +181,26 @@ namespace TetrisTower.Logic
 		private void AssertNoActions(GridRules rules)
 		{
 			List<GridAction> pendingActions = GameGridEvaluation.Evaluate(m_Grid, rules);
-			Assert.AreEqual(0, pendingActions.Count, $"Grid Actions left - {pendingActions.Count}.");
+
+			if (pendingActions.Count > 0) {
+				PrintGrid();
+				System.Diagnostics.Debugger.Break();
+			}
+
+			Assert.AreEqual(0, pendingActions.Count, $"Grid Actions left: {pendingActions.Count}.");
+		}
+
+		private static BlockType[,] Mirror(BlockType[,] blocks)
+		{
+			BlockType[,] mirror = new BlockType[blocks.GetLength(0), blocks.GetLength(1)];
+
+			for(int row = 0; row < blocks.GetLength(0); ++row) {
+				for(int column = 0; column < blocks.GetLength(1); ++column) {
+					mirror[row, blocks.GetLength(1) - 1 - column] = blocks[row, column];
+				}
+			}
+
+			return mirror;
 		}
 
 		#endregion
@@ -384,7 +457,7 @@ namespace TetrisTower.Logic
 				{ R, R, R, W, B, N, N, N, N, N, N, N, N },
 				{ S, S, S, N, S, S, S, N, N, N, N, N, N },
 				{ R, R, W, B, B, N, N, N, W, N, N, N, N },
-				{ R, R, W, B, W, N, N, N, S, S, N, N, N },
+				{ R, R, W, B, N, N, N, N, S, S, N, N, N },
 				{ S, S, S, N, S, S, S, N, W, W, N, N, N },
 				{ R, W, R, N, B, W, B, N, S, S, S, N, N },
 				{ S, S, S, N, S, S, S, N, W, W, W, N, N },
@@ -413,18 +486,47 @@ namespace TetrisTower.Logic
 		}
 
 		[UnityTest]
-		public IEnumerator WildBlock_Complex()
+		public IEnumerator WildBlock_Basics_Vertical()
 		{
+			BlockType[,] blocks_horizontal = new BlockType[,] {
+				{ R, R, R, W, B, B, N, N, N, N, N, N, N },
+				{ R, R, R, W, B, N, N, N, N, N, N, N, N },
+				{ S, S, S, N, S, S, S, N, N, N, N, N, N },
+				{ R, R, W, B, B, N, N, N, W, N, N, N, N },
+				{ R, R, W, B, N, N, N, N, S, S, N, N, N },
+				{ S, S, S, N, S, S, S, N, W, W, N, N, N },
+				{ R, W, R, N, B, W, B, N, S, S, S, N, N },
+				{ S, S, S, N, S, S, S, N, W, W, W, N, N },
+				{ R, W, W, N, W, W, B, N, S, S, S, S, N },
+				{ R, R, W, N, W, B, B, N, W, W, W, W, N },
+			};
+
 			BlockType[,] blocks = new BlockType[,] {
-				{ W, R, W, R, W, R, W, R, W, R, W, R, W },
 				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ W, N, B, N, N, N, N, N, N, N, N, N, N },
-				{ R, N, B, N, N, N, N, N, N, N, N, N, N },
-				{ R, R, W, N, N, N, N, N, N, N, N, N, N },
+				{ W, S, N, N, N, N, N, N, N, N, N, N, N },
+				{ W, S, W, S, N, N, N, N, N, N, N, N, N },
+				{ W, S, W, S, W, S, N, N, N, N, N, N, N },
+				{ W, S, W, S, W, S, W, N, N, N, N, N, N },
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ B, B, S, W, S, N, N, S, N, N, N, N, N },
+				{ B, W, S, B, S, N, N, S, N, B, N, N, N },
+				{ W, W, S, W, S, N, B, S, B, B, N, N, N },
+				{ N, N, N, N, N, B, B, N, W, W, N, N, N },
+				{ W, W, S, R, S, W, W, S, R, R, N, N, N },
+				{ R, W, S, W, S, R, R, S, R, R, N, N, N },
+				{ R, R, S, R, S, R, R, S, R, R, N, N, N },
 			};
 
 			BlockType[,] blocksDone = new BlockType[,] {
-				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, W, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, W, N, W, N, N, N, N, N, N, N, N },
+				{ N, N, W, N, W, N, N, N, N, N, N, N, N },
+				{ N, N, S, N, S, N, N, S, N, N, N, N, N },
+				{ N, N, S, N, S, N, N, S, N, N, N, N, N },
+				{ W, S, S, N, S, N, N, S, N, N, N, N, N },
+				{ W, S, S, S, S, S, N, S, N, N, N, N, N },
+				{ W, S, S, S, S, S, N, S, N, N, N, N, N },
+				{ W, S, S, S, S, B, W, S, B, N, N, N, N },
 			};
 
 			yield return SetupGrid(blocks);
@@ -435,6 +537,247 @@ namespace TetrisTower.Logic
 
 			AssertNoActions(DefaultRules);
 			AssertGrid(blocksDone);
+		}
+
+		[UnityTest]
+		public IEnumerator WildBlock_Complex()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ W, R, W, R, W, R, W, R, W, R, W, R, W },
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ W, N, B, N, N, N, N, N, N, N, N, N, N },
+				{ R, N, B, N, N, N, N, N, N, N, N, N, N },
+				{ R, R, W, B, B, W, S, W, W, B, N, N, N },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ N, N, N, N, N, N, S, N, N, N, N, N, N },
+			};
+
+			yield return SetupGrid(blocks);
+
+			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+			AssertNoActions(DefaultRules);
+			AssertGrid(blocksDone);
+		}
+
+		[UnityTest]
+		public IEnumerator WildBlock_Horizontal_Backtrack()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ N, R, W, B, B, N, R, W, N, B, B, N, N },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ N, R, N, N, N, N, R, W, N, B, B, N, N },
+			};
+
+			yield return SetupGrid(blocks);
+
+			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+			yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+			AssertNoActions(DefaultRules);
+			AssertGrid(blocksDone);
+		}
+
+		[UnityTest]
+		public IEnumerator WildBlock_Horizontal_Backtrack_Wrapped()
+		{
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ B, B, N, N, N, N, N, N, N, N, R, W, N },
+					{ B, N, N, N, N, N, N, N, N, N, R, W, B },
+					{ S, S, S, N, N, N, N, N, N, N, S, S, S },
+					{ N, B, B, N, N, N, N, N, N, N, N, R, W },
+					{ B, B, N, N, N, N, N, N, N, N, N, R, W },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, W, N },
+					{ N, S, S, N, N, N, N, N, N, N, R, S, N },
+					{ S, B, B, N, N, N, N, N, N, N, S, R, S },
+				};
+
+				yield return SetupGrid(blocks);
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(blocksDone);
+
+
+				//
+				// Mirrored
+				//
+
+				yield return SetupGrid(Mirror(blocks));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(Mirror(blocksDone));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ W, B, B, N, N, N, N, N, N, N, N, R, W },
+					{ W, B, N, N, N, N, N, N, N, N, N, R, W },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return SetupGrid(blocks);
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(blocksDone);
+
+				//
+				// Mirrored
+				//
+
+				yield return SetupGrid(Mirror(blocks));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(Mirror(blocksDone));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ W, B, N, N, N, N, N, N, N, N, R, R, W },
+					{ W, B, N, N, N, N, N, N, N, N, W, R, W },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return SetupGrid(blocks);
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(blocksDone);
+
+				//
+				// Mirrored
+				//
+
+				yield return SetupGrid(Mirror(blocks));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(Mirror(blocksDone));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ W, B, N, N, N, N, N, N, N, N, N, N, W },
+					{ W, B, N, N, N, N, N, N, N, N, N, W, W },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return SetupGrid(blocks);
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(blocksDone);
+
+				//
+				// Mirrored
+				//
+
+				yield return SetupGrid(Mirror(blocks));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(Mirror(blocksDone));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ B, B, N, N, N, N, N, N, N, N, N, N, W },
+					{ B, B, N, N, N, N, N, N, N, N, N, W, W },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return SetupGrid(blocks);
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(blocksDone);
+
+				//
+				// Mirrored
+				//
+
+				yield return SetupGrid(Mirror(blocks));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(Mirror(blocksDone));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
+				};
+
+				yield return SetupGrid(blocks);
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(blocksDone);
+
+				//
+				// Mirrored
+				//
+
+				yield return SetupGrid(Mirror(blocks));
+
+				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+
+				AssertNoActions(DefaultRules);
+				AssertGrid(Mirror(blocksDone));
+			}
 		}
 
 		#endregion
