@@ -619,10 +619,12 @@ namespace TetrisTower.Logic
 
 			{
 				BlockType[,] blocks = new BlockType[,] {
+					{ W, N, N, N, N, N, N, N, N, N, N, N, B },
 					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
 				};
 
 				BlockType[,] blocksDone = new BlockType[,] {
+					{ W, N, N, N, N, N, N, N, N, N, N, N, B },
 					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
 				};
 
@@ -631,8 +633,250 @@ namespace TetrisTower.Logic
 		}
 
 
-		// TODO: Add Wild block diagonal matching tests.
+		[UnityTest]
+		public IEnumerator WildBlock_Basics_Diagonals()
+		{
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, W, B, N },
+					{ N, N, W, B, N, N, W, B, N, R, W, N, N },
+					{ N, W, W, N, N, R, B, N, R, W, N, N, N },
+					{ R, W, N, N, R, W, N, R, W, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, (3 + 3) + (3 + 3) + (3 * 2 + 3 * 2));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, N, N, N, N, N, B, N, N, N },
+					{ N, N, N, B, B, N, N, B, B, N, N, N, N },
+					{ N, N, W, B, N, N, W, W, N, N, N, N, N },
+					{ N, W, W, N, N, R, R, N, N, N, N, N, N },
+					{ R, R, N, N, R, R, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, R, N, N, N, N, N, B, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, (3*2 + 3) + (3 + 3*2));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, B, N, N },
+					{ N, N, N, N, N, N, N, N, B, B, N, N, N },
+					{ N, N, N, N, B, N, N, W, W, N, N, N, N },
+					{ N, N, R, W, N, N, R, R, N, N, N, N, N },
+					{ N, W, W, N, N, R, R, N, N, N, N, N, N },
+					{ R, B, N, N, R, R, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, B, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, (3 + 3*2) + (3*2 + 3*3));
+			}
+		}
+
+		[UnityTest]
+		public IEnumerator WildBlock_Complex_Diagonals()
+		{
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ R, N, B, N, W, N, N, N, W, N, N, N, N },
+					{ N, W, N, N, N, B, N, R, N, N, N, N, N },
+					{ B, N, R, N, N, N, W, N, N, N, N, N, N },
+					{ N, W, N, N, N, R, N, B, N, N, N, N, N },
+					{ R, N, B, N, W, N, N, N, W, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, (3*4) + (3*6));
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, R },
+					{ N, N, N, N, N, N, N, N, N, N, N, W, N },
+					{ N, N, N, N, N, N, N, N, N, N, R, N, N },
+					{ N, N, N, N, N, N, N, N, N, W, N, N, N },
+					{ N, N, N, N, N, N, N, N, R, N, N, N, N },
+					{ N, N, N, N, N, N, N, W, N, N, N, N, N },
+					{ N, N, N, N, N, N, R, N, N, N, N, N, N },
+					{ N, N, N, N, N, W, N, N, N, N, N, N, N },
+					{ N, N, N, N, R, N, N, N, N, N, N, N, N },
+					{ N, N, N, W, N, N, N, N, N, N, N, N, N },
+					{ N, N, R, N, N, N, N, N, N, N, N, N, N },
+					{ N, W, N, N, N, N, N, N, N, N, N, N, N },
+					{ R, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*11);
+			}
+		}
+
+		[UnityTest]
+		public IEnumerator WildBlock_Diagonals_Backtrack()
+		{
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, N, N, N, B, N, N, N, N, N },
+					{ N, N, N, N, B, N, B, N, N, N, N, N, N },
+					{ N, N, N, B, N, N, N, N, N, N, N, N, N },
+					{ N, N, W, N, W, N, N, N, N, N, N, N, N },
+					{ N, R, N, R, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, R, N, R, W, N, B, B, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, 3);
+			}
+		}
+
+		[UnityTest]
+		public IEnumerator WildBlock_Diagonals_Backtrack_Wrapped()
+		{
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, B, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, R, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, R, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, R, N },
+					{ N, B, B, N, N, N, N, N, N, N, N, R, W },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, 3);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ B, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ B, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, N, N, N, N, N, N, N, W, B },
+					{ N, N, N, N, N, N, N, N, N, N, R, W, N },
+					{ N, N, N, N, N, N, N, N, N, N, R, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, R, N, N },
+					{ B, B, N, N, N, N, N, N, N, N, R, W, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, 3);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, B, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ W, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ W, N, N, N, N, N, N, N, N, N, N, N, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, R, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, R, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*2 + 3*3);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ W, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ W, N, N, N, N, N, N, N, N, N, N, N, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, R, W },
+					{ N, N, N, N, N, N, N, N, N, N, R, R, N },
+					{ N, N, N, N, N, N, N, N, N, N, W, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*3 + 3*3);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ W, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ W, N, N, N, N, N, N, N, N, N, N, N, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, N, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, W, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*2 + 3);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ B, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, N, W },
+					{ N, N, N, N, N, N, N, N, N, N, N, W, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*2 + 3);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ W, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ B, N, N, N, N, N, N, N, N, N, N, N, B },
+					{ N, N, N, N, N, N, N, N, N, N, N, N, W },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ W, N, N, N, N, N, N, N, N, N, N, N, B },
+					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, 0);
+			}
+		}
 
 		#endregion
-	}
+
+		}
 }
