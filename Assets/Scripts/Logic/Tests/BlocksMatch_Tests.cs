@@ -45,6 +45,10 @@ namespace TetrisTower.Logic
 		};
 
 		private BlocksGrid m_Grid;
+		private ScoreGrid m_ScoreGrid;
+		private GameGrid[] m_Grids;
+
+		private readonly GridAction[] m_FinishActions = new MatchingSequenceFinishAction[] { new MatchingSequenceFinishAction() };
 
 
 		#region Setup
@@ -90,12 +94,15 @@ namespace TetrisTower.Logic
 			};
 		}
 
-		private IEnumerator SetupGrid(BlockType[,] blocks, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+		private IEnumerator SetupGrid(BlockType[,] blocks, GridRules rules, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
 			Assert.LessOrEqual(blocks.GetLength(0), MaxRows, $"Wrong rows count.\n{caller}:{lineNumber}");
 			Assert.LessOrEqual(blocks.GetLength(1), MaxColumns, $"Wrong columns count.\n{caller}:{lineNumber}");
 
 			m_Grid = new BlocksGrid(MaxRows, MaxColumns);
+			m_ScoreGrid = new ScoreGrid(MaxRows, MaxColumns, rules);
+
+			m_Grids = new GameGrid[] { m_Grid, m_ScoreGrid };
 
 			yield return m_Grid.ApplyActions(new GridAction[] { SetupPlaceAction(blocks) });
 		}
@@ -204,32 +211,50 @@ namespace TetrisTower.Logic
 			return mirror;
 		}
 
-		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, int applyActionsCount, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, int applyActionsCount, int resultScore = -1, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
-			yield return SetupGrid(blocks, lineNumber, caller);
+			yield return SetupGrid(blocks, DefaultRules, lineNumber, caller);
 
 			for(int i = 0; i < applyActionsCount; ++i) {
 				var actions = GameGridEvaluation.Evaluate(m_Grid, DefaultRules);
 				Assert.AreNotEqual(0, actions.Count, $"No actions available.\n{caller}:{lineNumber}");
 
-				yield return m_Grid.ApplyActions(actions);
+				foreach(GameGrid grid in m_Grids) {
+					yield return grid.ApplyActions(actions);
+				}
 			}
+
+			yield return m_ScoreGrid.ApplyActions(m_FinishActions);
 
 			AssertNoActions(DefaultRules, lineNumber, caller);
 			AssertGrid(blocksDone, lineNumber, caller);
+
+			if (resultScore >= 0) {
+				Assert.AreEqual(resultScore, m_ScoreGrid.Score, $"Score is wrong.\n{caller}:{lineNumber}");
+			}
 
 			//
 			// Mirrored
 			//
 
-			yield return SetupGrid(Mirror(blocks), lineNumber, caller);
+			yield return SetupGrid(Mirror(blocks), DefaultRules, lineNumber, caller);
 
 			for (int i = 0; i < applyActionsCount; ++i) {
-				yield return m_Grid.ApplyActions(GameGridEvaluation.Evaluate(m_Grid, DefaultRules));
+				var actions = GameGridEvaluation.Evaluate(m_Grid, DefaultRules);
+
+				foreach (GameGrid grid in m_Grids) {
+					yield return grid.ApplyActions(actions);
+				}
 			}
+
+			yield return m_ScoreGrid.ApplyActions(m_FinishActions);
 
 			AssertNoActions(DefaultRules, lineNumber, caller);
 			AssertGrid(Mirror(blocksDone), lineNumber, caller);
+
+			if (resultScore >= 0) {
+				Assert.AreEqual(resultScore, m_ScoreGrid.Score, $"Score is wrong.\n{caller}:{lineNumber}");
+			}
 		}
 
 		#endregion
@@ -262,18 +287,18 @@ namespace TetrisTower.Logic
 				{ R, R, R, B, B, B, N, S, S, S, N, N, R },
 			};
 
-			yield return SetupGrid(blocks);
+			yield return SetupGrid(blocks, DefaultRules);
 
 			Assert.AreEqual(MaxRows, m_Grid.Rows);
 			Assert.AreEqual(MaxColumns, m_Grid.Columns);
 
 			AssertGrid(blocks);
 
-			yield return SetupGrid(blocks2);
+			yield return SetupGrid(blocks2, DefaultRules);
 
 			AssertGrid(blocks2);
 
-			yield return SetupGrid(blocks9);
+			yield return SetupGrid(blocks9, DefaultRules);
 
 			AssertGrid(blocks9);
 		}
@@ -294,7 +319,7 @@ namespace TetrisTower.Logic
 				{ N, N, N, N, R, N, N, S, S, S, N, N, B },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 2);
+			yield return EvaluateGrid(blocks, blocksDone, 2, 3*2 + 3);
 		}
 
 		[UnityTest]
@@ -314,7 +339,7 @@ namespace TetrisTower.Logic
 				{ N, N, B, N, N, N, N, B, N, S, N, S, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 2);
+			yield return EvaluateGrid(blocks, blocksDone, 2, 3*2 + 3*2 + 3);
 		}
 
 		[UnityTest]
@@ -335,7 +360,7 @@ namespace TetrisTower.Logic
 				{ N, S, S, S, R, R, N, G, G, N, N, N, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 2);
+			yield return EvaluateGrid(blocks, blocksDone, 2, 3 + 3 + 3*2 + 3 + 3 + 3);
 		}
 
 		[UnityTest]
@@ -355,7 +380,7 @@ namespace TetrisTower.Logic
 				{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 1);
+			yield return EvaluateGrid(blocks, blocksDone, 1, 3*3 + 3*3);
 		}
 
 		[UnityTest]
@@ -369,7 +394,7 @@ namespace TetrisTower.Logic
 				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 1);
+			yield return EvaluateGrid(blocks, blocksDone, 1, 3*11);
 		}
 
 		[UnityTest]
@@ -395,7 +420,7 @@ namespace TetrisTower.Logic
 				{ N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 1);
+			yield return EvaluateGrid(blocks, blocksDone, 1, 3*11);
 		}
 
 		#endregion
@@ -428,7 +453,7 @@ namespace TetrisTower.Logic
 				{ S, S, S, B, S, S, S, N, W, W, W, W, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 2);
+			yield return EvaluateGrid(blocks, blocksDone, 2, (3 + 3) + (3 + 3) + (3 + 3) + 3 + 3*2 + 3*2 + 3*3);
 		}
 
 		[UnityTest]
@@ -475,7 +500,7 @@ namespace TetrisTower.Logic
 				{ W, S, S, S, S, B, W, S, B, N, N, N, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 2);
+			yield return EvaluateGrid(blocks, blocksDone, 2, (3 + 3) + (3 + 3) + (3 + 3) + 3 + 3 * 2 + 3 * 2 + 3 * 3);
 		}
 
 		[UnityTest]
@@ -493,7 +518,7 @@ namespace TetrisTower.Logic
 				{ N, N, N, N, N, N, S, N, N, N, N, N, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 1);
+			yield return EvaluateGrid(blocks, blocksDone, 1, 3*2 + 3*3 + 3 + 3*11);
 		}
 
 		[UnityTest]
@@ -507,7 +532,7 @@ namespace TetrisTower.Logic
 				{ N, R, N, N, N, N, R, W, N, B, B, N, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 1);
+			yield return EvaluateGrid(blocks, blocksDone, 1, 3);
 		}
 
 		[UnityTest]
@@ -521,6 +546,15 @@ namespace TetrisTower.Logic
 					{ N, B, B, N, N, N, N, N, N, N, N, R, W },
 					{ B, B, N, N, N, N, N, N, N, N, N, R, W },
 				};
+				/*
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, N, N, N, N, N, N, N, W, N },
+					{ N, B, N, N, N, N, N, N, N, N, R, S, N },
+					{ B, S, S, N, N, N, N, N, N, N, R, R, S },
+					{ S, B, B, N, N, N, N, N, N, N, S, R, W }, // W matches by the 2 diagonals.
+				};
+				*/
 
 				BlockType[,] blocksDone = new BlockType[,] {
 					{ N, N, N, N, N, N, N, N, N, N, N, W, N },
@@ -528,7 +562,7 @@ namespace TetrisTower.Logic
 					{ S, B, B, N, N, N, N, N, N, N, S, R, S },
 				};
 
-				yield return EvaluateGrid(blocks, blocksDone, 4);
+				yield return EvaluateGrid(blocks, blocksDone, 4, 3 + 3 + 3 + 3);
 			}
 
 			{
@@ -541,7 +575,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return EvaluateGrid(blocks, blocksDone, 1);
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*2 + 3*3);
 			}
 
 			{
@@ -554,7 +588,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return EvaluateGrid(blocks, blocksDone, 1);
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*3 + 3*3);
 			}
 
 			{
@@ -567,7 +601,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return EvaluateGrid(blocks, blocksDone, 1);
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*2 + 3);
 			}
 
 			{
@@ -580,7 +614,7 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				yield return EvaluateGrid(blocks, blocksDone, 1);
+				yield return EvaluateGrid(blocks, blocksDone, 1, 3*2 + 3);
 			}
 
 			{
@@ -592,9 +626,10 @@ namespace TetrisTower.Logic
 					{ B, N, N, N, N, N, N, N, N, N, N, N, W },
 				};
 
-				yield return EvaluateGrid(blocks, blocksDone, 0);
+				yield return EvaluateGrid(blocks, blocksDone, 0, 0);
 			}
 		}
+
 
 		// TODO: Add Wild block diagonal matching tests.
 
