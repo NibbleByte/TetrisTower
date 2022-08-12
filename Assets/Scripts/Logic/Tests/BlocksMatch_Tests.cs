@@ -48,7 +48,7 @@ namespace TetrisTower.Logic
 		private ScoreGrid m_ScoreGrid;
 		private GameGrid[] m_Grids;
 
-		private readonly GridAction[] m_FinishActions = new MatchingSequenceFinishAction[] { new MatchingSequenceFinishAction() };
+		private readonly GridAction[] m_FinishActions = new EvaluationSequenceFinishAction[] { new EvaluationSequenceFinishAction() };
 
 
 		#region Setup
@@ -213,10 +213,15 @@ namespace TetrisTower.Logic
 
 		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, int applyActionsCount, int resultScore = -1, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
-			yield return SetupGrid(blocks, DefaultRules, lineNumber, caller);
+			yield return EvaluateGrid(blocks, blocksDone, DefaultRules, applyActionsCount, resultScore, doMirror, lineNumber, caller);
+		}
+
+		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, GridRules rules, int applyActionsCount, int resultScore = -1, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+		{
+			yield return SetupGrid(blocks, rules, lineNumber, caller);
 
 			for(int i = 0; i < applyActionsCount; ++i) {
-				var actions = GameGridEvaluation.Evaluate(m_Grid, DefaultRules);
+				var actions = GameGridEvaluation.Evaluate(m_Grid, rules);
 				Assert.AreNotEqual(0, actions.Count, $"No actions available.\n{caller}:{lineNumber}");
 
 				foreach(GameGrid grid in m_Grids) {
@@ -226,7 +231,7 @@ namespace TetrisTower.Logic
 
 			yield return m_ScoreGrid.ApplyActions(m_FinishActions);
 
-			AssertNoActions(DefaultRules, lineNumber, caller);
+			AssertNoActions(rules, lineNumber, caller);
 			AssertGrid(blocksDone, lineNumber, caller);
 
 			if (resultScore >= 0) {
@@ -237,10 +242,10 @@ namespace TetrisTower.Logic
 			// Mirrored
 			//
 
-			yield return SetupGrid(Mirror(blocks), DefaultRules, lineNumber, caller);
+			yield return SetupGrid(Mirror(blocks), rules, lineNumber, caller);
 
 			for (int i = 0; i < applyActionsCount; ++i) {
-				var actions = GameGridEvaluation.Evaluate(m_Grid, DefaultRules);
+				var actions = GameGridEvaluation.Evaluate(m_Grid, rules);
 
 				foreach (GameGrid grid in m_Grids) {
 					yield return grid.ApplyActions(actions);
@@ -249,7 +254,7 @@ namespace TetrisTower.Logic
 
 			yield return m_ScoreGrid.ApplyActions(m_FinishActions);
 
-			AssertNoActions(DefaultRules, lineNumber, caller);
+			AssertNoActions(rules, lineNumber, caller);
 			AssertGrid(Mirror(blocksDone), lineNumber, caller);
 
 			if (resultScore >= 0) {
@@ -562,7 +567,7 @@ namespace TetrisTower.Logic
 					{ S, B, B, N, N, N, N, N, N, N, S, R, S },
 				};
 
-				yield return EvaluateGrid(blocks, blocksDone, 4, 3 + 3 + 3 + 3);
+				yield return EvaluateGrid(blocks, blocksDone, 4, 3 + 3 + (3 + 3) * 2);
 			}
 
 			{
@@ -878,5 +883,254 @@ namespace TetrisTower.Logic
 
 		#endregion
 
+		#region Score Tests
+
+		[UnityTest]
+		public IEnumerator Score_Cascades()
+		{
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 3, 3 + 3*2);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 3, 3 + 6*2);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 3, 6 + 6*2);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, G, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, N, N, N, N, N, N },
+					{ G, R, G, G, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 5, 6 + 6*2 + 6*3);
+			}
 		}
+
+		[UnityTest]
+		public IEnumerator Score_Rules()
+		{
+			//
+			// Any
+			//
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, B, N, N, N, N, G, N, N, N, N },
+					{ N, N, N, B, N, N, N, G, N, N, N, N, N },
+					{ R, R, R, B, N, N, G, S, S, S, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = (MatchScoringType)~0;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
+				Assert.AreEqual(3 * 3, m_ScoreGrid.ObjectiveProgress);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, B, N, N, N, N, G, N, N, N, N },
+					{ N, N, N, B, N, N, N, G, N, N, N, N, N },
+					{ R, R, R, B, N, N, G, S, S, S, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
+				Assert.AreEqual(3 * 3, m_ScoreGrid.ObjectiveProgress);
+			}
+
+			//
+			// Single objective type
+			//
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, B, N, N, N, N, G, N, N, N, N },
+					{ N, N, N, B, N, N, N, G, N, N, N, N, N },
+					{ R, R, R, B, N, N, G, S, S, S, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = MatchScoringType.Horizontal;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
+				Assert.AreEqual(1, m_ScoreGrid.ObjectiveProgress);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, B, N, N, N, N, G, N, N, N, N },
+					{ N, N, N, B, N, N, N, G, N, N, N, N, N },
+					{ R, R, R, B, N, N, G, S, S, S, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = MatchScoringType.Vertical;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
+				Assert.AreEqual(1, m_ScoreGrid.ObjectiveProgress);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, B, N, N, N, N, G, N, N, N, N },
+					{ N, N, N, B, N, N, N, G, N, N, N, N, N },
+					{ R, R, R, B, N, N, G, S, S, S, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = MatchScoringType.Diagonals;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
+				Assert.AreEqual(1, m_ScoreGrid.ObjectiveProgress);
+			}
+
+			//
+			// Single Objective Type - Longer
+			//
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ R, R, R, R, N, B, B, B, B, B, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = MatchScoringType.Horizontal;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*2 + 3*3);
+				Assert.AreEqual(2 + 3, m_ScoreGrid.ObjectiveProgress);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, B, N, N, N, N, N, N, N, N, N, N },
+					{ R, N, B, N, N, N, N, N, N, N, N, N, N },
+					{ R, N, B, N, N, N, N, N, N, N, N, N, N },
+					{ R, N, B, N, N, N, N, N, N, N, N, N, N },
+					{ R, N, B, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = MatchScoringType.Vertical;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*2 + 3*3);
+				Assert.AreEqual(2 + 3, m_ScoreGrid.ObjectiveProgress);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, N, N, N, B, N, N, N, N, N, N, N, N },
+					{ N, N, N, R, N, B, N, N, N, N, N, N, N },
+					{ N, N, R, N, N, N, B, N, N, N, N, N, N },
+					{ N, R, N, N, N, N, N, B, N, N, N, N, N },
+					{ R, N, N, N, N, N, N, N, B, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				GridRules rules = DefaultRules;
+				rules.ObjectiveType = MatchScoringType.Diagonals;
+
+				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*2 + 3*3);
+				Assert.AreEqual(2 + 3, m_ScoreGrid.ObjectiveProgress);
+			}
+		}
+
+		#endregion
+	}
 }

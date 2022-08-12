@@ -11,6 +11,13 @@ namespace TetrisTower.Logic
 	[JsonObject(MemberSerialization.OptIn)]
 	public class ScoreGrid : GameGrid
 	{
+		public struct MatchBonus
+		{
+			public int ClearedBlocks;
+			public int CascadeBonusMultiplier;
+			public int ResultBonusScore;
+		}
+
 		[JsonProperty] public int Rows { get; private set; }
 
 		[JsonProperty] public int Columns { get; private set; }
@@ -24,8 +31,10 @@ namespace TetrisTower.Logic
 		[JsonProperty] public int TotalMatched { get; private set; }
 		[JsonProperty] public int ObjectiveProgress { get; private set; }
 
-		public int CurrentClearedBlocksCount { get; private set; }
-		public int CurrentClearActionsCount { get; private set; }
+		private int m_CurrentClearedBlocksCount = 0;
+		private int m_CurrentCascadesCount = 0;
+
+		public MatchBonus LastMatchBonus { get; private set; }
 
 		public int BonusScore { get; private set; } = 0;
 
@@ -41,24 +50,37 @@ namespace TetrisTower.Logic
 			Rules = rules;
 		}
 
+		public void ClearLastMatchBonus()
+		{
+			LastMatchBonus = new MatchBonus();
+		}
+
 		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
 		{
+			bool anyClears = false;
 			foreach (var action in actions) {
 				switch(action) {
 					case ClearMatchedAction clearAction:
 						ScoreMatchedCells(clearAction);
+						anyClears = true;
 						break;
 
-					case MatchingSequenceFinishAction finishAction:
-						MatchingSequenceFinished(finishAction);
+					case EvaluationSequenceFinishAction finishAction:
+						EvaluationSequenceFinished(finishAction);
+						anyClears = false;	// Handled.
 						break;
 				}
+			}
+
+			// Next set of actions are considered for cascade bonus.
+			if (anyClears) {
+				MatchingSequenceFinished();
 			}
 
 			yield break;
 		}
 
-		public void ScoreMatchedCells(ClearMatchedAction action)
+		private void ScoreMatchedCells(ClearMatchedAction action)
 		{
 			if (action.MatchedType == 0) {
 				Debug.LogError($"{nameof(ClearMatchedAction)} doesn't have a MatchedType set.");
@@ -74,24 +96,35 @@ namespace TetrisTower.Logic
 			}
 
 			// Having 4 or 5 in a row should be considered as 2x3 or 3x3 respectively.
-			CurrentClearedBlocksCount = Mathf.Max(CurrentClearedBlocksCount, maxMatch);
-			int clearActionsCount = Mathf.Max(action.Coords.Count - maxMatch + 1, 1);
-			CurrentClearActionsCount += clearActionsCount;
+			m_CurrentClearedBlocksCount += maxMatch * (action.Coords.Count - maxMatch + 1);
 
 			if ((Rules.ObjectiveType & action.MatchedType) != 0) {
 				if (Rules.IsObjectiveAllMatchTypes) {
 					ObjectiveProgress += action.Coords.Count;
 				} else {
+					int clearActionsCount = Mathf.Max(action.Coords.Count - maxMatch + 1, 1);
 					ObjectiveProgress += clearActionsCount;
 				}
 			}
 		}
 
-		private void MatchingSequenceFinished(MatchingSequenceFinishAction action)
+		private void MatchingSequenceFinished()
 		{
-			m_Score += CurrentClearedBlocksCount * CurrentClearActionsCount;
-			CurrentClearedBlocksCount = 0;
-			CurrentClearActionsCount = 0;
+			LastMatchBonus = new MatchBonus {
+				ClearedBlocks = m_CurrentClearedBlocksCount,
+				CascadeBonusMultiplier = m_CurrentCascadesCount + 1,
+				ResultBonusScore = m_CurrentClearedBlocksCount * (m_CurrentCascadesCount + 1),
+			};
+
+			m_Score += LastMatchBonus.ResultBonusScore;
+			m_CurrentClearedBlocksCount = 0;
+			m_CurrentCascadesCount++;
+		}
+
+		private void EvaluationSequenceFinished(EvaluationSequenceFinishAction action)
+		{
+			MatchingSequenceFinished();
+			m_CurrentCascadesCount = 0;
 		}
 
 		public void IncrementWonBonusScore()

@@ -40,14 +40,14 @@ namespace TetrisTower.TowerLevels.UI
 
 		public void OnUpdateScore(ScoreGrid scoreGrid)
 		{
-			if (ClearCombosCountText && scoreGrid.CurrentClearActionsCount > 1) {
+			if (ClearCombosCountText && scoreGrid.LastMatchBonus.CascadeBonusMultiplier > 1) {
 				ClearCombosCountText.gameObject.SetActive(true);
-				ClearCombosCountText.text = "x" + scoreGrid.CurrentClearActionsCount.ToString();
+				ClearCombosCountText.text = "x" + scoreGrid.LastMatchBonus.CascadeBonusMultiplier.ToString();
 			}
 
 			if (ClearedBlocksCountText) {
 				ClearedBlocksCountText.gameObject.SetActive(true);
-				ClearedBlocksCountText.text = "+" + scoreGrid.CurrentClearedBlocksCount.ToString();
+				ClearedBlocksCountText.text = "+" + scoreGrid.LastMatchBonus.ClearedBlocks.ToString();
 			}
 		}
 

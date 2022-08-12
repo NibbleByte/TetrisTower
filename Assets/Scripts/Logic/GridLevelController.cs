@@ -100,7 +100,7 @@ namespace TetrisTower.Logic
 			}
 
 			// Mark the matching sequence as complete. Used for scoring etc.
-			var finishedSequenceActions = new GridAction[] { new MatchingSequenceFinishAction() };
+			var finishedSequenceActions = new GridAction[] { new EvaluationSequenceFinishAction() };
 			foreach (var grid in Grids) {
 				yield return grid.ApplyActions(finishedSequenceActions);
 			}

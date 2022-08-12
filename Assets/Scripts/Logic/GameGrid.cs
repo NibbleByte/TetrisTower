@@ -106,7 +106,7 @@ namespace TetrisTower.Logic
 		public IReadOnlyCollection<KeyValuePair<GridCoords, GridCoords>> MovedCells;
 	}
 
-	public class MatchingSequenceFinishAction : GridAction
+	public class EvaluationSequenceFinishAction : GridAction
 	{
 
 	}

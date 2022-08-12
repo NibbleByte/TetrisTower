@@ -11,9 +11,9 @@ namespace TetrisTower.Visuals.Environment
 	{
 		public LightningEffectsController Effects;
 
-		[Tooltip("Trigger lightning only when combo multiplier is above this number.")]
+		[Tooltip("Trigger lightning only when cascade combo multiplier is above this number.")]
 		[Range(0, 20)]
-		public int ComboMultiplier = 3;
+		public int CascadeComboMultiplier = 3;
 
 		private ConeVisualsGrid m_VisualsGrid;
 
@@ -46,7 +46,7 @@ namespace TetrisTower.Visuals.Environment
 
 		private void OnUpdateScore(ScoreGrid scoreGrid)
 		{
-			if (scoreGrid.CurrentClearActionsCount >= ComboMultiplier) {
+			if (scoreGrid.LastMatchBonus.CascadeBonusMultiplier >= CascadeComboMultiplier) {
 				Effects.SpawnLightningStrike();
 			}
 		}

@@ -212,6 +212,14 @@ namespace TetrisTower.Visuals
 				}
 			}
 
+			m_ScoreGrid.ClearLastMatchBonus();
+			yield return m_ScoreGrid.ApplyActions(actions);
+
+			// TODO: Score should be displayed after match sequence is done. Do it when matches stack on screen, instead of single bonus displayed.
+			if (m_ScoreGrid.LastMatchBonus.ResultBonusScore > 0) {
+				ScoreUpdated?.Invoke(m_ScoreGrid);
+			}
+
 			foreach (var action in MergeActions(actions)) {
 				switch (action) {
 					case PlaceAction placeAction:
@@ -223,7 +231,7 @@ namespace TetrisTower.Visuals
 					case MoveCellsAction moveAction:
 						yield return MoveCells(moveAction);
 						break;
-					case MatchingSequenceFinishAction finishAction:
+					case EvaluationSequenceFinishAction finishAction:
 						ScoreFinished?.Invoke(m_ScoreGrid);
 						m_ScoreGrid = null;
 						break;
@@ -296,10 +304,6 @@ namespace TetrisTower.Visuals
 
 		private IEnumerator ClearMatchedCells(ClearMatchedAction action)
 		{
-			m_ScoreGrid.ScoreMatchedCells(action);
-
-			ScoreUpdated?.Invoke(m_ScoreGrid);
-
 			foreach (var coord in action.Coords) {
 
 				var visualsBlock = this[coord];
