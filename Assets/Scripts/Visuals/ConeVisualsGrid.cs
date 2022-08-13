@@ -215,10 +215,12 @@ namespace TetrisTower.Visuals
 			m_ScoreGrid.ClearLastMatchBonus();
 			yield return m_ScoreGrid.ApplyActions(actions);
 
-			// TODO: Score should be displayed after match sequence is done. Do it when matches stack on screen, instead of single bonus displayed.
-			if (m_ScoreGrid.LastMatchBonus.ResultBonusScore > 0) {
-				ScoreUpdated?.Invoke(m_ScoreGrid);
-			}
+			GridCoords displayScoreCoord = actions.OfType<ClearMatchedAction>()
+				.LastOrDefault()?.Coords
+				.SkipLast(1)
+				.LastOrDefault()
+				?? new GridCoords(-1, -1)
+				;
 
 			foreach (var action in MergeActions(actions)) {
 				switch (action) {
@@ -226,7 +228,7 @@ namespace TetrisTower.Visuals
 						yield return PlaceShape(placeAction);
 						break;
 					case ClearMatchedAction clearAction:
-						yield return ClearMatchedCells(clearAction);
+						yield return ClearMatchedCells(clearAction, displayScoreCoord);
 						break;
 					case MoveCellsAction moveAction:
 						yield return MoveCells(moveAction);
@@ -237,7 +239,6 @@ namespace TetrisTower.Visuals
 						break;
 				}
 			}
-
 		}
 
 		private IEnumerable<GridAction> MergeActions(IEnumerable<GridAction> actions)
@@ -302,9 +303,10 @@ namespace TetrisTower.Visuals
 			yield break;
 		}
 
-		private IEnumerator ClearMatchedCells(ClearMatchedAction action)
+		private IEnumerator ClearMatchedCells(ClearMatchedAction action, GridCoords displayScoreCoord)
 		{
-			foreach (var coord in action.Coords) {
+			for(int i = 0; i < action.Coords.Count; ++i) {
+				GridCoords coord = action.Coords[i];
 
 				var visualsBlock = this[coord];
 				Debug.Assert(visualsBlock != null);
@@ -317,7 +319,13 @@ namespace TetrisTower.Visuals
 					this[coord] = null;
 				}
 
-				yield return new WaitForSeconds(MatchBlockDelay);
+				if (displayScoreCoord == coord && m_ScoreGrid != null && m_ScoreGrid.LastMatchBonus.ResultBonusScore > 0) {
+					ScoreUpdated?.Invoke(m_ScoreGrid);
+				}
+
+				if (i < action.Coords.Count - 1) {
+					yield return new WaitForSeconds(MatchBlockDelay);
+				}
 			}
 
 			yield return new WaitForSeconds(MatchActionDelay);

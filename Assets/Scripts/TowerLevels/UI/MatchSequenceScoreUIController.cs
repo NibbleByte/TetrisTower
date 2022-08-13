@@ -78,7 +78,7 @@ namespace TetrisTower.TowerLevels.UI
 
 			// Ensure start values, pooled instance may come with random values.
 			entry.Transform.anchoredPosition = Vector2.zero;
-			entry.Transform.localScale = Vector3.one;
+			entry.Transform.localScale = Vector3.zero;
 			if (entry.CanvasGroup) {
 				entry.CanvasGroup.alpha = 1f;
 			}
