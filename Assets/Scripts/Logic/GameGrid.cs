@@ -99,6 +99,7 @@ namespace TetrisTower.Logic
 	{
 		public IReadOnlyList<GridCoords> Coords;
 		public MatchScoringType MatchedType;
+		public bool SpecialMatch = false;	// Match by a special block, not a normal match. Important for scoring.
 	}
 
 	public class MoveCellsAction : GridAction

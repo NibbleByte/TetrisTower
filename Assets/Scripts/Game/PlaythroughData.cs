@@ -36,6 +36,13 @@ namespace TetrisTower.Game
 		[Range(0f, 2f)]
 		public float WildBlockChance = 0.15f;
 
+		[Range(0f, 2f)]
+		public float BlockSmiteChance = 0.15f;
+
+		[Range(0f, 2f)]
+		public float RowSmiteChance = 0.15f;
+
+
 		public int CurrentLevelIndex = 0;
 		public LevelParamData[] Levels;
 
@@ -114,6 +121,12 @@ namespace TetrisTower.Game
 		[Tooltip("If true WildBlocks will be spawned with chance configured above. They match with any other type of block.")]
 		public bool SpawnWildBlocks = false;
 
+		[Tooltip("If true BlockSmite blocks will be spawned with chance configured above. They clear every block of the type it lands on.")]
+		public bool SpawnBlockSmites = false;
+
+		[Tooltip("If true RowSmite blocks will be spawned with chance configured above. They clear the row it lands on.")]
+		public bool SpawnRowSmites = false;
+
 		public GridRules Rules;
 
 		[Range(5, 20)]
@@ -175,6 +188,8 @@ namespace TetrisTower.Game
 				Random = new Xoshiro.PRNG32.XoShiRo128starstar(seed),
 
 				SpawnWildBlocksChance = SpawnWildBlocks ? playthrough.WildBlockChance : 0f,
+				SpawnBlockSmiteChance = SpawnBlockSmites ? playthrough.BlockSmiteChance : 0f,
+				SpawnRowSmiteChance = SpawnRowSmites ? playthrough.RowSmiteChance : 0f,
 
 				Rules = Rules,
 				Grid = new BlocksGrid(totalRows, GridColumns),

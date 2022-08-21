@@ -423,21 +423,46 @@ namespace TetrisTower.Logic
 		private BlocksShape GenerateShape(GridShapeTemplate template)
 		{
 			var shapeCoords = new List<BlocksShape.ShapeBind>();
-			Vector2Int blocksRange = LevelData.SpawnBlockTypesRange;
+			Vector2Int blocksRangeVec = LevelData.SpawnBlockTypesRange;
+			float blocksRange = blocksRangeVec.y - blocksRangeVec.x;
 
-			double totalRange = blocksRange.y - blocksRange.x;
+			double totalRange = blocksRange;
+
 			if (LevelData.SpawnWildBlocksChance > 0f) {
 				totalRange += LevelData.SpawnWildBlocksChance;
+			}
+			if (LevelData.SpawnBlockSmiteChance > 0f) {
+				totalRange += LevelData.SpawnBlockSmiteChance;
+			}
+			if (LevelData.SpawnRowSmiteChance > 0f) {
+				totalRange += LevelData.SpawnRowSmiteChance;
 			}
 
 
 			foreach (GridCoords coords in template.ShapeTemplate) {
 				double blockIndex = LevelData.Random.NextDouble() * totalRange;
 
-				BlockType blockType = blockIndex < blocksRange.y
-					? LevelData.BlocksPool[blocksRange.x + (int)blockIndex]
-					: LevelData.BlocksSet.WildBlock
-					;
+				BlockType blockType;
+				if (blockIndex < blocksRange) {
+					blockType = LevelData.BlocksPool[blocksRangeVec.x + (int)blockIndex];
+
+				} else {
+					blockIndex -= blocksRange;
+
+					if (blockIndex < LevelData.SpawnWildBlocksChance) {
+						blockType = LevelData.BlocksSet.WildBlock;
+
+					} else if (blockIndex < LevelData.SpawnWildBlocksChance + LevelData.SpawnBlockSmiteChance) {
+						blockType = LevelData.BlocksSet.BlockSmite;
+
+					} else if (blockIndex < LevelData.SpawnWildBlocksChance + LevelData.SpawnBlockSmiteChance + LevelData.SpawnRowSmiteChance) {
+						blockType = LevelData.BlocksSet.RowSmite;
+
+					} else {
+						Debug.LogError($"Generating block produced index {blockIndex + blocksRange} larger than anything allowed.", this);
+						blockType = LevelData.BlocksSet.WonBonusBlock;
+					}
+				}
 
 				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 					Coords = coords,

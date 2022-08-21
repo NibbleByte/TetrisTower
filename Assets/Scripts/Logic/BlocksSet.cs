@@ -13,6 +13,12 @@ namespace TetrisTower.Logic
 		[Tooltip("Block to be used as \"Wild\" or \"Joker\" that matches with any other type of block.")]
 		public BlockType WildBlock;
 
+		[Tooltip("This block destroys every block in the tower of the type that it lands on. Handy for removing obsolete blocks.")]
+		public BlockType BlockSmite;
+
+		[Tooltip("This block destroys every block in the tower at the height it lands.")]
+		public BlockType RowSmite;
+
 		[Tooltip("Block to be used for bonus blocks in the won animation at the end.")]
 		public BlockType WonBonusBlock;
 
@@ -25,6 +31,8 @@ namespace TetrisTower.Logic
 				}
 
 				if (WildBlock) yield return WildBlock;
+				if (BlockSmite) yield return BlockSmite;
+				if (RowSmite) yield return RowSmite;
 				if (WonBonusBlock) yield return WonBonusBlock;
 			}
 		}
@@ -56,6 +64,14 @@ namespace TetrisTower.Logic
 
 			if (WildBlock && WildBlock.MatchType != MatchType.MatchAny) {
 				Debug.LogError($"{nameof(WildBlock)} {WildBlock.name} should match anything, in {nameof(BlocksSet)} at {context}.{name}", context);
+			}
+
+			if (BlockSmite && BlockSmite.MatchType != MatchType.SpecialBlockSmite) {
+				Debug.LogError($"{nameof(BlockSmite)} {BlockSmite.name} should be {MatchType.SpecialBlockSmite}, in {nameof(BlocksSet)} at {context}.{name}", context);
+			}
+
+			if (RowSmite && RowSmite.MatchType != MatchType.SpecialRowSmite) {
+				Debug.LogError($"{nameof(RowSmite)} {RowSmite.name} should be {MatchType.SpecialRowSmite}, in {nameof(BlocksSet)} at {context}.{name}", context);
 			}
 
 			if (WonBonusBlock == null) {

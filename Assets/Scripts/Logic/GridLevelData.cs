@@ -61,6 +61,8 @@ namespace TetrisTower.Logic
 		public System.Random Random = null;
 
 		public float SpawnWildBlocksChance = 0f;
+		public float SpawnBlockSmiteChance = 0f;
+		public float SpawnRowSmiteChance = 0f;
 
 		public GridRules Rules;
 

@@ -10,6 +10,9 @@ namespace TetrisTower.Logic
 		None,
 		MatchSame,
 		MatchAny,
+
+		SpecialBlockSmite,
+		SpecialRowSmite,
 	}
 
 	[CreateAssetMenu(fileName = "Unknown_Block", menuName = "Tetris Tower/Block")]

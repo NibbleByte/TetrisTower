@@ -82,28 +82,40 @@ namespace TetrisTower.Logic
 
 		private void ScoreMatchedCells(ClearMatchedAction action)
 		{
-			if (action.MatchedType == 0) {
+			if (action.MatchedType == 0 && !action.SpecialMatch) {
 				Debug.LogError($"{nameof(ClearMatchedAction)} doesn't have a MatchedType set.");
 			}
 
 			TotalMatched += action.Coords.Count;
 
-			int maxMatch = 0;
-			switch(action.MatchedType) {
-				case MatchScoringType.Horizontal: maxMatch = Rules.MatchHorizontalLines; break;
-				case MatchScoringType.Vertical: maxMatch = Rules.MatchVerticalLines; break;
-				case MatchScoringType.Diagonals: maxMatch = Rules.MatchDiagonalsLines; break;
-			}
+			if (!action.SpecialMatch) {
 
-			// Having 4 or 5 in a row should be considered as 2x3 or 3x3 respectively.
-			m_CurrentClearedBlocksCount += maxMatch * (action.Coords.Count - maxMatch + 1);
+				int maxMatch = 0;
+				switch (action.MatchedType) {
+					case MatchScoringType.Horizontal: maxMatch = Rules.MatchHorizontalLines; break;
+					case MatchScoringType.Vertical: maxMatch = Rules.MatchVerticalLines; break;
+					case MatchScoringType.Diagonals: maxMatch = Rules.MatchDiagonalsLines; break;
+				}
 
-			if ((Rules.ObjectiveType & action.MatchedType) != 0) {
+				// Having 4 or 5 in a row should be considered as 2x3 or 3x3 respectively.
+				m_CurrentClearedBlocksCount += maxMatch * (action.Coords.Count - maxMatch + 1);
+
+				if ((Rules.ObjectiveType & action.MatchedType) != 0) {
+					if (Rules.IsObjectiveAllMatchTypes) {
+						ObjectiveProgress += action.Coords.Count;
+					} else {
+						int clearActionsCount = Mathf.Max(action.Coords.Count - maxMatch + 1, 1);
+						ObjectiveProgress += clearActionsCount;
+					}
+				}
+
+			} else {
+
+				// Take it as is.
+				m_CurrentClearedBlocksCount += action.Coords.Count;
+
 				if (Rules.IsObjectiveAllMatchTypes) {
 					ObjectiveProgress += action.Coords.Count;
-				} else {
-					int clearActionsCount = Mathf.Max(action.Coords.Count - maxMatch + 1, 1);
-					ObjectiveProgress += clearActionsCount;
 				}
 			}
 		}

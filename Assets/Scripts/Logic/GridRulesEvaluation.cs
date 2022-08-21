@@ -39,6 +39,8 @@ namespace TetrisTower.Logic
 
 			if (!grid.MatchingFrozen) {
 				EvaluateMatches(grid, rules, actions);
+
+				EvaluateSpecialMatches(grid, rules, actions);
 			}
 
 			if (actions.Count > 0)
@@ -50,6 +52,18 @@ namespace TetrisTower.Logic
 				return actions;
 
 			return actions;
+		}
+
+		public static bool IsNormalMatchType(this MatchType matchType)
+		{
+			switch(matchType) {
+				case MatchType.MatchSame:
+				case MatchType.MatchAny:
+					return true;
+
+				default:
+					return false;
+			}
 		}
 
 		private static void EvaluateMatches(BlocksGrid grid, GridRules rules, List<GridAction> actions)
@@ -71,18 +85,21 @@ namespace TetrisTower.Logic
 			if (block1 == null || block2 == null)
 				return false;
 
+			if (!block1.MatchType.IsNormalMatchType() || !block2.MatchType.IsNormalMatchType())
+				return false;
+
 			MatchType type = block1.MatchType;
-			if (block2.MatchType > type && type != MatchType.None) {
+			if (block2.MatchType > type) {
 				type = block2.MatchType;
 			}
 
 			switch (type) {
-				case MatchType.None:
-					return false;
 				case MatchType.MatchSame:
 					return block1 == block2;
+
 				case MatchType.MatchAny:
 					return true;
+
 				default:
 					throw new NotSupportedException(block2.MatchType.ToString());
 			}
@@ -119,7 +136,7 @@ namespace TetrisTower.Logic
 			for (int i = 0; i < totalBlocks; ++i) {
 				BlockType currentType = grid[coords];
 
-				if (currentType && currentType.MatchType == MatchType.None) {
+				if (currentType && !currentType.MatchType.IsNormalMatchType()) {
 					currentType = null;
 				}
 
@@ -281,7 +298,7 @@ namespace TetrisTower.Logic
 
 					BlockType currentType = grid[coords];
 
-					if (currentType && currentType.MatchType == MatchType.None) {
+					if (currentType && !currentType.MatchType.IsNormalMatchType()) {
 						currentType = null;
 					}
 
@@ -340,6 +357,76 @@ namespace TetrisTower.Logic
 
 						matched.Clear();
 						lastMatched = null;
+					}
+				}
+			}
+		}
+
+		private static void EvaluateSpecialMatches(BlocksGrid grid, GridRules rules, List<GridAction> actions)
+		{
+			GridCoords coord;
+			ClearMatchedAction action;
+
+			for (int row = 0; row < grid.Rows; ++row) {
+				for(int column = 0; column < grid.Columns; ++column) {
+					BlockType block = grid[row, column];
+
+					if (block == null)
+						continue;
+
+					switch(block.MatchType) {
+
+						case MatchType.SpecialBlockSmite:
+
+							if (row == 0)
+								continue;
+
+							BlockType matchedType = grid[row - 1, column];
+							if (matchedType == null || matchedType.MatchType != MatchType.MatchSame)
+								continue;
+
+							// Gather all blocks of the type below this one. Include this one too.
+							List<GridCoords> matched = new List<GridCoords>();
+							matched.Add(new GridCoords(row, column));
+
+							// Resume matching from this position. Looks better visually.
+							coord = new GridCoords(row - 1, column);
+							while(coord.Row != row || coord.Column != column) {
+								if (grid[coord] == matchedType) {
+									matched.Add(coord);
+								}
+
+								coord.Row--;
+								if (coord.Row < 0) {
+									coord.Row = grid.Rows - 1;
+									coord.Column = (coord.Column + 1) % grid.Columns;
+								}
+							}
+
+							// One match is always guaranteed. Add this block as well.
+							action = new ClearMatchedAction() {
+								MatchedType = 0,
+								SpecialMatch = true,
+								Coords = matched
+							};
+							actions.Add(action);
+							break;
+
+
+						case MatchType.SpecialRowSmite:
+
+							action = new ClearMatchedAction() {
+								MatchedType = 0,
+								SpecialMatch = true,
+								Coords = Enumerable
+									.Range(0, grid.Columns)
+									// Resume matching from this position. Looks better visually.
+									.Select(c => new GridCoords(row, (c + column) % grid.Columns))
+									.Where(c => grid[c])
+									.ToList()	// Including me
+							};
+							actions.Add(action);
+							break;
 					}
 				}
 			}
