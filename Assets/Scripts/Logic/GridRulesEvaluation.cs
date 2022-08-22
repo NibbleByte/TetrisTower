@@ -422,7 +422,7 @@ namespace TetrisTower.Logic
 									.Range(0, grid.Columns)
 									// Resume matching from this position. Looks better visually.
 									.Select(c => new GridCoords(row, (c + column) % grid.Columns))
-									.Where(c => grid[c])
+									.Where(c => grid[c] && grid[c].MatchType != MatchType.None)
 									.ToList()	// Including me
 							};
 							actions.Add(action);

@@ -25,6 +25,8 @@ namespace TetrisTower.Logic
 		private BlockType B; // "Blue" block
 
 		private BlockType W; // "Wild" block
+		private BlockType Q; // "Block Smite"
+		private BlockType H; // "Row Smite"
 
 		private BlockType S; // "Static" block
 
@@ -65,6 +67,9 @@ namespace TetrisTower.Logic
 			B = m_GameConfig.DefaultBlocksSet.Blocks[2];
 
 			W = m_GameConfig.DefaultBlocksSet.WildBlock;
+			Q = m_GameConfig.DefaultBlocksSet.BlockSmite;
+			H = m_GameConfig.DefaultBlocksSet.RowSmite;
+
 			S = m_GameConfig.DefaultBlocksSet.WonBonusBlock;
 
 			N = null;
@@ -126,6 +131,8 @@ namespace TetrisTower.Logic
 				if (block == B) return nameof(B);
 
 				if (block == W) return nameof(W);
+				if (block == Q) return nameof(Q);
+				if (block == H) return nameof(H);
 				if (block == S) return nameof(S);
 
 				if (block == N) return nameof(N);
@@ -879,6 +886,131 @@ namespace TetrisTower.Logic
 
 				yield return EvaluateGrid(blocks, blocksDone, 1, 0);
 			}
+		}
+
+		#endregion
+
+		#region Special Blocks
+
+		[UnityTest]
+		public IEnumerator BlockSmite_Basics()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ R, B, G, N, N, N, G, N, N, N, N, N, N },
+				{ Q, Q, Q, N, R, N, Q, N, N, G, N, Q, Q },
+				{ Q, Q, Q, N, Q, N, B, N, Q, S, N, Q, Q },
+				{ Q, Q, Q, N, R, N, B, G, S, S, N, Q, Q },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ N, N, G, N, N, N, N, N, N, N, N, N, N },
+				{ Q, Q, Q, N, N, N, N, N, N, G, N, Q, Q },
+				{ Q, Q, Q, N, N, N, N, N, Q, S, N, Q, Q },
+				{ Q, Q, Q, N, N, N, G, G, S, S, N, Q, Q },
+			};
+
+			yield return EvaluateGrid(blocks, blocksDone, 2, 4 + 4);
+		}
+
+		[UnityTest]
+		public IEnumerator RowSmite_Basics()
+		{
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, H, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+					{ N, B, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, 1);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ G, B, R, N, N, N, N, N, N, N, N, N, R },
+					{ R, H, G, N, N, N, N, N, N, N, N, N, G },
+					{ R, B, G, N, N, N, N, N, N, N, N, N, G },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ G, B, R, N, N, N, N, N, N, N, N, N, R },
+					{ R, B, G, N, N, N, N, N, N, N, N, N, G },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, 4);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ G, B, R, N, N, N, N, N, N, N, N, N, R },
+					{ R, H, H, H, H, H, N, N, N, N, N, N, G },
+					{ R, B, G, N, N, N, N, N, N, N, N, N, G },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ G, B, R, N, N, N, N, N, N, N, N, N, R },
+					{ R, B, G, N, N, N, N, N, N, N, N, N, G },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, 7*5);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ G, B, R, H, H, H, N, N, N, N, N, N, R },
+					{ R, H, H, H, H, H, N, N, N, N, N, N, G },
+					{ R, B, G, H, H, H, N, N, N, N, N, N, G },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 1, 7*3 + 7*5 + 7*3);
+			}
+
+			{
+				BlockType[,] blocks = new BlockType[,] {
+					{ G, B, R, N, N, N, N, N, N, N, N, N, R },
+					{ R, H, S, N, N, S, N, N, N, N, N, S, S },
+					{ R, B, G, N, N, S, N, N, N, N, N, S, G },
+				};
+
+				BlockType[,] blocksDone = new BlockType[,] {
+					{ N, N, R, N, N, N, N, N, N, N, N, N, R },
+					{ G, B, S, N, N, S, N, N, N, N, N, S, S },
+					{ R, B, G, N, N, S, N, N, N, N, N, S, G },
+				};
+
+				yield return EvaluateGrid(blocks, blocksDone, 2, 2);
+			}
+		}
+
+
+		[UnityTest]
+		public IEnumerator SpecialBlocks_Mix()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ N, N, N, H, N, N, N, H, N, N, N, N, N },
+				{ N, N, N, Q, N, N, N, Q, N, N, R, N, N },
+				{ N, N, N, H, N, Q, N, W, N, N, R, W, N },
+				{ N, Q, N, S, N, S, N, W, N, N, Q, Q, N },
+				{ N, W, N, S, N, S, N, W, Q, W, Q, Q, N },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, N, Q, N, N, N, Q, N, N, R, N, N },
+				{ N, Q, N, S, N, S, N, W, N, N, Q, Q, N },
+				{ N, W, N, S, N, S, N, W, Q, W, Q, Q, N },
+			};
+
+			yield return EvaluateGrid(blocks, blocksDone, 2, 5 + 2*2);
 		}
 
 		#endregion

@@ -33,6 +33,8 @@ namespace TetrisTower.Game
 			BlockType B; // "Blue" block
 
 			BlockType W; // "Wild" block
+			BlockType Q; // "Block Smite"
+			BlockType H; // "Row Smite"
 
 			BlockType S; // "Static" block
 
@@ -45,6 +47,9 @@ namespace TetrisTower.Game
 			B = gameConfig.DefaultBlocksSet.Blocks[2];
 
 			W = gameConfig.DefaultBlocksSet.WildBlock;
+			Q = gameConfig.DefaultBlocksSet.BlockSmite;
+			H = gameConfig.DefaultBlocksSet.RowSmite;
+
 			S = gameConfig.DefaultBlocksSet.WonBonusBlock;
 
 			N = null;
