@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.3708985, g: 0.3783704, b: 0.35722548, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -151,6 +151,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1848392056}
   m_RootOrder: 0
@@ -230,6 +231,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1221062997}
   m_RootOrder: 0
@@ -309,6 +311,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1624517865}
   m_RootOrder: 3
@@ -388,6 +391,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 879309882}
   m_RootOrder: 0
@@ -467,6 +471,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1263004219}
   m_RootOrder: 0
@@ -546,6 +551,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1624517865}
   m_RootOrder: 0
@@ -626,6 +632,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1109564869}
   - {fileID: 879309882}
@@ -694,6 +701,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutomaticFocus: 1
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -811,6 +822,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 533048043}
   - {fileID: 1221062997}
@@ -857,6 +869,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1624517865}
   m_RootOrder: 1
@@ -938,6 +951,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1579879222}
   m_RootOrder: 0
@@ -1078,6 +1092,7 @@ Transform:
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -1112,6 +1127,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 268956391}
   m_Father: {fileID: 533048043}
@@ -1168,13 +1184,13 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 540250532}
         m_TargetAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController,
-          DevLocker.GFrame
+          DevLocker.GFrame.SampleGame
         m_MethodName: SwitchState
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 11400000, guid: 8454c84836bb32c429378757a4fcf4ed, type: 2}
           m_ObjectArgumentAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState,
-            DevLocker.GFrame
+            DevLocker.GFrame.SampleGame
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1316,6 +1332,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1887850217}
   m_RootOrder: 0
@@ -1488,7 +1505,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1268881109926130125, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController, DevLocker.GFrame
+      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController, DevLocker.GFrame.SampleGame
       objectReference: {fileID: 0}
     - target: {fileID: 1268881109926130125, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgument
@@ -1496,7 +1513,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 4360ea24d749911439da295cb752efbb, type: 2}
     - target: {fileID: 1268881109926130125, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState, DevLocker.GFrame
+      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState, DevLocker.GFrame.SampleGame
       objectReference: {fileID: 0}
     - target: {fileID: 1268881110886724375, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -1520,7 +1537,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1268881110886724375, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController, DevLocker.GFrame
+      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController, DevLocker.GFrame.SampleGame
       objectReference: {fileID: 0}
     - target: {fileID: 1268881110886724375, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgument
@@ -1528,7 +1545,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 4360ea24d749911439da295cb752efbb, type: 2}
     - target: {fileID: 1268881110886724375, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState, DevLocker.GFrame
+      value: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState, DevLocker.GFrame.SampleGame
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 18052f04ff9f26c4eb3f362cec71b7cd, type: 3}
@@ -1565,6 +1582,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 533048043}
   m_RootOrder: 0
@@ -1644,6 +1662,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1692576567}
   m_RootOrder: 0
@@ -1723,6 +1742,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1592478627}
   m_RootOrder: 0
@@ -1804,6 +1824,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 205328976}
   - {fileID: 2087059635}
@@ -1878,6 +1899,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutomaticFocus: 1
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -1913,6 +1938,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 326475062}
   m_Father: {fileID: 1624517865}
@@ -1969,13 +1995,13 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 540250532}
         m_TargetAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController,
-          DevLocker.GFrame
+          DevLocker.GFrame.SampleGame
         m_MethodName: SwitchState
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 11400000, guid: 4360ea24d749911439da295cb752efbb, type: 2}
           m_ObjectArgumentAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState,
-            DevLocker.GFrame
+            DevLocker.GFrame.SampleGame
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2077,6 +2103,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2000531842}
   m_Father: {fileID: 533048043}
@@ -2225,6 +2252,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 790785013}
   m_Father: {fileID: 533048043}
@@ -2360,6 +2388,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1219242110}
   m_Father: {fileID: 1221062997}
@@ -2416,13 +2445,13 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 540250532}
         m_TargetAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController,
-          DevLocker.GFrame
+          DevLocker.GFrame.SampleGame
         m_MethodName: SwitchState
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 11400000, guid: 4360ea24d749911439da295cb752efbb, type: 2}
           m_ObjectArgumentAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState,
-            DevLocker.GFrame
+            DevLocker.GFrame.SampleGame
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2510,6 +2539,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 499219361}
   - {fileID: 753235476}
@@ -2573,6 +2603,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutomaticFocus: 1
+  OnEnableBehaviour: 0
+  OnDisableBehaviour: 0
+  OnDisableScopes: []
   ResetAllActionsOnEnable: 1
   EnableUsedInputActions: 1
   PushInputStack: 0
@@ -2606,6 +2640,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1132878504}
   m_Father: {fileID: 533048043}
@@ -2727,6 +2762,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1654366}
   m_Father: {fileID: 533048043}
@@ -2783,13 +2819,13 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 540250532}
         m_TargetAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController,
-          DevLocker.GFrame
+          DevLocker.GFrame.SampleGame
         m_MethodName: SwitchState
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 11400000, guid: f12e7f3639d5dc944a7954d5c84c98a2, type: 2}
           m_ObjectArgumentAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState,
-            DevLocker.GFrame
+            DevLocker.GFrame.SampleGame
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2862,6 +2898,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1014902411}
   m_Father: {fileID: 533048043}
@@ -2918,13 +2955,13 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 540250532}
         m_TargetAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuController,
-          DevLocker.GFrame
+          DevLocker.GFrame.SampleGame
         m_MethodName: SwitchState
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 11400000, guid: aa572b3a429862743a7e0ee652f9be07, type: 2}
           m_ObjectArgumentAssemblyTypeName: DevLocker.GFrame.SampleGame.MainMenu.SampleMainMenuState,
-            DevLocker.GFrame
+            DevLocker.GFrame.SampleGame
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2996,6 +3033,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 533048043}
   m_RootOrder: 7
@@ -3136,6 +3174,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -3168,6 +3207,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1297835252}
   m_RootOrder: 0
@@ -3247,6 +3287,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 533048043}
   m_RootOrder: 8
@@ -3334,6 +3375,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2087059635}
   m_RootOrder: 0
@@ -3415,6 +3457,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2067787782}
   m_Father: {fileID: 1221062997}
