@@ -107,13 +107,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7576299513132914443}
-  m_Father: {fileID: 1529557860106047984}
-  m_RootOrder: 2
+  m_Father: {fileID: 1529557861353451395}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 9}
-  m_SizeDelta: {x: -12, y: 18}
+  m_AnchoredPosition: {x: 0, y: 4}
+  m_SizeDelta: {x: 8, y: 8}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &8563772342077398365
 CanvasRenderer:
@@ -162,7 +162,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5394036698972749552, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_Name
-      value: Sample-HotkeyWithProgressIcon2
+      value: Sample-HotkeyWithProgressIcon
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_Pivot.x
@@ -250,11 +250,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
---- !u!224 &1529557860106047984 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
-  m_PrefabInstance: {fileID: 6908912196096880387}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1529557860106047987 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5394036698972749552, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
@@ -285,3 +280,8 @@ MonoBehaviour:
   Performed:
     m_PersistentCalls:
       m_Calls: []
+--- !u!224 &1529557861353451395 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5394036700216754304, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
+  m_PrefabInstance: {fileID: 6908912196096880387}
+  m_PrefabAsset: {fileID: 0}
