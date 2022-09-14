@@ -26,6 +26,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		[SerializeField]
 		protected InputActionReference m_InputAction;
 
+		protected bool m_ActionStarted { get; private set; } = false;
+		protected bool m_ActionPerformed { get; private set; } = false;
+
 		protected List<InputAction> m_SubscribedActions = new List<InputAction>();
 
 		protected virtual void OnEnable()
@@ -40,7 +43,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			foreach(InputAction action in GetUsedActions()) {
 				m_SubscribedActions.Add(action);
-				action.performed += OnInputAction;
+				action.started += OnInputStarted;
+				action.performed += OnInputPerformed;
+				action.canceled += OnInputCancel;
 			}
 		}
 
@@ -51,8 +56,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			InputContextManager.InputContext.PlayersChanged -= OnPlayersChanged;
 
+			m_ActionStarted = false;
+			m_ActionPerformed = false;
+
 			foreach (InputAction action in m_SubscribedActions) {
-				action.performed -= OnInputAction;
+				action.started -= OnInputStarted;
+				action.performed -= OnInputPerformed;
+				action.canceled -= OnInputCancel;
 			}
 
 			m_SubscribedActions.Clear();
@@ -64,7 +74,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			OnEnable();
 		}
 
-		private void OnInputAction(InputAction.CallbackContext obj)
+		private void OnInputStarted(InputAction.CallbackContext obj)
 		{
 			var selected = EventSystem.current.currentSelectedGameObject;
 
@@ -89,10 +99,76 @@ namespace DevLocker.GFrame.Input.UIScope
 #endif
 			}
 
+			m_ActionStarted = true;
+
+			OnStarted();
+		}
+
+		private void OnInputPerformed(InputAction.CallbackContext obj)
+		{
+			var selected = EventSystem.current.currentSelectedGameObject;
+
+			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
+				&& selected
+				&& !selected.GetComponent<InputField>()
+#if USE_TEXT_MESH_PRO
+				&& !selected.GetComponent<TMPro.TMP_InputField>()
+#endif
+				)
+				return;
+
+			if ((SkipHotkey & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
+				var inputField = selected.GetComponent<InputField>();
+				if (inputField && inputField.isFocused)
+					return;
+
+#if USE_TEXT_MESH_PRO
+				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
+				if (inputFieldTMP && inputFieldTMP.isFocused)
+					return;
+#endif
+			}
+
+			m_ActionStarted = false;
+			m_ActionPerformed = true;
+
 			OnInvoke();
 		}
 
+		private void OnInputCancel(InputAction.CallbackContext obj)
+		{
+			var selected = EventSystem.current.currentSelectedGameObject;
+
+			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
+				&& selected
+				&& !selected.GetComponent<InputField>()
+#if USE_TEXT_MESH_PRO
+				&& !selected.GetComponent<TMPro.TMP_InputField>()
+#endif
+				)
+				return;
+
+			if ((SkipHotkey & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
+				var inputField = selected.GetComponent<InputField>();
+				if (inputField && inputField.isFocused)
+					return;
+
+#if USE_TEXT_MESH_PRO
+				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
+				if (inputFieldTMP && inputFieldTMP.isFocused)
+					return;
+#endif
+			}
+
+			m_ActionStarted = false;
+			m_ActionPerformed = false;
+
+			OnCancel();
+		}
+
+		protected virtual void OnStarted() { }
 		protected abstract void OnInvoke();
+		protected virtual void OnCancel() { }
 
 		public IEnumerable<InputAction> GetUsedActions()
 		{
