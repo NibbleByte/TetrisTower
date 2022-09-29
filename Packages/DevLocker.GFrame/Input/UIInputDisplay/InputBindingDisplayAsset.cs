@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Layouts;
 
 namespace DevLocker.GFrame.Input.UIInputDisplay
 {
@@ -17,8 +18,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		[Serializable]
 		public struct BindingDisplayAssetsData
 		{
-			// TODO: UPDATE TO InputControl WHEN FIXED
-			[InputControlFIXED]
+			[InputControl]
 			public string BindingPath;
 
 			public Sprite Icon;
@@ -164,46 +164,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			return new InputBindingDisplayData() { BindingIndex = -1 };
 		}
 	}
-
-	/// <summary>
-	/// TODO: REMOVE WHEN FIXED
-	/// InputControlPathDrawer drawer doesn't work properly when used in lists - made a temporary fix until this gets resolved.
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Field)]
-	internal sealed class InputControlFIXEDAttribute : PropertyAttribute
-	{
-
-	}
-
-
-#if UNITY_EDITOR
-	/// <summary>
-	/// TODO: REMOVE WHEN FIXED
-	/// InputControlPathDrawer drawer doesn't work properly when used in lists - made a temporary fix until this gets resolved.
-	/// </summary>
-	[UnityEditor.CustomPropertyDrawer(typeof(InputControlFIXEDAttribute))]
-	internal sealed class InputControlPathDrawer : UnityEditor.PropertyDrawer
-	{
-		private UnityEngine.InputSystem.Editor.InputControlPickerState m_PickerState;
-
-		public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
-		{
-			if (m_PickerState == null)
-				m_PickerState = new UnityEngine.InputSystem.Editor.InputControlPickerState();
-
-			var editor = new UnityEngine.InputSystem.Editor.InputControlPathEditor(property, m_PickerState,
-				() => property.serializedObject.ApplyModifiedProperties(),
-				label: label);
-			editor.SetExpectedControlLayoutFromAttribute();
-
-			UnityEditor.EditorGUI.BeginProperty(position, label, property);
-			editor.OnGUI(position);
-			UnityEditor.EditorGUI.EndProperty();
-
-			editor.Dispose();
-		}
-	}
-#endif
 
 }
 #endif

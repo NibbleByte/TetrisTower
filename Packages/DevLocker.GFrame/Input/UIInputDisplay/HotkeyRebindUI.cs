@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Layouts;
 
 namespace DevLocker.GFrame.Input.UIInputDisplay
 {
@@ -17,14 +18,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public float WaitSecondsOnMatch = 0.1f;
 
 		[Tooltip("Binding used for cancel. Examples:\n\"<Keyboard>/escape\" - ESC\n\"*/{Cancel}\" - any input considered as cancel (use with caution).")]
-		[InputControlFIXED]
+		[InputControl]
 		public string CancelBinding;
 
-		[InputControlFIXED]
+		[InputControl]
 		[NonReorderable]
 		public string[] IncludeRebindsTo;
 
-		[InputControlFIXED]
+		[InputControl]
 		[NonReorderable]
 		public string[] ExcludeRebindsTo;
 
