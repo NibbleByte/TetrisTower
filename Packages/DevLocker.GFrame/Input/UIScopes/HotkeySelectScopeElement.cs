@@ -28,20 +28,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			base.OnValidate();
 
 			// OnValidate() gets called even if object is not active.
-			// HACK: Because Unity are idiots and missed this overload.
-			//var selectable = GetComponentInParent<Selectable>(true);
-
-			Selectable selectable = null;
-			var tr = transform;
-			while (tr) {
-				selectable = tr.GetComponent<Selectable>();
-				if (selectable)
-					break;
-
-				tr = tr.parent;
-			}
-
-
+			var selectable = GetComponentInParent<Selectable>(true);
 			if (selectable == null) {
 				Debug.LogError($"No valid selectable was found for HotkeySelect {name}", this);
 				return;

@@ -27,20 +27,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			base.OnValidate();
 
 			// OnValidate() gets called even if object is not active.
-			// HACK: Because Unity are idiots and missed this overload.
-			//var button = GetComponentInParent<Button>(true);
-
-			Button button = null;
-			var tr = transform;
-			while (tr) {
-				button = tr.GetComponent<Button>();
-				if (button)
-					break;
-
-				tr = tr.parent;
-			}
-
-
+			var button = GetComponentInParent<Button>(true);
 			if (button == null) {
 				Debug.LogError($"No valid button was found for HotkeyButton {name}", this);
 				return;
