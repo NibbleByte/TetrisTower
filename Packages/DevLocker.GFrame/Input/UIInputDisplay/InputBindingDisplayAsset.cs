@@ -1,5 +1,4 @@
 #if USE_INPUT_SYSTEM
-using DevLocker.GFrame.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;

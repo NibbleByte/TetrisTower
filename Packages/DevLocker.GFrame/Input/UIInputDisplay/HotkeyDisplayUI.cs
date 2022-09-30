@@ -55,6 +55,11 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public PlayerIndex Player = PlayerIndex.MasterPlayer;
 
 		public InputActionReference InputAction;
+		// Maybe you'd like to have the option to specify the binding here too.
+		// You can do this easily with the InputActionBindingPair class.
+		// But that is probably a bad idea, since you'll be locking this display to the binding control scheme.
+		// Most likely you'd want to update the display dynamically with the current control scheme.
+		// (i.e. binding displays keyboard key, but player switches to a controller).
 
 		[Range(0, 5)]
 		[Tooltip("If multiple bindings are present in the action matching this device, display the n-th one.\n(i.e. \"alternative binding\")")]
