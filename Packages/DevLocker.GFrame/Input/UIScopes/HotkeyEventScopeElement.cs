@@ -11,12 +11,11 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// </summary>
 	public class HotkeyEventScopeElement : HotkeyBaseScopeElement
 	{
-		[SerializeField]
-		private UnityEvent m_OnAction;
+		public UnityEvent OnAction;
 
 		protected override void OnInvoke()
 		{
-			m_OnAction.Invoke();
+			OnAction.Invoke();
 		}
 	}
 }
