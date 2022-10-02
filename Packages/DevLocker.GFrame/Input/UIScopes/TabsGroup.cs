@@ -16,6 +16,9 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// Can have hotkeys for switching between previous/next tab.
 	///
 	/// <see cref="Tabs"/> buttons can have additional onClick events (like sounds and particles). Hotkeys will invoke them as well (not only pointer clicks).
+	/// Or just use the <see cref="TabOpened"/> and <see cref="TabClosed"/>.
+	///
+	/// You can fill in the lists dynamically by code then call <see cref="Reinitialize(Button)"/>.
 	/// </summary>
 	public class TabsGroup : MonoBehaviour
 	{
@@ -53,54 +56,75 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private int m_CurrentIndex = -1;
 
+		private List<Button> m_SubscribedTabButtons = new List<Button>();
+
 		protected virtual void Awake()
 		{
 			Button disabledTab = Tabs.FirstOrDefault(b => !b.interactable && b.gameObject.activeInHierarchy);
 
-			for (int i = 0; i < Tabs.Length; ++i) {
-				Button tabButton = Tabs[i];
-				tabButton.onClick.AddListener(() => SwitchToTab(tabButton));
-				tabButton.interactable = true;
-				Contents[i].SetActive(false);
-			}
-
 			if (StartTab == null || !StartTab.gameObject.activeInHierarchy) {
-				StartTab = disabledTab ?? Tabs.First(b => b.gameObject.activeInHierarchy);
+				StartTab = disabledTab ?? Tabs.FirstOrDefault(b => b.gameObject.activeInHierarchy);
 			}
 
-			// If on, OnEnable will do the same thing.
-			if (!ActivateInitialTabOnEnable) {
-				SwitchToTab(StartTab);
+			if (StartTab) {
+				Reinitialize(StartTab);
 			}
 
 			NextHotkey?.OnAction.AddListener(OnNextAction);
 			PreviousHotkey?.OnAction.AddListener(OnPreviousAction);
 		}
 
+		/// <summary>
+		/// Call this when you add or replace the tab buttons & contents dynamically.
+		/// </summary>
+		/// <param name="nextStartTab">The tab that should be opened.</param>
+		public virtual void Reinitialize(Button nextStartTab)
+		{
+			OnValidate();
+
+			// Some buttons may be destroyed by the user, new ones added later.
+			m_SubscribedTabButtons.RemoveAll(b => b == null);
+
+			for (int i = 0; i < Tabs.Length; ++i) {
+				Button tabButton = Tabs[i];
+
+				if (!m_SubscribedTabButtons.Contains(tabButton)) {
+					tabButton.onClick.AddListener(() => SwitchToTab(tabButton));
+				}
+				tabButton.interactable = true;
+				Contents[i].SetActive(false);
+			}
+
+			m_CurrentIndex = -1;	// To skip TabClosed event.
+			SwitchToTab(nextStartTab);
+			StartTab = nextStartTab;
+		}
+
+		// Avoid duplication with Awake().
+		private bool m_EnabledOnce = false;
+
 		protected virtual void OnEnable()
 		{
-			if (ActivateInitialTabOnEnable) {
+			if (ActivateInitialTabOnEnable && m_EnabledOnce) {
 				m_CurrentIndex = -1;	// To skip TabClosed event.
 
-				if (StartTab.gameObject.activeInHierarchy) {
-					SwitchToTab(StartTab);
+				if (StartTab && StartTab.gameObject.activeInHierarchy) {
+					Reinitialize(StartTab);
 				} else {
-					SwitchToTab(Tabs.First(b => b.gameObject.activeInHierarchy));
+					Button tabButton = Tabs.FirstOrDefault(b => b.gameObject.activeInHierarchy);
+					if (tabButton) {
+						Reinitialize(tabButton);
+					}
 				}
 			}
+
+			m_EnabledOnce = true;
 		}
 
 		protected virtual void OnValidate()
 		{
-			if (Tabs.Length == 0) {
-				Debug.LogError($"\"{name}\" has no Tabs buttons specified.", this);
+			if (Tabs == null || Contents == null)
 				return;
-			}
-
-			if (Contents.Length == 0) {
-				Debug.LogError($"\"{name}\" has no Contents objects specified.", this);
-				return;
-			}
 
 			if (Tabs.Length != Contents.Length) {
 				Debug.LogError($"\"{name}\" Tabs buttons {Tabs.Length} count is different from the Contents objects {Contents.Length}. Every tab button needs corresponding content object.", this);
@@ -149,7 +173,6 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			List<Button> activeTabs = Tabs.Where(b => b.gameObject.activeInHierarchy).ToList();
 			if (activeTabs.Count == 0) {
-				Debug.LogError($"{nameof(TabsGroup)} \"{name}\" is trying to switch tab, but non are active!", this);
 				return;
 			}
 
@@ -169,7 +192,6 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			List<Button> activeTabs = Tabs.Where(b => b.gameObject.activeInHierarchy).ToList();
 			if (activeTabs.Count == 0) {
-				Debug.LogError($"{nameof(TabsGroup)} \"{name}\" is trying to switch tab, but non are active!", this);
 				return;
 			}
 

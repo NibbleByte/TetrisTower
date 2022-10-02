@@ -964,6 +964,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "NextListEntry",
+                    "type": "Button",
+                    "id": "febb67b0-2320-4791-ba0d-23e8be6a77f8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PrevListEntry",
+                    "type": "Button",
+                    "id": "f3135e94-409a-429d-982e-38916ffa8164",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1057,6 +1075,28 @@
                 },
                 {
                     "name": "",
+                    "id": "84bc279e-720c-4858-acda-f6d9a1cc8b9d",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "NextListEntry",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6ea3fef6-6e53-458d-8cda-f2233197531f",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "NextListEntry",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "62ae90ce-9021-4feb-b5d4-4c84912b8f00",
                     "path": "<Keyboard>/leftBracket",
                     "interactions": "",
@@ -1074,6 +1114,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "PrevSection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6008d5f6-2339-4f5b-a698-efb05a3b0ad8",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "PrevListEntry",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e98eabfd-31e7-44d3-92c5-e4e0e5748b5a",
+                    "path": "<Gamepad>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "PrevListEntry",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
