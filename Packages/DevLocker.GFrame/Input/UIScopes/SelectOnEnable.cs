@@ -14,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GameObject m_PersistedSelection = null;
 		private bool m_SelectRequested = false;
 
-		void OnEnable()
+		protected virtual void OnEnable()
 		{
 			m_SelectRequested = true;
 		}
@@ -47,10 +47,16 @@ namespace DevLocker.GFrame.Input.UIScope
 				}
 
 				EventSystem.current.SetSelectedGameObject(targetSelection);
+
+				Selected();
 			}
 		}
 
-		void OnDisable()
+		protected virtual void Selected()
+		{
+		}
+
+		protected virtual void OnDisable()
 		{
 			if (EventSystem.current && PersistentSelection) {
 				m_PersistedSelection = EventSystem.current.currentSelectedGameObject;
