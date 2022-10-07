@@ -1006,6 +1006,24 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HorizontalScroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""5d4298a6-0ad3-4fb9-84b6-b5037a41c751"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""VerticalScroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""b1b2f2f6-7286-43e1-93fa-236bf9bbb55b"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -1184,6 +1202,72 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""action"": ""NextListEntry"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Left Stick"",
+                    ""id"": ""39c755b8-811d-4a6f-abac-6d575b0fe70b"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HorizontalScroll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""fbfa6ec7-2ce6-4e53-a55b-d2b40d397f84"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""HorizontalScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""e9149de1-8776-41ea-b3db-d3c341186369"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""HorizontalScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Left Stick"",
+                    ""id"": ""74208213-82ac-485f-bc2b-9e59b93a4e99"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""VerticalScroll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""73504116-21bd-432d-90ff-ae3d0edabe14"",
+                    ""path"": ""<Gamepad>/leftStick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""VerticalScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""7e6839cd-a7d1-43c0-b3a8-9d7375569a2b"",
+                    ""path"": ""<Gamepad>/leftStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""VerticalScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -1455,6 +1539,8 @@ namespace DevLocker.GFrame.SampleGame.Game
             m_CommonHotkeys_PrevSection = m_CommonHotkeys.FindAction("PrevSection", throwIfNotFound: true);
             m_CommonHotkeys_NextListEntry = m_CommonHotkeys.FindAction("NextListEntry", throwIfNotFound: true);
             m_CommonHotkeys_PrevListEntry = m_CommonHotkeys.FindAction("PrevListEntry", throwIfNotFound: true);
+            m_CommonHotkeys_HorizontalScroll = m_CommonHotkeys.FindAction("HorizontalScroll", throwIfNotFound: true);
+            m_CommonHotkeys_VerticalScroll = m_CommonHotkeys.FindAction("VerticalScroll", throwIfNotFound: true);
             // UITester
             m_UITester = asset.FindActionMap("UITester", throwIfNotFound: true);
             m_UITester_TestHotkeyA = m_UITester.FindAction("TestHotkeyA", throwIfNotFound: true);
@@ -1756,6 +1842,8 @@ namespace DevLocker.GFrame.SampleGame.Game
         private readonly InputAction m_CommonHotkeys_PrevSection;
         private readonly InputAction m_CommonHotkeys_NextListEntry;
         private readonly InputAction m_CommonHotkeys_PrevListEntry;
+        private readonly InputAction m_CommonHotkeys_HorizontalScroll;
+        private readonly InputAction m_CommonHotkeys_VerticalScroll;
         public struct CommonHotkeysActions
         {
             private @SamplePlayerControls m_Wrapper;
@@ -1766,6 +1854,8 @@ namespace DevLocker.GFrame.SampleGame.Game
             public InputAction @PrevSection => m_Wrapper.m_CommonHotkeys_PrevSection;
             public InputAction @NextListEntry => m_Wrapper.m_CommonHotkeys_NextListEntry;
             public InputAction @PrevListEntry => m_Wrapper.m_CommonHotkeys_PrevListEntry;
+            public InputAction @HorizontalScroll => m_Wrapper.m_CommonHotkeys_HorizontalScroll;
+            public InputAction @VerticalScroll => m_Wrapper.m_CommonHotkeys_VerticalScroll;
             public InputActionMap Get() { return m_Wrapper.m_CommonHotkeys; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1793,6 +1883,12 @@ namespace DevLocker.GFrame.SampleGame.Game
                     @PrevListEntry.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevListEntry;
                     @PrevListEntry.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevListEntry;
                     @PrevListEntry.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevListEntry;
+                    @HorizontalScroll.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnHorizontalScroll;
+                    @HorizontalScroll.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnHorizontalScroll;
+                    @HorizontalScroll.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnHorizontalScroll;
+                    @VerticalScroll.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnVerticalScroll;
+                    @VerticalScroll.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnVerticalScroll;
+                    @VerticalScroll.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnVerticalScroll;
                 }
                 m_Wrapper.m_CommonHotkeysActionsCallbackInterface = instance;
                 if (instance != null)
@@ -1815,6 +1911,12 @@ namespace DevLocker.GFrame.SampleGame.Game
                     @PrevListEntry.started += instance.OnPrevListEntry;
                     @PrevListEntry.performed += instance.OnPrevListEntry;
                     @PrevListEntry.canceled += instance.OnPrevListEntry;
+                    @HorizontalScroll.started += instance.OnHorizontalScroll;
+                    @HorizontalScroll.performed += instance.OnHorizontalScroll;
+                    @HorizontalScroll.canceled += instance.OnHorizontalScroll;
+                    @VerticalScroll.started += instance.OnVerticalScroll;
+                    @VerticalScroll.performed += instance.OnVerticalScroll;
+                    @VerticalScroll.canceled += instance.OnVerticalScroll;
                 }
             }
         }
@@ -1955,6 +2057,8 @@ namespace DevLocker.GFrame.SampleGame.Game
             void OnPrevSection(InputAction.CallbackContext context);
             void OnNextListEntry(InputAction.CallbackContext context);
             void OnPrevListEntry(InputAction.CallbackContext context);
+            void OnHorizontalScroll(InputAction.CallbackContext context);
+            void OnVerticalScroll(InputAction.CallbackContext context);
         }
         public interface IUITesterActions
         {
