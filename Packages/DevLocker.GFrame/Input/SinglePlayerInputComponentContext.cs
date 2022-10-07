@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 namespace DevLocker.GFrame.Input
 {
@@ -33,6 +34,7 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public event PlayerIndexEventHandler LastUsedDeviceChanged;
 
+		private InputDevice m_LastUsedDevice;
 		private InputControlScheme m_LastUsedControlScheme;
 
 		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
@@ -63,6 +65,9 @@ namespace DevLocker.GFrame.Input
 
 			UIActions = uiActions;
 
+			m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
+			m_LastUsedDevice = InputSystem.devices.FirstOrDefault(d => m_LastUsedControlScheme.SupportsDevice(d));
+
 			m_BindingsDisplayProviders = bindingDisplayProviders != null ? bindingDisplayProviders.ToArray() : new IInputBindingDisplayDataProvider[0];
 
 			// HACK: To silence warning that it is never used.
@@ -73,19 +78,26 @@ namespace DevLocker.GFrame.Input
 				action.Disable();
 			}
 
+			// NOTE: Not used as it is hard to get the last used device (can't distinguish between keyboard and a mouse).
 			// Based on the NotificationBehavior, one of these can be invoked.
 			// If selected behavior is via Messages, the user have to invoke the
 			// TriggerLastUsedDeviceChanged() method manually.
-			PlayerInput.controlsChangedEvent.AddListener(OnControlsChanged);
-			PlayerInput.onControlsChanged += OnControlsChanged;
+			//PlayerInput.controlsChangedEvent.AddListener(OnControlsChanged);
+			//PlayerInput.onControlsChanged += OnControlsChanged;
 
-			m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
+			InputSystem.onEvent += OnInputSystemEvent;
+
+			// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
+			InputSystem.onDeviceChange += OnInputSystemDeviceChange;
 		}
 
 		public void Dispose()
 		{
-			PlayerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
-			PlayerInput.onControlsChanged -= OnControlsChanged;
+			//PlayerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
+			//PlayerInput.onControlsChanged -= OnControlsChanged;
+
+			InputSystem.onEvent -= OnInputSystemEvent;
+			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
 		}
 
 		public bool IsMasterPlayer(PlayerIndex playerIndex)
@@ -137,11 +149,7 @@ namespace DevLocker.GFrame.Input
 			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
-			// HACK: In the case of keyboard and mouse, this will always return keyboard.
-			return PlayerInput.devices.Count > 0
-				? PlayerInput.devices[0]
-				: null
-				;
+			return m_LastUsedDevice;
 		}
 
 		public InputControlScheme GetLastUsedInputControlScheme(PlayerIndex playerIndex)
@@ -180,9 +188,41 @@ namespace DevLocker.GFrame.Input
 			}
 		}
 
-		private void OnControlsChanged(PlayerInput obj)
+		// NOTE: Not used anymore, check the init method.
+		//private void OnControlsChanged(PlayerInput obj)
+		//{
+		//	m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
+		//
+		//	TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
+		//}
+
+		private void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
 		{
-			m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
+			// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
+			// Trigger event so UI gets refreshed properly.
+			TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
+		}
+
+		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
+		{
+			if (m_LastUsedDevice == device)
+				return;
+
+			// Some devices like to spam events like crazy.
+			// Example: PS4 controller on PC keeps triggering events without meaningful change.
+			var eventType = eventPtr.type;
+			if (eventType == StateEvent.Type) {
+
+				// Go through the changed controls in the event and look for ones actuated
+				// above a magnitude of a little above zero.
+				if (!eventPtr.EnumerateChangedControls(device: device, magnitudeThreshold: 0.0001f).Any())
+					return;
+			}
+
+			m_LastUsedDevice = device;
+			if (m_LastUsedDevice != null) {
+				m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
+			}
 
 			TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
 		}

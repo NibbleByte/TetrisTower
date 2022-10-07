@@ -52,11 +52,15 @@ namespace DevLocker.GFrame.Input
 			}
 
 			InputSystem.onEvent += OnInputSystemEvent;
+
+			// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
+			InputSystem.onDeviceChange += OnInputSystemDeviceChange;
 		}
 
 		public void Dispose()
 		{
 			InputSystem.onEvent -= OnInputSystemEvent;
+			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
 		}
 
 		public bool IsMasterPlayer(PlayerIndex playerIndex)
@@ -141,6 +145,13 @@ namespace DevLocker.GFrame.Input
 					}
 				}
 			}
+		}
+
+		private void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
+		{
+			// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
+			// Trigger event so UI gets refreshed properly.
+			TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
 		}
 
 		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
