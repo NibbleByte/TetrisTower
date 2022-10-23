@@ -83,6 +83,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.0.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.render-pipelines.core": {
       "version": "12.1.7",
       "depth": 1,
@@ -178,25 +185,17 @@
       "dependencies": {}
     },
     "devlocker.tools.assetmanagement": {
-      "version": "https://github.com/NibbleByte/UnityAssetManagementTools.git#upm",
+      "version": "file:devlocker.tools.assetmanagement@34c0b8fd1a",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "f69a2322c0f06ee2e1c6e20031d5efb82e5b17db"
+      "source": "embedded",
+      "dependencies": {}
     },
     "devlocker.utils.scenereference": {
-      "version": "https://github.com/NibbleByte/UnitySceneReference.git#upm",
+      "version": "1.0.4",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {},
-      "hash": "e8b3421cb05a0744ec70a02d76b06c22b4165467"
-    },
-    "jillejr.newtonsoft.json-for-unity": {
-      "version": "https://github.com/jilleJr/Newtonsoft.Json-for-Unity.git#upm",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "486af8b260b7cda4866ab6c336d8397338ab9c45"
+      "url": "https://package.openupm.com"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
