@@ -20,11 +20,13 @@ namespace TetrisTower.TowerLevels.UI
 		[Header("Prefixes")]
 		public string TotalScorePrefix = "Total: ";
 		public string CurrentScorePrefix = "Current: ";
+		public string BlocksClearedCountPrefix = "Blocks: ";
 		public string RemainingPrefix = "Remaining: ";
 
 		[Header("UI Texts")]
 		public TextMeshProUGUI TotalScoreText;
 		public TextMeshProUGUI CurrentScoreText;
+		public TextMeshProUGUI BlocksClearedCountText;
 		public TextMeshProUGUI RemainingText;
 		public TextMeshProUGUI RulesText;
 
@@ -51,6 +53,10 @@ namespace TetrisTower.TowerLevels.UI
 
 			if (CurrentScoreText) {
 				CurrentScoreText.text = CurrentScorePrefix + m_LevelData.Score.Score;
+			}
+
+			if (BlocksClearedCountText) {
+				BlocksClearedCountText.text = BlocksClearedCountPrefix + m_LevelData.Score.TotalClearedBlocksCount;
 			}
 
 			if (RemainingText) {

@@ -28,7 +28,9 @@ namespace TetrisTower.Logic
 		private int m_Score = 0;
 		public int Score => m_Score;
 
-		[JsonProperty] public int TotalMatched { get; private set; }
+
+		[JsonProperty] public int TotalMatched { get; private set; }	// These are matched, which can be more than the actually cleared blocks (when overlapping).
+		[JsonProperty] public int TotalClearedBlocksCount { get; private set; }
 		[JsonProperty] public int ObjectiveProgress { get; private set; }
 
 		private int m_CurrentClearedBlocksCount = 0;
@@ -57,11 +59,13 @@ namespace TetrisTower.Logic
 
 		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
 		{
+			var clearedCoords = new HashSet<GridCoords>();
+
 			bool anyClears = false;
 			foreach (var action in actions) {
 				switch(action) {
 					case ClearMatchedAction clearAction:
-						ScoreMatchedCells(clearAction);
+						ScoreMatchedCells(clearAction, clearedCoords);
 						anyClears = true;
 						break;
 
@@ -75,18 +79,24 @@ namespace TetrisTower.Logic
 			// Next set of actions are considered for cascade bonus.
 			if (anyClears) {
 				MatchingSequenceFinished();
+
+				TotalClearedBlocksCount += clearedCoords.Count;
 			}
 
 			yield break;
 		}
 
-		private void ScoreMatchedCells(ClearMatchedAction action)
+		private void ScoreMatchedCells(ClearMatchedAction action, HashSet<GridCoords> totalClearedCoords)
 		{
 			if (action.MatchedType == 0 && !action.SpecialMatch) {
 				Debug.LogError($"{nameof(ClearMatchedAction)} doesn't have a MatchedType set.");
 			}
 
 			TotalMatched += action.Coords.Count;
+
+			foreach(GridCoords coord in action.Coords) {
+				totalClearedCoords.Add(coord);
+			}
 
 			if (!action.SpecialMatch) {
 

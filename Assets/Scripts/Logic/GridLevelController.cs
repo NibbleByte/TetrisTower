@@ -112,7 +112,7 @@ namespace TetrisTower.Logic
 			if (LevelData.IsPlaying) {
 
 				int spawnBlockTypesProgress = LevelData.MatchesToModifySpawnedBlocksRange > 0
-					? LevelData.Score.TotalMatched / LevelData.MatchesToModifySpawnedBlocksRange
+					? LevelData.Score.TotalClearedBlocksCount / LevelData.MatchesToModifySpawnedBlocksRange
 					: 0
 					;
 
