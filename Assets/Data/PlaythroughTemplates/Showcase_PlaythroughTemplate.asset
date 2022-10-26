@@ -1,0 +1,128 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9374f2e4f65f3469683e1287ce1e80, type: 3}
+  m_Name: Showcase_PlaythroughTemplate
+  m_EditorClassIdentifier: 
+  m_PlayerData:
+    TowerLevel:
+      rid: -2
+    BlocksSet: {fileID: 0}
+    FallSpeedNormalized: 2
+    FallSpeedupPerAction: 0.02
+    MatchesToModifySpawnedBlocksRange: 120
+    ModifyBlocksRangeType: 0
+    RandomSeed: 0
+    RandomInitialSeed: 0
+    WildBlockChance: 0.05
+    BlockSmiteChance: 0.005
+    RowSmiteChance: 0.005
+    CurrentLevelIndex: 0
+    Levels:
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: a35fc937ade46df42b1e56067073a56e, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/SkyStory/S00_Babylon-Stormy.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 100
+      SpawnWildBlocks: 0
+      SpawnBlockSmites: 0
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: f09702fa4cdaef84c9088d7a7570a06e, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/SkyStory/S01_Babylon-High.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 260
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 0
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 300
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 0
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: a768265c5fa8bd4459cb6f1765526987, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W00_Babylon.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      InitialSpawnBlockTypesCount: 5
+      ObjectiveEndCount: 0
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 1
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+    ScoreOnLevelStart: 0
+    PlayTimeOnLevelStart: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }

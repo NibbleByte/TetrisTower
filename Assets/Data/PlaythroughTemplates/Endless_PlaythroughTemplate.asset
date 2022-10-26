@@ -18,24 +18,28 @@ MonoBehaviour:
     BlocksSet: {fileID: 0}
     FallSpeedNormalized: 2
     FallSpeedupPerAction: 0.01
-    MatchesToModifySpawnedBlocksRange: 160
+    MatchesToModifySpawnedBlocksRange: 100
     ModifyBlocksRangeType: 0
     RandomSeed: 0
     RandomInitialSeed: 0
-    WildBlockChance: 0.15
+    WildBlockChance: 0.05
+    BlockSmiteChance: 0.005
+    RowSmiteChance: 0.005
     CurrentLevelIndex: 0
     Levels:
     - BackgroundScene:
-        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
+        m_SceneAsset: {fileID: 102900000, guid: a768265c5fa8bd4459cb6f1765526987, type: 3}
         m_IsDirty: 0
-        m_ScenePath: Assets/Scenes/TowerScene-1.unity
+        m_ScenePath: Assets/Scenes/WorldStory/W00_Babylon.unity
       BackgroundSceneMobile:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
-      InitialSpawnBlockTypesCount: 3
+      InitialSpawnBlockTypesCount: 5
       ObjectiveEndCount: 0
-      SpawnWildBlocks: 0
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 1
+      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
