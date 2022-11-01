@@ -30,6 +30,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5497468870474291578}
   - {fileID: 5497468871225805934}
@@ -74,7 +75,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1041652087649913563}
   m_Enabled: 1
-  m_Alpha: 0.6
+  m_Alpha: 0.75
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -99,7 +100,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Grid: {fileID: 1041652087649913567}
-  TowerLevel: {fileID: 0}
   PreviewIconPrefab: {fileID: -3131326960039598751, guid: fe0b81c6f9f87de488a887a67d52aa5b, type: 3}
 --- !u!1001 &1041652087809660065
 PrefabInstance:
