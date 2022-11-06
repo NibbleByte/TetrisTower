@@ -21,12 +21,14 @@ namespace TetrisTower.TowerLevels.UI
 		public string TotalScorePrefix = "Total: ";
 		public string CurrentScorePrefix = "Current: ";
 		public string BlocksClearedCountPrefix = "Blocks: ";
+		public string BonusRatioPrefix = "Bonus Ratio: ";
 		public string RemainingPrefix = "Remaining: ";
 
 		[Header("UI Texts")]
 		public TextMeshProUGUI TotalScoreText;
 		public TextMeshProUGUI CurrentScoreText;
 		public TextMeshProUGUI BlocksClearedCountText;
+		public TextMeshProUGUI BonusRatioText;
 		public TextMeshProUGUI RemainingText;
 		public TextMeshProUGUI RulesText;
 
@@ -57,6 +59,12 @@ namespace TetrisTower.TowerLevels.UI
 
 			if (BlocksClearedCountText) {
 				BlocksClearedCountText.text = BlocksClearedCountPrefix + m_LevelData.Score.TotalClearedBlocksCount;
+			}
+			if (BonusRatioText) {
+				BonusRatioText.text = m_LevelData.Score.TotalClearedBlocksCount != 0
+					? BonusRatioPrefix + ((float)m_LevelData.Score.Score / m_LevelData.Score.TotalClearedBlocksCount).ToString("0.000")
+					: BonusRatioPrefix + "1.000"
+					;
 			}
 
 			if (RemainingText) {
