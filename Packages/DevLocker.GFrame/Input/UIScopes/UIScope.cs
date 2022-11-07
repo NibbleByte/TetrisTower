@@ -256,6 +256,16 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			s_Scopes.Remove(this);
 
+			// if this scope got activated and added parents to s_Scopes, but got immediately deactivated BEFORE the parent got enabled,
+			// parent would remain in that collection forever (or until activated). In that case remove the parents from the collection that are not enabled.
+			// This could be an issue if sibling scope child of the same parent is active - do this only if parent is actually inactive in the hierarchy.
+			// If it is active in the hierarchy, it will eventually get enabled and added to the collection.
+			for (int i = s_Scopes.Count - 1; i >= 0; --i) {
+				if (s_Scopes[i].m_FrameEnabled == -1 && !s_Scopes[i].gameObject.activeInHierarchy && transform.IsChildOf(s_Scopes[i].transform)) {
+					s_Scopes.RemoveAt(i);
+				}
+			}
+
 			// HACK: On turning off the game OnDisable() gets called which may call methods on destroyed objects.
 			int activeIndex = Array.IndexOf(m_ActiveScopes, this);
 			if (activeIndex != -1 && !m_GameQuitting) {
