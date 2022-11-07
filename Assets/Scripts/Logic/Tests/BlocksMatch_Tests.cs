@@ -380,19 +380,18 @@ namespace TetrisTower.Logic
 		{
 			BlockType[,] blocks = new BlockType[,] {
 				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ R, N, N, N, B, N, N, N, S, N, N, N, N },
-				{ R, R, N, B, B, B, N, S, S, S, N, N, R },
-				{ R, R, N, B, B, B, N, S, S, S, N, N, R },
+				{ N, N, R, N, B, N, N, N, B, N, N, R, N },
+				{ N, R, B, N, G, B, N, B, G, N, N, B, R },
+				{ W, B, B, N, G, G, W, G, G, N, N, B, B },
+				{ W, R, R, N, B, B, W, B, B, N, N, R, R },
+				{ W, R, R, N, B, B, W, B, B, N, N, R, R },
 			};
 
 			BlockType[,] blocksDone = new BlockType[,] {
 				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
-				{ N, N, N, N, N, N, N, N, S, N, N, N, N },
-				{ N, N, N, N, N, N, N, S, S, S, N, N, N },
-				{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 			};
 
-			yield return EvaluateGrid(blocks, blocksDone, 1, 3*3 + 3*3);
+			yield return EvaluateGrid(blocks, blocksDone, 1, (3 * 17) * 2);
 		}
 
 		[UnityTest]

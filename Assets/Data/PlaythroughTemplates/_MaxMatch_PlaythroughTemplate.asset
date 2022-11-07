@@ -22,6 +22,9 @@ MonoBehaviour:
     ModifyBlocksRangeType: 0
     RandomSeed: 0
     RandomInitialSeed: 0
+    WildBlockChance: 0.15
+    BlockSmiteChance: 0.15
+    RowSmiteChance: 0.15
     CurrentLevelIndex: 0
     Levels: []
     ScoreOnLevelStart: 0
@@ -55,6 +58,9 @@ MonoBehaviour:
         MatchesToModifySpawnedBlocksRange: 150
         ModifyBlocksRangeType: 0
         RandomInitialLevelSeed: 0
+        SpawnWildBlocksChance: 0
+        SpawnBlockSmiteChance: 0
+        SpawnRowSmiteChance: 0
         Rules:
           MatchHorizontalLines: 3
           MatchVerticalLines: 3
@@ -68,18 +74,6 @@ MonoBehaviour:
           m_Blocks:
           - {fileID: 0}
           - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
-          - {fileID: 0}
           - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
           - {fileID: 0}
           - {fileID: 0}
@@ -89,6 +83,47 @@ MonoBehaviour:
           - {fileID: 0}
           - {fileID: 0}
           - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+          - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+          - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 0}
+          - {fileID: 11400000, guid: e1cc068887c94934ba4c727537f5d0a3, type: 2}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
           - {fileID: 0}
           - {fileID: 0}
           - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
@@ -100,36 +135,7 @@ MonoBehaviour:
           - {fileID: 0}
           - {fileID: 0}
           - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
-          - {fileID: 0}
+          - {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
           - {fileID: 0}
           - {fileID: 0}
           - {fileID: 0}
@@ -275,12 +281,12 @@ MonoBehaviour:
         - Coords:
             Row: 0
             Column: 0
-          Value: {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          Value: {fileID: 11400000, guid: fff9b60f3f53d1249a8528975591c739, type: 2}
         - Coords:
             Row: 1
             Column: 0
-          Value: {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          Value: {fileID: 11400000, guid: fff9b60f3f53d1249a8528975591c739, type: 2}
         - Coords:
             Row: 2
             Column: 0
-          Value: {fileID: 11400000, guid: 54baa9462af8c474080a16ef36fbf276, type: 2}
+          Value: {fileID: 11400000, guid: fff9b60f3f53d1249a8528975591c739, type: 2}
