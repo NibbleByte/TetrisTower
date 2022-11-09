@@ -65,7 +65,7 @@ namespace TetrisTower.TowerLevels.UI
 			}
 
 			foreach (var shapeCoord in shape.ShapeCoords) {
-				int blockIndex = Array.IndexOf(m_LevelData.NormalBlocksSkins, shapeCoord.Value);
+				int blockIndex = Array.FindIndex(m_LevelData.NormalBlocksSkins, s => s.BlockType == shapeCoord.Value);
 
 				// Wild or other special block that is not displayed as normal.
 				if (blockIndex == -1)
