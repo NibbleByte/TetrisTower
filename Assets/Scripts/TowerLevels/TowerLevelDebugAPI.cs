@@ -227,7 +227,7 @@ namespace TetrisTower.TowerLevels
 					List<GridCoords> clearCoords = new List<GridCoords>();
 					for (int column = 0; column < m_TowerLevel.Grid.Columns; ++column) {
 						var coords = new GridCoords(keyRow, column);
-						if (m_TowerLevel.Grid[coords]) {
+						if (m_TowerLevel.Grid[coords] != BlockType.None) {
 							clearCoords.Add(coords);
 						}
 					}

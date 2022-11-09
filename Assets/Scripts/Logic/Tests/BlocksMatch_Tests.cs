@@ -18,19 +18,17 @@ namespace TetrisTower.Logic
 		// For copy-paste of empty line.
 		// { N, N, N, N, N, N, N, N, N, N, N, N, N },
 
-		private GameConfig m_GameConfig;
+		private BlockType R = BlockType.B1; // "Red" block
+		private BlockType G = BlockType.B2; // "Green" block
+		private BlockType B = BlockType.B3; // "Blue" block
 
-		private BlockType R; // "Red" block
-		private BlockType G; // "Green" block
-		private BlockType B; // "Blue" block
+		private BlockType W = BlockType.SpecialWildBlock;	// "Wild" block
+		private BlockType Q = BlockType.SpecialBlockSmite;	// "Block Smite"
+		private BlockType H = BlockType.SpecialRowSmite;	// "Row Smite"
 
-		private BlockType W; // "Wild" block
-		private BlockType Q; // "Block Smite"
-		private BlockType H; // "Row Smite"
+		private BlockType S = BlockType.StaticBlock;		// "Static" block
 
-		private BlockType S; // "Static" block
-
-		private BlockType N; // "null" block
+		private BlockType N = BlockType.None;				// "null" block
 
 		private const int MaxRows = 13;
 		private const int MaxColumns = 13;
@@ -56,31 +54,18 @@ namespace TetrisTower.Logic
 		#region Setup
 
 		[OneTimeSetUp]
-		public void OneTimeSetUp()
-		{
-			m_GameConfig = GameConfig.FindDefaultConfig();
-			if (m_GameConfig == null)
-				throw new System.NotSupportedException();
-
-			R = m_GameConfig.DefaultBlocksSet.Blocks[0];
-			G = m_GameConfig.DefaultBlocksSet.Blocks[1];
-			B = m_GameConfig.DefaultBlocksSet.Blocks[2];
-
-			W = m_GameConfig.DefaultBlocksSet.WildBlock;
-			Q = m_GameConfig.DefaultBlocksSet.BlockSmite;
-			H = m_GameConfig.DefaultBlocksSet.RowSmite;
-
-			S = m_GameConfig.DefaultBlocksSet.WonBonusBlock;
-
-			N = null;
-		}
+		//public void OneTimeSetUp()
+		//{
+		//	Debug.Log("OneTimeSetup");
+		//}
 
 		// This is called before every test in this class
-		//[SetUp]
-		//public void Setup()
-		//{
-		//	Debug.Log("Setup");
-		//}
+		[SetUp]
+		public void Setup()
+		{
+			// HACK: Keep this method as Unity tries to execute the other methods named Setup*.
+			//Debug.Log("Setup");
+		}
 
 		private PlaceAction SetupPlaceAction(BlockType[,] blocks)
 		{
@@ -137,7 +122,7 @@ namespace TetrisTower.Logic
 
 				if (block == N) return nameof(N);
 
-				throw new System.NotSupportedException(block?.name);
+				throw new System.NotSupportedException(block.ToString());
 			}
 
 
@@ -180,7 +165,7 @@ namespace TetrisTower.Logic
 				for (int column = 0; column < blocks.GetLength(1); ++column) {
 					int blocksRow = blocks.GetLength(0) - 1 - row;
 
-					BlockType block = blocksRow >= 0 ? blocks[blocksRow, column] : null;
+					BlockType block = blocksRow >= 0 ? blocks[blocksRow, column] : BlockType.None;
 					BlockType gridBlock = m_Grid[row, column];
 
 					if (block != gridBlock) {
@@ -558,7 +543,7 @@ namespace TetrisTower.Logic
 					{ B, B, N, N, N, N, N, N, N, N, N, R, W },
 				};
 				/*
-				BlockType[,] blocks = new BlockType[,] {
+				BlockValue[,] blocks = new BlockValue[,] {
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 					{ N, N, N, N, N, N, N, N, N, N, N, W, N },
 					{ N, B, N, N, N, N, N, N, N, N, R, S, N },

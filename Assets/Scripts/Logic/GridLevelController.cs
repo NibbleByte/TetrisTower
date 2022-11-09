@@ -120,7 +120,7 @@ namespace TetrisTower.Logic
 
 				switch(LevelData.ModifyBlocksRangeType) {
 					case ModifyBlocksRangeType.AddRemoveAlternating:
-						int lowerCap = LevelData.BlocksPool.Length - LevelData.InitialSpawnBlockTypesCount - 1;
+						int lowerCap = LevelData.NormalBlocksSkins.Length - LevelData.InitialSpawnBlockTypesCount - 1;
 						blocksRange.x = spawnBlockTypesProgress / 2;
 
 						// Unlikely to happen, but if game goes for too long, start adding blocks in reverse.
@@ -129,11 +129,11 @@ namespace TetrisTower.Logic
 							blocksRange.x = Mathf.Max(blocksRange.x, 0);
 						}
 
-						blocksRange.y = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + (spawnBlockTypesProgress + 1) / 2, LevelData.BlocksPool.Length);
+						blocksRange.y = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + (spawnBlockTypesProgress + 1) / 2, LevelData.NormalBlocksSkins.Length);
 						break;
 
 					case ModifyBlocksRangeType.AddBlocks:
-						blocksRange.y = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.BlocksPool.Length);
+						blocksRange.y = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.NormalBlocksSkins.Length);
 						break;
 
 					default: throw new NotSupportedException(LevelData.ModifyBlocksRangeType.ToString());
@@ -213,7 +213,7 @@ namespace TetrisTower.Logic
 			if (LevelData.FallingShape != null) {
 				foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
-					if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords])
+					if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords] != BlockType.None)
 						return false;
 				}
 			}
@@ -285,7 +285,7 @@ namespace TetrisTower.Logic
 				if (LevelData.FallingShape != null) {
 					foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
-						if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords]) {
+						if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords] != BlockType.None) {
 							FallingColumnAnalogOffset = 0;
 							break;
 						}
@@ -444,23 +444,23 @@ namespace TetrisTower.Logic
 
 				BlockType blockType;
 				if (blockIndex < blocksRange) {
-					blockType = LevelData.BlocksPool[blocksRangeVec.x + (int)blockIndex];
+					blockType = BlockType.B1 + blocksRangeVec.x + (int)blockIndex;
 
 				} else {
 					blockIndex -= blocksRange;
 
 					if (blockIndex < LevelData.SpawnWildBlocksChance) {
-						blockType = LevelData.BlocksSet.WildBlock;
+						blockType = BlockType.SpecialWildBlock;
 
 					} else if (blockIndex < LevelData.SpawnWildBlocksChance + LevelData.SpawnBlockSmiteChance) {
-						blockType = LevelData.BlocksSet.BlockSmite;
+						blockType = BlockType.SpecialBlockSmite;
 
 					} else if (blockIndex < LevelData.SpawnWildBlocksChance + LevelData.SpawnBlockSmiteChance + LevelData.SpawnRowSmiteChance) {
-						blockType = LevelData.BlocksSet.RowSmite;
+						blockType = BlockType.SpecialRowSmite;
 
 					} else {
 						Debug.LogError($"Generating block produced index {blockIndex + blocksRange} larger than anything allowed.", this);
-						blockType = LevelData.BlocksSet.WonBonusBlock;
+						blockType = BlockType.WonBonusBlock;
 					}
 				}
 
@@ -484,7 +484,7 @@ namespace TetrisTower.Logic
 
 				for (int row = 0; row < LevelData.PlayableSize.Row; ++row) {
 					for (int column = 0; column < LevelData.Grid.Columns; ++column) {
-						if (LevelData.Grid[row, column] == null) {
+						if (LevelData.Grid[row, column] == BlockType.None) {
 							LevelData.Score.IncrementWonBonusScore();
 						}
 					}
@@ -543,7 +543,7 @@ namespace TetrisTower.Logic
 					};
 					coords.WrapColumn(Grid);
 
-					if (Grid[coords] != null) {
+					if (Grid[coords] != BlockType.None) {
 						return false;
 					}
 				}
@@ -567,7 +567,7 @@ namespace TetrisTower.Logic
 				if (pair.Coords.Row >= Grid.Rows)
 					continue;
 
-				if (pair.Coords.Row < 0 || Grid[pair.Coords]) {
+				if (pair.Coords.Row < 0 || Grid[pair.Coords] != BlockType.None) {
 
 					PlacingFallingShape?.Invoke();
 

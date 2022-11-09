@@ -113,10 +113,10 @@ namespace TetrisTower.TowerLevels
 
 			for (int row = 0; row < rows; ++row) {
 				for (int column = 0; column < m_LevelData.Grid.Columns; ++column) {
-					if (m_LevelData.Grid[row, column] == null) {
+					if (m_LevelData.Grid[row, column] == BlockType.None) {
 						shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 							Coords = new GridCoords(row, column),
-							Value = m_LevelData.BlocksSet.WonBonusBlock,
+							Value = BlockType.WonBonusBlock,
 						});
 					}
 				}
@@ -132,7 +132,7 @@ namespace TetrisTower.TowerLevels
 		private bool IsFilledUpWithBonusBlocks()
 		{
 			for (int column = 0; column < m_LevelData.Grid.Columns; ++column) {
-				if (m_LevelData.Grid[m_LevelData.PlayableSize.Row - 1, column] == null)
+				if (m_LevelData.Grid[m_LevelData.PlayableSize.Row - 1, column] == BlockType.None)
 					return false;
 			}
 
@@ -165,7 +165,7 @@ namespace TetrisTower.TowerLevels
 			int fallColumnChange = 1;
 
 			// Find available column to drop bonus blocks.
-			while (m_LevelData.Grid[rows - 1, (m_LevelData.FallingColumn + fallColumnChange) % m_LevelData.Grid.Columns] != null) {
+			while (m_LevelData.Grid[rows - 1, (m_LevelData.FallingColumn + fallColumnChange) % m_LevelData.Grid.Columns] != BlockType.None) {
 				fallColumnChange++;
 			}
 
@@ -177,12 +177,12 @@ namespace TetrisTower.TowerLevels
 			int blocksCount = 0;
 			for (int row = rows - 1; row >= 0; --row) {
 
-				if (m_LevelData.Grid[row, m_LevelData.FallingColumn])
+				if (m_LevelData.Grid[row, m_LevelData.FallingColumn] != BlockType.None)
 					break;
 
 				shapeCoords.Add(new GridShape<BlockType>.ShapeBind() {
 					Coords = new GridCoords(blocksCount, 0),
-					Value = m_LevelData.BlocksSet.WonBonusBlock,
+					Value = BlockType.WonBonusBlock,
 				});
 
 				blocksCount++;

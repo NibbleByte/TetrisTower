@@ -15,7 +15,7 @@ namespace TetrisTower.Game
 		[SerializeReference] public GridLevelData TowerLevel;
 
 		[Tooltip("Blocks to be used. If empty, default set from the game config is used.")]
-		public BlocksSet BlocksSet;
+		public BlocksSkinSet BlocksSet;
 
 		public float FallSpeedNormalized = 2f;
 		public float FallSpeedupPerAction = 0.01f;
@@ -156,10 +156,10 @@ namespace TetrisTower.Game
 			}
 			int seed = playthrough.Random.Next();
 
-			if (playthrough.BlocksSet && config.DefaultBlocksSet.Blocks.Length != playthrough.BlocksSet.Blocks.Length) {
-				Debug.LogError($"Playthrough blocks count {playthrough.BlocksSet.Blocks.Length} doesn't match the ones in the game config {config.DefaultBlocksSet.Blocks.Length}");
+			if (playthrough.BlocksSet && config.DefaultBlocksSet.BlockSkins.Length != playthrough.BlocksSet.BlockSkins.Length) {
+				Debug.LogError($"Playthrough blocks count {playthrough.BlocksSet.BlockSkins.Length} doesn't match the ones in the game config {config.DefaultBlocksSet.BlockSkins.Length}");
 			}
-			BlocksSet blocks = playthrough.BlocksSet ?? config.DefaultBlocksSet;
+			BlocksSkinSet blocks = playthrough.BlocksSet ?? config.DefaultBlocksSet;
 			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0	? ShapeTemplates : config.ShapeTemplates;
 
 			// No, we don't need '+1'. 9 + 3 = 12 (0 - 11). Placing on the 9 takes (9, 10, 11).
@@ -174,7 +174,7 @@ namespace TetrisTower.Game
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = shapeTemplates.ToArray(),
-				BlocksSet = blocks,
+				BlocksSkinSet = blocks,
 
 				FallSpeedNormalized = playthrough.FallSpeedNormalized,
 				FallSpeedupPerAction = playthrough.FallSpeedupPerAction,

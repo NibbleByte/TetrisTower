@@ -77,7 +77,7 @@ namespace TetrisTower.Visuals.Effects
 
 			int row;
 			for(row = m_LevelData.Grid.Rows - 1; row >= 0; --row) {
-				if (m_LevelData.Grid[row, m_CurrentPreviewColumn])
+				if (m_LevelData.Grid[row, m_CurrentPreviewColumn] != BlockType.None)
 					break;
 			}
 

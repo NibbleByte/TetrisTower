@@ -29,8 +29,8 @@ namespace TetrisTower.TowerLevels.UI
 				GameObject.DestroyImmediate(transform.GetChild(0).gameObject);
 			}
 
-			for(int blockIndex = 0; blockIndex < m_LevelData.BlocksPool.Length; ++blockIndex) {
-				BlockType block = m_LevelData.BlocksPool[blockIndex];
+			for(int blockIndex = 0; blockIndex < m_LevelData.NormalBlocksSkins.Length; ++blockIndex) {
+				BlockSkin block = m_LevelData.NormalBlocksSkins[blockIndex];
 				TowerBlockPreviewIcon previewIcon = GameObject.Instantiate(PreviewIconPrefab, transform);
 
 				previewIcon.gameObject.SetActive(ShouldBeActive(blockIndex));
@@ -65,7 +65,7 @@ namespace TetrisTower.TowerLevels.UI
 			}
 
 			foreach (var shapeCoord in shape.ShapeCoords) {
-				int blockIndex = Array.IndexOf(m_LevelData.BlocksPool, shapeCoord.Value);
+				int blockIndex = Array.IndexOf(m_LevelData.NormalBlocksSkins, shapeCoord.Value);
 
 				// Wild or other special block that is not displayed as normal.
 				if (blockIndex == -1)

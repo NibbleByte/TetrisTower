@@ -38,8 +38,8 @@ namespace TetrisTower.Logic
 		public float PlayTime = 0;					// In seconds;
 
 		public GridShapeTemplate[] ShapeTemplates;
-		public BlocksSet BlocksSet;
-		public BlockType[] BlocksPool => BlocksSet.Blocks;
+		public BlocksSkinSet BlocksSkinSet;
+		public BlockSkin[] NormalBlocksSkins => BlocksSkinSet.GetNormalBlocks();
 
 		// Initial spawn blocks from the array.
 		public int InitialSpawnBlockTypesCount = 3;
@@ -100,8 +100,8 @@ namespace TetrisTower.Logic
 				Debug.LogError($"{nameof(GridLevelData)} has no ObjectiveType set.", context);
 			}
 
-			if (BlocksSet) {
-				BlocksSet.Validate(repo, context);
+			if (BlocksSkinSet) {
+				BlocksSkinSet.Validate(repo, context);
 			}
 		}
 	}

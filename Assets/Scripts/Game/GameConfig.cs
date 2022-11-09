@@ -20,7 +20,7 @@ namespace TetrisTower.Game
 		[Tooltip("Shape template to use along the playthroughs. Can be overridden by the playthrough template.")]
 		public GridShapeTemplate[] ShapeTemplates;
 
-		public BlocksSet DefaultBlocksSet;
+		public BlocksSkinSet DefaultBlocksSet;
 
 		public GameObject[] UIPrefabs;
 
@@ -37,8 +37,7 @@ namespace TetrisTower.Game
 		public float SwipeConformity = 0.9f;
 
 		public Newtonsoft.Json.JsonConverter[] Converters => new Newtonsoft.Json.JsonConverter[] {
-				new BlockTypeConverter(AssetsRepository),
-				new BlocksSetConverter(AssetsRepository),
+				new BlocksSkinSetConverter(AssetsRepository),
 				new GridShapeTemplateConverter(AssetsRepository),
 				new RandomXoShiRo128starstarJsonConverter(),
 		};

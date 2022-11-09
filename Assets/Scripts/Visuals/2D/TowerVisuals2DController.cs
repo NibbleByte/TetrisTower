@@ -41,7 +41,7 @@ namespace TetrisTower.Visuals2D
 			FallingVisualsContainer.localPosition = Vector3.zero;
 
 			m_TowerLevel.Grids.Add(VisualsGrid);
-			VisualsGrid.Init(m_LevelData.Grid);
+			VisualsGrid.Init(m_LevelData.Grid, m_LevelData.BlocksSkinSet);
 
 			DestroyFallingVisuals();
 			FallingVisualsContainer.SetAsFirstSibling();
@@ -90,7 +90,7 @@ namespace TetrisTower.Visuals2D
 			var visualbinds = new List<GridShape<GameObject>.ShapeBind>();
 
 			foreach (var bind in blocksShape.ShapeCoords) {
-				var visualBlock = GameObject.Instantiate(bind.Value.Prefab2D, FallingVisualsContainer);
+				var visualBlock = GameObject.Instantiate(m_LevelData.BlocksSkinSet.GetPrefabFor(bind.Value), FallingVisualsContainer);
 				visualbinds.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
 				var coords = startCoords + bind.Coords;
 				coords.WrapColumn(m_LevelData.Grid);

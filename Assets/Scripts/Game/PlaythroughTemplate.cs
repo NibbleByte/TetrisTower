@@ -28,31 +28,21 @@ namespace TetrisTower.Game
 		{
 			#region Setup Blocks
 
-			BlockType R; // "Red" block
-			BlockType G; // "Green" block
-			BlockType B; // "Blue" block
+#pragma warning disable CS0219 // Unused variables. Really don't care - this is a debug code.
 
-			BlockType W; // "Wild" block
-			BlockType Q; // "Block Smite"
-			BlockType H; // "Row Smite"
+			BlockType R = BlockType.B1; // "Red" block
+			BlockType G = BlockType.B2; // "Green" block
+			BlockType B = BlockType.B3; // "Blue" block
 
-			BlockType S; // "Static" block
+			BlockType W = BlockType.SpecialWildBlock;     // "Wild" block
+			BlockType Q = BlockType.SpecialBlockSmite;    // "Block Smite"
+			BlockType H = BlockType.SpecialRowSmite;      // "Row Smite"
 
-			BlockType N; // "null" block
+			BlockType S = BlockType.StaticBlock;          // "Static" block
 
-			GameConfig gameConfig = GameConfig.FindDefaultConfig();
+			BlockType N = BlockType.WonBonusBlock;        // "null" block
 
-			R = gameConfig.DefaultBlocksSet.Blocks[0];
-			G = gameConfig.DefaultBlocksSet.Blocks[1];
-			B = gameConfig.DefaultBlocksSet.Blocks[2];
-
-			W = gameConfig.DefaultBlocksSet.WildBlock;
-			Q = gameConfig.DefaultBlocksSet.BlockSmite;
-			H = gameConfig.DefaultBlocksSet.RowSmite;
-
-			S = gameConfig.DefaultBlocksSet.WonBonusBlock;
-
-			N = null;
+#pragma warning restore CS0219
 
 			#endregion
 
@@ -69,8 +59,6 @@ namespace TetrisTower.Game
 				{ R, R, W, N, W, B, B, N, W, W, W, W, N },
 			};
 
-
-
 			#region Apply to Grid
 
 			m_PlayerData.TowerLevel.FallDistanceNormalized = 0;
@@ -81,7 +69,7 @@ namespace TetrisTower.Game
 
 					BlockType blockType = blocks[row, column];
 
-					if (blockType == null)
+					if (blockType == BlockType.None)
 						continue;
 
 					var coords = new GridCoords(m_PlayerData.TowerLevel.Grid.Rows - 1 - row, column);
@@ -104,7 +92,7 @@ namespace TetrisTower.Game
 		[ContextMenu("Stack up!")]
 		void StackUp()
 		{
-			BlockType[] blocksPool = m_PlayerData.TowerLevel.BlocksPool;
+			BlockSkin[] blocksPool = m_PlayerData.TowerLevel.NormalBlocksSkins;
 			if (blocksPool == null || blocksPool.Length == 0) {
 				GameConfig gameConfig = GameConfig.FindDefaultConfig();
 
@@ -113,15 +101,15 @@ namespace TetrisTower.Game
 					return;
 				}
 
-				blocksPool = gameConfig.DefaultBlocksSet.Blocks.ToArray();
+				blocksPool = gameConfig.DefaultBlocksSet.BlockSkins.ToArray();
 			}
 
 			for (int row = 0; row < m_PlayerData.TowerLevel.Grid.Rows; ++row) {
 				for(int column = 0; column < m_PlayerData.TowerLevel.Grid.Columns; ++column) {
 
 					var blockType = row < m_PlayerData.TowerLevel.Grid.Rows - 3
-						? blocksPool[(column + row % 2) % blocksPool.Length]
-						: null
+						? blocksPool[(column + row % 2) % blocksPool.Length].BlockType
+						: BlockType.None
 						;
 
 					var coords = new GridCoords(row, column);

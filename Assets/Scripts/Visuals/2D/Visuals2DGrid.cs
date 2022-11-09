@@ -27,22 +27,25 @@ namespace TetrisTower.Visuals2D
 
 		private GameObject[,] m_Blocks;
 
+		private BlocksSkinSet m_BlocksSkinSet;
+
 		private GridShape<GameObject> m_PlacedShapeToBeReused = null;
 
-		public void Init(BlocksGrid grid)
+		public void Init(BlocksGrid grid, BlocksSkinSet skinsSet)
 		{
 			if (m_Blocks != null) {
 				DestroyInstances();
 			}
 
 			m_Blocks = new GameObject[grid.Rows, grid.Columns];
+			m_BlocksSkinSet = skinsSet;
 
-			for(int row = 0; row < grid.Rows; ++row) {
+			for (int row = 0; row < grid.Rows; ++row) {
 				for(int column = 0; column < grid.Columns; ++column) {
 					var coords = new GridCoords(row, column);
 					var blockType = grid[coords];
 
-					if (blockType != null) {
+					if (blockType != BlockType.None) {
 						CreateInstanceAt(coords, blockType);
 					}
 				}
@@ -200,7 +203,7 @@ namespace TetrisTower.Visuals2D
 			if (reuseVisuals) {
 				reuseVisuals.transform.SetParent(transform);
 			} else {
-				reuseVisuals = GameObject.Instantiate(blockType.Prefab2D, transform);
+				reuseVisuals = GameObject.Instantiate(m_BlocksSkinSet.GetPrefabFor(blockType), transform);
 			}
 
 			// Hitting the limit, won't be stored.

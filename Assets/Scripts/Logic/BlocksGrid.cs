@@ -93,7 +93,7 @@ namespace TetrisTower.Logic
 				if (pair.Coords.Row >= Rows)
 					continue;
 
-				UnityEngine.Debug.Assert(this[pair.Coords] == null);
+				UnityEngine.Debug.Assert(this[pair.Coords] == BlockType.None);
 
 				this[pair.Coords] = pair.Value;
 			}
@@ -104,9 +104,9 @@ namespace TetrisTower.Logic
 		private IEnumerator ClearMatchedCells(ClearMatchedAction action)
 		{
 			foreach(var coord in action.Coords) {
-				UnityEngine.Debug.Assert(this[coord] != null);
+				UnityEngine.Debug.Assert(this[coord] != BlockType.None);
 
-				this[coord] = null;
+				this[coord] = BlockType.None;
 			}
 
 			yield break;
@@ -115,11 +115,11 @@ namespace TetrisTower.Logic
 		private IEnumerator MoveCells(MoveCellsAction action)
 		{
 			foreach(var movedCell in action.MovedCells) {
-				UnityEngine.Debug.Assert(this[movedCell.Key] != null);
-				UnityEngine.Debug.Assert(this[movedCell.Value] == null);
+				UnityEngine.Debug.Assert(this[movedCell.Key] != BlockType.None);
+				UnityEngine.Debug.Assert(this[movedCell.Value] == BlockType.None);
 
 				this[movedCell.Value] = this[movedCell.Key];
-				this[movedCell.Key] = null;
+				this[movedCell.Key] = BlockType.None;
 			}
 
 			yield break;

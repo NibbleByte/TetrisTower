@@ -76,7 +76,7 @@ namespace TetrisTower.Logic
 					for(int column = 0; column < columns; ++column) {
 						var blockProp = gridProp.GetArrayElementAtIndex(row * columns + column);
 						var cellPos = new Rect(position.x + column * columnSize, position.y + (rows - row - 1) * rowSize, columnSize, rowSize);
-						blockProp.objectReferenceValue = EditorGUI.ObjectField(cellPos, blockProp.objectReferenceValue, typeof(BlockType), false);
+						blockProp.enumValueFlag = (int)(BlockType) EditorGUI.EnumPopup(cellPos, (BlockType)blockProp.enumValueFlag);
 					}
 				}
 			}
