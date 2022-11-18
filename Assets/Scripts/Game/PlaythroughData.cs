@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using TetrisTower.Logic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TetrisTower.Game
 {
@@ -12,10 +13,17 @@ namespace TetrisTower.Game
 	[JsonObject(MemberSerialization.Fields)]
 	public class PlaythroughData
 	{
-		[SerializeReference] public GridLevelData TowerLevel;
+		[SerializeReference]
+		[FormerlySerializedAs("TowerLevel")]
+		private GridLevelData m_TowerLevel;
+		public GridLevelData TowerLevel => m_TowerLevel;
+
+
 
 		[Tooltip("Blocks to be used. If empty, default set from the game config is used.")]
-		public BlocksSkinSet BlocksSet;
+		[FormerlySerializedAs("BlocksSet")]
+		private BlocksSkinSet m_BlocksSet;
+		public BlocksSkinSet BlocksSet => m_BlocksSet;
 
 		public float FallSpeedNormalized = 2f;
 		public float FallSpeedupPerAction = 0.01f;
@@ -47,55 +55,79 @@ namespace TetrisTower.Game
 		public LevelParamData[] Levels;
 
 		public int ScoreOnLevelStart = 0;
-		public int TotalScore => ScoreOnLevelStart + TowerLevel?.Score.Score ?? 0;
+		public int TotalScore => ScoreOnLevelStart + m_TowerLevel?.Score.Score ?? 0;
 
 		public float PlayTimeOnLevelStart = 0f;
-		public float TotalPlayTime => PlayTimeOnLevelStart + TowerLevel?.PlayTime ?? 0;
+		public float TotalPlayTime => PlayTimeOnLevelStart + m_TowerLevel?.PlayTime ?? 0;
 
 		public bool IsFinalLevel => CurrentLevelIndex == Levels.Length - 1;
 		public bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;
 
+		public void SetupCurrentLevel(GameConfig gameConfig)
+		{
+			if (CurrentLevelIndex >= Levels.Length) {
+				Debug.LogError($"Current level {CurrentLevelIndex} is out of range {Levels.Length}. Abort!");
+				m_TowerLevel = null;
+				return;
+			}
+
+			m_TowerLevel = Levels[CurrentLevelIndex].GenerateTowerLevelData(gameConfig, this);
+			Debug.Log($"Setup current level {CurrentLevelIndex} - \"{m_TowerLevel.BackgroundScene?.ScenePath}\".");
+		}
+
+		public void ReplaceCurrentLevel(GridLevelData levelData)
+		{
+			Debug.Log($"Replacing current level with {levelData?.BackgroundScene?.ScenePath}");
+			m_TowerLevel = levelData;
+		}
+
 		public void RetryLevel()
 		{
-			if (TowerLevel == null)
+			if (m_TowerLevel == null)
 				throw new InvalidOperationException($"Trying to retry a level when no level is in progress.");
 
-			TowerLevel = null;
+			m_TowerLevel = null;
 		}
 
 		public void FinishLevel()
 		{
-			if (TowerLevel == null || TowerLevel.RunningState != TowerLevelRunningState.Won)
-				throw new InvalidOperationException($"Trying to finish level when it hasn't finished - {TowerLevel?.RunningState}.");
+			if (m_TowerLevel == null || m_TowerLevel.RunningState != TowerLevelRunningState.Won)
+				throw new InvalidOperationException($"Trying to finish level when it hasn't finished - {m_TowerLevel?.RunningState}.");
 
 			// NOTE: This may be done earlier to show the score to the user. In that case, this should do nothing.
-			TowerLevel.Score.ConsumeBonusScore();
+			m_TowerLevel.Score.ConsumeBonusScore();
 
-			ScoreOnLevelStart += TowerLevel.Score.Score;
-			PlayTimeOnLevelStart += TowerLevel.PlayTime;
+			ScoreOnLevelStart += m_TowerLevel.Score.Score;
+			PlayTimeOnLevelStart += m_TowerLevel.PlayTime;
 
-			TowerLevel = null;
+			m_TowerLevel = null;
 			CurrentLevelIndex++;
 		}
 
-		public void CreateRandomGenerator()
+		public void SetupRandomGenerator(int seed = 0, bool resetCurrentLevelRandom = false)
 		{
 			if (Random != null) {
 				throw new InvalidOperationException();
 			}
 
+			RandomSeed = seed != 0 ? seed : RandomSeed;
 			RandomInitialSeed = RandomSeed != 0 ? RandomSeed : UnityEngine.Random.Range(0, int.MaxValue);
 			Random = new Xoshiro.PRNG32.XoShiRo128starstar(RandomInitialSeed);
+
+			if (resetCurrentLevelRandom) {
+				TowerLevel.RandomInitialLevelSeed = Random.Next();
+				TowerLevel.Random = new Xoshiro.PRNG32.XoShiRo128starstar(TowerLevel.RandomInitialLevelSeed);
+			}
 		}
 
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
-			if (TowerLevel != null) {
-				TowerLevel.Validate(repo, context);
+			if (m_TowerLevel != null) {
+				m_TowerLevel.Validate(repo, context);
 			}
 
-			if (BlocksSet) {
-				BlocksSet.Validate(repo, context);
+			if (m_BlocksSet) {
+				m_BlocksSet.Validate(repo, context);
 			}
 
 			foreach (var level in Levels) {
@@ -152,7 +184,7 @@ namespace TetrisTower.Game
 		public GridLevelData GenerateTowerLevelData(GameConfig config, PlaythroughData playthrough)
 		{
 			if (playthrough.Random == null) {
-				playthrough.CreateRandomGenerator();
+				playthrough.SetupRandomGenerator();
 			}
 			int seed = playthrough.Random.Next();
 
@@ -160,7 +192,7 @@ namespace TetrisTower.Game
 				Debug.LogError($"Playthrough blocks count {playthrough.BlocksSet.BlockSkins.Length} doesn't match the ones in the game config {config.DefaultBlocksSet.BlockSkins.Length}");
 			}
 			BlocksSkinSet blocks = playthrough.BlocksSet ?? config.DefaultBlocksSet;
-			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0	? ShapeTemplates : config.ShapeTemplates;
+			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0 ? ShapeTemplates : config.ShapeTemplates;
 
 			// No, we don't need '+1'. 9 + 3 = 12 (0 - 11). Placing on the 9 takes (9, 10, 11).
 			int extraRows = shapeTemplates.Max(st => st.Rows);

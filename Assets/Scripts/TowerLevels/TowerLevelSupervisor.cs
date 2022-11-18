@@ -17,6 +17,14 @@ namespace TetrisTower.TowerLevels
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
+		private SceneReference m_OverrideScene;
+
+		public TowerLevelSupervisor() { }
+		public TowerLevelSupervisor(SceneReference overrideScene)
+		{
+			m_OverrideScene = overrideScene;
+		}
+
 		public async Task LoadAsync()
 		{
 			GameContext gameContext = GameManager.Instance.GameContext;
@@ -28,21 +36,25 @@ namespace TetrisTower.TowerLevels
 			}
 
 			if (playthroughData.TowerLevel == null) {
-				if (playthroughData.CurrentLevelIndex >= playthroughData.Levels.Length) {
-					Debug.LogError($"Current level {playthroughData.CurrentLevelIndex} is out of range {playthroughData.Levels.Length}. Abort!");
-					CriticalError($"No available level {playthroughData.CurrentLevelIndex}.\nLevels count {playthroughData.Levels.Length}.", true);
+
+				playthroughData.SetupCurrentLevel(gameContext.GameConfig);
+
+				if (playthroughData.TowerLevel == null) {
+					CriticalError($"No available level.", true);
 					return;
 				}
 
-				playthroughData.TowerLevel = playthroughData.Levels[playthroughData.CurrentLevelIndex].GenerateTowerLevelData(gameContext.GameConfig, playthroughData);
+				if (m_OverrideScene != null) {
+					playthroughData.TowerLevel.BackgroundScene = m_OverrideScene;
+				}
 
 				if (playthroughData.TowerLevel.BackgroundScene.IsEmpty) {
-					Debug.LogError($"No appropriate scene found in level param {playthroughData.CurrentLevelIndex}! Setting dev one.");
+					Debug.LogError($"No appropriate scene found in current level! Setting dev one.");
 					playthroughData.TowerLevel.BackgroundScene = new SceneReference("Assets/Scenes/_DevTowerScene.unity");
 
 					bool isValidFallback = SceneUtility.GetBuildIndexByScenePath(playthroughData.TowerLevel.BackgroundScene.ScenePath) >= 0;
 
-					CriticalError($"Level {playthroughData.CurrentLevelIndex} did not have scene specified. Loading fallback.", !isValidFallback);
+					CriticalError($"Current level did not have scene specified. Loading fallback.", !isValidFallback);
 
 					if (!isValidFallback) {
 						return;
@@ -66,7 +78,7 @@ namespace TetrisTower.TowerLevels
 			if (levelController == null) {
 				var placeholder = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
 				if (placeholder == null) {
-					throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load level {playthroughData.CurrentLevelIndex} of {playthroughData.Levels.Length}.");
+					throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load current level.");
 				}
 
 				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);

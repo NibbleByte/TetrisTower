@@ -60,6 +60,8 @@ namespace TetrisTower.GameStarter
 			var towerLevelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (towerLevelController || GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag)) {
 
+				DevLocker.Utils.SceneReference overrideScene = null;
+
 				if (StartingPlaythroughTemplate) {
 
 					PlaythroughData playthroughData = StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
@@ -68,23 +70,14 @@ namespace TetrisTower.GameStarter
 					if (playthroughData.TowerLevel != null) {
 						playthroughData.TowerLevel.BackgroundScene.ScenePath = scenePath;
 
-						if (StartingRandomSeed != 0) {
-							playthroughData.RandomSeed = StartingRandomSeed;
-						}
-
-						playthroughData.CreateRandomGenerator();
-						playthroughData.TowerLevel.RandomInitialLevelSeed = playthroughData.Random.Next();
-						playthroughData.TowerLevel.Random = new Xoshiro.PRNG32.XoShiRo128starstar(playthroughData.TowerLevel.RandomInitialLevelSeed);
+						playthroughData.SetupRandomGenerator(StartingRandomSeed, true);
 
 						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, GameConfig.Converters);
 
 					} else {
-						LevelParamData levelParam = playthroughData.Levels[playthroughData.CurrentLevelIndex];
-						levelParam.BackgroundScene.ScenePath = scenePath;
+						overrideScene = new DevLocker.Utils.SceneReference(scenePath);
 
-						if (StartingRandomSeed != 0) {
-							playthroughData.RandomSeed = StartingRandomSeed;
-						}
+						playthroughData.SetupRandomGenerator(StartingRandomSeed);
 					}
 					GameContext.SetCurrentPlaythrough(playthroughData);
 
@@ -92,7 +85,7 @@ namespace TetrisTower.GameStarter
 					GameContext.SetCurrentPlaythrough(GameConfig.NormalPlaythgrough);
 				}
 
-				GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
+				GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor(overrideScene));
 				return;
 			}
 
