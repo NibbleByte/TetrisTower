@@ -20,8 +20,16 @@ namespace TetrisTower.Game
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(serialized, config.Converters);
 		}
 
-
 #if UNITY_EDITOR
+
+		private void OnValidate()
+		{
+			if (m_PlayerData != null) {
+				GameConfig gameConfig = GameConfig.FindDefaultConfig();
+				m_PlayerData.Validate(gameConfig.AssetsRepository, this);
+			}
+		}
+
 		// Just modify the hard-coded array. Copy one from the unit tests.
 		[ContextMenu("Setup From Array")]
 		void SetupFromArray()

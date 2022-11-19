@@ -45,6 +45,24 @@ namespace TetrisTower.Logic
 			m_Columns = columns;
 		}
 
+		public BlocksGrid(BlocksGrid grid)
+		{
+			m_Rows = grid.Rows;
+			m_Columns = grid.Columns;
+			m_Blocks = new BlockType[grid.m_Blocks.Length];
+
+			grid.m_Blocks.CopyTo(m_Blocks, 0);
+		}
+
+		public BlocksGrid(BlocksGrid grid, int rows, int columns)
+		{
+			m_Rows = rows;
+			m_Columns = columns;
+			m_Blocks = new BlockType[rows * columns];
+
+			grid.m_Blocks.CopyTo(m_Blocks, 0);
+		}
+
 		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
 		{
 			foreach (var action in MergeActions(actions)) {

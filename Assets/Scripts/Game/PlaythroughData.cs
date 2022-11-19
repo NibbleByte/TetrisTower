@@ -172,6 +172,9 @@ namespace TetrisTower.Game
 
 		public GridShapeTemplate[] ShapeTemplates;
 
+		[SerializeReference]
+		public BlocksGrid StartGrid;
+
 		public SceneReference GetAppropriateBackgroundScene()
 		{
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -224,7 +227,7 @@ namespace TetrisTower.Game
 				SpawnRowSmiteChance = SpawnRowSmites ? playthrough.RowSmiteChance : 0f,
 
 				Rules = Rules,
-				Grid = new BlocksGrid(totalRows, GridColumns),
+				Grid = StartGrid != null ? new BlocksGrid(StartGrid, totalRows, GridColumns) : new BlocksGrid(totalRows, GridColumns),
 				PlayableSize = new GridCoords(GridRows, GridColumns),
 
 				ObjectiveEndCount = ObjectiveEndCount,
@@ -237,6 +240,27 @@ namespace TetrisTower.Game
 		{
 			if (Rules.ObjectiveType == 0) {
 				Debug.LogError($"{nameof(PlaythroughData)} has no ObjectiveType set.", context);
+			}
+
+#if UNITY_EDITOR
+			if (GridRows == 0 || GridColumns == 0) {
+				GridRows = 9;
+				GridColumns = SupportedColumnsCount;
+				UnityEditor.EditorUtility.SetDirty(context);
+			}
+
+			if (StartGrid != null && StartGrid.Rows == 0) {
+				StartGrid = new BlocksGrid(GridRows, GridColumns);
+				UnityEditor.EditorUtility.SetDirty(context);
+			}
+#endif
+
+			if (GridRows == 0 || GridColumns == 0) {
+				Debug.LogError($"Level param {BackgroundScene} has invalid grid size set.", context);
+			}
+
+			if (StartGrid != null && (StartGrid.Rows != GridRows || StartGrid.Columns != GridColumns)) {
+				Debug.LogError($"Level param {BackgroundScene} has starting grid with wrong size.", context);
 			}
 		}
 	}
