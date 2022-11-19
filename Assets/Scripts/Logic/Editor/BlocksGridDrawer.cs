@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -6,11 +7,11 @@ using UnityEngine;
 namespace TetrisTower.Logic
 {
 	[CustomPropertyDrawer(typeof(BlocksGrid))]
-	public class BlocksGridDrawer : PropertyDrawer
+	public class BlocksGridDrawer : SerializeReferenceCreatorDrawer<BlocksGrid>
 	{
 		private bool m_Unfolded = true;
 
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		protected override float GetPropertyHeight_Custom(SerializedProperty property, GUIContent label)
 		{
 			int lines = 1;  // Property Label
 			if (m_Unfolded) {
@@ -20,7 +21,7 @@ namespace TetrisTower.Logic
 			return lines * EditorGUIUtility.singleLineHeight;
 		}
 
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		protected override void OnGUI_Custom(Rect position, SerializedProperty property, GUIContent label, bool isManagedReference)
 		{
 			label = EditorGUI.BeginProperty(position, label, property);
 
@@ -54,6 +55,12 @@ namespace TetrisTower.Logic
 				GUI.Label(sizePos, " x ");
 				sizePos.x += 18;
 				columnsProp.intValue = EditorGUI.IntField(sizePos, columnsProp.intValue);
+
+				if (isManagedReference) {
+					sizePos.x += 48;
+					sizePos.width = ReferenceButtonWidth;
+					DrawClearButton(property, sizePos, Color.red, "Clear");
+				}
 
 				position.y += EditorGUIUtility.singleLineHeight;
 				position.height -= EditorGUIUtility.singleLineHeight;

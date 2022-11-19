@@ -7,14 +7,34 @@ using UnityEngine;
 namespace DevLocker.GFrame.Utils
 {
 #if UNITY_EDITOR
+	/// <summary>
+	/// Use this class with [SerializeReference] attribute to have a "Create" button next to such fields.
+	/// By default [SerializeReference] fields display empty data in the inspector - there is no UI to create data instance.
+	///
+	/// Inherit your custom drawer for your class by specifying the class type itself as <typeparamref name="T"/>.
+	/// It works properly if [SerializeReference] is not present.
+	///
+	/// If you want to have custom drawing of the data, override the <see cref="GetPropertyHeight_Custom(SerializedProperty, GUIContent)"/> and
+	/// <see cref="OnGUI_Custom(Rect, SerializedProperty, GUIContent, bool)"/>.
+	///
+	/// Example:
+	/// [CustomPropertyDrawer(typeof(MyClass))]
+	/// public class MyClassDrawer : SerializeReferenceCreatorDrawer<MyClass>
+	/// {
+	/// }
+	///
+	/// </summary>
+	/// <typeparam name="T">Class type to be drawn.</typeparam>
 	public class SerializeReferenceCreatorDrawer<T> : PropertyDrawer where T: new()
 	{
+		protected const float ReferenceButtonWidth = 60f;
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			if (property.propertyType == SerializedPropertyType.ManagedReference && string.IsNullOrEmpty(property.managedReferenceFullTypename)) {
 				return EditorGUIUtility.singleLineHeight;
 			} else {
-				return EditorGUI.GetPropertyHeight(property);
+				return GetPropertyHeight_Custom(property, label);
 			}
 		}
 
@@ -22,51 +42,90 @@ namespace DevLocker.GFrame.Utils
 		{
 			// This property doesn't have the [SerializeReference] attribute.
 			if (property.propertyType != SerializedPropertyType.ManagedReference) {
-				label = EditorGUI.BeginProperty(position, label, property);
-				EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-
-				EditorGUI.PropertyField(position, property, true);
-
-				EditorGUI.EndProperty();
+				OnGUI_Custom(position, property, label, false);
 				return;
 			}
 
-			float ClearWidth = 60f;
-			var clearRect = position;
-			clearRect.x += clearRect.width - ClearWidth;
-			clearRect.width = ClearWidth;
-			clearRect.height = EditorGUIUtility.singleLineHeight;
+			var buttonRect = position;
+			buttonRect.x += buttonRect.width - ReferenceButtonWidth;
+			buttonRect.width = ReferenceButtonWidth;
+			buttonRect.height = EditorGUIUtility.singleLineHeight;
 
-			var prevBackground = GUI.backgroundColor;
+			bool isReferenceEmpty = string.IsNullOrEmpty(property.managedReferenceFullTypename);
 
-			if (string.IsNullOrEmpty(property.managedReferenceFullTypename)) {
+			if (isReferenceEmpty) {
 				label = EditorGUI.BeginProperty(position, label, property);
+
 				EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-				GUI.backgroundColor = Color.green;
-				if (GUI.Button(clearRect, "Create")) {
+				EditorGUI.EndProperty();
+
+				if (QuickButton(buttonRect, Color.green, "Create")) {
 					property.managedReferenceValue = new T();
 				}
-				GUI.backgroundColor = prevBackground;
-
-				EditorGUI.EndProperty();
 
 			} else {
+				OnGUI_Custom(position, property, label, true);
+			}
+		}
 
-				label = EditorGUI.BeginProperty(position, label, property);
-				EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+		/// <summary>
+		/// Override this to change the height of the displayed data.
+		/// </summary>
+		protected virtual float GetPropertyHeight_Custom(SerializedProperty property, GUIContent label)
+		{
+			return EditorGUI.GetPropertyHeight(property);
+		}
 
-				GUI.backgroundColor = Color.red;
-				if (GUI.Button(clearRect, "Clear")) {
-					property.managedReferenceValue = null;
-				}
-				GUI.backgroundColor = prevBackground;
+		/// <summary>
+		/// Override to customize how data is displayed.
+		/// NOTE: To have a clear button, make sure you call <see cref="DrawClearButton(SerializedProperty, Rect, Color, string)"/>!
+		/// </summary>
+		protected virtual void OnGUI_Custom(Rect position, SerializedProperty property, GUIContent label, bool isManagedReference)
+		{
+			if (isManagedReference) {
+				var buttonRect = position;
+				buttonRect.x += buttonRect.width - ReferenceButtonWidth;
+				buttonRect.width = ReferenceButtonWidth;
+				buttonRect.height = EditorGUIUtility.singleLineHeight;
 
-				EditorGUI.PropertyField(position, property, true);
-
-				EditorGUI.EndProperty();
+				DrawClearButton(property, buttonRect, Color.red, "Clear");
 			}
 
+			label = EditorGUI.BeginProperty(position, label, property);
+			EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+
+			EditorGUI.PropertyField(position, property, true);
+
+			EditorGUI.EndProperty();
+		}
+
+		/// <summary>
+		/// Draw the "Clear" button the way you want.
+		/// NOTE: if button is pressed, <see cref="GUIUtility.ExitGUI"/> is called, preventing the code from resuming with empty reference.
+		/// </summary>
+		protected void DrawClearButton(SerializedProperty property, Rect buttonRect, Color color, string text)
+		{
+			if (QuickButton(buttonRect, color, text)) {
+				property.managedReferenceValue = null;
+				property.serializedObject.ApplyModifiedProperties();
+				GUIUtility.ExitGUI();
+			}
+		}
+
+		private bool QuickButton(Rect buttonRect, Color color, string text)
+		{
+			var prevBackground = GUI.backgroundColor;
+			bool clicked = false;
+
+			GUI.backgroundColor = color;
+			if (GUI.Button(buttonRect, text)) {
+				clicked = true;
+			}
+
+			GUI.backgroundColor = prevBackground;
+
+			return clicked;
 		}
 	}
 #endif
