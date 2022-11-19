@@ -48,6 +48,8 @@ namespace TetrisTower.Logic
 		private ScoreGrid m_ScoreGrid;
 		private GameGrid[] m_Grids;
 
+		private bool m_SkipGridSetup = false;
+
 		private readonly GridAction[] m_FinishActions = new EvaluationSequenceFinishAction[] { new EvaluationSequenceFinishAction() };
 
 
@@ -65,6 +67,7 @@ namespace TetrisTower.Logic
 		{
 			// HACK: Keep this method as Unity tries to execute the other methods named Setup*.
 			//Debug.Log("Setup");
+			m_SkipGridSetup = false;
 		}
 
 		private PlaceAction SetupPlaceAction(BlockType[,] blocks)
@@ -101,6 +104,9 @@ namespace TetrisTower.Logic
 		public void TearDown()
 		{
 			m_Grid = null;
+			m_ScoreGrid = null;
+			m_Grids = null;
+			m_SkipGridSetup = false;
 		}
 
 		#endregion
@@ -210,7 +216,11 @@ namespace TetrisTower.Logic
 
 		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, GridRules rules, int applyActionsCount, int resultScore = -1, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
-			yield return SetupGrid(blocks, rules, lineNumber, caller);
+			if (!m_SkipGridSetup) {
+				yield return SetupGrid(blocks, rules, lineNumber, caller);
+			} else {
+				Assert.IsFalse(doMirror, $"Can't do mirror if using custom grid setup.\n{caller}:{lineNumber}");
+			}
 
 			for(int i = 0; i < applyActionsCount; ++i) {
 				var actions = GameGridEvaluation.Evaluate(m_Grid, rules);
@@ -233,24 +243,27 @@ namespace TetrisTower.Logic
 			//
 			// Mirrored
 			//
+			if (doMirror) {
 
-			yield return SetupGrid(Mirror(blocks), rules, lineNumber, caller);
+				yield return SetupGrid(Mirror(blocks), rules, lineNumber, caller);
 
-			for (int i = 0; i < applyActionsCount; ++i) {
-				var actions = GameGridEvaluation.Evaluate(m_Grid, rules);
+				for (int i = 0; i < applyActionsCount; ++i) {
+					var actions = GameGridEvaluation.Evaluate(m_Grid, rules);
 
-				foreach (GameGrid grid in m_Grids) {
-					yield return grid.ApplyActions(actions);
+					foreach (GameGrid grid in m_Grids) {
+						yield return grid.ApplyActions(actions);
+					}
 				}
-			}
 
-			yield return m_ScoreGrid.ApplyActions(m_FinishActions);
+				yield return m_ScoreGrid.ApplyActions(m_FinishActions);
 
-			AssertNoActions(rules, lineNumber, caller);
-			AssertGrid(Mirror(blocksDone), lineNumber, caller);
+				AssertNoActions(rules, lineNumber, caller);
+				AssertGrid(Mirror(blocksDone), lineNumber, caller);
 
-			if (resultScore >= 0) {
-				Assert.AreEqual(resultScore, m_ScoreGrid.Score, $"Score is wrong.\n{caller}:{lineNumber}");
+				if (resultScore >= 0) {
+					Assert.AreEqual(resultScore, m_ScoreGrid.Score, $"Score is wrong.\n{caller}:{lineNumber}");
+				}
+
 			}
 		}
 
@@ -1245,6 +1258,60 @@ namespace TetrisTower.Logic
 				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*2 + 3*3);
 				Assert.AreEqual(2 + 3, m_ScoreGrid.ObjectiveProgress);
 			}
+		}
+
+		#endregion
+
+		#region Pinned Tests
+
+		[UnityTest]
+		public IEnumerator Pinned()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ N, N, N, G, N, R, N, N, N, N, N, N, N },
+				{ N, N, B, N, N, R, N, N, N, N, N, N, N },
+				{ N, N, N, R, N, N, N, N, N, N, N, N, N },
+				{ N, R, B, R, N, B, N, N, N, N, N, G, N },
+				{ R, N, N, G, N, B, N, N, R, N, N, B, N },
+				{ N, B, G, N, N, R, N, G, N, N, N, B, N },
+				{ R, B, G, G, N, R, N, B, B, B, N, B, N },
+				{ N, N, N, N, N, N, N, N, N, G, N, N, N },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, N, G, N, R, N, N, N, N, N, N, N },
+				{ N, N, N, R, N, R, N, N, N, N, N, N, N },
+				{ N, N, B, R, N, B, N, N, N, N, N, N, N },
+				{ N, R, B, N, N, B, N, N, N, N, N, N, N },
+				{ R, B, G, G, N, N, N, N, N, N, N, N, N },
+				{ R, B, G, G, N, R, N, N, N, N, N, N, N },
+				{ N, N, N, N, N, R, N, G, R, G, N, G, N },
+			};
+
+			GridCoords[] pinned = new GridCoords[] {
+				new GridCoords(1, 0),
+				new GridCoords(1, 1),
+				new GridCoords(1, 2),
+				new GridCoords(1, 3),
+				new GridCoords(4, 3),
+
+				new GridCoords(3, 5),
+
+				new GridCoords(1, 7),
+				new GridCoords(1, 8),
+			};
+
+			var startGrid = new BlocksGrid(MaxRows, MaxColumns);
+			yield return startGrid.ApplyActions(new GridAction[] { SetupPlaceAction(blocks) });
+
+			m_Grid = new BlocksGrid(startGrid, MaxRows, MaxColumns, pinned);
+			m_ScoreGrid = new ScoreGrid(MaxRows, MaxColumns, DefaultRules);
+
+			m_Grids = new GameGrid[] { m_Grid, m_ScoreGrid };
+
+			m_SkipGridSetup = true;
+			yield return EvaluateGrid(blocks, blocksDone, DefaultRules, 2, 6, false);
 		}
 
 		#endregion
