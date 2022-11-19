@@ -447,6 +447,11 @@ namespace TetrisTower.Logic
 				for(int row = 0; row < grid.Rows; ++row) {
 					BlockType currentType = grid[row, column];
 
+					if (currentType != BlockType.None && grid.IsPinnedCoords(new GridCoords(row, column))) {
+						emptyRowsCount = 0;
+						continue;
+					}
+
 					if (currentType == BlockType.None) {
 						emptyRowsCount++;
 

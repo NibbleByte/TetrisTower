@@ -172,6 +172,9 @@ namespace TetrisTower.Game
 
 		public GridShapeTemplate[] ShapeTemplates;
 
+
+		public bool StartGridWithPinnedBlocks = true;
+
 		[SerializeReference]
 		public BlocksGrid StartGrid;
 
@@ -196,6 +199,11 @@ namespace TetrisTower.Game
 			}
 			BlocksSkinSet blocks = playthrough.BlocksSet ?? config.DefaultBlocksSet;
 			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0 ? ShapeTemplates : config.ShapeTemplates;
+
+			var pinnedBlocks = (StartGridWithPinnedBlocks && StartGrid != null)
+				? StartGrid.EnumerateOccupiedCoords()
+				: Enumerable.Empty<GridCoords>()
+				;
 
 			// No, we don't need '+1'. 9 + 3 = 12 (0 - 11). Placing on the 9 takes (9, 10, 11).
 			int extraRows = shapeTemplates.Max(st => st.Rows);
@@ -227,7 +235,7 @@ namespace TetrisTower.Game
 				SpawnRowSmiteChance = SpawnRowSmites ? playthrough.RowSmiteChance : 0f,
 
 				Rules = Rules,
-				Grid = StartGrid != null ? new BlocksGrid(StartGrid, totalRows, GridColumns) : new BlocksGrid(totalRows, GridColumns),
+				Grid = StartGrid != null ? new BlocksGrid(StartGrid, totalRows, GridColumns, pinnedBlocks) : new BlocksGrid(totalRows, GridColumns),
 				PlayableSize = new GridCoords(GridRows, GridColumns),
 
 				ObjectiveEndCount = ObjectiveEndCount,

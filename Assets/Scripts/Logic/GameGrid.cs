@@ -86,6 +86,15 @@ namespace TetrisTower.Logic
 		public static int WrappedColumn(this GameGrid grid, int column) => MathUtils.WrapValue(column, grid.Columns);
 
 		public static GridCoords WrappedCoords(this GameGrid grid, GridCoords coords) => new GridCoords(coords.Row, MathUtils.WrapValue(coords.Column, grid.Columns));
+
+		public static IEnumerable<GridCoords> EnumerateAllCoords(this GameGrid grid)
+		{
+			for (int row = 0; row < grid.Rows; ++row) {
+				for (int column = 0; column < grid.Columns; ++column) {
+					yield return new GridCoords(row, column);
+				}
+			}
+		}
 	}
 
 

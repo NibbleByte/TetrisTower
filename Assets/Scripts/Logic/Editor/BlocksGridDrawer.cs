@@ -18,7 +18,7 @@ namespace TetrisTower.Logic
 				lines += property.FindPropertyRelative("m_Rows").intValue;
 			}
 
-			return lines * EditorGUIUtility.singleLineHeight;
+			return lines * EditorGUIUtility.singleLineHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("m_PinnedCoords"), label);
 		}
 
 		protected override void OnGUI_Custom(Rect position, SerializedProperty property, GUIContent label, bool isManagedReference)
@@ -38,6 +38,9 @@ namespace TetrisTower.Logic
 
 			int rows = rowsProp.intValue;
 			int columns = columnsProp.intValue;
+
+			float rowSize = EditorGUIUtility.singleLineHeight;
+			float columnSize = position.width / columns;
 
 			int prevIndent = EditorGUI.indentLevel;
 			EditorGUI.indentLevel = 0;
@@ -76,8 +79,6 @@ namespace TetrisTower.Logic
 					gridProp.arraySize = rows * columns;
 				}
 
-				float rowSize = position.height / rows;
-				float columnSize = position.width / columns;
 
 				for(int row = 0; row < rows; ++row) {
 					for(int column = 0; column < columns; ++column) {
@@ -89,6 +90,23 @@ namespace TetrisTower.Logic
 			}
 
 			EditorGUI.indentLevel = prevIndent;
+
+			//
+			// Proceed to pinned list.
+			//
+
+			Rect pinnedRect = position;
+			if (m_Unfolded) {
+				pinnedRect.y += rowSize * rows;
+				pinnedRect.height -= rowSize * rows;
+			}
+
+			SerializedProperty pinnedProperty = property.FindPropertyRelative("m_PinnedCoords");
+			EditorGUI.BeginProperty(pinnedRect, new GUIContent("Pinned Blocks"), pinnedProperty);
+
+			EditorGUI.PropertyField(pinnedRect, pinnedProperty, true);
+
+			EditorGUI.EndProperty();
 
 			EditorGUI.EndProperty();
 		}

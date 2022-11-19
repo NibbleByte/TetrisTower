@@ -29,6 +29,9 @@ namespace TetrisTower.Logic
 		[UnityEngine.SerializeField] private int m_Columns;
 		[UnityEngine.SerializeField] private BlockType[] m_Blocks;
 
+		[UnityEngine.Tooltip("Pinned blocks will stay up in the air until cleared.")]
+		[UnityEngine.SerializeField] private List<GridCoords> m_PinnedCoords = new List<GridCoords>();
+
 		// Used for debug / cheat.
 		[NonSerialized]
 		public bool MatchingFrozen = false;
@@ -50,18 +53,46 @@ namespace TetrisTower.Logic
 			m_Rows = grid.Rows;
 			m_Columns = grid.Columns;
 			m_Blocks = new BlockType[grid.m_Blocks.Length];
+			m_PinnedCoords = grid.m_PinnedCoords.ToList();
 
 			grid.m_Blocks.CopyTo(m_Blocks, 0);
 		}
 
-		public BlocksGrid(BlocksGrid grid, int rows, int columns)
+		public BlocksGrid(BlocksGrid grid, int rows, int columns, IEnumerable<GridCoords> pinnedCoords)
 		{
 			m_Rows = rows;
 			m_Columns = columns;
 			m_Blocks = new BlockType[rows * columns];
+			m_PinnedCoords = pinnedCoords.ToList();
 
 			grid.m_Blocks.CopyTo(m_Blocks, 0);
 		}
+
+		public IEnumerable<GridCoords> EnumerateOccupiedCoords()
+		{
+			for(int row = 0; row < Rows; ++row) {
+				for(int column = 0; column < Columns; ++column) {
+					if (this[row, column] != BlockType.None) {
+						yield return new GridCoords(row, column);
+					}
+				}
+			}
+		}
+
+		public IEnumerable<GridCoords> EnumerateFreeCoords()
+		{
+			for(int row = 0; row < Rows; ++row) {
+				for(int column = 0; column < Columns; ++column) {
+					if (this[row, column] == BlockType.None) {
+						yield return new GridCoords(row, column);
+					}
+				}
+			}
+		}
+
+		public bool IsPinnedCoords(GridCoords coords) => m_PinnedCoords.Contains(coords);
+
+		private bool UnpinCoords(GridCoords coords) => m_PinnedCoords.Remove(coords);
 
 		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
 		{
@@ -125,6 +156,8 @@ namespace TetrisTower.Logic
 				UnityEngine.Debug.Assert(this[coord] != BlockType.None);
 
 				this[coord] = BlockType.None;
+
+				UnpinCoords(coord);
 			}
 
 			yield break;
