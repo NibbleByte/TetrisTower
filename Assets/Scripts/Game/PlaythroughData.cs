@@ -63,7 +63,7 @@ namespace TetrisTower.Game
 		public bool IsFinalLevel => CurrentLevelIndex == Levels.Length - 1;
 		public bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;
 
-		public void SetupCurrentLevel(GameConfig gameConfig)
+		public void SetupCurrentLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
 			if (CurrentLevelIndex >= Levels.Length) {
 				Debug.LogError($"Current level {CurrentLevelIndex} is out of range {Levels.Length}. Abort!");
@@ -71,7 +71,22 @@ namespace TetrisTower.Game
 				return;
 			}
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			// Start the level with the same scene.
+			if (overrideScene != null) {
+				int foundIndex = Array.FindIndex(Levels, l => l.BackgroundScene.ScenePath == overrideScene.ScenePath);
+				if (foundIndex != -1) {
+					CurrentLevelIndex = foundIndex;
+				}
+			}
+#endif
+
 			m_TowerLevel = Levels[CurrentLevelIndex].GenerateTowerLevelData(gameConfig, this);
+
+			if (overrideScene != null) {
+				TowerLevel.BackgroundScene = overrideScene;
+			}
+
 			Debug.Log($"Setup current level {CurrentLevelIndex} - \"{m_TowerLevel.BackgroundScene?.ScenePath}\".");
 		}
 

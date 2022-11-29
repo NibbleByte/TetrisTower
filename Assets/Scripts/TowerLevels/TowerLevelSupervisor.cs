@@ -37,15 +37,11 @@ namespace TetrisTower.TowerLevels
 
 			if (playthroughData.TowerLevel == null) {
 
-				playthroughData.SetupCurrentLevel(gameContext.GameConfig);
+				playthroughData.SetupCurrentLevel(gameContext.GameConfig, m_OverrideScene);
 
 				if (playthroughData.TowerLevel == null) {
 					CriticalError($"No available level.", true);
 					return;
-				}
-
-				if (m_OverrideScene != null) {
-					playthroughData.TowerLevel.BackgroundScene = m_OverrideScene;
 				}
 
 				if (playthroughData.TowerLevel.BackgroundScene.IsEmpty) {
