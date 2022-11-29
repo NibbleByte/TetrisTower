@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Showcase_PlaythroughTemplate
   m_EditorClassIdentifier: 
   m_PlayerData:
-    TowerLevel:
+    m_TowerLevel:
       rid: -2
-    BlocksSet: {fileID: 0}
     FallSpeedNormalized: 2
     FallSpeedupPerAction: 0.02
     MatchesToModifySpawnedBlocksRange: 120
@@ -50,6 +49,9 @@ MonoBehaviour:
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: f09702fa4cdaef84c9088d7a7570a06e, type: 3}
         m_IsDirty: 0
@@ -73,6 +75,61 @@ MonoBehaviour:
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 11aa518b027c5dd4f8b78489ffa37c37, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Colosseum.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 3
+      ObjectiveEndCount: 300
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 0
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: 6996691242994368519
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 6c5fc7ab53fadb641af161f1f1ef2570, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Stonehenge.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 300
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 0
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 1
+      StartGrid:
+        rid: 6996691242994368534
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
@@ -96,6 +153,9 @@ MonoBehaviour:
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: a768265c5fa8bd4459cb6f1765526987, type: 3}
         m_IsDirty: 0
@@ -119,6 +179,9 @@ MonoBehaviour:
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
     ScoreOnLevelStart: 0
     PlayTimeOnLevelStart: 0
   references:
@@ -126,3 +189,17 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 6996691242994368519
+      type: {class: BlocksGrid, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
+      data:
+        m_Rows: 9
+        m_Columns: 13
+        m_Blocks: 050000000400000001000000030000000100000002000000040000000400000002000000010000000300000001000000040000000600000005000000020000000400000002000000010000000300000003000000010000000200000004000000020000000500000000000000050000000100000003000000010000000200000004000000040000000200000001000000030000000100000005000000000000000400000005000000040000000500000006000000040000000400000006000000050000000400000005000000040000000000000000000000040000000400000005000000010000000600000006000000010000000500000004000000040000000000000000000000000000000100000003000000030000000400000003000000030000000400000003000000030000000100000000000000000000000000000001000000030000000300000004000000010000000100000004000000030000000300000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+        m_PinnedCoords: []
+    - rid: 6996691242994368534
+      type: {class: BlocksGrid, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
+      data:
+        m_Rows: 9
+        m_Columns: 13
+        m_Blocks: 00000000e803000000000000e80300000000000000000000e803000000000000e803000000000000e803000000000000e803000000000000e803000000000000e80300000000000000000000e803000000000000e803000000000000e803000000000000e803000000000000e8030000e8030000e80300000000000000000000e803000000000000e803000000000000e8030000e8030000e8030000000000000000000000000000000000000000000000000000e8030000e8030000e8030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+        m_PinnedCoords: []

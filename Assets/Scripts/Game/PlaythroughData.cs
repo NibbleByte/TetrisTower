@@ -188,7 +188,7 @@ namespace TetrisTower.Game
 		public GridShapeTemplate[] ShapeTemplates;
 
 
-		public bool StartGridWithPinnedBlocks = true;
+		public bool StartGridWithPinnedBlocks = false;
 
 		[SerializeReference]
 		public BlocksGrid StartGrid;
