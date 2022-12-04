@@ -193,6 +193,8 @@ namespace TetrisTower.Game
 		[SerializeReference]
 		public BlocksGrid StartGrid;
 
+		public BlocksSkinSet[] SkinOverrides;
+
 		public SceneReference GetAppropriateBackgroundScene()
 		{
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -212,7 +214,12 @@ namespace TetrisTower.Game
 			if (playthrough.BlocksSet && config.DefaultBlocksSet.BlockSkins.Length != playthrough.BlocksSet.BlockSkins.Length) {
 				Debug.LogError($"Playthrough blocks count {playthrough.BlocksSet.BlockSkins.Length} doesn't match the ones in the game config {config.DefaultBlocksSet.BlockSkins.Length}");
 			}
-			BlocksSkinSet blocks = playthrough.BlocksSet ?? config.DefaultBlocksSet;
+
+			BlocksSkinStack skinsStack = new BlocksSkinStack(config.DefaultBlocksSet, playthrough.BlocksSet);
+			if (SkinOverrides != null) {	// SO may not have filled this field yet...?
+				skinsStack.AppendSkinSets(SkinOverrides);
+			}
+
 			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0 ? ShapeTemplates : config.ShapeTemplates;
 
 			var pinnedBlocks = (StartGridWithPinnedBlocks && StartGrid != null)
@@ -232,7 +239,7 @@ namespace TetrisTower.Game
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
 
 				ShapeTemplates = shapeTemplates.ToArray(),
-				BlocksSkinSet = blocks,
+				BlocksSkinStack = skinsStack,
 
 				FallSpeedNormalized = playthrough.FallSpeedNormalized,
 				FallSpeedupPerAction = playthrough.FallSpeedupPerAction,
@@ -284,6 +291,10 @@ namespace TetrisTower.Game
 
 			if (StartGrid != null && (StartGrid.Rows != GridRows || StartGrid.Columns != GridColumns)) {
 				Debug.LogError($"Level param {BackgroundScene} has starting grid with wrong size.", context);
+			}
+
+			if (SkinOverrides != null && SkinOverrides.Any(s => !repo.IsRegistered(s))) {
+				Debug.LogError($"Level param {nameof(SkinOverrides)} has sets that are not registered as serializable.", context);
 			}
 		}
 	}

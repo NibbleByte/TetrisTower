@@ -75,7 +75,7 @@ namespace TetrisTower.TowerLevels.UI
 
 						var coords = bind.Coords - m_LevelData.NextShape.MinCoords;
 						if (coords.Row == row && coords.Column == column) {
-							icon = m_LevelData.BlocksSkinSet.GetIconFor(bind.Value);
+							icon = m_LevelData.BlocksSkinStack.GetIconFor(bind.Value);
 							break;
 						}
 					}

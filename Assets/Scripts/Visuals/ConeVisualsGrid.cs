@@ -81,7 +81,7 @@ namespace TetrisTower.Visuals
 
 		private GridShape<GameObject> m_PlacedShapeToBeReused = null;
 
-		private BlocksSkinSet m_BlocksSkinSet;
+		private BlocksSkinStack m_BlocksSkinStack;
 		private GridRules m_Rules;
 		private ScoreGrid m_ScoreGrid = null;
 
@@ -89,7 +89,7 @@ namespace TetrisTower.Visuals
 
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 
-		public void Init(BlocksGrid grid, BlocksSkinSet skinsSet, GridRules rules, GridCoords playableArea)
+		public void Init(BlocksGrid grid, BlocksSkinStack skinsStack, GridRules rules, GridCoords playableArea)
 		{
 			if (m_Blocks != null) {
 				DestroyInstances();
@@ -100,7 +100,7 @@ namespace TetrisTower.Visuals
 
 			CalculateCone(grid.Columns);
 
-			m_BlocksSkinSet = skinsSet;
+			m_BlocksSkinStack = skinsStack;
 			m_Rules = rules;
 
 			m_Blocks = new ConeVisualsBlock[grid.Rows, grid.Columns];
@@ -290,7 +290,7 @@ namespace TetrisTower.Visuals
 				coords.WrapColumn(this);
 
 				if (reusedVisuals) {
-					Debug.Assert(reusedVisuals.name.Contains(m_BlocksSkinSet.GetPrefabFor(pair.Value).name));
+					Debug.Assert(reusedVisuals.name.Contains(m_BlocksSkinStack.GetPrefabFor(pair.Value).name));
 				}
 
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
@@ -396,7 +396,7 @@ namespace TetrisTower.Visuals
 			if (reuseVisuals) {
 				reuseVisuals.transform.SetParent(transform);
 			} else {
-				reuseVisuals = GameObject.Instantiate(m_BlocksSkinSet.GetPrefabFor(blockType), transform);
+				reuseVisuals = GameObject.Instantiate(m_BlocksSkinStack.GetPrefabFor(blockType), transform);
 			}
 
 			reuseVisuals.transform.position = ConeApex;

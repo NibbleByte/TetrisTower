@@ -57,11 +57,11 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 
-			} else if (playthroughData.TowerLevel.BlocksSkinSet == null) {
+			} else if (playthroughData.TowerLevel.BlocksSkinStack == null || playthroughData.TowerLevel.BlocksSkinStack.IsEmpty) {
 
 				// For debug saves, blocks may be missing. Fill them up with the defaults.
-				playthroughData.TowerLevel.BlocksSkinSet = playthroughData.BlocksSet ?? gameContext.GameConfig.DefaultBlocksSet;
-				playthroughData.TowerLevel.BlocksSkinSet.Validate(gameContext.GameConfig.AssetsRepository, gameContext.GameConfig);
+				playthroughData.TowerLevel.BlocksSkinStack = new BlocksSkinStack(gameContext.GameConfig.DefaultBlocksSet, playthroughData.BlocksSet);
+				playthroughData.TowerLevel.BlocksSkinStack.Validate(gameContext.GameConfig.AssetsRepository, gameContext.GameConfig);
 			}
 
 			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;
