@@ -1,3 +1,5 @@
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+
 #if UNITY_2020_2_OR_NEWER || UNITY_2019_4_OR_NEWER || (UNITY_2018_4_OR_NEWER && !UNITY_2018_4_19 && !UNITY_2018_4_18 && !UNITY_2018_4_17 && !UNITY_2018_4_16 && !UNITY_2018_4_15)
 #define CAN_DISABLE_REFRESH
 #endif
@@ -167,7 +169,7 @@ namespace DevLocker.VersionControl.WiseSVN
 		#region Logging
 
 		// Used to track the shell commands output for errors and log them on Dispose().
-		private class ResultReporter : IShellMonitor, IDisposable
+		public class ResultConsoleReporter : IShellMonitor, IDisposable
 		{
 			private readonly ConcurrentQueue<string> m_CombinedOutput = new ConcurrentQueue<string>();
 
@@ -177,7 +179,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			private bool m_Silent;
 
 
-			public ResultReporter(bool logOutput, bool silent, string initialText = "")
+			public ResultConsoleReporter(bool logOutput, bool silent, string initialText = "")
 			{
 				m_LogOutput = logOutput;
 				m_Silent = silent;
@@ -259,9 +261,9 @@ namespace DevLocker.VersionControl.WiseSVN
 			}
 		}
 
-		private static ResultReporter CreateReporter()
+		public static ResultConsoleReporter CreateReporter()
 		{
-			var logger = new ResultReporter((TraceLogs & SVNTraceLogs.SVNOperations) != 0, Silent, "SVN Operations:");
+			var logger = new ResultConsoleReporter((TraceLogs & SVNTraceLogs.SVNOperations) != 0, Silent, "SVN Operations:");
 
 			return logger;
 		}
@@ -1707,6 +1709,14 @@ namespace DevLocker.VersionControl.WiseSVN
 						return AssetDeleteResult.DidNotDelete;
 					}
 
+					// svn: E155007: '...' is not a working copy
+					// Unversioned file in unversioned sub folder. Whatever the reason, we don't care about it - skip it.
+					// NOTE: This should not happen, as status above should be unversioned, but it does while baking unversioned scene.
+					if (result.Error.Contains("E155007")) {
+						reporter.ClearLogsAndErrorFlag();
+						return AssetDeleteResult.DidNotDelete;
+					}
+
 					return AssetDeleteResult.FailedDelete;
 				}
 
@@ -1861,7 +1871,7 @@ namespace DevLocker.VersionControl.WiseSVN
 			}
 		}
 
-		private static bool MoveAssetByAddDeleteOperations(string oldPath, string newPath, ResultReporter reporter)
+		private static bool MoveAssetByAddDeleteOperations(string oldPath, string newPath, ResultConsoleReporter reporter)
 		{
 			reporter.AppendTraceLine($"Moving file \"{oldPath}\" to \"{newPath}\" without SVN history...");
 
@@ -1954,8 +1964,15 @@ namespace DevLocker.VersionControl.WiseSVN
 		private static IEnumerable<SVNStatusData> ExtractStatuses(string output, SVNStatusDataOptions options, IShellMonitor shellMonitor = null)
 		{
 			using (var sr = new StringReader(output)) {
-				string line;
-				while ((line = sr.ReadLine()) != null) {
+				string line = string.Empty;
+				string nextLine = sr.ReadLine();
+
+				while (true) {
+					line = nextLine;
+					if (line == null)	// End of reader reached.
+						break;
+
+					nextLine = sr.ReadLine();
 
 					var lineLen = line.Length;
 
@@ -1998,6 +2015,19 @@ namespace DevLocker.VersionControl.WiseSVN
 					statusData.LockStatus = m_LockStatusMap[line[5]];
 					statusData.TreeConflictStatus = m_ConflictStatusMap[line[6]];
 					statusData.LockDetails = LockDetails.Empty;
+
+					// Last status was deleted / added+, so this is telling us where it moved to / from.
+					if (nextLine != null && nextLine.Length > 8 && nextLine[8] == '>') {
+
+						if (statusData.Status == VCFileStatus.Deleted) {
+							int movedPathStartIndex = "        > moved to ".Length;
+							statusData.MovedTo = nextLine.Substring(movedPathStartIndex).Replace('\\', '/');
+						}
+						if (statusData.Status == VCFileStatus.Added) {
+							int movedPathStartIndex = "        > moved from ".Length;
+							statusData.MovedFrom = nextLine.Substring(movedPathStartIndex).Replace('\\', '/');
+						}
+					}
 
 					// 7 columns statuses + space;
 					int pathStart = 7 + 1;

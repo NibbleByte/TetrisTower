@@ -1,3 +1,5 @@
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+
 using DevLocker.VersionControl.WiseSVN.Preferences;
 using System;
 using System.Linq;
@@ -47,10 +49,11 @@ namespace DevLocker.VersionControl.WiseSVN
 			OnDatabaseChanged();
 		}
 
-		public const string InvalidateDatabaseMenuText = "Assets/SVN/Refresh Overlay Icons";
+		public const string InvalidateDatabaseMenuText = "Assets/SVN/Refresh Icons && Locks";
 		[MenuItem(InvalidateDatabaseMenuText, false, ContextMenus.SVNContextMenusManager.MenuItemPriorityStart + 125)]
-		private static void InvalidateDatabaseMenu()
+		public static void InvalidateDatabaseMenu()
 		{
+			SVNPreferencesManager.Instance.TemporarySilenceLockPrompts = false;
 			SVNStatusesDatabase.Instance.m_GlobalIgnoresCollected = false;
 			SVNStatusesDatabase.Instance.InvalidateDatabase();
 			LockPrompting.SVNLockPromptDatabase.Instance.ClearKnowledge();

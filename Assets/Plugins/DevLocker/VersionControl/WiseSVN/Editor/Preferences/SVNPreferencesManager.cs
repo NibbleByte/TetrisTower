@@ -1,3 +1,5 @@
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+
 using DevLocker.VersionControl.WiseSVN.ContextMenus;
 using System;
 using System.Collections.Generic;
@@ -132,6 +134,8 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 
 		public PersonalPreferences PersonalPrefs;
 		public ProjectPreferences ProjectPrefs;
+
+		public bool TemporarySilenceLockPrompts = false;
 
 		[SerializeField] private long m_ProjectPrefsLastModifiedTime = 0;
 
