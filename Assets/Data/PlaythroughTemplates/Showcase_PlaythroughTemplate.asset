@@ -136,6 +136,62 @@ MonoBehaviour:
       SkinOverrides:
       - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
     - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 17f494c607e7b5a4b85f20d17c39e596, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Vikings.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 4
+      ObjectiveEndCount: 300
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 0
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: -1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 5
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides:
+      - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: aebb086cc80f793449da2f415203276c, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Atlantis.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      InitialSpawnBlockTypesCount: 5
+      ObjectiveEndCount: 40
+      SpawnWildBlocks: 1
+      SpawnBlockSmites: 0
+      SpawnRowSmites: 0
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        ObjectiveType: 1
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides:
+      - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
+    - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1.unity
@@ -143,7 +199,7 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
-      InitialSpawnBlockTypesCount: 4
+      InitialSpawnBlockTypesCount: 5
       ObjectiveEndCount: 300
       SpawnWildBlocks: 1
       SpawnBlockSmites: 0
@@ -170,7 +226,7 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
-      InitialSpawnBlockTypesCount: 5
+      InitialSpawnBlockTypesCount: 6
       ObjectiveEndCount: 0
       SpawnWildBlocks: 1
       SpawnBlockSmites: 1
