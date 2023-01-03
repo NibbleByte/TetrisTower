@@ -24,6 +24,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: 0406db5a14f94604a8c57ccfbc9f3b46, type: 3}
   m_ValidKeywords:
   - _COLORADDSUBDIFF_ON
+  - _FADING_ON
+  - _SOFTPARTICLES_ON
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords:
   - _FLIPBOOKBLENDING_OFF
@@ -85,8 +87,8 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
-    - _SoftParticlesEnabled: 0
-    - _SoftParticlesFarFadeDistance: 1
+    - _SoftParticlesEnabled: 1
+    - _SoftParticlesFarFadeDistance: 5
     - _SoftParticlesNearFadeDistance: 0
     - _SrcBlend: 5
     - _Surface: 1
@@ -97,7 +99,7 @@ Material:
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 0.28235295}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
+    - _SoftParticleFadeParams: {r: 0, g: 0.2, b: 0, a: 0}
     - _TintColor: {r: 0.8014706, g: 0.74457103, b: 0.6836073, a: 0.07058824}
   m_BuildTextureStacks: []
 --- !u!1002 &2100001
