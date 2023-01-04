@@ -70,6 +70,10 @@ namespace TetrisTower.TowerLevels
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
+			if (playthroughData.TowerLevel.RunningState == TowerLevelRunningState.Preparing) {
+				TryShowRulesGreetMessage(playthroughData.TowerLevel);
+			}
+
 			var levelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (levelController == null) {
 				var placeholder = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
@@ -157,8 +161,6 @@ namespace TetrisTower.TowerLevels
 
 			await StatesStack.SetStateAsync(new TowerPlayState());
 
-			ShowRulesMessage(playthroughData.TowerLevel);
-
 			if (gameContext.CurrentPlaythrough.TowerLevel.IsPlaying) {
 				GridLevelData levelData = gameContext.CurrentPlaythrough.TowerLevel;
 				// If save came with available matches, or pending actions, do them.
@@ -208,10 +210,17 @@ namespace TetrisTower.TowerLevels
 			}
 		}
 
-		private void ShowRulesMessage(GridLevelData levelData)
+		private static void TryShowRulesGreetMessage(GridLevelData levelData)
 		{
-			var flashMessagesController = StatesStack.ContextReferences.TryFindByType<UI.FlashMessageUIController>();
-			if (flashMessagesController && !levelData.Rules.IsObjectiveAllMatchTypes) {
+			if (!string.IsNullOrWhiteSpace(levelData.GreetMessage))
+				return;
+
+			if (levelData.ObjectiveEndCount <= 0) {
+				levelData.GreetMessage = "Endless!";
+				return;
+			}
+
+			if (!levelData.Rules.IsObjectiveAllMatchTypes) {
 				string message = "";
 				if (levelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Horizontal)) {
 					message += "Horizontal ";
@@ -225,7 +234,8 @@ namespace TetrisTower.TowerLevels
 
 				message += "Only!";
 
-				flashMessagesController.ShowMessage(message, false);
+				levelData.GreetMessage = message;
+				return;
 			}
 		}
 

@@ -141,7 +141,7 @@ namespace TetrisTower.Logic
 
 				if (LevelData.ObjectiveRemainingCount == 0 && !LevelData.IsEndlessGame && !AreGridActionsRunning) {
 					Debug.Log($"Remaining blocks to clear are 0. Player won.");
-					FinishLevel(TowerLevelRunningState.Won);
+					FinishLevel(true);
 
 				} else if (LevelData.SpawnBlockTypesRange != blocksRange) {
 					Debug.Log($"Changing blocks range from {LevelData.SpawnBlockTypesRange} to {blocksRange}.", this);
@@ -353,6 +353,10 @@ namespace TetrisTower.Logic
 
 			m_FallingSpeedup = speedUp;
 
+			if (LevelData.RunningState == TowerLevelRunningState.Preparing) {
+				LevelData.RunningState = TowerLevelRunningState.Running;
+			}
+
 			FallingShapeSpeedUp?.Invoke();
 
 			return true;
@@ -410,7 +414,7 @@ namespace TetrisTower.Logic
 				m_FinishedRuns++;
 
 				PlacedOutsideGrid?.Invoke();
-				FinishLevel(LevelData.IsEndlessGame ? TowerLevelRunningState.Won : TowerLevelRunningState.Lost);
+				FinishLevel(LevelData.IsEndlessGame);
 			}
 		}
 
@@ -473,14 +477,12 @@ namespace TetrisTower.Logic
 			return new BlocksShape() { ShapeCoords = shapeCoords.ToArray() };
 		}
 
-		public void FinishLevel(TowerLevelRunningState finishState)
+		public void FinishLevel(bool win)
 		{
-			if (finishState == TowerLevelRunningState.Running)
-				throw new ArgumentException($"Invalid finish state {finishState}");
+			LevelData.RunningState = TowerLevelRunningState.Finished;
+			LevelData.HasWon = win;
 
-			LevelData.RunningState = finishState;
-
-			if (LevelData.RunningState == TowerLevelRunningState.Won) {
+			if (LevelData.HasWon) {
 
 				for (int row = 0; row < LevelData.PlayableSize.Row; ++row) {
 					for (int column = 0; column < LevelData.Grid.Columns; ++column) {
@@ -555,6 +557,10 @@ namespace TetrisTower.Logic
 		private void UpdateFallShape()
 		{
 			if (LevelData.FallFrozen && m_FallingSpeedup == 0f)
+				return;
+
+			// Don't fall on it's own while player is preparing - waiting for them to start the level.
+			if (LevelData.RunningState == TowerLevelRunningState.Preparing)
 				return;
 
 			// Clamp to avoid skipping over a cell on hiccups.

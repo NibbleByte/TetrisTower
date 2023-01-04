@@ -106,8 +106,8 @@ namespace TetrisTower.Game
 
 		public void FinishLevel()
 		{
-			if (m_TowerLevel == null || m_TowerLevel.RunningState != TowerLevelRunningState.Won)
-				throw new InvalidOperationException($"Trying to finish level when it hasn't finished - {m_TowerLevel?.RunningState}.");
+			if (m_TowerLevel == null || m_TowerLevel.IsPlaying || !m_TowerLevel.HasWon)
+				throw new InvalidOperationException($"Trying to finish level while it hasn't been won.");
 
 			// NOTE: This may be done earlier to show the score to the user. In that case, this should do nothing.
 			m_TowerLevel.Score.ConsumeBonusScore();
@@ -158,6 +158,9 @@ namespace TetrisTower.Game
 		public SceneReference BackgroundScene;
 
 		public SceneReference BackgroundSceneMobile;
+
+		[Multiline]
+		public string GreetMessage = "";
 
 		// Spawn blocks from the array in range [0, TypesCount).
 		public int InitialSpawnBlockTypesCount = 3;
@@ -237,6 +240,7 @@ namespace TetrisTower.Game
 
 			var levelData = new GridLevelData() {
 				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
+				GreetMessage = GreetMessage,
 
 				ShapeTemplates = shapeTemplates.ToArray(),
 				BlocksSkinStack = skinsStack,

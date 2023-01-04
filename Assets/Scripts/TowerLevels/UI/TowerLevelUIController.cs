@@ -118,7 +118,7 @@ namespace TetrisTower.TowerLevels.UI
 			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
 			Debug.Assert(playthroughData.TowerLevel != null);
 
-			if (playthroughData.TowerLevel.RunningState != TowerLevelRunningState.Won) {
+			if (!playthroughData.TowerLevel.HasWon) {
 				Debug.LogError($"Trying to start the next level, while the player hasn't won the current one. Abort.");
 				return;
 			}

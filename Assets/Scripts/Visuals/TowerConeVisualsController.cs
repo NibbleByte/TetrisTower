@@ -92,7 +92,7 @@ namespace TetrisTower.Visuals
 
 		private void OnFallingShapeSpeedUp()
 		{
-			if (m_LevelData.RunningState == TowerLevelRunningState.Won) {
+			if (m_LevelData.HasWon) {
 				// Rotation happens for the next block, so shouldn't affect the last one.
 				if (WonFallTrailEffectsManager) {
 					WonFallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value), FallingVisualsContainer);

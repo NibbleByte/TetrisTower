@@ -65,14 +65,14 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Win Level");
 
-			m_TowerLevel.FinishLevel(TowerLevelRunningState.Won);
+			m_TowerLevel.FinishLevel(true);
 		}
 
 		public void Lose()
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Lose Level");
 
-			m_TowerLevel.FinishLevel(TowerLevelRunningState.Lost);
+			m_TowerLevel.FinishLevel(false);
 		}
 
 		public void Save()

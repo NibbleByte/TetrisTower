@@ -8,9 +8,9 @@ namespace TetrisTower.Logic
 {
 	public enum TowerLevelRunningState
 	{
+		Preparing,
 		Running,
-		Won,
-		Lost,
+		Finished,
 	}
 
 	public enum ModifyBlocksRangeType
@@ -84,8 +84,11 @@ namespace TetrisTower.Logic
 
 		public int ObjectiveRemainingCount => Mathf.Max(ObjectiveEndCount - Score.ObjectiveProgress, 0);
 
-		public TowerLevelRunningState RunningState = TowerLevelRunningState.Running;
-		public bool IsPlaying => RunningState == TowerLevelRunningState.Running;
+		public TowerLevelRunningState RunningState = TowerLevelRunningState.Preparing;
+		public bool IsPlaying => RunningState <= TowerLevelRunningState.Running;
+		public bool HasWon = false;
+
+		public string GreetMessage = "";
 
 		// Use Math.Floor() + 1, instead of Math.Ceiling() as initial value may be exactly 0 giving bad results.
 		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Floor(FallDistanceNormalized) - 1, column);
