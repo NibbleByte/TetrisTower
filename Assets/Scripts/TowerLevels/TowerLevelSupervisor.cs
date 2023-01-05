@@ -112,6 +112,15 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 
+				var overrideEffects = placeholder.GetComponentInChildren<Visuals.Effects.EffectsOverrider>();
+				if (overrideEffects) {
+					// It doesn't replace original objects, but still needs to be rescued from destruction.
+					overrideEffects.transform.SetParent(levelController.transform, false);
+
+					overrideEffects.Override(levelController.GetComponentInChildren<ConeVisualsGrid>());
+					overrideEffects.Override(levelController.GetComponentInChildren<TowerConeVisualsController>());
+				}
+
 				// Clean any leftovers in the placeholder (for example, temporary camera).
 				placeholder.transform.DestroyChildren(true);
 			}

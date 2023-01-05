@@ -58,6 +58,7 @@ namespace TetrisTower.Visuals
 		public float MatchActionDelay = 1.2f;
 
 		public ParticleSystem FallHitEffect;
+		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 
 		public delegate void ScoreEventHandler(ScoreGrid scoreGrid);
 		public event ScoreEventHandler ScoreUpdated;
@@ -86,8 +87,6 @@ namespace TetrisTower.Visuals
 		private ScoreGrid m_ScoreGrid = null;
 
 		private GridCoords m_PlayableArea;
-
-		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 
 		public void Init(BlocksGrid grid, BlocksSkinStack skinsStack, GridRules rules, GridCoords playableArea)
 		{

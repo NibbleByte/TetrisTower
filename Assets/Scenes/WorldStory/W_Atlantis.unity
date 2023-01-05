@@ -3666,6 +3666,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 1b7a91a3fd0b38b46987b91b495a9271, type: 3}
   m_PrefabInstance: {fileID: 89743651}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &89844506
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 89844507}
+  - component: {fileID: 89844508}
+  m_Layer: 0
+  m_Name: FallTrailEffect_GridMove
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &89844507
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89844506}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2039955403}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &89844508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89844506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c0f956426d56f2418bd35c283409f4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AddSideScale: 0.025
+  AddForwardOffset: 0.1
+  DampSpeed: 0.2
+  FinishDistance: 0.006
+  AlphaCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 23.736189
+      outSlope: 23.736189
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.06796117
+    - serializedVersion: 3
+      time: 0.1
+      value: 1
+      inSlope: -1.5683767
+      outSlope: -1.5683767
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.09902902
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &93077569
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7096,6 +7168,81 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 6052e84b6c60d88469d7befa45d791a4, type: 3}
   m_PrefabInstance: {fileID: 172304452}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &176301354
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2039955403}
+    m_Modifications:
+    - target: {fileID: 1876081050882714, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_Name
+      value: VFX_Blocks_Fall_Impact
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198963802851412370, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5558382899175781264, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6c60a2e5b7f11194ea9566c8a8b5de89, type: 2}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+--- !u!4 &176301355 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+  m_PrefabInstance: {fileID: 176301354}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &176301356 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8088966854869879571, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
+  m_PrefabInstance: {fileID: 176301354}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &176961420
 PrefabInstance:
@@ -20201,6 +20348,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7720949244660330588, guid: 9066b58cc27334549897dbc347845ffd, type: 3}
   m_PrefabInstance: {fileID: 517875236}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &518665880
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 518665881}
+  - component: {fileID: 518665882}
+  m_Layer: 0
+  m_Name: FallTrailEffect_FallingShape
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &518665881
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518665880}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2039955403}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &518665882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518665880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c0f956426d56f2418bd35c283409f4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AddSideScale: 0.025
+  AddForwardOffset: 0.1
+  DampSpeed: 0.19
+  FinishDistance: 0.006
+  AlphaCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -0
+      outSlope: -0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.14563107
+    - serializedVersion: 3
+      time: 0.1
+      value: 0.75
+      inSlope: 1.3606445
+      outSlope: 1.3606445
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.10291256
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &525620706
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20871,7 +21090,7 @@ Transform:
   - {fileID: 1621138569}
   - {fileID: 1170606421}
   m_Father: {fileID: 40051661}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &538376015
 PrefabInstance:
@@ -57374,6 +57593,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 37a44a06ba5c7c648afd1ea3f6a3f019, type: 3}
   m_PrefabInstance: {fileID: 1575592223}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1576152900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1576152901}
+  - component: {fileID: 1576152902}
+  m_Layer: 0
+  m_Name: FallTrailEffect_WonFallingShape
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1576152901
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576152900}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2039955403}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1576152902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576152900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c0f956426d56f2418bd35c283409f4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AddSideScale: 0.025
+  AddForwardOffset: 0.1
+  DampSpeed: 0.18
+  FinishDistance: 0.003
+  AlphaCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 13.257372
+      outSlope: 13.257372
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.07961166
+    - serializedVersion: 3
+      time: 0.1
+      value: 0.6
+      inSlope: -1.5683767
+      outSlope: -1.5683767
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.09902902
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &1578125825
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -67030,7 +67321,7 @@ Transform:
   - {fileID: 128757536}
   - {fileID: 2030838905}
   m_Father: {fileID: 40051661}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1798216922
 PrefabInstance:
@@ -75866,6 +76157,58 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bfbe95597e415274c853137757652d55, type: 3}
+--- !u!1 &2039955402
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2039955403}
+  - component: {fileID: 2039955404}
+  m_Layer: 0
+  m_Name: Effects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2039955403
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039955402}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -120.3, y: 18.1, z: 30}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 176301355}
+  - {fileID: 89844507}
+  - {fileID: 518665881}
+  - {fileID: 1576152901}
+  m_Father: {fileID: 40051661}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2039955404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039955402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65fa56bb662553a4fac4e5b60f859f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FallHitEffect: {fileID: 176301356}
+  GridMoveFallTrailEffectsManager: {fileID: 0}
+  SelectedShapeFallTrailEffectsManager: {fileID: 0}
+  WonFallTrailEffectsManager: {fileID: 0}
 --- !u!1001 &2039957361
 PrefabInstance:
   m_ObjectHideFlags: 0
