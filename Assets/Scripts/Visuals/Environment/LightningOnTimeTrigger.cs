@@ -15,6 +15,9 @@ namespace TetrisTower.Visuals.Environment
 		[Tooltip("Should start all over after script has ran out of entries?")]
 		public bool Loop = false;
 
+		[Tooltip("Consider times after the prepare phase is over?")]
+		public bool AfterPrepareStateIsOver = true;
+
 		[Tooltip("How many seconds after the level start should the lightning be spawned?")]
 		public float[] LightningSecondsSinceStart;
 
@@ -73,12 +76,14 @@ namespace TetrisTower.Visuals.Environment
 			}
 		}
 
+		private float m_PlayTime => AfterPrepareStateIsOver ? m_LevelData.PlayTime - m_LevelData.PrepareTime : m_LevelData.PlayTime;
+
 		void Update()
 		{
 			if (m_TowerLevel == null)
 				return;
 
-			while((Loop || m_LoopCount == 0) && LightningSecondsSinceStart[m_LastTimeIndex] <= (m_LevelData.PlayTime - m_LoopCount * LightningSecondsSinceStart.Last())) {
+			while((Loop || m_LoopCount == 0) && LightningSecondsSinceStart[m_LastTimeIndex] <= (m_PlayTime - m_LoopCount * LightningSecondsSinceStart.Last())) {
 				m_LastTimeIndex++;
 				Effects.SpawnLightningStrike();
 

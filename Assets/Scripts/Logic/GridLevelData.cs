@@ -36,6 +36,7 @@ namespace TetrisTower.Logic
 		public float FallSpeedupPerAction = 0.01f;  // Added to the falling speed every placement.
 
 		public float PlayTime = 0;					// In seconds;
+		public float PrepareTime = 0;
 
 		public GridShapeTemplate[] ShapeTemplates;
 

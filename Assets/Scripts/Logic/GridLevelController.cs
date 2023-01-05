@@ -521,6 +521,11 @@ namespace TetrisTower.Logic
 			}
 
 			if (LevelData.IsPlaying) {
+
+				if (LevelData.RunningState == TowerLevelRunningState.Preparing) {
+					LevelData.PrepareTime += Time.deltaTime;
+				}
+
 				LevelData.PlayTime += Time.deltaTime;
 			}
 		}
