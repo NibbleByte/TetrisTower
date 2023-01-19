@@ -1,5 +1,7 @@
+#if USE_TEXT_MESH_PRO
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+
 
 namespace DevLocker.GFrame.UIUtils
 {
@@ -9,9 +11,10 @@ namespace DevLocker.GFrame.UIUtils
 	public class UIDebugShowSupervisorAndState : MonoBehaviour
 	{
 		public string SupervisorPrefix = "Supervisor: ";
-		public Text SupervisorText;
+		public TextMeshProUGUI SupervisorText;
+
 		public string StatePrefix = "State: ";
-		public Text StateText;
+		public TextMeshProUGUI StateText;
 
 		private ILevelSupervisor m_CurrentLevelSupervisor;
 		private ILevelState m_CurrentLevelState;
@@ -52,3 +55,4 @@ namespace DevLocker.GFrame.UIUtils
 		}
 	}
 }
+#endif

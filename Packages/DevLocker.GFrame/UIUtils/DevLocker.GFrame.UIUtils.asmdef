@@ -2,6 +2,7 @@
     "name": "DevLocker.GFrame.UIUtils",
     "rootNamespace": "",
     "references": [
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:a180fb7e55aa04146bd87666f719efb3"
     ],
     "includePlatforms": [],
@@ -11,6 +12,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "1.0",
+            "define": "USE_TEXT_MESH_PRO"
+        }
+    ],
     "noEngineReferences": false
 }

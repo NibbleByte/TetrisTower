@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#if USE_TEXT_MESH_PRO
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,12 +11,12 @@ namespace DevLocker.GFrame.SampleGame.UITester
 	/// </summary>
 	public class SampleUITesterButtonLogDisplay : MonoBehaviour
 	{
-		public Text SampleText;
+		public TextMeshProUGUI SampleText;
 		public float Duration = 2f;
 
 		private class LogEntry
 		{
-			public Text Text;
+			public TextMeshProUGUI Text;
 			public float StartTime;
 		}
 
@@ -29,7 +31,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 
 		public void LogText(string text)
 		{
-			Text instance = Instantiate(SampleText, SampleText.transform.parent);
+			TextMeshProUGUI instance = Instantiate(SampleText, SampleText.transform.parent);
 			instance.text = text;
 			instance.gameObject.SetActive(true);
 			GameObject.Destroy(instance.gameObject, Duration);
@@ -38,3 +40,4 @@ namespace DevLocker.GFrame.SampleGame.UITester
 		}
 	}
 }
+#endif

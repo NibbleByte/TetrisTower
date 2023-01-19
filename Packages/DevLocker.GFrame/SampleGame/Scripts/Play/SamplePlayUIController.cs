@@ -30,6 +30,9 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public GameObject ChopperModePanel;
 
 		public Text ModeLabel;
+#if USE_TEXT_MESH_PRO
+		public TMPro.TextMeshProUGUI ModeLabelTMP;
+#endif
 
 		public StatePanelBinds[] StatePanels;
 
@@ -51,6 +54,12 @@ namespace DevLocker.GFrame.SampleGame.Play
 				if (ModeLabel) {
 					ModeLabel.text = $"Player Mode: {(jumperMode.Value ? "Jumper" : "Chopper")}";
 				}
+
+#if USE_TEXT_MESH_PRO
+				if (ModeLabelTMP) {
+					ModeLabelTMP.text = $"Player Mode: {(jumperMode.Value ? "Jumper" : "Chopper")}";
+				}
+#endif
 			}
 
 			if (state == CurrentState)
