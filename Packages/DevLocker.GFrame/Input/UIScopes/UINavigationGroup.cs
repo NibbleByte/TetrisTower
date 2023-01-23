@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using System;
+using UnityEngine.EventSystems;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,8 +24,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			Wrap,
 			Auto,
 			Explicit,
-			FirstSelectableOfNavigationGroup,
-			LastSelectableOfNavigationGroup,
+			FirstSelectableOfNavigationGroup,   // NOTE: These might not be what you expect if arrangement is more irregular...
+			LastSelectableOfNavigationGroup,    // NOTE: These might not be what you expect if arrangement is more irregular...
 			FocusScope,
 			TriggerEvent,
 		}
@@ -55,7 +56,19 @@ namespace DevLocker.GFrame.Input.UIScope
 			public UnityEvent Event;
 		}
 
-		// TODO: Apply wrap mode ONLY when selected boundary button.
+		// IMoveHandler and other events are received only if this is the selected object.
+		// Also, yes, nested MonoBehaviours are allowed!
+		protected internal class UINavigationListener : MonoBehaviour, IMoveHandler
+		{
+			public UINavigationGroup Owner;
+
+			public void OnMove(AxisEventData eventData)
+			{
+				if (Owner) {
+					Owner.OnMove(eventData);
+				}
+			}
+		}
 
 		[Header("Wrap Behaviours")]
 		public WrapBehaviour WrapUp;
@@ -111,6 +124,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		private Selectable m_FirstSelectable = null;
 		private Selectable m_LastSelectable = null;
 
+		private GameObject m_CurrentSelectedObject;
+
 		/// <summary>
 		/// Call this if you have added or removed child selectables and have <see cref="AutoScanForSelectables"/> disabled (no updates, no polling).
 		/// </summary>
@@ -157,6 +172,17 @@ namespace DevLocker.GFrame.Input.UIScope
 					&& (Include.Contains(selectable) || selectable.transform.IsChildOf(transform))
 					) {
 					m_ManagedSelectables.Add(selectable);
+
+					if (Application.isPlaying) {
+						// Never removed but who cares...
+						var listener = selectable.gameObject.GetComponent<UINavigationListener>();
+						if (listener == null) {
+							listener = selectable.gameObject.AddComponent<UINavigationListener>();
+						}
+
+						listener.Owner = this;
+					}
+
 					needsRefresh = true;
 				}
 			}
@@ -208,11 +234,13 @@ namespace DevLocker.GFrame.Input.UIScope
 				bool outsideLeft = nav.selectOnLeft == null || !m_ManagedSelectables.Contains(nav.selectOnLeft);
 				bool outsideRight = nav.selectOnRight == null || !m_ManagedSelectables.Contains(nav.selectOnRight);
 
-				if (outsideUp == outsideLeft == false) {
+				// NOTE: These might not be what you expect if arrangement is more irregular...
+				if (outsideUp && outsideLeft) {
 					m_FirstSelectable = selectable;
 				}
 
-				if (outsideDown == outsideRight == false) {
+				// NOTE: These might not be what you expect if arrangement is more irregular...
+				if (outsideDown && outsideRight) {
 					m_LastSelectable = selectable;
 				}
 
@@ -349,8 +377,91 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		void Update()
 		{
+			m_CurrentSelectedObject = EventSystem.current?.currentSelectedGameObject;
+
 			if (AutoScanForSelectables) {
 				RescanSelectables();
+			}
+		}
+
+		public void OnMove(AxisEventData eventData)
+		{
+			// OnMove() event is called AFTER selected was changed, so you want to skip the initial call.
+			// (they are rather called together, but Selectable.Navigate() is first and it doesn't use / consume the event).
+			if (m_CurrentSelectedObject != EventSystem.current?.currentSelectedGameObject)
+				return;
+
+			Selectable selectable = EventSystem.current?.currentSelectedGameObject?.GetComponent<Selectable>();
+
+			if (eventData.used || !m_ManagedSelectables.Contains(selectable))
+				return;
+
+			switch (eventData.moveDir) {
+				case MoveDirection.Up:
+					OnMoveWrapDynamic(WrapUp, selectable.navigation.selectOnUp, eventData);
+					break;
+
+				case MoveDirection.Down:
+					OnMoveWrapDynamic(WrapDown, selectable.navigation.selectOnDown, eventData);
+					break;
+
+				case MoveDirection.Left:
+					OnMoveWrapDynamic(WrapLeft, selectable.navigation.selectOnLeft, eventData);
+					break;
+
+				case MoveDirection.Right:
+					OnMoveWrapDynamic(WrapRight, selectable.navigation.selectOnRight, eventData);
+					break;
+			}
+		}
+
+		private void OnMoveWrapDynamic(WrapBehaviour wrapBehaviour, bool hasWrapLink, AxisEventData eventData)
+		{
+			if (hasWrapLink)
+				return;
+
+			Selectable nextSelectable;
+
+			switch (wrapBehaviour.Mode) {
+				case WrapMode.None:
+				case WrapMode.Wrap:
+				case WrapMode.Auto:
+				case WrapMode.Explicit:
+					// Do nothing, they should be linked already.
+					return;
+
+				case WrapMode.FirstSelectableOfNavigationGroup:
+					nextSelectable = wrapBehaviour.NavigationGroup ? wrapBehaviour.NavigationGroup.FirstSelectable : null;
+
+					if (nextSelectable && nextSelectable.gameObject.activeInHierarchy) {
+						eventData.selectedObject = nextSelectable.gameObject;
+						eventData.Use();
+					}
+					break;
+
+				case WrapMode.LastSelectableOfNavigationGroup:
+					nextSelectable = wrapBehaviour.NavigationGroup ? wrapBehaviour.NavigationGroup.LastSelectable : null;
+
+					if (nextSelectable && nextSelectable.gameObject.activeInHierarchy) {
+						eventData.selectedObject = nextSelectable.gameObject;
+						eventData.Use();
+					}
+					break;
+
+				case WrapMode.FocusScope:
+					// It already checks for activeInHierarchy.
+					if (wrapBehaviour.Scope) {
+						wrapBehaviour.Scope.ForceRefocusScope();
+						eventData.Use();
+					}
+					break;
+
+				case WrapMode.TriggerEvent:
+					wrapBehaviour.Event?.Invoke();
+					eventData.Use();
+					break;
+
+				default: throw new NotSupportedException(wrapBehaviour.Mode.ToString());
 			}
 		}
 	}

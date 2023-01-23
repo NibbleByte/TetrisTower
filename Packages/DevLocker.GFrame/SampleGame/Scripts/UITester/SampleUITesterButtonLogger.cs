@@ -21,7 +21,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 			GetComponent<Button>().onClick.RemoveListener(OnButtonClicked);
 		}
 
-		private void OnButtonClicked()
+		public void OnButtonClicked()
 		{
 			string buttonText = GetComponentInChildren<Text>()?.text;
 #if USE_TEXT_MESH_PRO
