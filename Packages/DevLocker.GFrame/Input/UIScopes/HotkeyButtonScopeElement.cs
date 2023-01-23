@@ -1,6 +1,7 @@
 #if USE_INPUT_SYSTEM
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input.UIScope
@@ -19,7 +20,8 @@ namespace DevLocker.GFrame.Input.UIScope
 				m_Button = GetComponentInParent<Button>();
 			}
 
-			m_Button.onClick.Invoke();
+			ExecuteEvents.Execute(m_Button.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler);
+			// Button.onClick.Invoke(); // This will ignore disabled state.
 		}
 
 		protected override void OnValidate()

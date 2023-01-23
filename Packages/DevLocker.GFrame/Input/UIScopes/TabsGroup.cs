@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input.UIScope
@@ -184,7 +185,8 @@ namespace DevLocker.GFrame.Input.UIScope
 				;
 
 			if (lastIndex != nextIndex) {
-				activeTabs[nextIndex].onClick.Invoke();
+				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler);
+				// Button.onClick.Invoke(); // This will ignore disabled state.
 			}
 		}
 
@@ -207,7 +209,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (lastIndex != nextIndex) {
-				activeTabs[nextIndex].onClick.Invoke();
+				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler);
+				// Button.onClick.Invoke(); // This will ignore disabled state.
 			}
 		}
 
