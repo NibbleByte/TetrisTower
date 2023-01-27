@@ -21,8 +21,6 @@ namespace DevLocker.GFrame.Input.UIScope
 	public interface IHotkeyWithInputAction
 	{
 		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions();
-
-		bool CheckIfAnyActionIsEnabled();
 	}
 #endif
 
@@ -641,7 +639,11 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					var prevColor = GUI.color;
 
-					bool actionsActive = uiScope.enabled && uiScope.gameObject.activeInHierarchy && hotkeyElement.CheckIfAnyActionIsEnabled();
+					bool actionsActive = uiScope.enabled
+						&& uiScope.gameObject.activeInHierarchy
+						&& InputContextManager.InputContext != null
+						&& hotkeyElement.GetUsedActions().Any(a => a.enabled);
+
 					string activeStr = actionsActive ? "Active" : "Inactive";
 					GUI.color = actionsActive ? Color.green : Color.red;
 

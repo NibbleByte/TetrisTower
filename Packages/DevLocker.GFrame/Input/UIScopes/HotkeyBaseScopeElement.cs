@@ -191,19 +191,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
-		public bool CheckIfAnyActionIsEnabled()
-		{
-			if (InputContextManager.InputContext == null)
-				return false;
-
-			foreach(InputAction action in GetUsedActions()) {
-				if (action.enabled)
-					return true;
-			}
-
-			return false;
-		}
-
 		protected virtual void OnValidate()
 		{
 			Utils.Validation.ValidateMissingObject(this, m_InputAction, nameof(m_InputAction));
