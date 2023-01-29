@@ -87,6 +87,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		[Tooltip("Optional - enter how the hotkey text should be displayed. Use \"{Hotkey}\" to be replaced with the matched text.\nLeave empty to skip.")]
 		public string FormatText;
 
+		[Tooltip("Optional - list of objects to be activated when hotkeys are displayed. Useful for labels indicating the result of the action.")]
+		public GameObject[] AdditionalObjectsToActivate;
+
 		public InputBindingDisplayData CurrentlyDisplayedData { get; private set; }
 
 		private InputDevice m_LastDevice;
@@ -133,6 +136,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 #if USE_TEXT_MESH_PRO
 							if (TextMeshProText) TextMeshProText.gameObject.SetActive(false);
 #endif
+
+							SetAdditionalObjects(false);
+
 							return;
 						}
 
@@ -154,6 +160,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 #if USE_TEXT_MESH_PRO
 							if (TextMeshProText) TextMeshProText.gameObject.SetActive(false);
 #endif
+
+							SetAdditionalObjects(false);
+
 							return;
 						}
 
@@ -234,6 +243,15 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 #endif
 
 			}
+
+			bool shown = (Icon && Icon.gameObject.activeSelf)
+				|| (Text && Text.gameObject.activeSelf)
+#if USE_TEXT_MESH_PRO
+				|| (TextMeshProText && TextMeshProText.gameObject.activeSelf)
+#endif
+			;
+
+			SetAdditionalObjects(shown);
 		}
 
 		void OnEnable()
@@ -260,6 +278,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				return;
 			}
 
+			SetAdditionalObjects(false);
+
 			InputContextManager.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
 
 			if (Icon) {
@@ -276,6 +296,15 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				TextMeshProText.gameObject.SetActive(false);
 			}
 #endif
+		}
+
+		private void SetAdditionalObjects(bool active)
+		{
+			foreach(GameObject go in AdditionalObjectsToActivate) {
+				if (go) {
+					go.SetActive(active);
+				}
+			}
 		}
 
 		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)

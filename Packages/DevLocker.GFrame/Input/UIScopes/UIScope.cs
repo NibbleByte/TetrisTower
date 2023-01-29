@@ -83,6 +83,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool PushInputStack = false;
 		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
 		public bool IncludeUIActions = true;
+
+		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of lowest root will remain inactive).")]
+		public bool IsRoot = false;
 #endif
 
 		private UIScope m_LastFocusedScope;
@@ -92,14 +95,14 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Focused scope which keeps it and all its parents active (and the rest will be inactive).
 		/// </summary>
-		public static UIScope FocusedScope => m_ActiveScopes.LastOrDefault();
+		public static UIScope FocusedScope => s_ActiveScopes.LastOrDefault();
 
 		/// <summary>
 		/// The focused scope plus all it's parents - top to bottom.
 		/// </summary>
-		public static IReadOnlyCollection<UIScope> ActiveScopes => m_ActiveScopes;
+		public static IReadOnlyCollection<UIScope> ActiveScopes => s_ActiveScopes;
 
-		private static UIScope[] m_ActiveScopes = Array.Empty<UIScope>();
+		private static UIScope[] s_ActiveScopes = Array.Empty<UIScope>();
 
 		private static List<UIScope> s_Scopes = new List<UIScope>();
 
@@ -125,7 +128,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		private static void ClearStaticsCache()
 		{
-			m_ActiveScopes = Array.Empty<UIScope>();
+			s_ActiveScopes = Array.Empty<UIScope>();
 			s_Scopes = new List<UIScope>();
 			s_ChangingActiveScopes = false;
 			s_PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
@@ -172,10 +175,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			// Child scope was active, but this one was disabled. The user just enabled me.
 			// Re-insert me (us) to the collections keeping the correct order.
-			if (m_ActiveScopes.Length > 0 && m_ActiveScopes.Last().transform.IsChildOf(transform)) {
+			if (s_ActiveScopes.Length > 0 && s_ActiveScopes.Last().transform.IsChildOf(transform)) {
 
 				// That would include me, freshly enabled.
-				UIScope[] nextScopes = CollectScopes(m_ActiveScopes.Last());
+				UIScope[] nextScopes = CollectScopes(s_ActiveScopes.Last());
 
 				for (int i = 0; i < nextScopes.Length; ++i) {
 					UIScope scope = nextScopes[i];
@@ -186,7 +189,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					s_Scopes.Add(this);
 				}
 
-				SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+				SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
 
 			} else {
 
@@ -203,29 +206,29 @@ namespace DevLocker.GFrame.Input.UIScope
 					}
 				}
 
-				UIScope lastActive = m_ActiveScopes.LastOrDefault();
+				UIScope lastActive = s_ActiveScopes.LastOrDefault();
 
 				switch (OnEnableBehaviour) {
 					case OnEnablePolicy.Focus:
 						// Skip activation if this frame another scope was activated with higher priority.
-						if (!m_ActiveScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
-							SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+						if (!s_ActiveScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
+							SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
 						}
 						break;
 
 					case OnEnablePolicy.FocusWithFramePriority:
-						SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+						SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
 						break;
 
 					case OnEnablePolicy.FocusIfCurrentIsLowerDepth:
 						if (lastActive == null || lastActive.m_ScopeDepth < m_ScopeDepth) {
-							SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+							SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
 						}
 						break;
 
 					case OnEnablePolicy.FocusIfCurrentIsLowerOrEqualDepth:
 						if (lastActive == null || lastActive.m_ScopeDepth <= m_ScopeDepth) {
-							SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+							SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
 						}
 						break;
 
@@ -265,13 +268,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			// HACK: On turning off the game OnDisable() gets called which may call methods on destroyed objects.
-			int activeIndex = Array.IndexOf(m_ActiveScopes, this);
+			int activeIndex = Array.IndexOf(s_ActiveScopes, this);
 			if (activeIndex != -1 && !m_GameQuitting) {
 
 				// Proceed only if this is the deepest scope (i.e. the focused one).
-				if (activeIndex != m_ActiveScopes.Length - 1) {
-					var activeScopes = CollectScopes(m_ActiveScopes.Last());
-					SwitchActiveScopes(ref m_ActiveScopes, activeScopes);
+				if (activeIndex != s_ActiveScopes.Length - 1) {
+					var activeScopes = CollectScopes(s_ActiveScopes.Last());
+					SwitchActiveScopes(ref s_ActiveScopes, activeScopes);
 					return;
 				}
 
@@ -337,7 +340,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					: Array.Empty<UIScope>()
 					;
 
-				SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+				SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
 			}
 		}
 
@@ -347,10 +350,10 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public static void RefocusActiveScopes()
 		{
-			if (m_ActiveScopes.Length == 0)
+			if (s_ActiveScopes.Length == 0)
 				return;
 
-			var lastActive = m_ActiveScopes.Last();
+			var lastActive = s_ActiveScopes.Last();
 
 			if (s_ChangingActiveScopes) {
 				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
@@ -358,7 +361,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			// Force full re-initialization of all the scopes.
-			SwitchActiveScopes(ref m_ActiveScopes, new UIScope[0]);
+			SwitchActiveScopes(ref s_ActiveScopes, new UIScope[0]);
 			lastActive.ForceRefocusScope();
 		}
 
@@ -385,10 +388,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UIScope[] nextScopes = CollectScopes(this);
 
-			SwitchActiveScopes(ref m_ActiveScopes, nextScopes);
+			SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
 		}
 
-		public static bool IsScopeActive(UIScope scope) => m_ActiveScopes.Contains(scope);
+		public static bool IsScopeActive(UIScope scope) => s_ActiveScopes.Contains(scope);
 
 		/// <summary>
 		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.
@@ -401,8 +404,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			ScanForChildScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 			m_HasScannedForElements = true;
 
-			if (Array.IndexOf(m_ActiveScopes, this) != -1) {
-				var lastActive = m_ActiveScopes.Last();
+			if (Array.IndexOf(s_ActiveScopes, this) != -1) {
+				var lastActive = s_ActiveScopes.Last();
 
 				if (s_ChangingActiveScopes) {
 					s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
@@ -410,7 +413,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				}
 
 				// Force full re-initialization of all the scopes including this one.
-				SwitchActiveScopes(ref m_ActiveScopes, new UIScope[0]);
+				SwitchActiveScopes(ref s_ActiveScopes, new UIScope[0]);
 				lastActive.ForceRefocusScope();
 
 			} else {
@@ -460,6 +463,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected static void SwitchActiveScopes(ref UIScope[] prevScopes, UIScope[] nextScopes)
 		{
+			// Find if there is a root scope and trim the parents.
+			// Do it now, at the last moment, instead of CollectScopes(), so correct depth can be set.
+			int rootIndex = Array.FindLastIndex(nextScopes, s => s.IsRoot);
+			if (rootIndex > 0) {
+				nextScopes = new ArraySegment<UIScope>(nextScopes, rootIndex, nextScopes.Length - rootIndex).ToArray();
+			}
+
 			// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
 			// Any such change will be pushed to a queue and applied later on.
 			// TODO: This was never really tested.
@@ -619,6 +629,8 @@ namespace DevLocker.GFrame.Input.UIScope
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IncludeUIActions)));
 			}
 #endif
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IsRoot)));
+
 			serializedObject.ApplyModifiedProperties();
 
 

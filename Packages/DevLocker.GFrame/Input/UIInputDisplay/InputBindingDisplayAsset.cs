@@ -160,14 +160,30 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			}
 
 			if (FallbackToDefaultDisplayTexts) {
+				string text;
+				string shortText;
+
+				try {
+					text = action.GetBindingDisplayString(bindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
+					shortText = action.GetBindingDisplayString(bindingIndex);
+				}
+				catch (NotImplementedException) {
+					// HACK: current version of the InputSystem 1.3.0 doesn't support texts for special bindings like "*/{Submit}".
+					// This is what they say in the MatchControlsRecursive():
+					////TODO: support scavenging a subhierarchy for usages
+					//throw new NotImplementedException("Matching usages inside subcontrols instead of at device root");
+
+					text = string.Empty;
+					shortText = string.Empty;
+				}
 
 				return new InputBindingDisplayData {
 					Binding = binding,
 					BindingIndex = bindingIndex,
 					ControlScheme = MatchingControlScheme,
 					Icon = null,
-					Text = action.GetBindingDisplayString(bindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames),
-					ShortText = action.GetBindingDisplayString(bindingIndex),
+					Text = text,
+					ShortText = shortText,
 				};
 			}
 
