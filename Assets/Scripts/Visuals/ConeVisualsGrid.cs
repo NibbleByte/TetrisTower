@@ -1,3 +1,4 @@
+using DevLocker.GFrame;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,8 +89,13 @@ namespace TetrisTower.Visuals
 
 		private GridCoords m_PlayableArea;
 
-		public void Init(BlocksGrid grid, BlocksSkinStack skinsStack, GridRules rules, GridCoords playableArea)
+		private Effects.FairyMatchingController m_Fairy;
+
+		public void Init(LevelStateContextReferences contextReferences)
 		{
+			GridLevelController towerLevel = contextReferences.FindByType<GridLevelController>();
+			BlocksGrid grid = towerLevel.Grid;
+
 			if (m_Blocks != null) {
 				DestroyInstances();
 			}
@@ -99,13 +105,13 @@ namespace TetrisTower.Visuals
 
 			CalculateCone(grid.Columns);
 
-			m_BlocksSkinStack = skinsStack;
-			m_Rules = rules;
+			m_BlocksSkinStack = towerLevel.LevelData.BlocksSkinStack;
+			m_Rules = towerLevel.LevelData.Rules;
 
 			m_Blocks = new ConeVisualsBlock[grid.Rows, grid.Columns];
 			m_ScoreGrid = null;
 
-			m_PlayableArea = playableArea;
+			m_PlayableArea = towerLevel.LevelData.PlayableSize;
 
 			for (int row = 0; row < grid.Rows; ++row) {
 				for(int column = 0; column < grid.Columns; ++column) {
@@ -115,6 +121,22 @@ namespace TetrisTower.Visuals
 					if (blockType != BlockType.None) {
 						CreateInstanceAt(coords, blockType);
 					}
+				}
+			}
+
+			if (contextReferences.TrySetByType(out m_Fairy)) {
+
+				GameObject[] found = GameObject.FindGameObjectsWithTag(Game.GameTags.FairyRestPoint);
+				var fairyRestPoints = found.Where(go => go.transform.IsChildOf(transform)).Select(go => go.transform).ToArray();
+
+				if (fairyRestPoints.Length >= 2) {
+					m_Fairy.Init(fairyRestPoints);
+				} else {
+					Debug.LogWarning("Couldn't find enough fairy rest point. Need at least 2. Destroying the fairy.", this);
+
+					contextReferences.RemoveByType<Effects.FairyMatchingController>();
+					Destroy(m_Fairy.gameObject);
+					m_Fairy = null;
 				}
 			}
 		}

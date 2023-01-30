@@ -86,5 +86,21 @@ namespace DevLocker.GFrame
 				}
 			}
 		}
+
+		/// <summary>
+		/// Remove reference by type.
+		/// </summary>
+		/// <returns>true if successfully removed, otherwise false.</returns>
+		public bool RemoveByType<T>()
+		{
+			for(int i = 0; i < m_ContextReferences.Count; ++i) {
+				if (m_ContextReferences[i] is T) {
+					m_ContextReferences.RemoveAt(i);
+					return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }

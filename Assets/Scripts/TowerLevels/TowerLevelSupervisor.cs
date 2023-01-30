@@ -153,6 +153,7 @@ namespace TetrisTower.TowerLevels
 				behaviours.OfType<UI.FlashMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<ConeVisualsGrid>().First(),
 				behaviours.OfType<TowerConeVisualsController>().First(),
+				behaviours.OfType<Visuals.Effects.FairyMatchingController>().FirstOrDefault(),
 				behaviours.OfType<ILostAnimationExecutor>().ToArray()	// Tower level prefab OR scene ones.
 				);
 
