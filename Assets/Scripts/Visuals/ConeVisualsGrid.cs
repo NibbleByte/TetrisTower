@@ -130,7 +130,7 @@ namespace TetrisTower.Visuals
 				var fairyRestPoints = found.Where(go => go.transform.IsChildOf(transform)).Select(go => go.transform).ToArray();
 
 				if (fairyRestPoints.Length >= 2) {
-					m_Fairy.Init(fairyRestPoints);
+					m_Fairy.Init(fairyRestPoints, transform.position, ConeOuterRadius);
 				} else {
 					Debug.LogWarning("Couldn't find enough fairy rest point. Need at least 2. Destroying the fairy.", this);
 
