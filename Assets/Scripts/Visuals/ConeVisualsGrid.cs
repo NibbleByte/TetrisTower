@@ -204,6 +204,14 @@ namespace TetrisTower.Visuals
 			return vertexStart + (vertexEnd - vertexStart) / 2f;
 		}
 
+		public Vector3 GridToWorldFrontCenter(GridCoords coords)
+		{
+			var vertexStart = GridToWorldFrontSideMidpoint(coords);
+			var vertexEnd = GridToWorldFrontSideMidpoint(coords + new GridCoords(1, 0));
+
+			return vertexStart + (vertexEnd - vertexStart) / 2f;
+		}
+
 		private void DestroyInstances()
 		{
 			for (int row = 0; row < Rows; ++row) {
@@ -328,8 +336,20 @@ namespace TetrisTower.Visuals
 
 		private IEnumerator ClearMatchedCells(ClearMatchedAction action, GridCoords displayScoreCoord)
 		{
-			for(int i = 0; i < action.Coords.Count; ++i) {
-				GridCoords coord = action.Coords[i];
+			List<GridCoords> coords = action.Coords.ToList();
+
+			// Start from the closer end....
+			Vector3 fairyPos = m_Fairy.transform.position;
+			if (Vector3.Distance(GridToWorldFrontCenter(coords.First()), fairyPos) > Vector3.Distance(GridToWorldFrontCenter(coords.Last()), fairyPos)) {
+				coords.Reverse();
+			}
+
+			for(int i = 0; i < coords.Count; ++i) {
+				GridCoords coord = coords[i];
+
+				if (m_Fairy) {
+					yield return m_Fairy.ChaseTo(GridToWorldFrontCenter(coord));
+				}
 
 				var visualsBlock = this[coord];
 				Debug.Assert(visualsBlock != null);
@@ -346,13 +366,14 @@ namespace TetrisTower.Visuals
 					ScoreUpdated?.Invoke(m_ScoreGrid);
 				}
 
-				if (i < action.Coords.Count - 1) {
+				if (m_Fairy == null && i < coords.Count - 1) {
 					yield return new WaitForSeconds(MatchBlockDelay);
 				}
 			}
 
-			yield return new WaitForSeconds(MatchActionDelay);
-			yield break;
+			if (m_Fairy == null) {
+				yield return new WaitForSeconds(MatchActionDelay);
+			}
 		}
 
 		private IEnumerator MoveCells(MoveCellsAction action)

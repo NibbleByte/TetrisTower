@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,6 +12,9 @@ namespace TetrisTower.Visuals.Effects
 		public float RotationSpeed = 10;
 		public float SpeedCatchupRotation = 16;
 
+		public float ChaseSpeed = 12;
+		public float ChaseRotation = 16;
+
 		public Transform[] RestPoints { get; private set; }
 
 		private Transform m_CurrentRestPoint = null;
@@ -21,6 +25,9 @@ namespace TetrisTower.Visuals.Effects
 		private float m_TowerRadius;
 
 		private float m_ChaseRestMinDistance;
+
+		private Vector3? m_ChasePos;
+		private Vector3? m_ChasePosWaypoint;
 
 		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius)
 		{
@@ -38,7 +45,7 @@ namespace TetrisTower.Visuals.Effects
 			m_Speed = IdleSpeed;
 
 			m_TowerBaseCenter = towerBaseCenter;
-			m_TowerRadius = towerRadius * 1.2f;	// Inflate a bit
+			m_TowerRadius = towerRadius;
 
 
 			m_ChaseRestMinDistance = 0;
@@ -53,7 +60,24 @@ namespace TetrisTower.Visuals.Effects
 			}
 		}
 
-		void Update()
+		public IEnumerator ChaseTo(Vector3 chasePos)
+		{
+			m_ChasePos = chasePos;
+
+			Vector3 dist = m_ChasePos.Value - transform.position;
+			Vector3 bumpPoint = transform.position + dist * 0.5f;
+
+			Vector3 center = m_TowerBaseCenter;
+			center.y = bumpPoint.y;
+
+			m_ChasePosWaypoint = 1.0f * m_TowerRadius * (bumpPoint - center).normalized + center;
+
+			while (m_ChasePos.HasValue) {
+				yield return null;
+			}
+		}
+
+		private void IdleUpdate()
 		{
 			if (Vector3.Distance(transform.position, m_CurrentRestPoint.position) < 0.2f) {
 				var leftPoints = RestPoints.ToList();
@@ -75,7 +99,7 @@ namespace TetrisTower.Visuals.Effects
 				Vector3 center = m_TowerBaseCenter;
 				center.y = closePoint.y;
 
-				Vector3 targetWaypoint = m_TowerRadius * (closePoint - center).normalized + center;
+				Vector3 targetWaypoint = 1.2f * m_TowerRadius * (closePoint - center).normalized + center;
 
 				dist = targetWaypoint - transform.position;
 				dir = dist.normalized;
@@ -94,6 +118,38 @@ namespace TetrisTower.Visuals.Effects
 			transform.position += m_Heading * Time.deltaTime * m_Speed;
 
 			Debug.DrawLine(m_CurrentRestPoint.position, m_CurrentRestPoint.position + Vector3.up * 2, Color.blue);
+		}
+
+		private void ChaseUpdate()
+		{
+			Vector3 targetPos = (m_ChasePosWaypoint.HasValue) ? m_ChasePosWaypoint.Value : m_ChasePos.Value;
+
+			Debug.DrawLine(targetPos, targetPos + Vector3.up * 2, Color.red);
+
+			m_Speed = Mathf.Lerp(m_Speed, ChaseSpeed, Time.deltaTime * 2f);
+
+			transform.position = Vector3.MoveTowards(transform.position, targetPos, m_Speed * Time.deltaTime);
+
+			if (m_ChasePosWaypoint.HasValue && Vector3.Distance(transform.position, m_ChasePosWaypoint.Value) < 0.2f) {
+				m_ChasePosWaypoint = null;
+				return;
+			}
+
+			if (Vector3.Distance(transform.position, m_ChasePos.Value) < 0.2f) {
+				m_Speed = ChaseSpeed * 0.5f;
+				m_ChasePos = null;
+				m_ChasePosWaypoint = null;
+				return;
+			}
+		}
+
+		void Update()
+		{
+			if (m_ChasePos.HasValue) {
+				ChaseUpdate();
+			} else {
+				IdleUpdate();
+			}
 		}
 	}
 
