@@ -9,6 +9,7 @@ namespace TetrisTower.Game
         public const string TowerPlaceholderTag = "TowerPlaceholder";
         public const string TowerDecors = "TowerDecors";
         public const string FairyRestPoint = "FairyRestPoint";
+        public const string BlocksLight = "BlocksLight";
     }
 
     public static class GameLayers

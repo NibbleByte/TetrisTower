@@ -83,9 +83,9 @@ namespace TetrisTower.TowerLevels
 
 				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 
-				var overrideBlocksLight = placeholder.transform.GetComponentInChildren<Light>();
+				Light overrideBlocksLight = placeholder.transform.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 				if (overrideBlocksLight) {
-					var blocksLight = levelController.GetComponentInChildren<Light>();
+					Light blocksLight = levelController.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 					overrideBlocksLight.transform.SetParent(blocksLight.transform.parent, false);
 					GameObject.DestroyImmediate(blocksLight.gameObject);
 				}
@@ -206,7 +206,7 @@ namespace TetrisTower.TowerLevels
 
 		private static void SetupLights(GridLevelController levelController)
 		{
-			var blocksLight = levelController.GetComponentInChildren<Light>();
+			var blocksLight = levelController.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 
 			if (blocksLight) {
 				blocksLight.cullingMask = GameLayers.BlocksMask;
@@ -214,7 +214,10 @@ namespace TetrisTower.TowerLevels
 				var levelLights = GameObject.FindObjectsOfType<Light>();
 				foreach(Light light in levelLights) {
 					if (light != blocksLight) {
-						light.cullingMask &= ~GameLayers.BlocksMask;
+						light.cullingMask &= light.GetComponentInParent<Visuals.Effects.FairyMatchingController>()
+							? ~0 // Fairy lights up everything
+							: ~GameLayers.BlocksMask // Light environment without the blocks.
+							;
 					}
 				}
 			}

@@ -136,7 +136,7 @@ namespace TetrisTower.Visuals.Effects
 			}
 
 			if (Vector3.Distance(transform.position, m_ChasePos.Value) < 0.2f) {
-				m_Speed = ChaseSpeed * 0.5f;
+				m_Speed = ChaseSpeed * 0.3f;
 				m_ChasePos = null;
 				m_ChasePosWaypoint = null;
 				return;
@@ -150,6 +150,11 @@ namespace TetrisTower.Visuals.Effects
 			} else {
 				IdleUpdate();
 			}
+		}
+
+		void LateUpdate()
+		{
+			transform.LookAt(Camera.main.transform);
 		}
 	}
 
