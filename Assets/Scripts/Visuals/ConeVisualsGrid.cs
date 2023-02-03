@@ -59,6 +59,7 @@ namespace TetrisTower.Visuals
 		public float MatchActionDelay = 1.2f;
 
 		public ParticleSystem FallHitEffect;
+		public ParticleSystem MatchBlockEffect;
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 
 		public delegate void ScoreEventHandler(ScoreGrid scoreGrid);
@@ -178,7 +179,7 @@ namespace TetrisTower.Visuals
 			return ConeApex + coneEdgeFullDist * GridToScale(coords).x;
 		}
 
-		public Vector3 GridToWorldBaseBackSideMidpoint(GridCoords coords)
+		public Vector3 GridToWorldBackEdgeMidpoint(GridCoords coords)
 		{
 			var vertexStart = GridToWorldBackVertex(coords);
 			coords.Column++;
@@ -187,7 +188,7 @@ namespace TetrisTower.Visuals
 			return vertexStart + (vertexEnd - vertexStart) / 2f;
 		}
 
-		public Vector3 GridToWorldFrontSideMidpoint(GridCoords coords)
+		public Vector3 GridToWorldFrontEdgeMidpoint(GridCoords coords)
 		{
 			var vertexStart = GridToWorldFrontVertex(coords);
 			coords.Column++;
@@ -198,16 +199,32 @@ namespace TetrisTower.Visuals
 
 		public Vector3 GridToWorldBottomCenter(GridCoords coords)
 		{
-			var vertexStart = GridToWorldBaseBackSideMidpoint(coords);
-			var vertexEnd = GridToWorldFrontSideMidpoint(coords);
+			var vertexStart = GridToWorldBackEdgeMidpoint(coords);
+			var vertexEnd = GridToWorldFrontEdgeMidpoint(coords);
 
 			return vertexStart + (vertexEnd - vertexStart) / 2f;
 		}
 
 		public Vector3 GridToWorldFrontCenter(GridCoords coords)
 		{
-			var vertexStart = GridToWorldFrontSideMidpoint(coords);
-			var vertexEnd = GridToWorldFrontSideMidpoint(coords + new GridCoords(1, 0));
+			var vertexStart = GridToWorldFrontEdgeMidpoint(coords);
+			var vertexEnd = GridToWorldFrontEdgeMidpoint(coords + new GridCoords(1, 0));
+
+			return vertexStart + (vertexEnd - vertexStart) / 2f;
+		}
+
+		public Vector3 GridToWorldBackCenter(GridCoords coords)
+		{
+			var vertexStart = GridToWorldBackEdgeMidpoint(coords);
+			var vertexEnd = GridToWorldBackEdgeMidpoint(coords + new GridCoords(1, 0));
+
+			return vertexStart + (vertexEnd - vertexStart) / 2f;
+		}
+
+		public Vector3 GridToWorldCenter(GridCoords coords)
+		{
+			var vertexStart = GridToWorldFrontCenter(coords);
+			var vertexEnd = GridToWorldBackCenter(coords);
 
 			return vertexStart + (vertexEnd - vertexStart) / 2f;
 		}
@@ -325,7 +342,7 @@ namespace TetrisTower.Visuals
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
 
 				if (lowestRows[coords.Column] == coords.Row) {
-					EmitFallHitEffectAt(GridToWorldBottomCenter(coords));
+					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(coords));
 				}
 			}
 
@@ -352,6 +369,8 @@ namespace TetrisTower.Visuals
 					// Move a bit forward from the block front face, so light looks good.
 					frontCenter += (frontCenter - new Vector3(transform.position.x, frontCenter.y, transform.position.z)).normalized * 0.1f;
 					yield return m_Fairy.ChaseTo(frontCenter);
+
+					EmitParticlesAt(MatchBlockEffect, GridToWorldCenter(coord));
 				}
 
 				var visualsBlock = this[coord];
@@ -423,7 +442,7 @@ namespace TetrisTower.Visuals
 				visualsBlock.transform.localScale = GridToScale(movedPair.Value);
 
 				if (lowestRows[movedPair.Value.Column] == movedPair.Value.Row) {
-					EmitFallHitEffectAt(GridToWorldBottomCenter(movedPair.Value));
+					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(movedPair.Value));
 				}
 
 				if (visualsBlock.IsHighlighted && movedPair.Value.Row < m_PlayableArea.Row) {
@@ -475,22 +494,24 @@ namespace TetrisTower.Visuals
 			m_PlacedShapeToBeReused = shape;
 		}
 
-
-		private void EmitFallHitEffectAt(Vector3 worldPosition)
+		private void EmitParticlesAt(ParticleSystem particleSystem, Vector3 worldPosition)
 		{
-			FallHitEffect.transform.position = worldPosition;
+			if (particleSystem == null)
+				return;
+
+			particleSystem.transform.position = worldPosition;
 			Vector3 direction = worldPosition - transform.position;
 			direction.y = 0;
-			FallHitEffect.transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+			particleSystem.transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
 
-			var burst = FallHitEffect.emission.GetBurst(0);
+			var burst = particleSystem.emission.GetBurst(0);
 
 			int count = (int)burst.count.constant;
 			if (burst.count.mode == ParticleSystemCurveMode.TwoConstants) {
 				count = (int)Random.Range(burst.count.constantMin, burst.count.constantMax);
 			}
 
-			FallHitEffect.Emit(count);
+			particleSystem.Emit(count);
 		}
 
 		// Gather the lowest found rows so we can spawn particles underneath.
@@ -582,7 +603,7 @@ namespace TetrisTower.Visuals
 					if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
 						continue;
 
-					var position = GridToWorldFrontSideMidpoint(coords);
+					var position = GridToWorldFrontEdgeMidpoint(coords);
 					position.y -= 1f;
 
 					UnityEditor.Handles.Label(position, coords.Column.ToString(), m_GizmoCoordsStyle);
