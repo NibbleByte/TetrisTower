@@ -135,6 +135,7 @@ MonoBehaviour:
   SpeedCatchupRotation: 30
   ChaseSpeed: 90
   ChaseRotation: 20
+  ChaseEndDelay: 0.08
 --- !u!96 &6884260518412779626
 TrailRenderer:
   serializedVersion: 2
@@ -180,35 +181,35 @@ TrailRenderer:
   m_Time: 0.6
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.8
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
         value: 1
-        inSlope: 0
-        outSlope: 0
+        inSlope: -0.5523431
+        outSlope: -0.5523431
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.33333334
+        outWeight: 0.18411553
       - serializedVersion: 3
         time: 1
-        value: 0.2
-        inSlope: -1.5557151
-        outSlope: -1.5557151
+        value: 0.25
+        inSlope: -0.83837765
+        outSlope: -0.83837765
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.08937204
+        inWeight: 0.17689532
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 0.05882353}
+      key0: {r: 1, g: 1, b: 1, a: 0.3137255}
+      key1: {r: 1, g: 1, b: 1, a: 0.11764706}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}

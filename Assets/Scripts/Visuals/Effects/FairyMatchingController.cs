@@ -14,6 +14,7 @@ namespace TetrisTower.Visuals.Effects
 
 		public float ChaseSpeed = 12;
 		public float ChaseRotation = 16;
+		public float ChaseEndDelay = 0.2f;
 
 		public Transform[] RestPoints { get; private set; }
 
@@ -28,6 +29,7 @@ namespace TetrisTower.Visuals.Effects
 
 		private Vector3? m_ChasePos;
 		private Vector3? m_ChasePosWaypoint;
+		private float m_ChaseEndDuration = 0;
 
 		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius)
 		{
@@ -63,6 +65,7 @@ namespace TetrisTower.Visuals.Effects
 		public IEnumerator ChaseTo(Vector3 chasePos)
 		{
 			m_ChasePos = chasePos;
+			m_ChaseEndDuration = 0f;
 
 			Vector3 dist = m_ChasePos.Value - transform.position;
 			Vector3 bumpPoint = transform.position + dist * 0.5f;
@@ -136,9 +139,14 @@ namespace TetrisTower.Visuals.Effects
 			}
 
 			if (Vector3.Distance(transform.position, m_ChasePos.Value) < 0.2f) {
-				m_Speed = ChaseSpeed * 0.3f;
-				m_ChasePos = null;
-				m_ChasePosWaypoint = null;
+				m_ChaseEndDuration += Time.deltaTime;
+
+				if (m_ChaseEndDuration >= ChaseEndDelay) {
+					m_Speed = ChaseSpeed * 0.3f;
+					m_ChasePos = null;
+					m_ChasePosWaypoint = null;
+					m_ChaseEndDuration = 0f;
+				}
 				return;
 			}
 		}

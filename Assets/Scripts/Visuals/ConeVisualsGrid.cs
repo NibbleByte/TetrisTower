@@ -348,7 +348,10 @@ namespace TetrisTower.Visuals
 				GridCoords coord = coords[i];
 
 				if (m_Fairy) {
-					yield return m_Fairy.ChaseTo(GridToWorldFrontCenter(coord));
+					Vector3 frontCenter = GridToWorldFrontCenter(coord);
+					// Move a bit forward from the block front face, so light looks good.
+					frontCenter += (frontCenter - new Vector3(transform.position.x, frontCenter.y, transform.position.z)).normalized * 0.1f;
+					yield return m_Fairy.ChaseTo(frontCenter);
 				}
 
 				var visualsBlock = this[coord];
