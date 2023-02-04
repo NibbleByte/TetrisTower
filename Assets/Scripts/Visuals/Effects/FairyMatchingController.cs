@@ -146,6 +146,11 @@ namespace TetrisTower.Visuals.Effects
 					m_ChasePos = null;
 					m_ChasePosWaypoint = null;
 					m_ChaseEndDuration = 0f;
+
+					// Head away from the tower.
+					Vector3 center = m_TowerBaseCenter;
+					center.y = transform.position.y;
+					m_Heading = (transform.position - center).normalized;
 				}
 				return;
 			}
