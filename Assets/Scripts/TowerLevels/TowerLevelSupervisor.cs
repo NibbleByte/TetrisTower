@@ -121,6 +121,14 @@ namespace TetrisTower.TowerLevels
 					overrideEffects.Override(levelController.GetComponentInChildren<TowerConeVisualsController>());
 				}
 
+
+				var overrideFairy = placeholder.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
+				if (overrideFairy) {
+					var fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
+					overrideFairy.transform.SetParent(fairy.transform.parent, false);
+					GameObject.DestroyImmediate(fairy.gameObject);
+				}
+
 				// Clean any leftovers in the placeholder (for example, temporary camera).
 				placeholder.transform.DestroyChildren(true);
 			}

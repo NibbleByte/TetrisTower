@@ -1,0 +1,5 @@
+
+Notes on rendering configuration:
+- The mobile rendering data excludes SSAO as it is too heavy for those platforms.
+- The rendering data has a RenderObjects feature set to render all "TransparentFX" objects at BeforeRenderingPostProcessing so transparent objects in the W_Atlantis level work properly.
+  Read more about the transparent underwater issue here: https://crest.readthedocs.io/en/stable/user/rendering.html?rp=urp#transparent-object-underwater

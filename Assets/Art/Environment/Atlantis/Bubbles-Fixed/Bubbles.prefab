@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4024541923486603594}
   - component: {fileID: 4024541923486603592}
   - component: {fileID: 4024541923486603595}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: Bubbles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +223,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 1, b: 1, a: 1}
+      maxColor: {r: 0.72156864, g: 0.827451, b: 0.9019608, a: 0.9019608}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -867,7 +867,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 15
+      scalar: 8
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -1322,7 +1322,7 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 49151
+        atime1: 7132
         atime2: 65535
         atime3: 0
         atime4: 0
