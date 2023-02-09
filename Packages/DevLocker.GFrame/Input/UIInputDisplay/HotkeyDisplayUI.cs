@@ -300,6 +300,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		private void SetAdditionalObjects(bool active)
 		{
+			// HACK: Cause Unity can sometimes miss those... just for old serialized data...
+			if (AdditionalObjectsToActivate == null)
+				return;
+
 			foreach(GameObject go in AdditionalObjectsToActivate) {
 				if (go) {
 					go.SetActive(active);
