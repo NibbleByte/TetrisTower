@@ -11,6 +11,7 @@ namespace TetrisTower.Visuals.Effects
 		public float IdleSpeed = 12;
 		public float RotationSpeed = 10;
 		public float SpeedCatchupRotation = 16;
+		public float IdleRestPointTimeout = 2f;
 
 		public float ChaseSpeed = 12;
 		public float ChaseRotation = 16;
@@ -19,6 +20,7 @@ namespace TetrisTower.Visuals.Effects
 		public Transform[] RestPoints { get; private set; }
 
 		private Transform m_CurrentRestPoint = null;
+		private float m_CurrentRestPointTime = 0f;
 		private Vector3 m_Heading;
 		private float m_Speed;
 
@@ -82,12 +84,21 @@ namespace TetrisTower.Visuals.Effects
 
 		private void IdleUpdate()
 		{
-			if (Vector3.Distance(transform.position, m_CurrentRestPoint.position) < 0.2f) {
+			if (m_CurrentRestPointTime > IdleRestPointTimeout) {
+				Debug.LogError(m_CurrentRestPointTime.ToString());
+			}
+
+			if (Vector3.Distance(transform.position, m_CurrentRestPoint.position) < 0.2f || m_CurrentRestPointTime > IdleRestPointTimeout) {
 				var leftPoints = RestPoints.ToList();
 				leftPoints.Remove(m_CurrentRestPoint);
 
 				m_CurrentRestPoint = leftPoints[UnityEngine.Random.Range(0, leftPoints.Count)];
+				m_CurrentRestPointTime = 0f;
+
+			} else {
+				m_CurrentRestPointTime += Time.deltaTime;
 			}
+
 
 			Vector3 dist = m_CurrentRestPoint.position - transform.position;
 			Vector3 dir = dist.normalized;
@@ -112,7 +123,10 @@ namespace TetrisTower.Visuals.Effects
 				rotateSpeed = RotationSpeed * 4;
 
 				Debug.DrawLine(targetWaypoint, targetWaypoint + Vector3.up * 2, Color.red);
+
+				m_CurrentRestPointTime = 0;
 			}
+
 
 			m_Heading = Vector3.RotateTowards(m_Heading, dir, rotateSpeed * Time.deltaTime, float.MaxValue);
 
@@ -151,6 +165,8 @@ namespace TetrisTower.Visuals.Effects
 					Vector3 center = m_TowerBaseCenter;
 					center.y = transform.position.y;
 					m_Heading = (transform.position - center).normalized;
+
+					m_CurrentRestPointTime = 0f;
 				}
 				return;
 			}
