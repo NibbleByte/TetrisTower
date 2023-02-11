@@ -24,6 +24,9 @@ namespace TetrisTower.Game
 
 		private void OnValidate()
 		{
+			if (UnityEditor.EditorApplication.isUpdating)
+				return;
+
 			if (m_PlayerData != null) {
 				GameConfig gameConfig = GameConfig.FindDefaultConfig();
 				m_PlayerData.Validate(gameConfig.AssetsRepository, this);

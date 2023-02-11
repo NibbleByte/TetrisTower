@@ -10,6 +10,8 @@ Material:
   m_Name: ParticleDuststorm
   m_Shader: {fileID: 4800000, guid: 0406db5a14f94604a8c57ccfbc9f3b46, type: 3}
   m_ValidKeywords:
+  - _FADING_ON
+  - _SOFTPARTICLES_ON
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords:
   - _FLIPBOOKBLENDING_OFF
@@ -71,19 +73,19 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 0
     - _Smoothness: 0
-    - _SoftParticlesEnabled: 0
+    - _SoftParticlesEnabled: 1
     - _SoftParticlesFarFadeDistance: 1
     - _SoftParticlesNearFadeDistance: 0
     - _SrcBlend: 5
     - _Surface: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.8, g: 0.74509805, b: 0.68235296, a: 0.4}
+    - _BaseColor: {r: 0.801, g: 0.664424, b: 0.498318, a: 0.78039217}
     - _BaseColorAddSubDiff: {r: 1, g: 0, b: 0, a: 0}
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
-    - _Color: {r: 0.8, g: 0.74509805, b: 0.68235296, a: 0.4}
+    - _Color: {r: 0.8509804, g: 0.7039929, b: 0.5276078, a: 0.8}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
+    - _SoftParticleFadeParams: {r: 0, g: 1, b: 0, a: 0}
     - _TintColor: {r: 0.8014706, g: 0.74457103, b: 0.6836073, a: 0.07058824}
   m_BuildTextureStacks: []
 --- !u!1002 &2100001
