@@ -84,10 +84,6 @@ namespace TetrisTower.Visuals.Effects
 
 		private void IdleUpdate()
 		{
-			if (m_CurrentRestPointTime > IdleRestPointTimeout) {
-				Debug.LogError(m_CurrentRestPointTime.ToString());
-			}
-
 			if (Vector3.Distance(transform.position, m_CurrentRestPoint.position) < 0.2f || m_CurrentRestPointTime > IdleRestPointTimeout) {
 				var leftPoints = RestPoints.ToList();
 				leftPoints.Remove(m_CurrentRestPoint);
@@ -174,6 +170,10 @@ namespace TetrisTower.Visuals.Effects
 
 		void Update()
 		{
+			// Not initialized yet...
+			if (m_CurrentRestPoint == null)
+				return;
+
 			if (m_ChasePos.HasValue) {
 				ChaseUpdate();
 			} else {
@@ -181,10 +181,11 @@ namespace TetrisTower.Visuals.Effects
 			}
 		}
 
-		void LateUpdate()
-		{
-			transform.LookAt(Camera.main.transform);
-		}
+		// Not needed anymore.
+		//void LateUpdate()
+		//{
+		//	transform.LookAt(Camera.main.transform);
+		//}
 	}
 
 }
