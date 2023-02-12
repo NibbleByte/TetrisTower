@@ -4,6 +4,7 @@ using TetrisTower.Core;
 using TetrisTower.Logic;
 using UnityEngine;
 using System.Linq;
+using DevLocker.Utils;
 
 namespace TetrisTower.Game
 {
@@ -22,8 +23,10 @@ namespace TetrisTower.Game
 
 		public BlocksSkinSet DefaultBlocksSet;
 
-		public GameObject[] UIPrefabs;
+		public SceneReference BootScene;
+		public SceneReference BootSceneMobile;
 
+		public GameObject[] UIPrefabs;
 		public GameObject[] UIPrefabsMobile;
 
 		public InputBindingDisplayAsset[] BindingDisplayAssets;

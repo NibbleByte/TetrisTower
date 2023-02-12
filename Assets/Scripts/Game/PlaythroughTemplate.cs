@@ -33,6 +33,8 @@ namespace TetrisTower.Game
 			}
 		}
 
+		public PlaythroughData __GetPlaythroughData() => m_PlayerData;
+
 		// Just modify the hard-coded array. Copy one from the unit tests.
 		[ContextMenu("Setup From Array")]
 		void SetupFromArray()
