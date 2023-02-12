@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
+using DevLocker.Utils;
 using System;
 using System.Collections;
 using System.Threading.Tasks;
@@ -21,8 +22,13 @@ namespace TetrisTower.HomeScreen
 				MessageBox.Instance.ForceCloseAllMessages();
 			}
 
-			if (SceneManager.GetActiveScene().name != "HomeScreenScene") {
-				var loadOp = SceneManager.LoadSceneAsync("HomeScreenScene", LoadSceneMode.Single);
+			SceneReference scene = Platforms.PlatformsUtils.IsMobileOrSimulator
+				? gameContext.GameConfig.BootSceneMobile
+				: gameContext.GameConfig.BootScene
+				;
+
+			if (SceneManager.GetActiveScene().name != scene.SceneName) {
+				var loadOp = SceneManager.LoadSceneAsync(scene.SceneName, LoadSceneMode.Single);
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
