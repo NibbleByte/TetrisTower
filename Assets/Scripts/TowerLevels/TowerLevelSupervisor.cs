@@ -139,8 +139,14 @@ namespace TetrisTower.TowerLevels
 
 			var uiController = GameObject.FindObjectOfType<UI.TowerLevelUIController>(true);
 			if (uiController == null) {
-				foreach(GameObject prefab in gameContext.GameConfig.UIPrefabs) {
+				GameObject[] uiPrefabs = Platforms.PlatformsUtils.IsMobileOrSimulator
+					? gameContext.GameConfig.UIPrefabsMobile
+					: gameContext.GameConfig.UIPrefabs
+					;
+
+				foreach (GameObject prefab in uiPrefabs) {
 					var instance = GameObject.Instantiate<GameObject>(prefab);
+					instance.name = prefab.name;
 
 					if (uiController == null) {
 						uiController = instance.GetComponent<UI.TowerLevelUIController>();

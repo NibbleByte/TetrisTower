@@ -24,6 +24,8 @@ namespace TetrisTower.Game
 
 		public GameObject[] UIPrefabs;
 
+		public GameObject[] UIPrefabsMobile;
+
 		public InputBindingDisplayAsset[] BindingDisplayAssets;
 
 		public float FallSpeedup = 40f;
