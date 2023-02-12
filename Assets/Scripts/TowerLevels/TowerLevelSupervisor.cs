@@ -83,7 +83,7 @@ namespace TetrisTower.TowerLevels
 
 				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 
-				Light overrideBlocksLight = placeholder.transform.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
+				Light overrideBlocksLight = placeholder.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 				if (overrideBlocksLight) {
 					Light blocksLight = levelController.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 					overrideBlocksLight.transform.SetParent(blocksLight.transform.parent, false);
@@ -99,9 +99,9 @@ namespace TetrisTower.TowerLevels
 					GameObject.DestroyImmediate(camera.transform.parent.gameObject);
 				}
 
-				Transform[] overrideDecors = placeholder.transform.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
+				Transform[] overrideDecors = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
 				if (overrideDecors.Length != 0) {
-					Transform[] decors = levelController.transform.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
+					Transform[] decors = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
 
 					foreach(Transform overrideDecor in overrideDecors) {
 						overrideDecor.SetParent(levelController.transform, true);
@@ -121,6 +121,23 @@ namespace TetrisTower.TowerLevels
 					overrideEffects.Override(levelController.GetComponentInChildren<TowerConeVisualsController>());
 				}
 
+
+				Transform[] overrideRestPoints = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToArray();
+				if (overrideRestPoints.Length != 0) {
+					Transform[] restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToArray();
+
+					if (restPoints.Length != 0) {
+						foreach (Transform overrideDecor in overrideRestPoints) {
+							overrideDecor.SetParent(restPoints[0].parent, true); // Assume all have the same parent.
+						}
+
+						foreach (Transform decor in restPoints) {
+							GameObject.DestroyImmediate(decor.gameObject);
+						}
+					} else {
+						Debug.LogError("No rest points found in the instantiated level controller!", levelController);
+					}
+				}
 
 				var overrideFairy = placeholder.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
 				if (overrideFairy) {
