@@ -46,12 +46,12 @@ namespace TetrisTower.GameStarter
 			var supervisorManager = gameObject.AddComponent<GameManager>();
 			supervisorManager.SetGameContext(GameContext);
 
-#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-			Application.targetFrameRate = Screen.currentResolution.refreshRate;		// Max possible FPS.
-			//Application.targetFrameRate = -1;										// Defaults to 30 FPS to save battery.
-#else
-			Application.targetFrameRate = 60;
-#endif
+			if (Platforms.PlatformsUtils.IsMobile) {
+				Application.targetFrameRate = Screen.currentResolution.refreshRate;		// Max possible FPS.
+				//Application.targetFrameRate = -1;										// Defaults to 30 FPS to save battery.
+			} else {
+				Application.targetFrameRate = 60;
+			}
 		}
 
 		void Start()

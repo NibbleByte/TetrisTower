@@ -200,11 +200,11 @@ namespace TetrisTower.Game
 
 		public SceneReference GetAppropriateBackgroundScene()
 		{
-#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-			return BackgroundSceneMobile.IsEmpty ? BackgroundScene : BackgroundSceneMobile;
-#else
-			return BackgroundScene;
-#endif
+			if (Platforms.PlatformsUtils.IsMobile) {
+				return BackgroundSceneMobile.IsEmpty ? BackgroundScene : BackgroundSceneMobile;
+			} else {
+				return BackgroundScene;
+			}
 		}
 
 		public GridLevelData GenerateTowerLevelData(GameConfig config, PlaythroughData playthrough)

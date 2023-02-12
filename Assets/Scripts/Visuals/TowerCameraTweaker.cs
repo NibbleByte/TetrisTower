@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using TetrisTower.Game;
+using TetrisTower.Platforms;
 using UnityEngine;
 
 namespace TetrisTower.Visuals
@@ -21,9 +21,12 @@ namespace TetrisTower.Visuals
 		private void Awake()
 		{
 			m_InitialZ = transform.localPosition.z;
+
+			if (!PlatformsUtils.IsMobile && !PlatformsUtils.IsEditor) {
+				enabled = false;
+			}
 		}
 
-#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
 		void Update()
 		{
 
@@ -31,14 +34,11 @@ namespace TetrisTower.Visuals
 
 				Vector3 pos = transform.localPosition;
 
-#if UNITY_EDITOR
-				// If normal game window, consider it a PC. If dpi is different - we are simulating phone screen.
-				if (Screen.dpi <= InputMetrics.DefaultDPIForPC ) {
+				if (!PlatformsUtils.IsMobileOrSimulator) {
 					pos.z = m_InitialZ;
 					transform.localPosition = pos;
 					return;
 				}
-#endif
 
 				float ratio = (float)Screen.width / Screen.height;
 
@@ -58,7 +58,6 @@ namespace TetrisTower.Visuals
 				m_ScreenPrevHeight = Screen.height;
 			}
 		}
-#endif
 
 		private void OnValidate()
 		{
