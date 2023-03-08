@@ -1575,6 +1575,7 @@ GameObject:
   - component: {fileID: 5836640995107078600}
   - component: {fileID: 5836640995107078598}
   - component: {fileID: 5836640995107078599}
+  - component: {fileID: 7237865542311609168}
   m_Layer: 5
   m_Name: PausedPanel
   m_TagString: Untagged
@@ -1675,6 +1676,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TouchInputType: {fileID: 5836640995778915848}
+--- !u!114 &7237865542311609168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640995107078602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 4757464412193887359}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme:
+  - Gamepad
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &5836640995252584296
 GameObject:
   m_ObjectHideFlags: 0
@@ -2239,6 +2258,7 @@ GameObject:
   - component: {fileID: 5836640996391399454}
   - component: {fileID: 515308325594576808}
   - component: {fileID: 5836640996391399452}
+  - component: {fileID: 8285624101363596056}
   m_Layer: 5
   m_Name: LevelFinished
   m_TagString: Untagged
@@ -2349,6 +2369,24 @@ MonoBehaviour:
   BonusRatioText: {fileID: 553543741779820993}
   RemainingText: {fileID: 0}
   RulesText: {fileID: 0}
+--- !u!114 &8285624101363596056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640996391399424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 4757464412371532069}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme:
+  - Gamepad
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &5932794371714255677
 GameObject:
   m_ObjectHideFlags: 0
@@ -3543,19 +3581,6 @@ MonoBehaviour:
   Player: 0
   SkipHotkey: 0
   m_InputAction: {fileID: 1797235489119140995, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
---- !u!114 &5836640994754793478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4757464412193887357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
 --- !u!114 &5836640994754793479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3566,6 +3591,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6cc1b04b633e9af47807fdcf8c4e7d74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4757464412193887359 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
+  m_PrefabInstance: {fileID: 5836640994754793483}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4757464412193887357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &5836640994912714065
@@ -3701,24 +3737,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
---- !u!1 &4757464412371532071 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1367408335253832822, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
+--- !u!114 &4757464412371532069 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
   m_PrefabInstance: {fileID: 5836640994912714065}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &792621327589303865
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4757464412371532071}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PersistentSelection: 0
 --- !u!1001 &5836640994999684187
 PrefabInstance:
   m_ObjectHideFlags: 0

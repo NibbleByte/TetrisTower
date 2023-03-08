@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 1268881109800414550}
   - component: {fileID: 1268881109800414548}
   - component: {fileID: 1268881109800414549}
+  - component: {fileID: 1068605576635113298}
   m_Layer: 5
   m_Name: OptionsPanel
   m_TagString: Untagged
@@ -315,6 +316,7 @@ MonoBehaviour:
   EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
+  IsRoot: 0
 --- !u!114 &1268881109800414549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,6 +333,24 @@ MonoBehaviour:
   VSyncToggle: {fileID: 1268881110833372330}
   MusicToggle: {fileID: 1268881111400655130}
   SoundToggle: {fileID: 1268881111081535075}
+--- !u!114 &1068605576635113298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268881109800414544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 821960843856060531}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme:
+  - Gamepad
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &1268881109884049377
 GameObject:
   m_ObjectHideFlags: 0
@@ -2363,24 +2383,22 @@ MonoBehaviour:
   Player: 0
   SkipHotkey: 2
   m_InputAction: {fileID: -545284412596635738, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
---- !u!114 &6801818895604099432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821960843856060529}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
 --- !u!224 &821960843856060530 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1367408335253832821, guid: dbe8c541d967b2643882f3d7b2382d51, type: 3}
   m_PrefabInstance: {fileID: 1842592004947878919}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &821960843856060531 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1367408335253832820, guid: dbe8c541d967b2643882f3d7b2382d51, type: 3}
+  m_PrefabInstance: {fileID: 1842592004947878919}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821960843856060529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2169638555866475505
 PrefabInstance:
   m_ObjectHideFlags: 0

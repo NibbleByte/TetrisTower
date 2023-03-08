@@ -110,7 +110,7 @@ namespace DevLocker.GFrame.Input
 
 		public InputAction FindActionFor(PlayerIndex playerIndex, string actionNameOrId, bool throwIfNotFound = false)
 		{
-			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
+			if (playerIndex > PlayerIndex.Player0)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
 			return PlayerInput.actions.FindAction(actionNameOrId, throwIfNotFound);
@@ -146,7 +146,7 @@ namespace DevLocker.GFrame.Input
 
 		public InputDevice GetLastUsedInputDevice(PlayerIndex playerIndex)
 		{
-			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
+			if (playerIndex > PlayerIndex.Player0)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
 			return m_LastUsedDevice;
@@ -154,7 +154,7 @@ namespace DevLocker.GFrame.Input
 
 		public InputControlScheme GetLastUsedInputControlScheme(PlayerIndex playerIndex)
 		{
-			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
+			if (playerIndex > PlayerIndex.Player0)
 				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
 
 			return m_LastUsedControlScheme;

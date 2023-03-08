@@ -156,7 +156,6 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Find InputAction by action name or id for specific player.
 		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
-		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
 		InputAction FindActionFor(PlayerIndex playerIndex, string actionNameOrId, bool throwIfNotFound = false);
 
@@ -206,14 +205,12 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Get last updated device for specified player.
 		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
-		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
 		InputDevice GetLastUsedInputDevice(PlayerIndex playerIndex);
 
 		/// <summary>
 		/// Get last used <see cref="InputControlScheme" /> for specified player.
 		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
-		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// NOTE: If no devices used, empty control scheme will be returned.
 		/// </summary>
 		InputControlScheme GetLastUsedInputControlScheme(PlayerIndex playerIndex);

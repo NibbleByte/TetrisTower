@@ -2390,7 +2390,6 @@ GameObject:
   m_Component:
   - component: {fileID: 179159743}
   - component: {fileID: 179159745}
-  - component: {fileID: 179159744}
   m_Layer: 5
   m_Name: StereoToggle
   m_TagString: Untagged
@@ -2420,20 +2419,6 @@ RectTransform:
   m_AnchoredPosition: {x: 100, y: -118.4}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &179159744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 179159742}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
-  ClearSelectionOnDisable: 1
 --- !u!114 &179159745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5078,7 +5063,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Focusing a UIScope activates it and all its'' parent scopes, enabling
     the controlled IScopeElement components. This sometimes may be an undesired effect.
-    Example: main top-level sreen has scopes with hotkeys that open child panels
+    Example: main top-level screen has scopes with hotkeys that open child panels
     - the children should override the hotkeys of the main screen. In such cases
     you can set the child top-level scope as "Root". This will limit the focused
     scope activations up to that one or top is reached.
@@ -6834,6 +6819,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 401357470}
+  - component: {fileID: 401357471}
   m_Layer: 5
   m_Name: GameplayContent
   m_TagString: Untagged
@@ -6862,6 +6848,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &401357471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401357469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 979707328}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &405241815
 GameObject:
   m_ObjectHideFlags: 0
@@ -9388,7 +9392,6 @@ GameObject:
   m_Component:
   - component: {fileID: 523239559}
   - component: {fileID: 523239561}
-  - component: {fileID: 523239560}
   m_Layer: 5
   m_Name: Toggle
   m_TagString: Untagged
@@ -9418,19 +9421,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -25}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &523239560
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 523239558}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
 --- !u!114 &523239561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10572,7 +10562,7 @@ MonoBehaviour:
 
 
     Note: everytime this page is displayed,
-    the first toggle will be automatically selected. This is achieved by another
+    the first toggle will be automatically selected. This is achieved by the SelectionController 
     component.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -12658,6 +12648,7 @@ GameObject:
   - component: {fileID: 707024439}
   - component: {fileID: 707024438}
   - component: {fileID: 707024437}
+  - component: {fileID: 707024440}
   m_Layer: 5
   m_Name: NavigationGroupPanel
   m_TagString: Untagged
@@ -12751,6 +12742,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 707024435}
   m_CullTransparentMesh: 1
+--- !u!114 &707024440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707024435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 845707173}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &708464784
 GameObject:
   m_ObjectHideFlags: 0
@@ -14472,7 +14480,6 @@ GameObject:
   m_Component:
   - component: {fileID: 780555684}
   - component: {fileID: 780555686}
-  - component: {fileID: 780555687}
   m_Layer: 5
   m_Name: MuteToggle
   m_TagString: Untagged
@@ -14550,20 +14557,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
---- !u!114 &780555687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 780555683}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
-  ClearSelectionOnDisable: 1
 --- !u!1 &787096632
 GameObject:
   m_ObjectHideFlags: 0
@@ -16240,7 +16233,6 @@ GameObject:
   m_Component:
   - component: {fileID: 845707171}
   - component: {fileID: 845707173}
-  - component: {fileID: 845707172}
   m_Layer: 5
   m_Name: Toggle
   m_TagString: Untagged
@@ -16270,19 +16262,6 @@ RectTransform:
   m_AnchoredPosition: {x: -60, y: -25}
   m_SizeDelta: {x: 80, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &845707172
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 845707170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
 --- !u!114 &845707173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19154,7 +19133,6 @@ GameObject:
   - component: {fileID: 979707330}
   - component: {fileID: 979707329}
   - component: {fileID: 979707328}
-  - component: {fileID: 979707331}
   m_Layer: 5
   m_Name: Difficulty
   m_TagString: Untagged
@@ -19282,20 +19260,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 979707326}
   m_CullTransparentMesh: 1
---- !u!114 &979707331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 979707326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
-  ClearSelectionOnDisable: 1
 --- !u!1 &981790159
 GameObject:
   m_ObjectHideFlags: 0
@@ -23185,6 +23149,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1196320993}
+  - component: {fileID: 1196320994}
   m_Layer: 5
   m_Name: GraphicsContent
   m_TagString: Untagged
@@ -23215,6 +23180,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1196320994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196320992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 1725207028}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &1214150327
 GameObject:
   m_ObjectHideFlags: 0
@@ -29478,6 +29461,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1481851908}
+  - component: {fileID: 1481851909}
   m_Layer: 5
   m_Name: AudioContent
   m_TagString: Untagged
@@ -29509,6 +29493,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1481851909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1481851907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 780555686}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &1485287079
 GameObject:
   m_ObjectHideFlags: 0
@@ -34055,7 +34057,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1725207027}
   - component: {fileID: 1725207028}
-  - component: {fileID: 1725207029}
   m_Layer: 5
   m_Name: VSyncToggle
   m_TagString: Untagged
@@ -34133,20 +34134,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
---- !u!114 &1725207029
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1725207026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
-  ClearSelectionOnDisable: 1
 --- !u!1 &1730321164
 GameObject:
   m_ObjectHideFlags: 0
@@ -34573,6 +34560,7 @@ GameObject:
   - component: {fileID: 1743657239}
   - component: {fileID: 1743657238}
   - component: {fileID: 1743657237}
+  - component: {fileID: 1743657240}
   m_Layer: 5
   m_Name: SelectionsPanel
   m_TagString: Untagged
@@ -34663,6 +34651,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1743657235}
   m_CullTransparentMesh: 1
+--- !u!114 &1743657240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743657235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 523239561}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &1753969374
 GameObject:
   m_ObjectHideFlags: 0

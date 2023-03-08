@@ -193,6 +193,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 1332669761}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!114 &1659193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,6 +222,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 936201677}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!1 &97753992
 GameObject:
   m_ObjectHideFlags: 0
@@ -831,6 +833,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 1628424256}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!114 &318219085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -859,6 +862,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 1365124316}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!1 &334952919
 GameObject:
   m_ObjectHideFlags: 0
@@ -1334,6 +1338,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 2058897299}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!114 &440074263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1362,6 +1367,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 2127293146}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!1 &554001643
 GameObject:
   m_ObjectHideFlags: 0
@@ -3512,6 +3518,7 @@ MonoBehaviour:
   EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
+  IsRoot: 0
 --- !u!1 &1306513263
 GameObject:
   m_ObjectHideFlags: 0
@@ -3658,6 +3665,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 334952923}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!114 &1318878026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3686,6 +3694,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 1061343406}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!1 &1332669757
 GameObject:
   m_ObjectHideFlags: 0
@@ -4336,6 +4345,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 812291148}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!114 &1444108440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4364,6 +4374,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 2134122524}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!1 &1558155515
 GameObject:
   m_ObjectHideFlags: 0
@@ -4513,7 +4524,6 @@ GameObject:
   - component: {fileID: 1612941644}
   - component: {fileID: 1612941647}
   - component: {fileID: 1612941649}
-  - component: {fileID: 1612941648}
   m_Layer: 5
   m_Name: ResumeButton
   m_TagString: Untagged
@@ -4639,19 +4649,6 @@ MonoBehaviour:
   Player: 0
   SkipHotkey: 0
   m_InputAction: {fileID: 1797235489119140995, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
---- !u!114 &1612941648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1612941642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
 --- !u!114 &1612941649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4734,6 +4731,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 1926903281}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!114 &1613478103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4762,6 +4760,7 @@ MonoBehaviour:
   TextMeshProText: {fileID: 680102560}
   UseShortText: 0
   FormatText: 
+  AdditionalObjectsToActivate: []
 --- !u!1 &1628424252
 GameObject:
   m_ObjectHideFlags: 0
@@ -5151,6 +5150,7 @@ GameObject:
   - component: {fileID: 1698978887}
   - component: {fileID: 1698978886}
   - component: {fileID: 1698978888}
+  - component: {fileID: 1698978889}
   m_Layer: 5
   m_Name: PausedPanel
   m_TagString: Untagged
@@ -5239,6 +5239,24 @@ MonoBehaviour:
   EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
+  IsRoot: 0
+--- !u!114 &1698978889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1698978884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 1612941644}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &1796854669
 GameObject:
   m_ObjectHideFlags: 0

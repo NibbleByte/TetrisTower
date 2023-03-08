@@ -1302,6 +1302,7 @@ GameObject:
   - component: {fileID: 533048045}
   - component: {fileID: 533048044}
   - component: {fileID: 533048046}
+  - component: {fileID: 533048047}
   m_Layer: 5
   m_Name: MainMenuPanel
   m_TagString: Untagged
@@ -1396,6 +1397,24 @@ MonoBehaviour:
   EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
+  IsRoot: 0
+--- !u!114 &533048047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 533048042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 879309883}
+  PersistentSelection: 1
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &540250531
 GameObject:
   m_ObjectHideFlags: 0
@@ -2025,7 +2044,6 @@ GameObject:
   - component: {fileID: 879309885}
   - component: {fileID: 879309884}
   - component: {fileID: 879309883}
-  - component: {fileID: 879309886}
   - component: {fileID: 879309887}
   m_Layer: 5
   m_Name: NewGameButton
@@ -2152,19 +2170,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 879309881}
   m_CullTransparentMesh: 1
---- !u!114 &879309886
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 879309881}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 1
 --- !u!114 &879309887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3081,6 +3086,7 @@ GameObject:
   - component: {fileID: 1221062998}
   - component: {fileID: 1221063000}
   - component: {fileID: 1221063001}
+  - component: {fileID: 1221063002}
   m_Layer: 5
   m_Name: NewGamePanel
   m_TagString: Untagged
@@ -3181,6 +3187,24 @@ MonoBehaviour:
   EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
+  IsRoot: 0
+--- !u!114 &1221063002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221062996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 2087059636}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &1263004218
 GameObject:
   m_ObjectHideFlags: 0
@@ -3194,7 +3218,6 @@ GameObject:
   - component: {fileID: 1263004221}
   - component: {fileID: 1263004220}
   - component: {fileID: 1263004223}
-  - component: {fileID: 1263004224}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -3334,19 +3357,6 @@ MonoBehaviour:
   Player: 0
   SkipHotkey: 0
   m_InputAction: {fileID: -7452923264383808493, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
---- !u!114 &1263004224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1263004218}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
 --- !u!1 &1297835251
 GameObject:
   m_ObjectHideFlags: 0
@@ -3834,6 +3844,7 @@ GameObject:
   - component: {fileID: 1624517867}
   - component: {fileID: 1624517866}
   - component: {fileID: 1624517868}
+  - component: {fileID: 1624517869}
   m_Layer: 5
   m_Name: CreditsPanel
   m_TagString: Untagged
@@ -3923,6 +3934,24 @@ MonoBehaviour:
   EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
+  IsRoot: 0
+--- !u!114 &1624517869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1624517864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartSelection: {fileID: 1263004220}
+  PersistentSelection: 0
+  NoSelectionAction: 8
+  FilterControlScheme: []
+  RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &1692576566
 GameObject:
   m_ObjectHideFlags: 0
@@ -5147,7 +5176,6 @@ GameObject:
   - component: {fileID: 2087059638}
   - component: {fileID: 2087059637}
   - component: {fileID: 2087059636}
-  - component: {fileID: 2087059640}
   m_Layer: 5
   m_Name: StartGameButton
   m_TagString: Untagged
@@ -5271,16 +5299,3 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2087059634}
   m_CullTransparentMesh: 1
---- !u!114 &2087059640
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2087059634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PersistentSelection: 0
