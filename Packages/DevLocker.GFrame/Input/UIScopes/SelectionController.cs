@@ -170,7 +170,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnValidate()
 		{
-			if (StartSelection == null && Application.isPlaying) {
+			if (StartSelection == null
+#if UNITY_EDITOR
+				&& (Application.isPlaying || UnityEditor.BuildPipeline.isBuildingPlayer)
+#else
+				&& Application.isPlaying
+#endif
+				) {
 				Debug.LogError($"{name} {nameof(SelectionController)} has no start selection set. Disabling!", this);
 				enabled = false;
 			}
