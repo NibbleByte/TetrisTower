@@ -46,7 +46,12 @@ namespace TetrisTower.GameStarter
 			var supervisorManager = gameObject.AddComponent<GameManager>();
 			supervisorManager.SetGameContext(GameContext);
 
+
 			if (Platforms.PlatformsUtils.IsMobile) {
+#if DEVELOPMENT_BUILD
+				gameObject.AddComponent<Tools.DebugLogDisplay>();	// Because Android doesn't display dev console on errors. Have to use Logcat.
+#endif
+
 				Application.targetFrameRate = Screen.currentResolution.refreshRate;		// Max possible FPS.
 				//Application.targetFrameRate = -1;										// Defaults to 30 FPS to save battery.
 			} else {
