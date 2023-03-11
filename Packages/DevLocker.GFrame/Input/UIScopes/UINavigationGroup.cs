@@ -82,6 +82,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public NavigationMode Navigation = NavigationMode.Grid;
 
+		[Tooltip("Skip navigation wrapping if last move happened sooner than this threshold. Useful for stopping continues navigation before user wraps away the current group. 0 will not skip anything. 0.5 is a good value.")]
+		public float SkipWrapTimeTreshold = 0f;
+
 
 		[Tooltip("Include these selectables to navigation links, in addition to any group children.\nUseful to include special selectables from outside the group, but not all outsiders.")]
 		public List<Selectable> Include;
@@ -123,6 +126,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private Selectable m_FirstSelectable = null;
 		private Selectable m_LastSelectable = null;
+
+		private Dictionary<int, List<MoveDirection>> m_OwnedEdgeSelectableIds = new Dictionary<int, List<MoveDirection>>();
+
+		private float m_LastMove = -1f;
 
 		private GameObject m_CurrentSelectedObject;
 
@@ -208,6 +215,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 #endif
 
+			m_OwnedEdgeSelectableIds.Clear();
+
 			for (int i = 0; i < m_ManagedSelectables.Count; ++i) {
 				Selectable selectable = m_ManagedSelectables[i];
 
@@ -243,6 +252,11 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (outsideDown && outsideRight) {
 					m_LastSelectable = selectable;
 				}
+
+				if (outsideUp) RecordEdgeSelectable(selectable.gameObject, MoveDirection.Up);
+				if (outsideDown) RecordEdgeSelectable(selectable.gameObject, MoveDirection.Down);
+				if (outsideLeft) RecordEdgeSelectable(selectable.gameObject, MoveDirection.Left);
+				if (outsideRight) RecordEdgeSelectable(selectable.gameObject, MoveDirection.Right);
 
 				// Not one of ours? Don't link then!
 				if (outsideUp && !WrapUp.IsAutoMode) nav.selectOnUp = null;
@@ -375,6 +389,18 @@ namespace DevLocker.GFrame.Input.UIScope
 		}
 #endif
 
+		void RecordEdgeSelectable(GameObject go, MoveDirection direction)
+		{
+			int id = go.GetInstanceID();
+
+			if (!m_OwnedEdgeSelectableIds.TryGetValue(id, out List<MoveDirection> directions)) {
+				directions = new List<MoveDirection>();
+				m_OwnedEdgeSelectableIds.Add(id, directions);
+			}
+
+			directions.Add(direction);
+		}
+
 		void Update()
 		{
 			m_CurrentSelectedObject = EventSystem.current?.currentSelectedGameObject;
@@ -386,6 +412,18 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public void OnMove(AxisEventData eventData)
 		{
+			if (SkipWrapTimeTreshold > 0f) {
+				m_OwnedEdgeSelectableIds.TryGetValue(m_CurrentSelectedObject.GetInstanceID(), out List<MoveDirection> edgeDirections);
+
+				if (edgeDirections != null && edgeDirections.Contains(eventData.moveDir) && Time.time - m_LastMove <= SkipWrapTimeTreshold) {
+					eventData.selectedObject = m_CurrentSelectedObject;
+					m_LastMove = Time.time; // Still counts as move - prevent the following calls of continues navigation as well.
+					return;
+				}
+			}
+
+			m_LastMove = Time.time;
+
 			// OnMove() event is called AFTER selected was changed, so you want to skip the initial call.
 			// (they are rather called together, but Selectable.Navigate() is first and it doesn't use / consume the event).
 			if (m_CurrentSelectedObject != EventSystem.current?.currentSelectedGameObject)
