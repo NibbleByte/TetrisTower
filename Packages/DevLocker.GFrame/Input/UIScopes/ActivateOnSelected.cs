@@ -26,20 +26,28 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private GameObject m_LastSelectedObject;
 
-		private void Awake()
+		// Used for multiple event systems (e.g. split screen).
+		protected UIEventSystemRootObject.EventSystemLocator m_ESLocator;
+
+		void Awake()
 		{
 			if (!MultipleObjects && OnSelectedObject == null) {
 				OnSelectedObject = GetComponent<Selectable>();
 			}
 		}
 
+		void Start()
+		{
+			m_ESLocator = new UIEventSystemRootObject.EventSystemLocator(gameObject);
+		}
+
 		void Update()
 		{
-			if (EventSystem.current == null)
+			if (m_ESLocator.EventSystem == null)
 				return;
 
-			if (m_LastSelectedObject != EventSystem.current.currentSelectedGameObject) {
-				m_LastSelectedObject = EventSystem.current.currentSelectedGameObject;
+			if (m_LastSelectedObject != m_ESLocator.SelectedObject) {
+				m_LastSelectedObject = m_ESLocator.SelectedObject;
 
 				if (MultipleObjects) {
 					bool activate;

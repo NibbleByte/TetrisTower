@@ -131,7 +131,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private float m_LastMove = -1f;
 
-		private GameObject m_CurrentSelectedObject;
+		private GameObject m_LastSelectedObject;
+		private EventSystem m_CurrentEventSystem;
 
 		/// <summary>
 		/// Call this if you have added or removed child selectables and have <see cref="AutoScanForSelectables"/> disabled (no updates, no polling).
@@ -401,9 +402,17 @@ namespace DevLocker.GFrame.Input.UIScope
 			directions.Add(direction);
 		}
 
+		protected virtual GameObject GetCurrentlySelectedObject()
+		{
+			return m_CurrentEventSystem
+				? m_CurrentEventSystem.currentSelectedGameObject
+				: EventSystem.current?.currentSelectedGameObject
+				;
+		}
+
 		void Update()
 		{
-			m_CurrentSelectedObject = EventSystem.current?.currentSelectedGameObject;
+			m_LastSelectedObject = GetCurrentlySelectedObject();
 
 			if (AutoScanForSelectables) {
 				RescanSelectables();
@@ -412,11 +421,15 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public void OnMove(AxisEventData eventData)
 		{
+			// In case of multiple event system, movement will happen from the "current" that owns me.
+			// Used in split-screen setup.
+			m_CurrentEventSystem = EventSystem.current;
+
 			if (SkipWrapTimeTreshold > 0f) {
-				m_OwnedEdgeSelectableIds.TryGetValue(m_CurrentSelectedObject.GetInstanceID(), out List<MoveDirection> edgeDirections);
+				m_OwnedEdgeSelectableIds.TryGetValue(m_LastSelectedObject.GetInstanceID(), out List<MoveDirection> edgeDirections);
 
 				if (edgeDirections != null && edgeDirections.Contains(eventData.moveDir) && Time.time - m_LastMove <= SkipWrapTimeTreshold) {
-					eventData.selectedObject = m_CurrentSelectedObject;
+					eventData.selectedObject = m_LastSelectedObject;
 					m_LastMove = Time.time; // Still counts as move - prevent the following calls of continues navigation as well.
 					return;
 				}
@@ -426,10 +439,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			// OnMove() event is called AFTER selected was changed, so you want to skip the initial call.
 			// (they are rather called together, but Selectable.Navigate() is first and it doesn't use / consume the event).
-			if (m_CurrentSelectedObject != EventSystem.current?.currentSelectedGameObject)
+			if (m_LastSelectedObject != GetCurrentlySelectedObject())
 				return;
 
-			Selectable selectable = EventSystem.current?.currentSelectedGameObject?.GetComponent<Selectable>();
+			Selectable selectable = GetCurrentlySelectedObject()?.GetComponent<Selectable>();
 
 			if (eventData.used || !m_ManagedSelectables.Contains(selectable))
 				return;

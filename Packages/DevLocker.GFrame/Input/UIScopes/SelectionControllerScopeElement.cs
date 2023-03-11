@@ -14,8 +14,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			base.OnDisable();
 
-			if (ClearSelectionOnDisable && EventSystem.current) {
-				EventSystem.current.SetSelectedGameObject(null);
+			if (ClearSelectionOnDisable && m_ESLocator?.EventSystem != null) {
+				m_ESLocator.SetSelectedObject(null);
 			}
 		}
 	}
