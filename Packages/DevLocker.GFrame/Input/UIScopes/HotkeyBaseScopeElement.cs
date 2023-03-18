@@ -32,11 +32,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected List<InputAction> m_SubscribedActions = new List<InputAction>();
 
 		// Used for multiple event systems (e.g. split screen).
-		protected UIEventSystemRootObject.EventSystemLocator m_ESLocator;
+		protected UIPlayerRootObject m_PlayerUI;
 
-		protected virtual void Start()
+		protected virtual void Awake()
 		{
-			m_ESLocator = new UIEventSystemRootObject.EventSystemLocator(gameObject);
+			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
 		}
 
 		protected virtual void OnEnable()
@@ -84,7 +84,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputStarted(InputAction.CallbackContext obj)
 		{
-			var selected = m_ESLocator.SelectedObject;
+			var selected = m_PlayerUI.SelectedGameObject;
 
 			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected
@@ -114,7 +114,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputPerformed(InputAction.CallbackContext obj)
 		{
-			var selected = m_ESLocator.SelectedObject;
+			var selected = m_PlayerUI.SelectedGameObject;
 
 			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected
@@ -145,7 +145,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputCancel(InputAction.CallbackContext obj)
 		{
-			var selected = m_ESLocator.SelectedObject;
+			var selected = m_PlayerUI.SelectedGameObject;
 
 			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected

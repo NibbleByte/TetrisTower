@@ -14,27 +14,24 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GameObject m_LastSelectedObject;
 
 		// Used for multiple event systems (e.g. split screen).
-		protected UIEventSystemRootObject.EventSystemLocator m_ESLocator;
+		protected UIPlayerRootObject m_PlayerUI;
 
 		void Awake()
 		{
 			if (Scope == null) {
 				Scope = GetComponent<UIScope>();
 			}
-		}
 
-		void Start()
-		{
-			m_ESLocator = new UIEventSystemRootObject.EventSystemLocator(gameObject);
+			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
 		}
 
 		void Update()
 		{
-			if (m_ESLocator.EventSystem == null)
+			if (m_PlayerUI.EventSystem == null)
 				return;
 
-			if (m_LastSelectedObject != m_ESLocator.SelectedObject) {
-				m_LastSelectedObject = m_ESLocator.SelectedObject;
+			if (m_LastSelectedObject != m_PlayerUI.SelectedGameObject) {
+				m_LastSelectedObject = m_PlayerUI.SelectedGameObject;
 
 				if (!UIScope.IsScopeActive(Scope) && m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(transform)) {
 					Scope.ForceRefocusScope();

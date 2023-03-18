@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.EventSystems;
+using DevLocker.GFrame.Input.UIScope;
 
 namespace DevLocker.GFrame.SampleGame.Game
 {
@@ -51,6 +53,8 @@ namespace DevLocker.GFrame.SampleGame.Game
 			uiInputModule.actionsAsset = playerControls.asset;  // This will refresh the UI Input action references to the new asset.
 
 			playerInput.uiInputModule = uiInputModule;
+
+			UIPlayerRootObject.GlobalUIRootObject.SetupGlobal(uiInputModule.GetComponent<EventSystem>());
 
 			GameContext = new SampleGameContext(playerInput, playerControls, BindingDisplayAssets);
 

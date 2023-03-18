@@ -60,7 +60,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private List<Button> m_SubscribedTabButtons = new List<Button>();
 
 		// Used for multiple event systems (e.g. split screen).
-		protected UIEventSystemRootObject.EventSystemLocator m_ESLocator;
+		protected UIPlayerRootObject m_PlayerUI;
 
 		protected virtual void Awake()
 		{
@@ -76,11 +76,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			NextHotkey?.OnAction.AddListener(OnNextAction);
 			PreviousHotkey?.OnAction.AddListener(OnPreviousAction);
-		}
 
-		protected virtual void Start()
-		{
-			m_ESLocator = new UIEventSystemRootObject.EventSystemLocator(gameObject);
+			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
 		}
 
 		/// <summary>
@@ -193,7 +190,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				;
 
 			if (lastIndex != nextIndex) {
-				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_ESLocator.EventSystem), ExecuteEvents.pointerClickHandler);
+				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_PlayerUI.EventSystem), ExecuteEvents.pointerClickHandler);
 				// Button.onClick.Invoke(); // This will ignore disabled state.
 			}
 		}
@@ -217,7 +214,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (lastIndex != nextIndex) {
-				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_ESLocator.EventSystem), ExecuteEvents.pointerClickHandler);
+				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_PlayerUI.EventSystem), ExecuteEvents.pointerClickHandler);
 				// Button.onClick.Invoke(); // This will ignore disabled state.
 			}
 		}

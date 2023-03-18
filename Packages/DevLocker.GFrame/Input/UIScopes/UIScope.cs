@@ -40,6 +40,10 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// > "Back" hotkey element is attached on the displayed menu and another "Back" hotkey attached to the "Yes/No" pop up, displayed on top.
 	/// > The usual solution is to invoke only the last enabled hotkey instead of all of them.
 	/// UIScope groups all child scope elements into a single group. The last enabled UIScope is focused - it and all its parent scopes are activated, while the rest will be disabled.
+	///
+	/// Note: Each scope belongs to a <see cref="PlayerScopeSet"/> - each player has it's own set of scopes with it's own navigation, hotkeys, selection etc.
+	///		  If there is only one player (i.e. no player root objects), global <see cref="PlayerScopeSet"/> is used.
+	///		  For more info check <see cref="UIPlayerRootObject"/>.
 	/// </summary>
 	[SelectionBase]
 	public class UIScope : MonoBehaviour
@@ -60,6 +64,22 @@ namespace DevLocker.GFrame.Input.UIScope
 			FocusParentScope = 10,
 			FocusFirstEnabledScopeFromList = 15,
 			EmptyFocus = 20,
+		}
+
+		/// <summary>
+		/// Contains all scopes used by certain player,
+		/// since every player needs to have their own active & focused scopes.
+		/// </summary>
+		protected class PlayerScopeSet
+		{
+			public UIScope[] ActiveScopes = Array.Empty<UIScope>();
+
+			public List<UIScope> RegisteredScopes = new List<UIScope>();
+
+			// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
+			// Any such change will be pushed to a queue and applied later on.
+			public bool ChangingActiveScopes = false;
+			public Queue<KeyValuePair<UIScope, bool>> PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
 		}
 
 		[Tooltip("If on, you can choose OnEnable and OnDisable automatic focus behaviour.\n\nIf off, this scope will always be active when enabled and vice versa. You'll have to manually handle this and it will be excluded from any focus schemes (i.e. it can be active while another scope is focused + parents). You'll be responsible for managing conflicts.")]
@@ -95,16 +115,29 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Focused scope which keeps it and all its parents active (and the rest will be inactive).
 		/// </summary>
-		public static UIScope FocusedScope => s_ActiveScopes.LastOrDefault();
+		/// <param name="playerRoot">Player root the scope is part of (in case of split-screen)</param>
+		public static UIScope FocusedScope(UIPlayerRootObject playerRoot)
+		{
+			s_PlayerSets.TryGetValue(playerRoot, out PlayerScopeSet playerSet);
+
+			return playerSet?.ActiveScopes.LastOrDefault();
+		}
 
 		/// <summary>
 		/// The focused scope plus all it's parents - top to bottom.
+		/// <param name="playerRoot">Player root the scope is part of (in case of split-screen)</param>
 		/// </summary>
-		public static IReadOnlyCollection<UIScope> ActiveScopes => s_ActiveScopes;
+		public static IReadOnlyCollection<UIScope> GetActiveScopes(UIPlayerRootObject playerRoot)
+		{
+			s_PlayerSets.TryGetValue(playerRoot, out PlayerScopeSet playerSet);
 
-		private static UIScope[] s_ActiveScopes = Array.Empty<UIScope>();
+			return playerSet?.ActiveScopes;
+		}
 
-		private static List<UIScope> s_Scopes = new List<UIScope>();
+		private static Dictionary<UIPlayerRootObject, PlayerScopeSet> s_PlayerSets = new Dictionary<UIPlayerRootObject, PlayerScopeSet>();
+
+		// Player set used by this UIScope.
+		private PlayerScopeSet m_PlayerSet;
 
 		public IReadOnlyList<IScopeElement> OwnedElements => m_ScopeElements;
 		public IReadOnlyList<UIScope> DirectChildScopes => m_DirectChildScopes;
@@ -112,12 +145,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
 
-		private bool m_HasScannedForElements = false;
-
-		// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
-		// Any such change will be pushed to a queue and applied later on.
-		private static bool s_ChangingActiveScopes = false;
-		private static Queue<KeyValuePair<UIScope, bool>> s_PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
+		private bool m_HasInitialized = false;
 
 		private bool m_GameQuitting = false;
 
@@ -128,16 +156,13 @@ namespace DevLocker.GFrame.Input.UIScope
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		private static void ClearStaticsCache()
 		{
-			s_ActiveScopes = Array.Empty<UIScope>();
-			s_Scopes = new List<UIScope>();
-			s_ChangingActiveScopes = false;
-			s_PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
+			s_PlayerSets.Clear();
 		}
 
 		protected virtual void Awake()
 		{
-			if (!m_HasScannedForElements) {
-				ScanForChildScopeElements();
+			if (!m_HasInitialized) {
+				Initialize();
 			}
 		}
 
@@ -158,38 +183,52 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+		protected virtual void Initialize()
+		{
+			var playerUIRoot = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
+
+			if (!s_PlayerSets.TryGetValue(playerUIRoot, out m_PlayerSet)) {
+				m_PlayerSet = new PlayerScopeSet();
+				s_PlayerSets.Add(playerUIRoot, m_PlayerSet);
+			}
+
+			ScanForChildScopeElements();
+
+			m_HasInitialized = true;
+		}
+
 		void OnEnable()
 		{
 			m_FrameEnabled = Time.frameCount;
-			m_LastFocusedScope = FocusedScope;
+			m_LastFocusedScope = m_PlayerSet.ActiveScopes.LastOrDefault();
 
 			if (!AutomaticFocus) {
 				SetScopeState(true);
 				return;
 			}
 
-			if (s_ChangingActiveScopes) {
-				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
+			if (m_PlayerSet.ChangingActiveScopes) {
+				m_PlayerSet.PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
 				return;
 			}
 
 			// Child scope was active, but this one was disabled. The user just enabled me.
 			// Re-insert me (us) to the collections keeping the correct order.
-			if (s_ActiveScopes.Length > 0 && s_ActiveScopes.Last().transform.IsChildOf(transform)) {
+			if (m_PlayerSet.ActiveScopes.Length > 0 && m_PlayerSet.ActiveScopes.Last().transform.IsChildOf(transform)) {
 
 				// That would include me, freshly enabled.
-				UIScope[] nextScopes = CollectScopes(s_ActiveScopes.Last());
+				UIScope[] nextScopes = CollectScopes(m_PlayerSet.ActiveScopes.Last());
 
 				for (int i = 0; i < nextScopes.Length; ++i) {
 					UIScope scope = nextScopes[i];
 					scope.m_ScopeDepth = i; // Always set this in case hierarchy changed in the mean time.
 				}
 
-				if (!s_Scopes.Contains(this)) {
-					s_Scopes.Add(this);
+				if (!m_PlayerSet.RegisteredScopes.Contains(this)) {
+					m_PlayerSet.RegisteredScopes.Add(this);
 				}
 
-				SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
+				SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 
 			} else {
 
@@ -201,34 +240,34 @@ namespace DevLocker.GFrame.Input.UIScope
 					UIScope scope = nextScopes[i];
 					scope.m_ScopeDepth = i;	// Always set this in case hierarchy changed in the mean time.
 
-					if (!s_Scopes.Contains(scope)) {
-						s_Scopes.Add(scope);
+					if (!m_PlayerSet.RegisteredScopes.Contains(scope)) {
+						m_PlayerSet.RegisteredScopes.Add(scope);
 					}
 				}
 
-				UIScope lastActive = s_ActiveScopes.LastOrDefault();
+				UIScope lastActive = m_PlayerSet.ActiveScopes.LastOrDefault();
 
 				switch (OnEnableBehaviour) {
 					case OnEnablePolicy.Focus:
 						// Skip activation if this frame another scope was activated with higher priority.
-						if (!s_ActiveScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
-							SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
+						if (!m_PlayerSet.ActiveScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
+							SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						}
 						break;
 
 					case OnEnablePolicy.FocusWithFramePriority:
-						SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
+						SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						break;
 
 					case OnEnablePolicy.FocusIfCurrentIsLowerDepth:
 						if (lastActive == null || lastActive.m_ScopeDepth < m_ScopeDepth) {
-							SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
+							SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						}
 						break;
 
 					case OnEnablePolicy.FocusIfCurrentIsLowerOrEqualDepth:
 						if (lastActive == null || lastActive.m_ScopeDepth <= m_ScopeDepth) {
-							SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
+							SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						}
 						break;
 
@@ -250,36 +289,36 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 			}
 
-			if (s_ChangingActiveScopes) {
-				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, false));
+			if (m_PlayerSet.ChangingActiveScopes) {
+				m_PlayerSet.PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, false));
 				return;
 			}
 
-			s_Scopes.Remove(this);
+			m_PlayerSet.RegisteredScopes.Remove(this);
 
-			// if this scope got activated and added parents to s_Scopes, but got immediately deactivated BEFORE the parent got enabled,
+			// if this scope got activated and added parents to m_PlayerScope.Scopes, but got immediately deactivated BEFORE the parent got enabled,
 			// parent would remain in that collection forever (or until activated). In that case remove the parents from the collection that are not enabled.
 			// This could be an issue if sibling scope child of the same parent is active - do this only if parent is actually inactive in the hierarchy.
 			// If it is active in the hierarchy, it will eventually get enabled and added to the collection.
-			for (int i = s_Scopes.Count - 1; i >= 0; --i) {
-				if (s_Scopes[i].m_FrameEnabled == -1 && !s_Scopes[i].gameObject.activeInHierarchy && transform.IsChildOf(s_Scopes[i].transform)) {
-					s_Scopes.RemoveAt(i);
+			for (int i = m_PlayerSet.RegisteredScopes.Count - 1; i >= 0; --i) {
+				if (m_PlayerSet.RegisteredScopes[i].m_FrameEnabled == -1 && !m_PlayerSet.RegisteredScopes[i].gameObject.activeInHierarchy && transform.IsChildOf(m_PlayerSet.RegisteredScopes[i].transform)) {
+					m_PlayerSet.RegisteredScopes.RemoveAt(i);
 				}
 			}
 
 			// HACK: On turning off the game OnDisable() gets called which may call methods on destroyed objects.
-			int activeIndex = Array.IndexOf(s_ActiveScopes, this);
+			int activeIndex = Array.IndexOf(m_PlayerSet.ActiveScopes, this);
 			if (activeIndex != -1 && !m_GameQuitting) {
 
 				// Proceed only if this is the deepest scope (i.e. the focused one).
-				if (activeIndex != s_ActiveScopes.Length - 1) {
-					var activeScopes = CollectScopes(s_ActiveScopes.Last());
-					SwitchActiveScopes(ref s_ActiveScopes, activeScopes);
+				if (activeIndex != m_PlayerSet.ActiveScopes.Length - 1) {
+					var activeScopes = CollectScopes(m_PlayerSet.ActiveScopes.Last());
+					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, activeScopes);
 					return;
 				}
 
 				// Something else just activated, don't change the focus.
-				foreach(UIScope scope in s_Scopes) {
+				foreach(UIScope scope in m_PlayerSet.RegisteredScopes) {
 					if (scope.m_FrameEnabled == Time.frameCount) {
 						return;
 					}
@@ -315,8 +354,8 @@ namespace DevLocker.GFrame.Input.UIScope
 						break;
 
 					case OnDisablePolicy.FocusScopeWithHighestDepth:
-						nextScope = s_Scopes.FirstOrDefault();
-						foreach(UIScope scope in s_Scopes) {
+						nextScope = m_PlayerSet.RegisteredScopes.FirstOrDefault();
+						foreach(UIScope scope in m_PlayerSet.RegisteredScopes) {
 							if (nextScope.m_ScopeDepth < scope.m_ScopeDepth && scope.isActiveAndEnabled) {
 								nextScope = scope;
 							}
@@ -340,8 +379,31 @@ namespace DevLocker.GFrame.Input.UIScope
 					: Array.Empty<UIScope>()
 					;
 
-				SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
+				SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 			}
+		}
+
+		/// <summary>
+		/// Deactivate the current active scopes and reactivate them back, forcing full reinitialization.
+		/// NOTE: This will not rescan for new ScopeElements.
+		/// </summary>
+		public static void RefocusActiveScopes(UIPlayerRootObject playerUI)
+		{
+			s_PlayerSets.TryGetValue(playerUI, out PlayerScopeSet playerSet);
+
+			if (playerSet == null || playerSet.ActiveScopes.Length == 0)
+				return;
+
+			var lastActive = playerSet.ActiveScopes.Last();
+
+			if (playerSet.ChangingActiveScopes) {
+				playerSet.PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
+				return;
+			}
+
+			// Force full re-initialization of all the scopes.
+			SwitchActiveScopes(playerSet, ref playerSet.ActiveScopes, new UIScope[0]);
+			lastActive.ForceRefocusScope();
 		}
 
 		/// <summary>
@@ -350,19 +412,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public static void RefocusActiveScopes()
 		{
-			if (s_ActiveScopes.Length == 0)
-				return;
-
-			var lastActive = s_ActiveScopes.Last();
-
-			if (s_ChangingActiveScopes) {
-				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
-				return;
+			foreach(UIPlayerRootObject playerUI in s_PlayerSets.Keys) {
+				RefocusActiveScopes(playerUI);
 			}
-
-			// Force full re-initialization of all the scopes.
-			SwitchActiveScopes(ref s_ActiveScopes, new UIScope[0]);
-			lastActive.ForceRefocusScope();
 		}
 
 		/// <summary>
@@ -375,8 +427,8 @@ namespace DevLocker.GFrame.Input.UIScope
 				throw new InvalidOperationException($"Trying to focus scope {name} that has set {nameof(AutomaticFocus)} to false. Just enable the scope and it will be active.");
 			}
 
-			if (s_ChangingActiveScopes) {
-				s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
+			if (m_PlayerSet.ChangingActiveScopes) {
+				m_PlayerSet.PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(this, true));
 				return;
 			}
 
@@ -388,10 +440,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UIScope[] nextScopes = CollectScopes(this);
 
-			SwitchActiveScopes(ref s_ActiveScopes, nextScopes);
+			SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 		}
 
-		public static bool IsScopeActive(UIScope scope) => s_ActiveScopes.Contains(scope);
+		public static bool IsScopeActive(UIScope scope) => scope.m_PlayerSet.ActiveScopes.Contains(scope);
 
 		/// <summary>
 		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.
@@ -402,18 +454,18 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_ScopeElements.Clear();
 			m_DirectChildScopes.Clear();
 			ScanForChildScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
-			m_HasScannedForElements = true;
 
-			if (Array.IndexOf(s_ActiveScopes, this) != -1) {
-				var lastActive = s_ActiveScopes.Last();
 
-				if (s_ChangingActiveScopes) {
-					s_PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
+			if (Array.IndexOf(m_PlayerSet.ActiveScopes, this) != -1) {
+				var lastActive = m_PlayerSet.ActiveScopes.Last();
+
+				if (m_PlayerSet.ChangingActiveScopes) {
+					m_PlayerSet.PendingScopeChanges.Enqueue(new KeyValuePair<UIScope, bool>(lastActive, true));
 					return;
 				}
 
 				// Force full re-initialization of all the scopes including this one.
-				SwitchActiveScopes(ref s_ActiveScopes, new UIScope[0]);
+				SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, new UIScope[0]);
 				lastActive.ForceRefocusScope();
 
 			} else {
@@ -461,7 +513,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				.ToArray();
 		}
 
-		protected static void SwitchActiveScopes(ref UIScope[] prevScopes, UIScope[] nextScopes)
+		protected static void SwitchActiveScopes(PlayerScopeSet playerSet, ref UIScope[] prevScopes, UIScope[] nextScopes)
 		{
 			// Find if there is a root scope and trim the parents.
 			// Do it now, at the last moment, instead of CollectScopes(), so correct depth can be set.
@@ -473,7 +525,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
 			// Any such change will be pushed to a queue and applied later on.
 			// TODO: This was never really tested.
-			s_ChangingActiveScopes = true;
+			playerSet.ChangingActiveScopes = true;
 
 			try {
 				// Reversed order, just in case.
@@ -492,11 +544,11 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			finally {
 				prevScopes = nextScopes;
-				s_ChangingActiveScopes = false;
+				playerSet.ChangingActiveScopes = false;
 			}
 
-			while(s_PendingScopeChanges.Count > 0) {
-				var scopeChange = s_PendingScopeChanges.Dequeue();
+			while(playerSet.PendingScopeChanges.Count > 0) {
+				var scopeChange = playerSet.PendingScopeChanges.Dequeue();
 
 				if (scopeChange.Value) {
 					scopeChange.Key.OnEnable();
@@ -510,8 +562,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			// If this scope isn't still initialized, do it now, or no elements will be enabled.
 			// This happens when child scope tries to activate the parent scope for the first time, while the parent was still inactive.
-			if (!m_HasScannedForElements) {
-				ScanForChildScopeElements();
+			if (!m_HasInitialized) {
+				Initialize();
 			}
 
 			foreach(IScopeElement scopeElement in m_ScopeElements) {

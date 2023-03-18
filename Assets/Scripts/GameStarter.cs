@@ -1,8 +1,10 @@
+using DevLocker.GFrame.Input.UIScope;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 
 namespace TetrisTower.GameStarter
@@ -40,6 +42,8 @@ namespace TetrisTower.GameStarter
 
 			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
 			uiInputModule.actionsAsset = playerControls.asset;
+
+			UIPlayerRootObject.GlobalUIRootObject.SetupGlobal(uiInputModule.GetComponent<EventSystem>());
 
 			GameContext = new GameContext(GameConfig, playerControls);
 
