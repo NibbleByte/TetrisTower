@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.EventSystems;
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Input.Contexts;
 
 namespace DevLocker.GFrame.SampleGame.Game
 {
@@ -55,7 +56,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 			playerInput.uiInputModule = uiInputModule;
 
-			var inputContext = new SinglePlayerInputComponentContext(playerInput, playerControls.InputStack, BindingDisplayAssets);
+			var inputContext = new InputComponentContext(playerInput, playerControls.InputStack, BindingDisplayAssets);
 
 			PlayerContextUtils.GlobalPlayerContext.SetupGlobal(uiInputModule.GetComponent<EventSystem>(), inputContext);
 

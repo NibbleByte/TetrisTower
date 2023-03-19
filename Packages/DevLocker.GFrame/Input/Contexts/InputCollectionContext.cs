@@ -7,13 +7,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 
-namespace DevLocker.GFrame.Input
+namespace DevLocker.GFrame.Input.Contexts
 {
 
 	/// <summary>
 	/// Use this as IInputContext if you have a single player game with generated IInputActionCollection class.
 	/// </summary>
-	public sealed class SinglePlayerInputCollectionContext : IInputContext
+	public sealed class InputCollectionContext : IInputContext
 	{
 		public IInputActionCollection2 InputActionsCollection { get; }
 
@@ -29,7 +29,7 @@ namespace DevLocker.GFrame.Input
 		private InputControlScheme m_LastUsedControlScheme;
 		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
 
-		public SinglePlayerInputCollectionContext(IInputActionCollection2 actionsCollection, InputActionsStack inputStack, IEnumerable<InputAction> uiActions, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
+		public InputCollectionContext(IInputActionCollection2 actionsCollection, InputActionsStack inputStack, IEnumerable<InputAction> uiActions, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
 		{
 			InputActionsCollection = actionsCollection;
 

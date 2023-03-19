@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace DevLocker.GFrame.Input
+namespace DevLocker.GFrame.Input.Contexts
 {
 	/// <summary>
 	/// Use this to forward some UI objects input toward specific <see cref="PlayerContextUIRootObject"/>.

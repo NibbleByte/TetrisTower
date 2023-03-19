@@ -98,7 +98,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Short-cut to create <see cref="LevelStateStack"/> specific to this player.
 		/// </summary>
-		public static void CreatePlayerStack(this Input.PlayerContextUIRootObject playerRoot, params object[] references)
+		public static void CreatePlayerStack(this Input.Contexts.PlayerContextUIRootObject playerRoot, params object[] references)
 		{
 			playerRoot.AddContextReference(new LevelStateStack(references));
 		}

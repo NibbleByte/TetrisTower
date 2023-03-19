@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 
-namespace DevLocker.GFrame.Input
+namespace DevLocker.GFrame.Input.Contexts
 {
 
 	/// <summary>
@@ -18,7 +18,7 @@ namespace DevLocker.GFrame.Input
 	/// IMPORTANT2: The <see cref="LastUsedDeviceChanged"/> event will be invoked only if you've selected the notificationBehavior to be Unity or C# events.
 	///				If you prefer using messages, you'll need to trigger the <see cref="TriggerLastUsedDeviceChanged"/>() manually when devices change.
 	/// </summary>
-	public sealed class SinglePlayerInputComponentContext : IInputContext
+	public sealed class InputComponentContext : IInputContext
 	{
 		public PlayerInput PlayerInput { get; }
 
@@ -39,7 +39,7 @@ namespace DevLocker.GFrame.Input
 
 		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
 
-		public SinglePlayerInputComponentContext(PlayerInput playerInput, InputActionsStack inputStack, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
+		public InputComponentContext(PlayerInput playerInput, InputActionsStack inputStack, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
 		{
 			PlayerInput = playerInput;
 
