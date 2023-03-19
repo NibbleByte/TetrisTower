@@ -60,7 +60,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private List<Button> m_SubscribedTabButtons = new List<Button>();
 
 		// Used for multiple event systems (e.g. split screen).
-		protected UIPlayerRootObject m_PlayerUI;
+		protected IPlayerRoot m_PlayerUI;
 
 		protected virtual void Awake()
 		{
@@ -177,6 +177,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnNextAction()
 		{
+			if (!m_PlayerUI.IsActive)
+				return;
+
 			List<Button> activeTabs = Tabs.Where(b => b.gameObject.activeInHierarchy).ToList();
 			if (activeTabs.Count == 0) {
 				return;
@@ -197,6 +200,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnPreviousAction()
 		{
+			if (!m_PlayerUI.IsActive)
+				return;
+
 			List<Button> activeTabs = Tabs.Where(b => b.gameObject.activeInHierarchy).ToList();
 			if (activeTabs.Count == 0) {
 				return;

@@ -41,7 +41,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private static SelectionController m_ActiveInstance;
 
 		// Used for multiple event systems (e.g. split screen).
-		protected UIPlayerRootObject m_PlayerUI;
+		protected IPlayerRoot m_PlayerUI;
 
 		protected virtual void Awake()
 		{
@@ -55,7 +55,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		void Update()
 		{
-			if (m_PlayerUI.EventSystem == null)
+			if (!m_PlayerUI.IsActive)
 				return;
 
 			if (FilterControlScheme.Length != 0 && InputContextManager.InputContext != null) {

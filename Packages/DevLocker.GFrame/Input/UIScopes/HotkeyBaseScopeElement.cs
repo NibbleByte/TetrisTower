@@ -32,7 +32,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected List<InputAction> m_SubscribedActions = new List<InputAction>();
 
 		// Used for multiple event systems (e.g. split screen).
-		protected UIPlayerRootObject m_PlayerUI;
+		protected IPlayerRoot m_PlayerUI;
 
 		protected virtual void Awake()
 		{

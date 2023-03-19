@@ -14,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GameObject m_LastSelectedObject;
 
 		// Used for multiple event systems (e.g. split screen).
-		protected UIPlayerRootObject m_PlayerUI;
+		protected IPlayerRoot m_PlayerUI;
 
 		void Awake()
 		{
@@ -25,9 +25,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
 		}
 
-		void Update()
+		/// <summary>
+		/// LateUpdate() as most scripts will do selection on Update() - wait for all of them to finish... hopefully.
+		/// <see cref="SelectionController"/>
+		/// </summary>
+		void LateUpdate()
 		{
-			if (m_PlayerUI.EventSystem == null)
+			if (!m_PlayerUI.IsActive)
 				return;
 
 			if (m_LastSelectedObject != m_PlayerUI.SelectedGameObject) {
