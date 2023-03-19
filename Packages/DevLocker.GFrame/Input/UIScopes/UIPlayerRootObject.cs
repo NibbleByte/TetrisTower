@@ -233,6 +233,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		/// <summary>
 		/// Set the owning event system & player index.
+		/// If event system is <see cref="UnityEngine.InputSystem.UI.MultiplayerEventSystem"/> will set it's playerRoot.
 		/// </summary>
 		public void SetupPlayer(EventSystem eventSystem, PlayerIndex playerIndex)
 		{
@@ -243,6 +244,12 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (playerIndex < PlayerIndex.Player0) {
 				Debug.LogError($"Trying to setup event system root object \"{name}\" with invalid player index: {playerIndex}", this);
 			}
+
+#if USE_INPUT_SYSTEM
+			if (eventSystem is UnityEngine.InputSystem.UI.MultiplayerEventSystem multiplayerEventSystem) {
+				multiplayerEventSystem.playerRoot = gameObject;
+			}
+#endif
 
 			m_EventSystem = eventSystem;
 			m_PlayerIndex = playerIndex;
