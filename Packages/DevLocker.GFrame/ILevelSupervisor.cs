@@ -89,4 +89,26 @@ namespace DevLocker.GFrame
 	{
 		void LateUpdate();
 	}
+
+	/// <summary>
+	/// Bridge between per-player input and level states.
+	/// </summary>
+	public static class LevelPlayerContextExtensions
+	{
+		/// <summary>
+		/// Short-cut to create <see cref="LevelStateStack"/> specific to this player.
+		/// </summary>
+		public static void CreatePlayerStack(this Input.PlayerContextUIRootObject playerRoot, params object[] references)
+		{
+			playerRoot.AddContextReference(new LevelStateStack(references));
+		}
+
+		/// <summary>
+		/// Short-cut to get the <see cref="LevelStateStack"/> for this player.
+		/// </summary>
+		public static LevelStateStack GetPlayerStateStack(this Input.IPlayerContext playerRoot)
+		{
+			return playerRoot.GetContextReference<LevelStateStack>();
+		}
+	}
 }

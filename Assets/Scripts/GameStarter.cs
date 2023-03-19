@@ -1,4 +1,4 @@
-using DevLocker.GFrame.Input.UIScope;
+using DevLocker.GFrame.Input;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
@@ -36,6 +36,7 @@ namespace TetrisTower.GameStarter
 			DontDestroyOnLoad(gameObject);
 
 			var playerControls = new PlayerControls();
+			playerControls.InitStack();
 
 			var gameInputObject = Instantiate(GameConfig.GameInputPrefab, transform);
 			Instantiate(GameConfig.MessageBoxPrefab.gameObject, transform);
@@ -43,9 +44,11 @@ namespace TetrisTower.GameStarter
 			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
 			uiInputModule.actionsAsset = playerControls.asset;
 
-			UIPlayerRootObject.GlobalUIRootObject.SetupGlobal(uiInputModule.GetComponent<EventSystem>());
+			var inputContext = new SinglePlayerInputCollectionContext(playerControls, playerControls.InputStack, playerControls.UI.Get(), GameConfig.BindingDisplayAssets);
 
-			GameContext = new GameContext(GameConfig, playerControls);
+			PlayerContextUtils.GlobalPlayerContext.SetupGlobal(uiInputModule.GetComponent<EventSystem>(), inputContext);
+
+			GameContext = new GameContext(GameConfig, playerControls, inputContext);
 
 			var supervisorManager = gameObject.AddComponent<GameManager>();
 			supervisorManager.SetGameContext(GameContext);
@@ -108,7 +111,6 @@ namespace TetrisTower.GameStarter
 		private void OnDestroy()
 		{
 			if (m_Instance == this) {
-				GameContext.Dispose();
 				m_Instance = null;
 			}
 		}

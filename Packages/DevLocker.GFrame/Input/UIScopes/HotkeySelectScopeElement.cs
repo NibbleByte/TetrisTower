@@ -20,7 +20,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				m_Selectable = GetComponentInParent<Selectable>();
 			}
 
-			m_PlayerUI.SetSelectedGameObject(gameObject);
+			m_PlayerContext.SetSelectedGameObject(gameObject);
 		}
 
 		protected override void OnValidate()

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -41,11 +40,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		private static SelectionController m_ActiveInstance;
 
 		// Used for multiple event systems (e.g. split screen).
-		protected IPlayerRoot m_PlayerUI;
+		protected IPlayerContext m_PlayerContext;
 
 		protected virtual void Awake()
 		{
-			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
 
 		protected virtual void OnEnable()
@@ -55,10 +54,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		void Update()
 		{
-			if (!m_PlayerUI.IsActive)
+			if (!m_PlayerContext.IsActive)
 				return;
 
-			if (FilterControlScheme.Length != 0 && InputContextManager.InputContext != null) {
+			if (FilterControlScheme.Length != 0 && m_PlayerContext.InputContext != null) {
 				UpdateControlScheme();
 			}
 
@@ -76,7 +75,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				// while "Submit" action of the InputSystemUIInputModule runs on key release / up.
 				// This makes hotkey being executed, new screen scope shown and executing the newly selected button on release.
 				// We don't want that so wait till submit action is no more pressed.
-				var inputModule = m_PlayerUI.EventSystem.currentInputModule as UnityEngine.InputSystem.UI.InputSystemUIInputModule;
+				var inputModule = m_PlayerContext.EventSystem.currentInputModule as UnityEngine.InputSystem.UI.InputSystemUIInputModule;
 				var submitAction = inputModule?.submit?.action;
 				if (submitAction != null && submitAction.IsPressed())
 					return;
@@ -96,13 +95,13 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (m_ControlSchemeMatched) {
 
 					// If UI was deactivated but selection didn't change, activating it back will leave the button selected but not highlighted.
-					if (m_PlayerUI.SelectedGameObject == targetSelection) {
-						m_PlayerUI.SetSelectedGameObject(null);
+					if (m_PlayerContext.SelectedGameObject == targetSelection) {
+						m_PlayerContext.SetSelectedGameObject(null);
 					}
 
-					m_PlayerUI.SetSelectedGameObject(targetSelection);
+					m_PlayerContext.SetSelectedGameObject(targetSelection);
 
-					m_PersistedSelection = m_PlayerUI.SelectedGameObject;
+					m_PersistedSelection = m_PlayerContext.SelectedGameObject;
 
 					OnSelected();
 
@@ -114,14 +113,14 @@ namespace DevLocker.GFrame.Input.UIScope
 			} else {
 
 				if (m_ControlSchemeMatched) {
-					if (m_PlayerUI.SelectedGameObject) {
-						m_PersistedSelection = m_PlayerUI.SelectedGameObject;
+					if (m_PlayerContext.SelectedGameObject) {
+						m_PersistedSelection = m_PlayerContext.SelectedGameObject;
 					} else {
 						DoNoSelectionAction();
 					}
 				} else {
-					if (RemoveSelectionOnControlSchemeMismatch && m_PlayerUI.SelectedGameObject) {
-						m_PlayerUI.SetSelectedGameObject(null);
+					if (RemoveSelectionOnControlSchemeMismatch && m_PlayerContext.SelectedGameObject) {
+						m_PlayerContext.SetSelectedGameObject(null);
 					}
 				}
 			}
@@ -129,7 +128,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void UpdateControlScheme()
 		{
-			InputControlScheme scheme = InputContextManager.InputContext.GetLastUsedInputControlScheme(PlayerIndex.AnyPlayer);
+			InputControlScheme scheme = m_PlayerContext.InputContext.GetLastUsedInputControlScheme();
 
 			if (!m_LastControlScheme.Equals(scheme.bindingGroup)) {
 
@@ -151,12 +150,12 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				case NoSelectionActionType.SelectLastSelectedObject:
 					OnSelected();
-					m_PlayerUI.SetSelectedGameObject(m_PersistedSelection);
+					m_PlayerContext.SetSelectedGameObject(m_PersistedSelection);
 					break;
 
 				case NoSelectionActionType.SelectStartObject:
 					OnSelected();
-					m_PlayerUI.SetSelectedGameObject(StartSelection.gameObject);
+					m_PlayerContext.SetSelectedGameObject(StartSelection.gameObject);
 					break;
 
 				case NoSelectionActionType.DoNothing:

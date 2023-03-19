@@ -3,34 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.Input
 {
-	public enum PlayerIndex
-	{
-		AnyPlayer,		// Any Player
-		MasterPlayer,   // Usually the first player that has more permissions than the rest.
-		Player0,
-		Player1,
-		Player2,
-		Player3,
-		Player4,
-		Player5,
-		Player6,
-		Player7,
-		Player8,
-		Player9,
-		Player10,
-		Player11,
-		Player12,
-		Player13,
-		Player14,
-		Player15,
-	}
-
-	public delegate void PlayerIndexEventHandler(PlayerIndex playerIndex);
-
 
 	/// <summary>
 	/// Includes everything needed to display <see cref="InputBinding"/> to the UI.
@@ -72,7 +50,7 @@ namespace DevLocker.GFrame.Input
 		public IReadOnlyList<InputBindingDisplayData> CompositeBindingParts;
 
 
-		public UnityEngine.Sprite Icon;
+		public Sprite Icon;
 		public string Text;
 		public string ShortText;
 
@@ -113,23 +91,52 @@ namespace DevLocker.GFrame.Input
 	}
 
 	/// <summary>
-	/// A place for the framework to find the <see cref="IInputContext"/>.
-	/// Set it initially.
+	/// Manages player context and input. This also should be a MonoBehavior marking the UI hierarchy used by the specific player.
+	/// For more info check <see cref="PlayerContextUIRootObject"/> and <see cref="PlayerContextUIRootForwarder"/>.
+	/// Remember, you have a Global player root as well - <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>
 	/// </summary>
-	public static class InputContextManager
+	public interface IPlayerContext
 	{
-		public static IInputContext InputContext { get; private set; }
+		/// <summary>
+		/// Is the player setup ready.
+		/// </summary>
+		bool IsActive { get; }
 
-		public static void SetContext(IInputContext context)
-		{
-			InputContext = context;
-		}
+		/// <summary>
+		/// Name of the player.
+		/// </summary>
+		string PlayerName { get; }
 
-		public static void DisposeContext()
-		{
-			InputContext?.Dispose();
-			InputContext = null;
-		}
+		/// <summary>
+		/// The input context for this player. The heart of this framework.
+		/// Includes the InputStack that should be used everywhere.
+		/// </summary>
+		IInputContext InputContext { get; }
+
+		/// <summary>
+		/// Event system used by this player.
+		/// </summary>
+		EventSystem EventSystem { get; }
+
+		/// <summary>
+		/// Short-cut - get selected UI object for this player.
+		/// </summary>
+		GameObject SelectedGameObject { get; }
+
+		/// <summary>
+		/// Short-cut - set selected UI object for this player.
+		/// </summary>
+		void SetSelectedGameObject(GameObject selected);
+
+		/// <summary>
+		/// Get arbitrary object from this player root. Useful for attaching level state stack or similar per player.
+		/// </summary>
+		T GetContextReference<T>();
+
+		/// <summary>
+		/// Get the top-most root object.
+		/// </summary>
+		PlayerContextUIRootObject GetRootObject();
 	}
 
 	/// <summary>
@@ -143,26 +150,14 @@ namespace DevLocker.GFrame.Input
 		event Action PlayersChanged;
 
 		/// <summary>
-		/// Last device used changed for playerIndex.
+		/// Last device used got changed.
 		/// </summary>
-		event PlayerIndexEventHandler LastUsedDeviceChanged;
+		event Action LastUsedDeviceChanged;
 
 		/// <summary>
-		/// Returns true if the playerIndex is the master player.
-		/// This is usually the first player that has more permissions than the rest.
+		/// Find InputAction by action name or id.
 		/// </summary>
-		bool IsMasterPlayer(PlayerIndex playerIndex);
-
-		/// <summary>
-		/// Find InputAction by action name or id for specific player.
-		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
-		/// </summary>
-		InputAction FindActionFor(PlayerIndex playerIndex, string actionNameOrId, bool throwIfNotFound = false);
-
-		/// <summary>
-		/// Find InputActions by action name or id for all currently active players.
-		/// </summary>
-		IEnumerable<InputAction> FindActionsForAllPlayers(string actionNameOrId, bool throwIfNotFound = false);
+		InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false);
 
 		/// <summary>
 		/// Push a new entry in the input actions stack, by specifying who is the source of the request.
@@ -170,8 +165,6 @@ namespace DevLocker.GFrame.Input
 		/// If resetActions is true, all InputActions will be disabled after this call.
 		/// Previous top entry will record the InputActions enabled flags at the moment and re-apply them when it is reactivated.
 		/// It is strongly recommended to implement this method using <see cref="InputActionsStack" />.
-		///
-		/// NOTE: If you support more than one player, execute this operation for each players' stack!
 		/// </summary>
 		void PushActionsState(object source, bool resetActions = true);
 
@@ -179,50 +172,40 @@ namespace DevLocker.GFrame.Input
 		/// Removes an entry made from the specified source in the input actions stack.
 		/// If that entry was the top of the stack, next entry state's enabled flags are applied to the InputActions.
 		/// It is strongly recommended to implement this method using <see cref="InputActionsStack" />.
-		///
-		/// NOTE: If you support more than one player, execute this operation for each players' stack!
 		/// </summary>
 		bool PopActionsState(object source);
 
 		/// <summary>
 		/// Return all actions required for the UI input to work properly.
-		/// Usually those are the ones specified in the InputSystemUIInputModule,
-		/// which you can easily obtain from UnityEngine.EventSystems.EventSystem.current.currentInputModule.
-		/// If you have IInputActionCollection, you can just get the InputActionMap responsible for the UI.
+		/// Usually those are the ones specified in the <see cref="UnityEngine.InputSystem.UI.InputSystemUIInputModule"/>,
+		/// which you can easily obtain from <see cref="EventSystem.current.currentInputModule"/>.
+		/// If you have <see cref="IInputActionCollection"/>, you can just get the InputActionMap responsible for the UI.
 		/// Example: PlayerControls.UI.Get();
-		///
-		/// NOTE: If you support more than one player, return all players UI actions!
 		/// </summary>
 		IEnumerable<InputAction> GetUIActions();
 
 		/// <summary>
-		/// Returns all <see cref="InputAction"/> for the specified player.
-		/// <see cref="PlayerIndex.MasterPlayer"/> will return results for the master player.
-		/// <see cref="PlayerIndex.AnyPlayer"/> will return all actions for all the players.
+		/// Returns all <see cref="InputAction"/>.
 		/// </summary>
-		IEnumerable<InputAction> GetAllActionsFor(PlayerIndex playerIndex);
+		IEnumerable<InputAction> GetAllActions();
 
 		/// <summary>
-		/// Get last updated device for specified player.
-		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
+		/// Get last updated device.
 		/// </summary>
-		InputDevice GetLastUsedInputDevice(PlayerIndex playerIndex);
+		InputDevice GetLastUsedInputDevice();
 
 		/// <summary>
-		/// Get last used <see cref="InputControlScheme" /> for specified player.
-		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
+		/// Get last used <see cref="InputControlScheme" />.
 		/// NOTE: If no devices used, empty control scheme will be returned.
 		/// </summary>
-		InputControlScheme GetLastUsedInputControlScheme(PlayerIndex playerIndex);
+		InputControlScheme GetLastUsedInputControlScheme();
 
 		/// <summary>
-		/// Force invoke the LastUsedDeviceChanged for specified player, so UI and others can refresh.
+		/// Force invoke the LastUsedDeviceChanged, so UI and others can refresh.
 		/// This is useful if the player changed the controls or similar,
 		/// or if you're using PlayerInput component with SendMessage / Broadcast notification.
-		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
-		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
-		void TriggerLastUsedDeviceChanged(PlayerIndex playerIndex = PlayerIndex.MasterPlayer);
+		void TriggerLastUsedDeviceChanged();
 
 		/// <summary>
 		/// Get all used <see cref="InputControlScheme" />.
@@ -236,17 +219,34 @@ namespace DevLocker.GFrame.Input
 		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action);
 	}
 
+	public class PlayerContextUtils
+	{
+		public static PlayerContextUIRootObject GlobalPlayerContext => PlayerContextUIRootObject.GlobalPlayerContext;
+
+		/// <summary>
+		/// Get the owning player context root. If no owner found, <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/> is returned.
+		/// </summary>
+		/// <param name="go">target object needing player context</param>
+		public static IPlayerContext GetPlayerContextFor(GameObject go)
+		{
+			var rootObject = go.transform.GetComponentInParent<IPlayerContext>(true);
+			if (rootObject != null) {
+				return rootObject;
+			}
+
+			return PlayerContextUIRootObject.GlobalPlayerContext;
+		}
+	}
+
 	public static class InputSystemIntegrationExtensions
 	{
 		/// <summary>
 		/// Get the display representations of the matched device for the passed action.
 		/// An action can have multiple bindings for the same device.
-		/// <see cref="PlayerIndex.MasterPlayer"/> will return result for the master player.
-		/// <see cref="PlayerIndex.AnyPlayer"/> is an INVALID option.
 		/// </summary>
-		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, PlayerIndex playerIndex, InputAction action)
+		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, InputAction action)
 		{
-			InputDevice lastUsedDevice = context.GetLastUsedInputDevice(playerIndex);
+			InputDevice lastUsedDevice = context.GetLastUsedInputDevice();
 			if (lastUsedDevice == null) {
 				return Enumerable.Empty<InputBindingDisplayData>();
 			}

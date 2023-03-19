@@ -1,8 +1,5 @@
-using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using System;
-using System.Collections;
-using TetrisTower.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,14 +18,11 @@ namespace TetrisTower.Game
 	[Serializable]
 	public sealed class GameContext
 	{
-		public GameContext(GameConfig config, PlayerControls controls)
+		public GameContext(GameConfig config, PlayerControls controls, IInputContext inputContext)
 		{
 			GameConfig = config;
 			PlayerControls = controls;
-			PlayerControls.InitStack();
-
-			InputContext = new SinglePlayerInputCollectionContext(PlayerControls, PlayerControls.InputStack, PlayerControls.UI.Get(), GameConfig.BindingDisplayAssets);
-			InputContextManager.SetContext(InputContext);
+			InputContext = inputContext;
 		}
 
 		public GameConfig GameConfig { get; }
@@ -56,11 +50,6 @@ namespace TetrisTower.Game
 		public void ClearCurrentPlaythrough()
 		{
 			CurrentPlaythrough = m_DebugPlaythroughData = null;
-		}
-
-		public void Dispose()
-		{
-			InputContextManager.DisposeContext();
 		}
 	}
 }

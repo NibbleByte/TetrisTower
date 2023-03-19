@@ -4,63 +4,21 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace DevLocker.GFrame.Input.UIScope
+namespace DevLocker.GFrame.Input
 {
-	/// <summary>
-	/// Abstract interface for <see cref="UIPlayerRootObject"/> and <see cref="UIPlayerRootForwarder"/>.
-	/// Use it as reference for the player root. Remember, you have a Global player root as well - <see cref="UIPlayerRootObject"/>
-	/// </summary>
-	public interface IPlayerRoot
-	{
-		/// <summary>
-		/// Is the player setup ready.
-		/// </summary>
-		public bool IsActive { get; }
-
-		/// <summary>
-		/// Event system used by this player.
-		/// </summary>
-		EventSystem EventSystem { get; }
-
-		/// <summary>
-		/// Player Index of the owner player.
-		/// </summary>
-		PlayerIndex PlayerIndex { get; }
-
-		/// <summary>
-		/// Short-cut - get selected UI object for this player.
-		/// </summary>
-		GameObject SelectedGameObject { get; }
-
-		/// <summary>
-		/// Short-cut - set selected UI object for this player.
-		/// </summary>
-		void SetSelectedGameObject(GameObject selected);
-
-		/// <summary>
-		/// Get arbitrary object from this player root. Useful for attaching level state stack or similar per player.
-		/// </summary>
-		T GetContextReference<T>();
-
-		/// <summary>
-		/// Get the top-most root object.
-		/// </summary>
-		UIPlayerRootObject GetRootObject();
-	}
-
 	/// <summary>
 	/// When using multiple event systems (e.g. split-screen) add this component to the root UI canvas object of each player.
 	/// This marks all children as owned by the specific player.
-	/// At some point set the owning event system via <see cref="SetupPlayer(EventSystem, PlayerIndex)"/> (edit time or via code).
+	/// At some point set the owning event system via <see cref="SetupPlayer"/> (edit time or via code).
 	/// Other child components may use this information to work properly in such environment.
 	///
 	/// Make sure the component exists on the Awake() step of the child objects, i.e. have it defined in the UI prefab. If that is not possible:
-	///		- Use <see cref="UIPlayerRootForwarder"/>.
+	///		- Use <see cref="PlayerContextUIRootForwarder"/>.
 	///		- Make a prefab variant with added component and instantiate that one instead.
 	///		- Have the prefab saved as inactive. Add the component after instantiation, then activate the prefab.
 	///		- If not working with prefabs - add the component to the scene UI root game object, instantiate it and destroy the original.
 	///
-	/// Additionally, there is a global fall-back instance automatically created for any objects that do not belong to any player.
+	/// Additionally, there is a <see cref="GlobalPlayerContext"/> fall-back instance automatically created for any objects that do not belong to any player.
 	/// For this reason, for single player game don't attach any components.
 	///
 	/// Note: this is how Unity UI can support multiple players each having their own UI selection and navigation.
@@ -68,39 +26,37 @@ namespace DevLocker.GFrame.Input.UIScope
 	///		  Good explanation: https://www.youtube.com/watch?v=Ur2tBl58YOc
 	///		  Also: https://opsive.com/support/documentation/ultimate-inventory-system/input/split-screen-co-op-ui/
 	/// </summary>
-	public class UIPlayerRootObject : MonoBehaviour, IPlayerRoot
+	public class PlayerContextUIRootObject : MonoBehaviour, IPlayerContext
 	{
-
 		/// <summary>
 		/// Global root object used by any components not owned by any player.
-		/// You may want to set this as DontDestroyOnLoad() or parent it under your input system.
+		/// You may want to set this as DontDestroyOnLoad() or parent it under your event system.
 		/// </summary>
-		public static UIPlayerRootObject GlobalUIRootObject {
+		public static PlayerContextUIRootObject GlobalPlayerContext {
 			get {
 				if (m_GlobalUIRootObject == null) {
-					m_GlobalUIRootObject = new GameObject(nameof(GlobalUIRootObject)).AddComponent<UIPlayerRootObject>();
-					m_GlobalUIRootObject.m_PlayerIndex = PlayerIndex.MasterPlayer;
+					m_GlobalUIRootObject = new GameObject(nameof(GlobalPlayerContext)).AddComponent<PlayerContextUIRootObject>();
 				}
 
 				return m_GlobalUIRootObject;
 			}
 		}
-		private static UIPlayerRootObject m_GlobalUIRootObject;
+		private static PlayerContextUIRootObject m_GlobalUIRootObject;
 
 		/// <summary>
 		/// Root objects for all the players, excluding the Global one.
 		/// </summary>
-		public static IReadOnlyCollection<UIPlayerRootObject> PlayerUIRoots => m_PlayerRootObjects;
-		private static List<UIPlayerRootObject> m_PlayerRootObjects = new List<UIPlayerRootObject>();
+		public static IReadOnlyCollection<PlayerContextUIRootObject> PlayerUIRoots => m_PlayerRootObjects;
+		private static List<PlayerContextUIRootObject> m_PlayerRootObjects = new List<PlayerContextUIRootObject>();
 
 		/// <summary>
 		/// All player root objects, including the Global one.
 		/// </summary>
-		public static IEnumerable<UIPlayerRootObject> AllPlayerUIRoots {
+		public static IEnumerable<PlayerContextUIRootObject> AllPlayerUIRoots {
 			get {
-				yield return GlobalUIRootObject;
+				yield return GlobalPlayerContext;
 
-				foreach(UIPlayerRootObject rootObject in m_PlayerRootObjects) {
+				foreach(PlayerContextUIRootObject rootObject in m_PlayerRootObjects) {
 					yield return rootObject;
 				}
 			}
@@ -112,16 +68,23 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool IsActive => EventSystem != null;
 
 		/// <summary>
+		/// Name of the player.
+		/// </summary>
+		public string PlayerName => name;
+
+#if USE_INPUT_SYSTEM
+		/// <summary>
+		/// The input context for this player. The heart of this framework.
+		/// Includes the InputStack that should be used everywhere.
+		/// </summary>
+		public IInputContext InputContext { get; private set; }
+#endif
+
+		/// <summary>
 		/// Event system used by this player.
 		/// </summary>
 		public EventSystem EventSystem => m_EventSystem;
 		[SerializeField] private EventSystem m_EventSystem;
-
-		/// <summary>
-		/// Player Index of the owner player.
-		/// </summary>
-		public PlayerIndex PlayerIndex => m_PlayerIndex;
-		[SerializeField] private PlayerIndex m_PlayerIndex = PlayerIndex.Player0;
 
 		private List<object> m_ContextReferences = new List<object>();
 
@@ -138,25 +101,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Get the top-most root object.
 		/// </summary>
-		public UIPlayerRootObject GetRootObject() => this;
-
-		/// <summary>
-		/// Get the owning player root object. If no owner found, <see cref="GlobalUIRootObject"/> is returned.
-		/// </summary>
-		/// <param name="go">target object needing player owner</param>
-		public static IPlayerRoot GetPlayerUIRootFor(GameObject go)
-		{
-			var rootObject = go.transform.GetComponentInParent<IPlayerRoot>(true);
-			if (rootObject != null) {
-				if (rootObject is UIPlayerRootObject uiRootObject && !m_PlayerRootObjects.Contains(uiRootObject)) {
-					m_PlayerRootObjects.Add(uiRootObject);
-				}
-
-				return rootObject;
-			}
-
-			return GlobalUIRootObject;
-		}
+		public PlayerContextUIRootObject GetRootObject() => this;
 
 		/// <summary>
 		/// Add arbitrary object to this player root. Useful for attaching level state stack or similar per player.
@@ -211,22 +156,23 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnDestroy()
 		{
+			InputContext?.Dispose();
 			m_PlayerRootObjects.Remove(this);
 			m_EventSystem = null;
 		}
 
 		/// <summary>
-		/// Set the owning event system for the <see cref="GlobalUIRootObject"/>.
+		/// Set the owning event system for the <see cref="GlobalPlayerContext"/>.
 		/// Will attach the player root to the EventSystem.
 		/// </summary>
-		public void SetupGlobal(EventSystem eventSystem)
+		public void SetupGlobal(EventSystem eventSystem, IInputContext inputContext)
 		{
 			if (this != m_GlobalUIRootObject) {
 				throw new System.InvalidOperationException($"Trying to setup {name} as global player root object. Please use \"{nameof(SetupPlayer)}()\"");
 			}
 
+			InputContext = inputContext;
 			m_EventSystem = eventSystem;
-			m_PlayerIndex = PlayerIndex.MasterPlayer;
 
 			transform.SetParent(eventSystem.transform);
 		}
@@ -235,14 +181,10 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// Set the owning event system & player index.
 		/// If event system is <see cref="UnityEngine.InputSystem.UI.MultiplayerEventSystem"/> will set it's playerRoot.
 		/// </summary>
-		public void SetupPlayer(EventSystem eventSystem, PlayerIndex playerIndex)
+		public void SetupPlayer(EventSystem eventSystem, IInputContext inputContext)
 		{
 			if (this == m_GlobalUIRootObject) {
 				throw new System.InvalidOperationException($"Trying to setup {name} as non-global player root object. Please use \"{nameof(SetupGlobal)}()\"");
-			}
-
-			if (playerIndex < PlayerIndex.Player0) {
-				Debug.LogError($"Trying to setup event system root object \"{name}\" with invalid player index: {playerIndex}", this);
 			}
 
 #if USE_INPUT_SYSTEM
@@ -251,8 +193,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 #endif
 
+			InputContext = inputContext;
 			m_EventSystem = eventSystem;
-			m_PlayerIndex = playerIndex;
 		}
 	}
 }

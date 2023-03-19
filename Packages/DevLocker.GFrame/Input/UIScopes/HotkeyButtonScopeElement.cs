@@ -20,7 +20,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				m_Button = GetComponentInParent<Button>();
 			}
 
-			ExecuteEvents.Execute(m_Button.gameObject, new PointerEventData(m_PlayerUI.EventSystem), ExecuteEvents.pointerClickHandler);
+			ExecuteEvents.Execute(m_Button.gameObject, new PointerEventData(m_PlayerContext.EventSystem), ExecuteEvents.pointerClickHandler);
 			// Button.onClick.Invoke(); // This will ignore disabled state.
 		}
 

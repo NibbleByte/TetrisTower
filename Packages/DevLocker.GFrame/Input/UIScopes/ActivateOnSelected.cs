@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using System.Linq;
 
 namespace DevLocker.GFrame.Input.UIScope
@@ -27,7 +26,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GameObject m_LastSelectedObject;
 
 		// Used for multiple event systems (e.g. split screen).
-		protected IPlayerRoot m_PlayerUI;
+		protected IPlayerContext m_PlayerContext;
 
 		void Awake()
 		{
@@ -35,16 +34,16 @@ namespace DevLocker.GFrame.Input.UIScope
 				OnSelectedObject = GetComponent<Selectable>();
 			}
 
-			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
 
 		void Update()
 		{
-			if (!m_PlayerUI.IsActive)
+			if (!m_PlayerContext.IsActive)
 				return;
 
-			if (m_LastSelectedObject != m_PlayerUI.SelectedGameObject) {
-				m_LastSelectedObject = m_PlayerUI.SelectedGameObject;
+			if (m_LastSelectedObject != m_PlayerContext.SelectedGameObject) {
+				m_LastSelectedObject = m_PlayerContext.SelectedGameObject;
 
 				if (MultipleObjects) {
 					bool activate;

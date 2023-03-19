@@ -22,6 +22,14 @@ namespace DevLocker.GFrame.SampleGame.UITester
 
 		public int WikiEntriesCount = 10;
 
+		// Used for multiple event systems (e.g. split screen).
+		protected IPlayerContext m_PlayerContext;
+
+		private void Awake()
+		{
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+		}
+
 		public void Start()
 		{
 			List<Button> tabs = new List<Button>();
@@ -57,7 +65,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 		{
 			// TODO: This doesn't work with PlayerInput component - returns only keyboard, even when clicking with mouse :(
 			// Don't snap when user is clicking with a pointer device.
-			if (InputContextManager.InputContext.GetLastUsedInputDevice(PlayerIndex.MasterPlayer) is Mouse)
+			if (m_PlayerContext.InputContext.GetLastUsedInputDevice() is Mouse)
 				return;
 
 			// Copied from https://stackoverflow.com/a/50191835

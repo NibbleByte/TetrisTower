@@ -15,8 +15,8 @@ namespace DevLocker.GFrame.Input
 	///
 	/// IMPORTANT: never use <see cref="PlayerInput.SwitchCurrentActionMap"/> to set currently active actions directly. Use the <see cref="InputActionsStack" /> instead.
 	///
-	/// IMPORTANT2: The LastUsedDeviceChanged event will be invoked only if you've selected the notificationBehavior to be Unity or C# events.
-	///				If you prefer using messages, you'll need to trigger the TriggerLastUsedDeviceChanged() manually when devices change.
+	/// IMPORTANT2: The <see cref="LastUsedDeviceChanged"/> event will be invoked only if you've selected the notificationBehavior to be Unity or C# events.
+	///				If you prefer using messages, you'll need to trigger the <see cref="TriggerLastUsedDeviceChanged"/>() manually when devices change.
 	/// </summary>
 	public sealed class SinglePlayerInputComponentContext : IInputContext
 	{
@@ -32,7 +32,7 @@ namespace DevLocker.GFrame.Input
 		/// IMPORTANT2: The LastUsedDeviceChanged event will be invoked only if you've selected the notificationBehavior to be Unity or C# events.
 		///				If you prefer using messages, you'll need to trigger the TriggerLastUsedDeviceChanged() manually when devices change.
 		/// </summary>
-		public event PlayerIndexEventHandler LastUsedDeviceChanged;
+		public event Action LastUsedDeviceChanged;
 
 		private InputDevice m_LastUsedDevice;
 		private InputControlScheme m_LastUsedControlScheme;
@@ -100,19 +100,8 @@ namespace DevLocker.GFrame.Input
 			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
 		}
 
-		public bool IsMasterPlayer(PlayerIndex playerIndex)
+		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false)
 		{
-			if (playerIndex < PlayerIndex.Player0)
-				throw new ArgumentException($"{playerIndex} is not a proper player index.");
-
-			return playerIndex == PlayerIndex.Player0;
-		}
-
-		public InputAction FindActionFor(PlayerIndex playerIndex, string actionNameOrId, bool throwIfNotFound = false)
-		{
-			if (playerIndex > PlayerIndex.Player0)
-				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
-
 			return PlayerInput.actions.FindAction(actionNameOrId, throwIfNotFound);
 		}
 
@@ -136,44 +125,30 @@ namespace DevLocker.GFrame.Input
 			return UIActions;
 		}
 
-		public IEnumerable<InputAction> GetAllActionsFor(PlayerIndex playerIndex)
+		public IEnumerable<InputAction> GetAllActions()
 		{
-			if (playerIndex > PlayerIndex.Player0)
-				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
-
 			return PlayerInput.actions;
 		}
 
-		public InputDevice GetLastUsedInputDevice(PlayerIndex playerIndex)
+		public InputDevice GetLastUsedInputDevice()
 		{
-			if (playerIndex > PlayerIndex.Player0)
-				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
-
 			return m_LastUsedDevice;
 		}
 
-		public InputControlScheme GetLastUsedInputControlScheme(PlayerIndex playerIndex)
+		public InputControlScheme GetLastUsedInputControlScheme()
 		{
-			if (playerIndex > PlayerIndex.Player0)
-				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
-
 			return m_LastUsedControlScheme;
 		}
 
-		public void TriggerLastUsedDeviceChanged(PlayerIndex playerIndex = PlayerIndex.MasterPlayer)
+		public void TriggerLastUsedDeviceChanged()
 		{
-			if (playerIndex > PlayerIndex.Player0 || playerIndex == PlayerIndex.AnyPlayer)
-				throw new NotSupportedException($"Only single player is supported, but {playerIndex} was requested.");
-
-			LastUsedDeviceChanged?.Invoke(PlayerIndex.Player0);
+			LastUsedDeviceChanged?.Invoke();
 		}
 
 		public IEnumerable<InputControlScheme> GetAllInputControlSchemes()
 		{
-			foreach (PlayerInput playerInput in PlayerInput.all) {
-				foreach(InputControlScheme controlScheme in playerInput.actions.controlSchemes) {
-					yield return controlScheme;
-				}
+			foreach(InputControlScheme controlScheme in PlayerInput.actions.controlSchemes) {
+				yield return controlScheme;
 			}
 		}
 
@@ -200,7 +175,7 @@ namespace DevLocker.GFrame.Input
 		{
 			// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
 			// Trigger event so UI gets refreshed properly.
-			TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
+			TriggerLastUsedDeviceChanged();
 		}
 
 		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
@@ -224,7 +199,7 @@ namespace DevLocker.GFrame.Input
 				m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
 			}
 
-			TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
+			TriggerLastUsedDeviceChanged();
 		}
 	}
 }

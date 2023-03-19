@@ -43,7 +43,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	///
 	/// Note: Each scope belongs to a <see cref="PlayerScopeSet"/> - each player has it's own set of scopes with it's own navigation, hotkeys, selection etc.
 	///		  If there is only one player (i.e. no player root objects), global <see cref="PlayerScopeSet"/> is used.
-	///		  For more info check <see cref="UIPlayerRootObject"/>.
+	///		  For more info check <see cref="PlayerContextUIRootObject"/>.
 	/// </summary>
 	[SelectionBase]
 	public class UIScope : MonoBehaviour
@@ -116,7 +116,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// Focused scope which keeps it and all its parents active (and the rest will be inactive).
 		/// </summary>
 		/// <param name="playerRoot">Player root the scope is part of (in case of split-screen)</param>
-		public static UIScope FocusedScope(UIPlayerRootObject playerRoot)
+		public static UIScope FocusedScope(PlayerContextUIRootObject playerRoot)
 		{
 			s_PlayerSets.TryGetValue(playerRoot, out PlayerScopeSet playerSet);
 
@@ -127,17 +127,18 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// The focused scope plus all it's parents - top to bottom.
 		/// <param name="playerRoot">Player root the scope is part of (in case of split-screen)</param>
 		/// </summary>
-		public static IReadOnlyCollection<UIScope> GetActiveScopes(UIPlayerRootObject playerRoot)
+		public static IReadOnlyCollection<UIScope> GetActiveScopes(PlayerContextUIRootObject playerRoot)
 		{
 			s_PlayerSets.TryGetValue(playerRoot, out PlayerScopeSet playerSet);
 
 			return playerSet?.ActiveScopes;
 		}
 
-		private static Dictionary<UIPlayerRootObject, PlayerScopeSet> s_PlayerSets = new Dictionary<UIPlayerRootObject, PlayerScopeSet>();
+		private static Dictionary<PlayerContextUIRootObject, PlayerScopeSet> s_PlayerSets = new Dictionary<PlayerContextUIRootObject, PlayerScopeSet>();
 
 		// Player set used by this UIScope.
 		private PlayerScopeSet m_PlayerSet;
+		internal PlayerContextUIRootObject m_PlayerContext;
 
 		public IReadOnlyList<IScopeElement> OwnedElements => m_ScopeElements;
 		public IReadOnlyList<UIScope> DirectChildScopes => m_DirectChildScopes;
@@ -185,16 +186,18 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public virtual bool Initialize()
 		{
-			UIPlayerRootObject rootObject = UIPlayerRootObject.GetPlayerUIRootFor(gameObject).GetRootObject();
+			PlayerContextUIRootObject playerContext = PlayerContextUtils.GetPlayerContextFor(gameObject).GetRootObject();
 
 			// If using forwarder, it may not yet be setup. Will do delayed Initialize(). Check Update().
-			if (rootObject == null) {
+			if (playerContext == null) {
 				return false;
 			}
 
-			if (!s_PlayerSets.TryGetValue(rootObject, out m_PlayerSet)) {
+			m_PlayerContext = playerContext;
+
+			if (!s_PlayerSets.TryGetValue(playerContext, out m_PlayerSet)) {
 				m_PlayerSet = new PlayerScopeSet();
-				s_PlayerSets.Add(rootObject, m_PlayerSet);
+				s_PlayerSets.Add(playerContext, m_PlayerSet);
 			}
 
 			m_HasInitialized = true;
@@ -409,7 +412,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// Deactivate the current active scopes and reactivate them back, forcing full reinitialization.
 		/// NOTE: This will not rescan for new ScopeElements.
 		/// </summary>
-		public static void RefocusActiveScopes(UIPlayerRootObject playerUI)
+		public static void RefocusActiveScopes(PlayerContextUIRootObject playerUI)
 		{
 			s_PlayerSets.TryGetValue(playerUI, out PlayerScopeSet playerSet);
 
@@ -434,7 +437,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public static void RefocusActiveScopes()
 		{
-			foreach(UIPlayerRootObject playerUI in s_PlayerSets.Keys) {
+			foreach(PlayerContextUIRootObject playerUI in s_PlayerSets.Keys) {
 				RefocusActiveScopes(playerUI);
 			}
 		}
@@ -613,7 +616,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected void ProcessInput(bool active)
 		{
 #if USE_INPUT_SYSTEM
-			var context = Input.InputContextManager.InputContext;
+			var context = m_PlayerContext.InputContext;
 
 			if (context == null) {
 				Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
@@ -625,7 +628,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				// Resets all enabled actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
 				// Useful on changing states or scopes, so gestures, drags, sequences don't leak in.
-				foreach (var action in context.GetAllActionsFor(Input.PlayerIndex.AnyPlayer)) {
+				foreach (var action in context.GetAllActions()) {
 					if (action.enabled) {
 						action.Reset();
 					}
@@ -742,7 +745,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					bool actionsActive = uiScope.enabled
 						&& uiScope.gameObject.activeInHierarchy
-						&& InputContextManager.InputContext != null
+						&& uiScope.m_PlayerContext?.InputContext != null
 						&& hotkeyElement.GetUsedActions().Any(a => a.enabled);
 
 					string activeStr = actionsActive ? "Active" : "Inactive";

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.EventSystems;
-using DevLocker.GFrame.Input.UIScope;
+using DevLocker.GFrame.Input;
 
 namespace DevLocker.GFrame.SampleGame.Game
 {
@@ -41,6 +41,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 			DontDestroyOnLoad(gameObject);
 
 			var playerControls = new SamplePlayerControls();
+			playerControls.InitStack();
 
 			var gameInputObject = Instantiate(GameInputPrefab, transform);
 			var levelFader = Instantiate(LevelFader.gameObject, transform).GetComponent<UIUtils.UISimpleCanvasGroupFader>();
@@ -54,9 +55,12 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 			playerInput.uiInputModule = uiInputModule;
 
-			UIPlayerRootObject.GlobalUIRootObject.SetupGlobal(uiInputModule.GetComponent<EventSystem>());
+			var inputContext = new SinglePlayerInputComponentContext(playerInput, playerControls.InputStack, BindingDisplayAssets);
 
-			GameContext = new SampleGameContext(playerInput, playerControls, BindingDisplayAssets);
+			PlayerContextUtils.GlobalPlayerContext.SetupGlobal(uiInputModule.GetComponent<EventSystem>(), inputContext);
+
+
+			GameContext = new SampleGameContext(playerInput, playerControls, inputContext);
 
 			var levelsManager = gameObject.AddComponent<SampleLevelsManager>();
 			levelsManager.LevelLoadingScreen = levelFader;
@@ -97,7 +101,6 @@ namespace DevLocker.GFrame.SampleGame.Game
 		private void OnDestroy()
 		{
 			if (m_Instance == this) {
-				GameContext.Dispose();
 				m_Instance = null;
 			}
 		}

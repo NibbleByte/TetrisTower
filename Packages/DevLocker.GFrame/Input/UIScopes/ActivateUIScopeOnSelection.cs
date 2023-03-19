@@ -14,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GameObject m_LastSelectedObject;
 
 		// Used for multiple event systems (e.g. split screen).
-		protected IPlayerRoot m_PlayerUI;
+		protected IPlayerContext m_PlayerContext;
 
 		void Awake()
 		{
@@ -22,7 +22,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				Scope = GetComponent<UIScope>();
 			}
 
-			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
 
 		/// <summary>
@@ -31,11 +31,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		void LateUpdate()
 		{
-			if (!m_PlayerUI.IsActive)
+			if (!m_PlayerContext.IsActive)
 				return;
 
-			if (m_LastSelectedObject != m_PlayerUI.SelectedGameObject) {
-				m_LastSelectedObject = m_PlayerUI.SelectedGameObject;
+			if (m_LastSelectedObject != m_PlayerContext.SelectedGameObject) {
+				m_LastSelectedObject = m_PlayerContext.SelectedGameObject;
 
 				if (!UIScope.IsScopeActive(Scope) && m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(transform)) {
 					Scope.ForceRefocusScope();

@@ -51,9 +51,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			ShowBoth,
 		}
 
-		[Tooltip("Which player should this hotkey be displayed for?\nIf unsure or for single player games, leave MasterPlayer.")]
-		public PlayerIndex Player = PlayerIndex.MasterPlayer;
-
 		public InputActionReference InputAction;
 		// Maybe you'd like to have the option to specify the binding here too.
 		// You can do this easily with the InputActionBindingPair class.
@@ -96,27 +93,30 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		private bool m_GameQuitting = false;
 
+		// Used for multiple event systems (e.g. split screen).
+		protected IPlayerContext m_PlayerContext;
+
 		/// <summary>
 		/// Call this if you rebind the input or something...
 		/// </summary>
 		public void RefreshDisplay()
 		{
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
 			m_LastDevice = null;
-			RefreshDisplay(InputContextManager.InputContext, Player);
+			RefreshDisplay(m_PlayerContext.InputContext);
 		}
 
-		private void RefreshDisplay(IInputContext context, PlayerIndex playerIndex)
+		private void RefreshDisplay(IInputContext context)
 		{
 			string deviceLayout;
 
 			if (DisplayMode.Mode != DisplayModes.DisplaySpecificDeviceIgnoringTheCurrentOne) {
-				InputDevice device = context.GetLastUsedInputDevice(playerIndex);
+				InputDevice device = context.GetLastUsedInputDevice();
 
 				// HACK: Prevent from spamming on PC.
 				//		 Keyboard & Mouse are be considered (usually) the same. Gamepads are not - each one comes with its own assets.
@@ -126,7 +126,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				m_LastDevice = device;
 
 				if (DisplayMode.Mode == DisplayModes.UpdateWithCurrentDeviceOnlyForControlScheme) {
-					var lastControlScheme = context.GetLastUsedInputControlScheme(playerIndex).bindingGroup;
+					var lastControlScheme = context.GetLastUsedInputControlScheme().bindingGroup;
 
 					if (!DisplayMode.DisplayedControlScheme.Equals(lastControlScheme, StringComparison.OrdinalIgnoreCase)) {
 
@@ -150,7 +150,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				}
 
 				if (DisplayMode.Mode == DisplayModes.UpdateWithCurrentDeviceExcludeSchemes) {
-					var lastControlScheme = context.GetLastUsedInputControlScheme(playerIndex).bindingGroup;
+					var lastControlScheme = context.GetLastUsedInputControlScheme().bindingGroup;
 
 					if (DisplayMode.ExcludedControlSchemes.Contains(lastControlScheme)) {
 
@@ -183,9 +183,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				deviceLayout = DisplayMode.DisplayedDeviceLayout;
 			}
 
-			InputAction action = context.FindActionFor(playerIndex, InputAction.name);
+			InputAction action = context.FindActionFor(InputAction.name);
 			if (action == null) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} couldn't find specified action {InputAction.name} for player {playerIndex}", this);
+				Debug.LogError($"{nameof(HotkeyDisplayUI)} couldn't find specified action {InputAction.name} for player {m_PlayerContext.PlayerName}", this);
 				return;
 			}
 
@@ -254,23 +254,28 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			SetAdditionalObjects(shown);
 		}
 
+		private void Awake()
+		{
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+		}
+
 		void OnEnable()
 		{
 
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			InputContextManager.InputContext.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
+			m_PlayerContext.InputContext.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
 			m_LastDevice = null;
-			RefreshDisplay(InputContextManager.InputContext, Player);
+			RefreshDisplay(m_PlayerContext.InputContext);
 		}
 
 		void OnDisable()
 		{
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				if (!m_GameQuitting) {
 					Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 					enabled = false;
@@ -280,7 +285,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			SetAdditionalObjects(false);
 
-			InputContextManager.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
+			m_PlayerContext.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
 
 			if (Icon) {
 				Icon.gameObject.SetActive(false);
@@ -311,22 +316,15 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			}
 		}
 
-		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)
+		private void OnLastUsedDeviceChanged()
 		{
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			if (Player == PlayerIndex.MasterPlayer) {
-				if (!InputContextManager.InputContext.IsMasterPlayer(playerIndex))
-					return;
-			} else if (playerIndex != Player) {
-				return;
-			}
-
-			RefreshDisplay(InputContextManager.InputContext, playerIndex);
+			RefreshDisplay(m_PlayerContext.InputContext);
 		}
 
 		void OnValidate()
@@ -341,14 +339,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			if ((Icon && Icon.gameObject == gameObject) || (Text && Text.gameObject == gameObject) || (TextMeshProText && TextMeshProText.gameObject == gameObject)) {
 				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
-			}
-
-			if (Player == PlayerIndex.AnyPlayer) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} doesn't allow setting {nameof(PlayerIndex.AnyPlayer)} for {nameof(Player)}.", this);
-				Player = PlayerIndex.MasterPlayer;
-#if UNITY_EDITOR
-				UnityEditor.EditorUtility.SetDirty(this);
-#endif
 			}
 		}
 

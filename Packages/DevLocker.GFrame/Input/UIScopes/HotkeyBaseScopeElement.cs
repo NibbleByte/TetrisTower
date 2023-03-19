@@ -1,10 +1,8 @@
 #if USE_INPUT_SYSTEM
 
-using DevLocker.GFrame.Input;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -16,9 +14,6 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// </summary>
 	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeyWithInputAction
 	{
-		[Tooltip("Which player should this hotkey be listened to?\nIf unsure or for single player games, leave MasterPlayer.")]
-		public PlayerIndex Player = PlayerIndex.AnyPlayer;
-
 		[Tooltip("Skip the hotkey based on the selected condition.")]
 		[Utils.EnumMask]
 		public SkipHotkeyOption SkipHotkey;
@@ -32,22 +27,22 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected List<InputAction> m_SubscribedActions = new List<InputAction>();
 
 		// Used for multiple event systems (e.g. split screen).
-		protected IPlayerRoot m_PlayerUI;
+		protected IPlayerContext m_PlayerContext;
 
 		protected virtual void Awake()
 		{
-			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
 
 		protected virtual void OnEnable()
 		{
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			InputContextManager.InputContext.PlayersChanged += OnPlayersChanged;
+			m_PlayerContext.InputContext.PlayersChanged += OnPlayersChanged;
 
 			foreach(InputAction action in GetUsedActions()) {
 				m_SubscribedActions.Add(action);
@@ -59,10 +54,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnDisable()
 		{
-			if (InputContextManager.InputContext == null)
+			if (m_PlayerContext.InputContext == null)
 				return;
 
-			InputContextManager.InputContext.PlayersChanged -= OnPlayersChanged;
+			m_PlayerContext.InputContext.PlayersChanged -= OnPlayersChanged;
 
 			m_ActionStarted = false;
 			m_ActionPerformed = false;
@@ -84,7 +79,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputStarted(InputAction.CallbackContext obj)
 		{
-			var selected = m_PlayerUI.SelectedGameObject;
+			var selected = m_PlayerContext.SelectedGameObject;
 
 			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected
@@ -114,7 +109,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputPerformed(InputAction.CallbackContext obj)
 		{
-			var selected = m_PlayerUI.SelectedGameObject;
+			var selected = m_PlayerContext.SelectedGameObject;
 
 			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected
@@ -145,7 +140,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputCancel(InputAction.CallbackContext obj)
 		{
-			var selected = m_PlayerUI.SelectedGameObject;
+			var selected = m_PlayerContext.SelectedGameObject;
 
 			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected
@@ -180,22 +175,16 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public IEnumerable<InputAction> GetUsedActions()
 		{
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				Enumerable.Empty<InputAction>();
 			}
 
 			// Don't use m_SubscribedActions directly as the behaviour may not yet be enabled when this method is called.
 
-			if (Player == PlayerIndex.AnyPlayer) {
-				foreach (InputAction action in InputContextManager.InputContext.FindActionsForAllPlayers(m_InputAction.name)) {
-					yield return action;
-				}
-			} else {
-				InputAction action = InputContextManager.InputContext.FindActionFor(Player, m_InputAction.name);
-				if (action != null) {
-					yield return action;
-				}
+			InputAction action = m_PlayerContext.InputContext.FindActionFor(m_InputAction.name);
+			if (action != null) {
+				yield return action;
 			}
 		}
 

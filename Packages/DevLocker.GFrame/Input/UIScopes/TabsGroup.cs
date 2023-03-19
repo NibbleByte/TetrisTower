@@ -60,7 +60,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private List<Button> m_SubscribedTabButtons = new List<Button>();
 
 		// Used for multiple event systems (e.g. split screen).
-		protected IPlayerRoot m_PlayerUI;
+		protected IPlayerContext m_PlayerContext;
 
 		protected virtual void Awake()
 		{
@@ -77,7 +77,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			NextHotkey?.OnAction.AddListener(OnNextAction);
 			PreviousHotkey?.OnAction.AddListener(OnPreviousAction);
 
-			m_PlayerUI = UIPlayerRootObject.GetPlayerUIRootFor(gameObject);
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
 
 		/// <summary>
@@ -177,7 +177,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnNextAction()
 		{
-			if (!m_PlayerUI.IsActive)
+			if (!m_PlayerContext.IsActive)
 				return;
 
 			List<Button> activeTabs = Tabs.Where(b => b.gameObject.activeInHierarchy).ToList();
@@ -193,14 +193,14 @@ namespace DevLocker.GFrame.Input.UIScope
 				;
 
 			if (lastIndex != nextIndex) {
-				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_PlayerUI.EventSystem), ExecuteEvents.pointerClickHandler);
+				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_PlayerContext.EventSystem), ExecuteEvents.pointerClickHandler);
 				// Button.onClick.Invoke(); // This will ignore disabled state.
 			}
 		}
 
 		protected virtual void OnPreviousAction()
 		{
-			if (!m_PlayerUI.IsActive)
+			if (!m_PlayerContext.IsActive)
 				return;
 
 			List<Button> activeTabs = Tabs.Where(b => b.gameObject.activeInHierarchy).ToList();
@@ -220,7 +220,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (lastIndex != nextIndex) {
-				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_PlayerUI.EventSystem), ExecuteEvents.pointerClickHandler);
+				ExecuteEvents.Execute(activeTabs[nextIndex].gameObject, new PointerEventData(m_PlayerContext.EventSystem), ExecuteEvents.pointerClickHandler);
 				// Button.onClick.Invoke(); // This will ignore disabled state.
 			}
 		}

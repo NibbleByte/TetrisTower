@@ -24,16 +24,16 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			public GameObject[] Objects;
 		}
 
-		[Tooltip("Which player should this hotkey be displayed for?\nIf unsure or for single player games, leave MasterPlayer.")]
-		public PlayerIndex Player = PlayerIndex.MasterPlayer;
-
 		public ControlSchemeActiveObjects[] ControlSchemeObjects;
+
+		// Used for multiple event systems (e.g. split screen).
+		protected IPlayerContext m_PlayerContext;
 
 		private string m_LastControlScheme;
 
-		private void RefreshObjects(IInputContext context, PlayerIndex playerIndex)
+		private void RefreshObjects(IInputContext context)
 		{
-			InputControlScheme scheme = context.GetLastUsedInputControlScheme(playerIndex);
+			InputControlScheme scheme = context.GetLastUsedInputControlScheme();
 
 			if (scheme.bindingGroup == m_LastControlScheme)
 				return;
@@ -65,7 +65,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		void Awake()
 		{
-			foreach(ControlSchemeActiveObjects bind in ControlSchemeObjects) {
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+
+			foreach (ControlSchemeActiveObjects bind in ControlSchemeObjects) {
 				foreach(GameObject obj in bind.Objects) {
 					if (obj) {
 						obj.SetActive(false);
@@ -76,59 +78,44 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		void OnEnable()
 		{
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			InputContextManager.InputContext.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
+			m_PlayerContext.InputContext.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
 			m_LastControlScheme = null;
-			RefreshObjects(InputContextManager.InputContext, Player);
+			RefreshObjects(m_PlayerContext.InputContext);
 		}
 
 		void OnDisable()
 		{
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			InputContextManager.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
+			m_PlayerContext.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
 		}
 
-		private void OnLastUsedDeviceChanged(PlayerIndex playerIndex)
+		private void OnLastUsedDeviceChanged()
 		{
 
-			if (InputContextManager.InputContext == null) {
+			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
-			if (Player == PlayerIndex.MasterPlayer) {
-				if (!InputContextManager.InputContext.IsMasterPlayer(playerIndex))
-					return;
-			} else if (playerIndex != Player) {
-				return;
-			}
-
-			RefreshObjects(InputContextManager.InputContext, playerIndex);
+			RefreshObjects(m_PlayerContext.InputContext);
 		}
 
 		void OnValidate()
 		{
 			if (ControlSchemeObjects.SelectMany(bind => bind.Objects).Any(obj => obj && transform.IsChildOf(obj.transform))) {
 				Debug.LogError($"{nameof(InputControlSchemeActivatorUI)} deactivates game objects that are parents of it. This is not allowed.", this);
-			}
-
-			if (Player == PlayerIndex.AnyPlayer) {
-				Debug.LogError($"{nameof(InputControlSchemeActivatorUI)} doesn't allow setting {nameof(PlayerIndex.AnyPlayer)} for {nameof(Player)}.", this);
-				Player = PlayerIndex.MasterPlayer;
-#if UNITY_EDITOR
-				UnityEditor.EditorUtility.SetDirty(this);
-#endif
 			}
 		}
 	}

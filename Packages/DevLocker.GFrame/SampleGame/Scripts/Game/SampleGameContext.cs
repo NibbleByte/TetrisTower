@@ -22,14 +22,11 @@ namespace DevLocker.GFrame.SampleGame.Game
 	/// </summary>
 	public sealed class SampleGameContext
 	{
-		public SampleGameContext(PlayerInput playerInput, SamplePlayerControls controls, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders)
+		public SampleGameContext(PlayerInput playerInput, SamplePlayerControls controls, IInputContext inputContext)
 		{
 			PlayerInput = playerInput;
 			PlayerControls = controls;
-			PlayerControls.InitStack();
-
-			InputContext = new SinglePlayerInputComponentContext(PlayerInput, PlayerControls.InputStack, bindingDisplayProviders);
-			InputContextManager.SetContext(InputContext);
+			InputContext = inputContext;
 		}
 
 		public SamplePlayerControls PlayerControls { get; }
@@ -37,10 +34,5 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public PlayerInput PlayerInput { get; }
 
 		public IInputContext InputContext { get; }
-
-		public void Dispose()
-		{
-			InputContextManager.DisposeContext();
-		}
 	}
 }
