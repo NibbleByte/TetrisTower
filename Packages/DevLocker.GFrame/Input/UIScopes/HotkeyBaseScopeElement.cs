@@ -42,8 +42,6 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 			}
 
-			m_PlayerContext.InputContext.PlayersChanged += OnPlayersChanged;
-
 			foreach(InputAction action in GetUsedActions()) {
 				m_SubscribedActions.Add(action);
 				action.started += OnInputStarted;
@@ -57,8 +55,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (m_PlayerContext.InputContext == null)
 				return;
 
-			m_PlayerContext.InputContext.PlayersChanged -= OnPlayersChanged;
-
 			m_ActionStarted = false;
 			m_ActionPerformed = false;
 
@@ -69,12 +65,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			m_SubscribedActions.Clear();
-		}
-
-		protected virtual void OnPlayersChanged()
-		{
-			OnDisable();
-			OnEnable();
 		}
 
 		private void OnInputStarted(InputAction.CallbackContext obj)

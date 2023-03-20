@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 
 namespace DevLocker.GFrame.Input
 {
@@ -146,11 +147,6 @@ namespace DevLocker.GFrame.Input
 	public interface IInputContext : IDisposable
 	{
 		/// <summary>
-		/// Notifies if any player joined or left, or any other action that would require a refresh.
-		/// </summary>
-		event Action PlayersChanged;
-
-		/// <summary>
 		/// Last device used got changed.
 		/// </summary>
 		event Action LastUsedDeviceChanged;
@@ -189,6 +185,11 @@ namespace DevLocker.GFrame.Input
 		/// Returns all <see cref="InputAction"/>.
 		/// </summary>
 		IEnumerable<InputAction> GetAllActions();
+
+		/// <summary>
+		/// Get all paired devices to this player.
+		/// </summary>
+		ReadOnlyArray<InputDevice> GetPairedInputDevices();
 
 		/// <summary>
 		/// Get last updated device.

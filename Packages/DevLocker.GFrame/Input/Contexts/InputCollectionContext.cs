@@ -6,12 +6,13 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Utilities;
 
 namespace DevLocker.GFrame.Input.Contexts
 {
 
 	/// <summary>
-	/// Use this as IInputContext if you have a single player game with generated IInputActionCollection class.
+	/// Use this as IInputContext if you don't want to use PlayerInput component, but rather have game with simple generated IInputActionCollection class.
 	/// </summary>
 	public sealed class InputCollectionContext : IInputContext
 	{
@@ -21,10 +22,10 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public IReadOnlyCollection<InputAction> UIActions { get; }
 
-		public event Action PlayersChanged;
 		public event Action LastUsedDeviceChanged;
 
 
+		private InputDevice[] m_PairedDevices = new InputDevice[0];
 		private InputDevice m_LastUsedDevice;
 		private InputControlScheme m_LastUsedControlScheme;
 		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
@@ -42,9 +43,6 @@ namespace DevLocker.GFrame.Input.Contexts
 			}
 
 			m_BindingsDisplayProviders = bindingDisplayProviders != null ? bindingDisplayProviders.ToArray() : new IInputBindingDisplayDataProvider[0];
-
-			// HACK: To silence warning that it is never used.
-			PlayersChanged?.Invoke();
 
 			// Make sure no input is enabled when starting level (including UI).
 			foreach (InputAction action in InputActionsCollection) {
@@ -98,6 +96,16 @@ namespace DevLocker.GFrame.Input.Contexts
 			return m_LastUsedDevice;
 		}
 
+		public ReadOnlyArray<InputDevice> GetPairedInputDevices()
+		{
+			return m_PairedDevices;
+		}
+
+		public void SetPairedInputDevices(IEnumerable<InputDevice> devices)
+		{
+			m_PairedDevices = devices.ToArray();
+		}
+
 		public InputControlScheme GetLastUsedInputControlScheme()
 		{
 			return m_LastUsedControlScheme;
@@ -126,14 +134,17 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		private void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
 		{
-			// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
-			// Trigger event so UI gets refreshed properly.
-			TriggerLastUsedDeviceChanged();
+			if (m_PairedDevices.Contains(device) || m_PairedDevices.Length == 0) {
+
+				// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
+				// Trigger event so UI gets refreshed properly.
+				TriggerLastUsedDeviceChanged();
+			}
 		}
 
 		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
 		{
-			if (m_LastUsedDevice == device)
+			if (m_LastUsedDevice == device || (!m_PairedDevices.Contains(device) && m_PairedDevices.Length != 0))
 				return;
 
 			// Some devices like to spam events like crazy.
