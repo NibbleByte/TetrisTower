@@ -57,7 +57,7 @@ namespace DevLocker.GFrame
 		/// The process will scan all public and private fields and set them based on their type if appropriate reference exists.
 		/// The level supervisor should have added all the needed references for you.
 		/// </summary>
-		public void SetAllReferencesTo(ILevelState state)
+		public void SetAllReferencesTo(object state)
 		{
 			var fields = state.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			var properties = state.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -85,6 +85,17 @@ namespace DevLocker.GFrame
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Add reference to the already existing list of reference. Should not have another reference of the same type.
+		/// </summary>
+		public void AddReference<T>(T reference)
+		{
+			if (m_ContextReferences.OfType<T>().Any())
+				throw new ArgumentException($"Trying to add reference of type \"{nameof(T)}\" that already exists. {reference}");
+
+			m_ContextReferences.Add(reference);
 		}
 
 		/// <summary>

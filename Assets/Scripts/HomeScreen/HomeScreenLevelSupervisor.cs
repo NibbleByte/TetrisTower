@@ -37,7 +37,7 @@ namespace TetrisTower.HomeScreen
 			// StateStack not needed for now.
 			//var levelController = GameObject.FindObjectOfType<HomeScreenController>();
 			//
-			//StatesStack = new LevelStateStack(
+			//StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
 			//	GameContext.GameConfig,
 			//	GameContext.Options,
 			//	GameContext.PlayerControls,

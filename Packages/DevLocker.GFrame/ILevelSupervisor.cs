@@ -93,14 +93,17 @@ namespace DevLocker.GFrame
 	/// <summary>
 	/// Bridge between per-player input and level states.
 	/// </summary>
-	public static class LevelPlayerContextExtensions
+	public static class LevelPlayerContextUtils
 	{
 		/// <summary>
 		/// Short-cut to create <see cref="LevelStateStack"/> specific to this player.
 		/// </summary>
-		public static void CreatePlayerStack(this Input.Contexts.PlayerContextUIRootObject playerRoot, params object[] references)
+		public static LevelStateStack CreatePlayerStack(this Input.Contexts.PlayerContextUIRootObject playerRoot, params object[] references)
 		{
-			playerRoot.AddContextReference(new LevelStateStack(references));
+			var stack = new LevelStateStack(references);
+			playerRoot.AddContextReference(stack);
+			stack.ContextReferences.AddReference(playerRoot);
+			return stack;
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.MessageBox;
 using DevLocker.Utils;
 using System;
@@ -173,7 +174,7 @@ namespace TetrisTower.TowerLevels
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
-			StatesStack = new LevelStateStack(
+			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
 				gameContext,
 				gameContext.GameConfig,
 				gameContext.PlayerControls,
