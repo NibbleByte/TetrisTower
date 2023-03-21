@@ -1,9 +1,6 @@
-using DevLocker.GFrame.Input.UIScope;
-using System;
+using DevLocker.GFrame.Input;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace DevLocker.GFrame.SampleGame.UITester
 {
@@ -12,12 +9,20 @@ namespace DevLocker.GFrame.SampleGame.UITester
 	/// </summary>
 	public class SampleUITesterController : MonoBehaviour
 	{
+		// Used for multiple event systems (e.g. split screen).
+		protected IPlayerContext m_PlayerContext;
+
+		private void Awake()
+		{
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+		}
+
 		public void LoadMainMenu()
 		{
 #if GFRAME_ASYNC
-			Game.SampleLevelsManager.Instance.SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
+			m_PlayerContext.GetLevelManager().SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
 #else
-			Game.SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+			m_PlayerContext.GetLevelManager().SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 #endif
 		}
 	}

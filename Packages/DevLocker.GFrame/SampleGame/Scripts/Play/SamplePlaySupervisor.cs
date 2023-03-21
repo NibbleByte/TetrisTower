@@ -57,7 +57,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 			var uiController = GameObject.FindObjectOfType<SamplePlayUIController>(true);
 
-			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
+			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(SampleLevelsManager.Instance,
 				gameContext.PlayerControls,
 				playerController,
 				uiController

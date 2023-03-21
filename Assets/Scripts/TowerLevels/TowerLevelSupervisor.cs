@@ -174,7 +174,7 @@ namespace TetrisTower.TowerLevels
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
-			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
+			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(GameManager.Instance,
 				gameContext,
 				gameContext.GameConfig,
 				gameContext.PlayerControls,

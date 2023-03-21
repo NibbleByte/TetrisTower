@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,8 +37,13 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 		public StatePanelBinds[] StatePanels;
 
+		// Used for multiple event systems (e.g. split screen).
+		protected IPlayerContext m_PlayerContext;
+
 		void Awake()
 		{
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+
 			foreach (var bind in StatePanels) {
 				bind.Panel.SetActive(false);
 			}
@@ -87,24 +93,28 @@ namespace DevLocker.GFrame.SampleGame.Play
 		}
 
 
-		public void PauseLevel()
+		public async void PauseLevel()
 		{
 			// Will be popped by UI.
-			Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayPausedState());
+			await m_PlayerContext.GetPlayerStateStack().PushStateAsync(new SamplePlayPausedState());
+			//Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayPausedState());
 		}
 
-		public void OpenOptions()
+		public async void OpenOptions()
 		{
 			// Will be popped by UI.
-			Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayOptionsState());
+			await m_PlayerContext.GetPlayerStateStack().PushStateAsync(new SamplePlayOptionsState());
+			//Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayOptionsState());
 		}
 
 		public void ExitToMainMenu()
 		{
 #if GFRAME_ASYNC
-			Game.SampleLevelsManager.Instance.SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
+			m_PlayerContext.GetLevelManager().SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
+			//Game.SampleLevelsManager.Instance.SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
 #else
-			Game.SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+			m_PlayerContext.GetLevelManager().SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+			//Game.SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 #endif
 		}
 	}
