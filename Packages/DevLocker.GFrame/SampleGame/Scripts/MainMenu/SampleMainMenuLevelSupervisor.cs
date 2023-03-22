@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.SampleGame.Game;
 using System.Collections;
 using System.Threading.Tasks;
@@ -51,10 +52,10 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 			// StateStack not needed for now.
 			//var levelController = GameObject.FindObjectOfType<SampleMainMenuController>();
 			//
-			//StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
-			//	GameContext.PlayerControls,
-			//	levelController
-			//	);
+
+			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(SampleLevelsManager.Instance,
+				gameContext.PlayerControls
+				);
 
 			// The whole level is UI, so enable it for the whole level.
 			gameContext.PlayerControls.InputStack.PushActionsState(this);
@@ -68,6 +69,8 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 #endif
 		{
 			SampleLevelsManager.Instance.GameContext.PlayerControls.InputStack.PopActionsState(this);
+
+			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;

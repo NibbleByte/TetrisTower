@@ -233,6 +233,8 @@ namespace TetrisTower.TowerLevels
 
 			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
 
+			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
+
 			return Task.CompletedTask;
 		}
 

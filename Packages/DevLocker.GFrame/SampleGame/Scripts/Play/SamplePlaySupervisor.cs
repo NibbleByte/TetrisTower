@@ -97,6 +97,8 @@ namespace DevLocker.GFrame.SampleGame.Play
 				listener.OnLevelUnloading();
 			}
 
+			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
+
 #if GFRAME_ASYNC
 			return Task.CompletedTask;
 #else

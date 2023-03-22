@@ -106,17 +106,20 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// <summary>
 		/// Add arbitrary object to this player root. Useful for attaching level state stack or similar per player.
 		/// </summary>
-		public void AddContextReference(object reference) => m_ContextReferences.Add(reference);
+		public void AddContextReference<T>(T reference)
+		{
+			if (GetContextReference<T>() != null) {
+				Debug.LogError($"Trying to add duplicate reference: {reference}!");
+				return;
+			}
+
+			m_ContextReferences.Add(reference);
+		}
 
 		/// <summary>
 		/// Get arbitrary object from this player root. Useful for attaching level state stack or similar per player.
 		/// </summary>
 		public T GetContextReference<T>() => m_ContextReferences.OfType<T>().FirstOrDefault();
-
-		/// <summary>
-		/// Remove arbitrary object from this player root. Useful for attaching level state stack or similar per player.
-		/// </summary>
-		public bool RemoveContextReference(object reference) => m_ContextReferences.Remove(reference);
 
 		/// <summary>
 		/// Remove arbitrary object from this player root. Useful for attaching level state stack or similar per player.
