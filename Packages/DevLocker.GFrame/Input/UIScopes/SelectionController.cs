@@ -1,3 +1,5 @@
+using DevLocker.GFrame.Input.Contexts;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -37,7 +39,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private string m_LastControlScheme = "";
 		private bool m_ControlSchemeMatched = true;
 
-		private static SelectionController m_ActiveInstance;
+		private static Dictionary<PlayerContextUIRootObject, SelectionController> m_ActiveInstances = new Dictionary<PlayerContextUIRootObject, SelectionController>();
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
@@ -63,11 +65,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			if (m_SelectRequested) {
 
+				SelectionController activeInstance = GetActiveInstanceForThisPlayer();
+
 				// Call this on update, to avoid errors while switching active object (turn on one, turn off another).
-				if (m_ActiveInstance == null) {
-					m_ActiveInstance = this;
+				if (activeInstance == null) {
+					m_ActiveInstances.Add(m_PlayerContext.GetRootObject(), this);
 				} else {
-					Debug.LogError($"There are two or more {nameof(SelectionController)} instances active at the same time - this is not allowed. Currently active: \"{m_ActiveInstance.name}\". Additional instance: \"{name}\"", this);
+					Debug.LogError($"There are two or more {nameof(SelectionController)} instances active at the same time - this is not allowed. Currently active: \"{activeInstance.name}\". Additional instance: \"{name}\"", this);
 				}
 
 #if USE_INPUT_SYSTEM
@@ -170,9 +174,21 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnDisable()
 		{
-			if (m_ActiveInstance == this) {
-				m_ActiveInstance = null;
+			if (GetActiveInstanceForThisPlayer() == this) {
+				m_ActiveInstances.Remove(m_PlayerContext.GetRootObject());
 			}
+		}
+
+		protected SelectionController GetActiveInstanceForThisPlayer()
+		{
+			PlayerContextUIRootObject rootObject = m_PlayerContext?.GetRootObject();
+			if (rootObject == null)
+				return null;
+
+			SelectionController result;
+			m_ActiveInstances.TryGetValue(rootObject, out result);
+
+			return result;
 		}
 
 		protected virtual void OnValidate()
