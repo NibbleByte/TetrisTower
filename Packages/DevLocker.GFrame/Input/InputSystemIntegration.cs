@@ -230,6 +230,111 @@ namespace DevLocker.GFrame.Input
 		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action);
 	}
 
+	/// <summary>
+	/// Use this to specify what <see cref="InputAction"/>s should be enabled.
+	/// When you're done using them call <see cref="Dispose"/> to disable them back.
+	/// Has checks to see if action state is what is expected and will warn if there are some conflicts.
+	/// </summary>
+	public class InputEnabler : IDisposable
+	{
+		private object m_Source;
+		private List<InputAction> m_Actions = new List<InputAction>();
+
+		/// <summary>
+		/// Provide source for debug & logging purposes.
+		/// </summary>
+		public InputEnabler(object source)
+		{
+			m_Source = source;
+		}
+
+		/// <summary>
+		/// Enable specified actions and remember them for later.
+		/// </summary>
+		public void Enable(params InputAction[] actions)
+		{
+			if (actions.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			foreach (InputAction action in actions) {
+
+				if (m_Actions.Contains(action)) {
+					Debug.LogWarning($"Trying to enable InputAction \"{action.name}\" that is already owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
+					continue;
+				}
+
+				if (action.enabled) {
+					Debug.LogWarning($"Trying to enable InputAction \"{action.name}\" that is already enabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
+
+				} else {
+					action.Enable();
+					m_Actions.Add(action);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Disable and forget specified actions.
+		/// </summary>
+		public void Disable(params InputAction[] actions)
+		{
+			if (actions.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			foreach (InputAction action in actions) {
+
+				if (!m_Actions.Contains(action)) {
+					Debug.LogWarning($"Trying to disable InputAction \"{action.name}\" that is not owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
+					continue;
+				}
+
+				if (action.enabled) {
+					action.Disable();
+					m_Actions.Remove(action);
+				} else {
+					Debug.LogWarning($"Trying to disable InputAction \"{action.name}\" that is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Enable specified actions and remember them for later.
+		/// </summary>
+		public void Enable(InputActionMap inputActionsMap)
+		{
+			foreach(InputAction action in inputActionsMap) {
+				Enable(action);
+			}
+		}
+
+		/// <summary>
+		/// Disable and forget specified actions.
+		/// </summary>
+		public void Disable(InputActionMap inputActionsMap)
+		{
+			foreach(InputAction action in inputActionsMap) {
+				Disable(action);
+			}
+		}
+
+		/// <summary>
+		/// Call this when you're done using those InputActions to disable all of them.
+		/// </summary>
+		public void Dispose()
+		{
+			foreach (InputAction action in m_Actions) {
+				if (action.enabled) {
+					action.Disable();
+				}else {
+					Debug.LogWarning($"Trying to disable InputAction \"{action.name}\" is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
+				}
+			}
+
+			m_Source = null;
+			m_Actions = null;
+		}
+	}
+
 	public class PlayerContextUtils
 	{
 		public static PlayerContextUIRootObject GlobalPlayerContext => PlayerContextUIRootObject.GlobalPlayerContext;

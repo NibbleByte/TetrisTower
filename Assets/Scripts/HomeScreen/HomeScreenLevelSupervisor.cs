@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.MessageBox;
 using DevLocker.Utils;
 using System;
@@ -13,6 +14,8 @@ namespace TetrisTower.HomeScreen
 	public class HomeScreenLevelSupervisor : ILevelSupervisor
 	{
 		public LevelStateStack StatesStack { get; private set; }
+
+		private InputEnabler m_InputEnabler;
 
 		public async Task LoadAsync()
 		{
@@ -45,13 +48,13 @@ namespace TetrisTower.HomeScreen
 			//	);
 
 			// The whole level is UI, so enable it for the whole level.
-			gameContext.PlayerControls.InputStack.PushActionsState(this);
-			gameContext.PlayerControls.UI.Enable();
+			m_InputEnabler = new InputEnabler(this);
+			m_InputEnabler.Enable(gameContext.PlayerControls.UI);
 		}
 
 		public Task UnloadAsync()
 		{
-			GameManager.Instance.GameContext.PlayerControls.InputStack.PopActionsState(this);
+			m_InputEnabler.Dispose();
 
 			return Task.CompletedTask;
 		}

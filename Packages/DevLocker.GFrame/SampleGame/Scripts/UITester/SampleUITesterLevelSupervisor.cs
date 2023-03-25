@@ -13,6 +13,8 @@ namespace DevLocker.GFrame.SampleGame.UITester
 	{
 		public LevelStateStack StatesStack { get; private set; }
 
+		private InputEnabler m_InputEnabler;
+
 #if GFRAME_ASYNC
 		public async Task LoadAsync()
 #else
@@ -51,15 +53,14 @@ namespace DevLocker.GFrame.SampleGame.UITester
 
 			// StateStack not needed for now.
 			//var levelController = GameObject.FindObjectOfType<SampleMainMenuController>();
-			//var levelController = GameObject.FindObjectOfType<SampleMainMenuController>();
 
 			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
 				gameContext.PlayerControls
 				);
 
 			// The whole level is UI, so enable it for the whole level.
-			gameContext.PlayerControls.InputStack.PushActionsState(this);
-			gameContext.PlayerControls.UI.Enable();
+			m_InputEnabler = new InputEnabler(this);
+			m_InputEnabler.Enable(gameContext.PlayerControls.UI);
 		}
 
 #if GFRAME_ASYNC
@@ -68,7 +69,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 		public IEnumerator Unload()
 #endif
 		{
-			SampleLevelsManager.Instance.GameContext.PlayerControls.InputStack.PopActionsState(this);
+			m_InputEnabler.Dispose();
 
 			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
 

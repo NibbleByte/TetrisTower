@@ -15,14 +15,6 @@ namespace DevLocker.GFrame.Input
 	/// If another source requests a push, the current flags state will be recorded in the entry at the top,
 	/// then a push will be initiated, creating the new top entry.
 	///
-	/// IMPORTANT: On entering a new game state, first call <see cref="InputActionsStack.PushActionsState(object,bool)"/>,
-	///			   then enable the desired actions / action maps. Make sure you call those before HotkeyScope too.
-	///
-	/// This is done, as pushing and popping can be quite distant from each other and a lot of stuff can happen in between.
-	/// Example: Player is in the shop - pushed ShopState. Clicks on a "Buy" button, a message is shown to confirm, pushing "ConfirmState".
-	///			 While the player decides, the shop screen is closed because time passed and the shop keeper left - pop ShopState.
-	///			 The top of the stack and current input state is still "ConfirmState".
-	///
 	/// PRO TIP: Prefer sticking the <see cref="InputActionsStack" /> in the IInputActionCollection itself using the partial feature.
 	///			 Example:
 	///

@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.SampleGame.Game;
 using System.Collections;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private SamplePlayerController m_PlayerController;
 		private SamplePlayUIController m_UIController;
 
+		private InputEnabler m_InputEnabler;
+
 #if GFRAME_ASYNC
 		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 #else
@@ -26,14 +29,14 @@ namespace DevLocker.GFrame.SampleGame.Play
 			contextReferences.SetByType(out m_PlayerController);
 			contextReferences.SetByType(out m_UIController);
 
-			m_PlayerControls.InputStack.PushActionsState(this);
-			m_PlayerControls.UI.Enable();
+			m_InputEnabler = new InputEnabler(this);
+			m_InputEnabler.Enable(m_PlayerControls.UI);
+			m_InputEnabler.Enable(m_PlayerControls.PlayChopper);
 			m_PlayerControls.PlayChopper.SetCallbacks(this);
-			m_PlayerControls.PlayChopper.Enable();
 
 			// You don't want "Return" key to trigger selected buttons.
-			m_PlayerControls.UI.Submit.Disable();
-			m_PlayerControls.UI.Navigate.Disable();
+			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
+			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
 
 			m_UIController.SwitchState(PlayUIState.Play, false);
 
@@ -51,7 +54,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 #endif
 		{
 			m_PlayerControls.PlayChopper.SetCallbacks(null);
-			m_PlayerControls.InputStack.PopActionsState(this);
+			m_InputEnabler.Dispose();
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;

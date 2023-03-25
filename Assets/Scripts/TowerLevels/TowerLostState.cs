@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,8 @@ namespace TetrisTower.TowerLevels
 		private ConeVisualsGrid m_VisualsGrid;
 		private TowerConeVisualsController m_VisualsController;
 
+		private InputEnabler m_InputEnabler;
+
 		private ILostAnimationExecutor m_CurrentAnimation;
 		private bool m_Interrupted;
 
@@ -33,13 +36,13 @@ namespace TetrisTower.TowerLevels
 			contextReferences.SetByType(out m_VisualsController);
 
 
-			m_PlayerControls.InputStack.PushActionsState(this);
-			m_PlayerControls.UI.Enable();
+			m_InputEnabler = new InputEnabler(this);
+			m_InputEnabler.Enable(m_PlayerControls.UI);
+			m_InputEnabler.Enable(m_PlayerControls.CommonHotkeys);
 			m_PlayerControls.CommonHotkeys.SetCallbacks(this);
-			m_PlayerControls.CommonHotkeys.Enable();
 			// HACK: Listen for touch-screen tapping as they don't have CommonHotkeys (back button is not ideal).
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
-			m_PlayerControls.TowerLevelPlay.PointerPress.Enable();
+			m_InputEnabler.Enable(m_PlayerControls.TowerLevelPlay.PointerPress);
 
 			// These are still active (Menu hotkey).
 			m_PlayerControls.TowerLevelShared.Disable();
@@ -74,7 +77,7 @@ namespace TetrisTower.TowerLevels
 		{
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnPointerPressed;
 			m_PlayerControls.CommonHotkeys.SetCallbacks(null);
-			m_PlayerControls.InputStack.PopActionsState(this);
+			m_InputEnabler.Dispose();
 
 			if (!m_Interrupted) {
 				m_Interrupted = true;

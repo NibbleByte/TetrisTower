@@ -8,6 +8,7 @@ using TetrisTower.Game;
 using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DevLocker.GFrame.Input;
 
 namespace TetrisTower.TowerLevels
 {
@@ -28,6 +29,8 @@ namespace TetrisTower.TowerLevels
 
 		private int m_LastUpdateFrame;
 
+		private InputEnabler m_InputEnabler;
+
 		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 		{
 			contextReferences.SetByType(out m_PlayerControls);
@@ -36,14 +39,14 @@ namespace TetrisTower.TowerLevels
 			contextReferences.SetByType(out m_GameConfig);
 			contextReferences.SetByType(out m_Options);
 
-			m_PlayerControls.InputStack.PushActionsState(this);
-			m_PlayerControls.UI.Enable();
+			m_InputEnabler = new InputEnabler(this);
+			m_InputEnabler.Enable(m_PlayerControls.UI);
+			m_InputEnabler.Enable(m_PlayerControls.TowerLevelPlay);
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(this);
-			m_PlayerControls.TowerLevelPlay.Enable();
 
 			// You don't want "Return" key to trigger selected buttons.
-			m_PlayerControls.UI.Submit.Disable();
-			m_PlayerControls.UI.Navigate.Disable();
+			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
+			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
 
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
@@ -57,7 +60,7 @@ namespace TetrisTower.TowerLevels
 		public Task ExitStateAsync()
 		{
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
-			m_PlayerControls.InputStack.PopActionsState(this);
+			m_InputEnabler.Dispose();
 
 			MessageBox.Instance.MessageShown -= m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed -= m_LevelController.ResumeLevel;

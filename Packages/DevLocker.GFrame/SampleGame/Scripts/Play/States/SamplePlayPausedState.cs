@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.SampleGame.Game;
 using System.Collections;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private SamplePlayerControls m_PlayerControls;
 		private SamplePlayUIController m_UIController;
 
+		private InputEnabler m_InputEnabler;
+
 #if GFRAME_ASYNC
 		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
 #else
@@ -21,8 +24,8 @@ namespace DevLocker.GFrame.SampleGame.Play
 			contextReferences.SetByType(out m_PlayerControls);
 			contextReferences.SetByType(out m_UIController);
 
-			m_PlayerControls.InputStack.PushActionsState(this);
-			m_PlayerControls.UI.Enable();
+			m_InputEnabler = new InputEnabler(this);
+			m_InputEnabler.Enable(m_PlayerControls.UI);
 
 			m_UIController.SwitchState(PlayUIState.Paused);
 
@@ -39,7 +42,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public IEnumerator ExitState()
 #endif
 		{
-			m_PlayerControls.InputStack.PopActionsState(this);
+			m_InputEnabler.Dispose();
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;
