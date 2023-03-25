@@ -9,7 +9,7 @@ namespace DevLocker.GFrame.Input.Contexts
 	/// <summary>
 	/// When using multiple event systems (e.g. split-screen) add this component to the root UI canvas object of each player.
 	/// This marks all children as owned by the specific player.
-	/// At some point set the owning event system via <see cref="SetupPlayer"/> (edit time or via code).
+	/// At some point set the owning event system via <see cref="SetupPlayer"/>.
 	/// Other child components may use this information to work properly in such environment.
 	///
 	/// Make sure the component exists on the Awake() step of the child objects, i.e. have it defined in the UI prefab. If that is not possible:
@@ -19,7 +19,7 @@ namespace DevLocker.GFrame.Input.Contexts
 	///		- If not working with prefabs - add the component to the scene UI root game object, instantiate it and destroy the original.
 	///
 	/// Additionally, there is a <see cref="GlobalPlayerContext"/> fall-back instance automatically created for any objects that do not belong to any player.
-	/// For this reason, for single player game don't attach any components.
+	/// For this reason, for single player game don't attach any components. Just call <see cref="SetupGlobal"/>.
 	///
 	/// Note: this is how Unity UI can support multiple players each having their own UI selection and navigation.
 	///		  Basically they are limited by the <see cref="UnityEngine.InputSystem.UI.MultiplayerEventSystem.playerRoot"/>
@@ -62,6 +62,10 @@ namespace DevLocker.GFrame.Input.Contexts
 			}
 		}
 
+
+		// Called when setup happens or immediately if setup was already done.
+		private IPlayerContext.SetupCallbackDelegate m_CallbacksOnSetup;
+
 		/// <summary>
 		/// Is the player setup ready.
 		/// </summary>
@@ -83,8 +87,7 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// <summary>
 		/// Event system used by this player.
 		/// </summary>
-		public EventSystem EventSystem => m_EventSystem;
-		[SerializeField] private EventSystem m_EventSystem;
+		public EventSystem EventSystem { get; private set; }
 
 		private List<object> m_ContextReferences = new List<object>();
 
@@ -161,7 +164,21 @@ namespace DevLocker.GFrame.Input.Contexts
 		{
 			InputContext?.Dispose();
 			m_PlayerRootObjects.Remove(this);
-			m_EventSystem = null;
+			EventSystem = null;
+		}
+
+		/// <summary>
+		/// Handler is called when setup (<see cref="SetupGlobal"/> or <see cref="SetupPlayer"/>) happens or immediately if setup was already done.
+		/// Use this to delay your initialization if you need the InputContext on Awake() or OnEnable(), but it is not yet available.
+		/// Once called after setup, the callback is lost - won't be called again so no need to unsubscribe.
+		/// </summary>
+		public void AddSetupCallback(IPlayerContext.SetupCallbackDelegate setupReadyCallback)
+		{
+			if (IsActive) {
+				setupReadyCallback(false);
+			} else {
+				m_CallbacksOnSetup += setupReadyCallback;
+			}
 		}
 
 		/// <summary>
@@ -175,9 +192,12 @@ namespace DevLocker.GFrame.Input.Contexts
 			}
 
 			InputContext = inputContext;
-			m_EventSystem = eventSystem;
+			EventSystem = eventSystem;
 
 			transform.SetParent(eventSystem.transform);
+
+			m_CallbacksOnSetup?.Invoke(true);
+			m_CallbacksOnSetup = null;
 		}
 
 		/// <summary>
@@ -197,7 +217,10 @@ namespace DevLocker.GFrame.Input.Contexts
 #endif
 
 			InputContext = inputContext;
-			m_EventSystem = eventSystem;
+			EventSystem = eventSystem;
+
+			m_CallbacksOnSetup?.Invoke(true);
+			m_CallbacksOnSetup = null;
 		}
 	}
 }

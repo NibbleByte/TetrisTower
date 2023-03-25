@@ -17,9 +17,18 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 		public void StartNewGame()
 		{
 #if GFRAME_ASYNC
-			m_PlayerContext.GetLevelManager().SwitchLevelAsync(new Play.SamplePlaySupervisor());
+			Game.SampleLevelsManager.Instance.SwitchLevelAsync(new Play.SamplePlaySupervisor());
 #else
-			m_PlayerContext.GetLevelManager().SwitchLevel(new Play.SamplePlaySupervisor());
+			Game.SampleLevelsManager.Instance.SwitchLevel(new Play.SamplePlaySupervisor());
+#endif
+		}
+
+		public void StartMultiplayerNewGame()
+		{
+#if GFRAME_ASYNC
+			Game.SampleLevelsManager.Instance.SwitchLevelAsync(new Play.SampleMultiPlaySupervisor());
+#else
+			Game.SampleLevelsManager.Instance.SwitchLevel(new Play.SampleMultiPlaySupervisor());
 #endif
 		}
 	}

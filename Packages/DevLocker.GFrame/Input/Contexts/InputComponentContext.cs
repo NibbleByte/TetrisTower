@@ -61,8 +61,10 @@ namespace DevLocker.GFrame.Input.Contexts
 
 			UIActions = uiActions;
 
-			m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
-			m_LastUsedDevice = InputSystem.devices.FirstOrDefault(d => m_LastUsedControlScheme.SupportsDevice(d));
+			if (PlayerInput.currentControlScheme != null) {
+				m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
+				m_LastUsedDevice = InputSystem.devices.FirstOrDefault(d => m_LastUsedControlScheme.SupportsDevice(d));
+			}
 
 			m_BindingsDisplayProviders = bindingDisplayProviders != null ? bindingDisplayProviders.ToArray() : new IInputBindingDisplayDataProvider[0];
 
@@ -99,11 +101,14 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false)
 		{
-			return PlayerInput.actions.FindAction(actionNameOrId, throwIfNotFound);
+			return PlayerInput ? PlayerInput.actions.FindAction(actionNameOrId, throwIfNotFound) : null;
 		}
 
 		public IEnumerable<InputAction> FindActionsForAllPlayers(string actionNameOrId, bool throwIfNotFound = false)
 		{
+			if (PlayerInput == null)
+				yield break;
+
 			yield return PlayerInput.actions.FindAction(actionNameOrId, throwIfNotFound);
 		}
 
@@ -124,7 +129,7 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public IEnumerable<InputAction> GetAllActions()
 		{
-			return PlayerInput.actions;
+			return PlayerInput ? PlayerInput.actions : Enumerable.Empty<InputAction>();
 		}
 
 		public InputDevice GetLastUsedInputDevice()
@@ -134,7 +139,7 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public ReadOnlyArray<InputDevice> GetPairedInputDevices()
 		{
-			return PlayerInput.devices;
+			return PlayerInput ? PlayerInput.devices : new InputDevice[0];
 		}
 
 		public InputControlScheme GetLastUsedInputControlScheme()
@@ -149,6 +154,9 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public IEnumerable<InputControlScheme> GetAllInputControlSchemes()
 		{
+			if (PlayerInput == null)
+				yield break;
+
 			foreach(InputControlScheme controlScheme in PlayerInput.actions.controlSchemes) {
 				yield return controlScheme;
 			}
@@ -175,6 +183,9 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		private void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
 		{
+			if (PlayerInput == null)
+				return;
+
 			if (PlayerInput.devices.Contains(device)) {
 
 				// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
@@ -185,7 +196,7 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
 		{
-			if (m_LastUsedDevice == device || !PlayerInput.devices.Contains(device))
+			if (m_LastUsedDevice == device || PlayerInput == null || !PlayerInput.devices.Contains(device))
 				return;
 
 			// Some devices like to spam events like crazy.

@@ -53,7 +53,7 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 			//var levelController = GameObject.FindObjectOfType<SampleMainMenuController>();
 			//
 
-			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(SampleLevelsManager.Instance,
+			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
 				gameContext.PlayerControls
 				);
 

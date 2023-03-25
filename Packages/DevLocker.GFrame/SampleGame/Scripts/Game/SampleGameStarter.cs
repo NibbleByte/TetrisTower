@@ -48,6 +48,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 			var levelFader = Instantiate(LevelFader.gameObject, transform).GetComponent<UIUtils.UISimpleCanvasGroupFader>();
 			Instantiate(MessageBoxPrefab.gameObject, transform);
 
+			gameInputObject.name = gameInputObject.name.Replace("(Clone)", "-Global");
 			var playerInput = gameInputObject.GetComponentInChildren<PlayerInput>();
 			playerInput.actions = playerControls.asset;
 
@@ -71,6 +72,15 @@ namespace DevLocker.GFrame.SampleGame.Game
 		void Start()
 		{
 			// Boot game from current scene
+			if (GameObject.FindObjectOfType<PlayerInputManager>()) {
+#if GFRAME_ASYNC
+				SampleLevelsManager.Instance.SwitchLevelAsync(new Play.SampleMultiPlaySupervisor());
+#else
+				SampleLevelsManager.Instance.SwitchLevel(new Play.SampleMultiPlaySupervisor());
+#endif
+				return;
+			}
+
 			if (GameObject.FindObjectOfType<Play.SamplePlayerController>()) {
 #if GFRAME_ASYNC
 				SampleLevelsManager.Instance.SwitchLevelAsync(new Play.SamplePlaySupervisor());

@@ -17,6 +17,11 @@ namespace DevLocker.GFrame
 		public LevelStateContextReferences(IEnumerable<object> contextReferences)
 		{
 			m_ContextReferences = contextReferences.Where(obj => obj != null).ToList();
+
+			var duplicateGroups = m_ContextReferences.GroupBy(r => r.GetType()).Where(g => g.Count() > 1);
+			if (duplicateGroups.Any()) {
+				throw new ArgumentException($"Trying to add references of the same type: {duplicateGroups.First().Key}");
+			}
 		}
 
 		/// <summary>

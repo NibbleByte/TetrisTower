@@ -96,11 +96,16 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
+		protected bool m_HasInitialized = false;
+
 		/// <summary>
 		/// Call this if you rebind the input or something...
 		/// </summary>
 		public void RefreshDisplay()
 		{
+			if (!m_HasInitialized)
+				return;
+
 			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
@@ -257,10 +262,20 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+
+			m_PlayerContext.AddSetupCallback((delayedSetup) => {
+				m_HasInitialized = true;
+
+				if (delayedSetup && isActiveAndEnabled) {
+					OnEnable();
+				}
+			});
 		}
 
 		void OnEnable()
 		{
+			if (!m_HasInitialized)
+				return;
 
 			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
@@ -275,6 +290,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		void OnDisable()
 		{
+			if (!m_HasInitialized)
+				return;
+
 			if (m_PlayerContext.InputContext == null) {
 				if (!m_GameQuitting) {
 					Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);

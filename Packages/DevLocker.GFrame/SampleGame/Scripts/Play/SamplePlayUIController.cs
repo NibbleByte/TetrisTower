@@ -96,24 +96,24 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public async void PauseLevel()
 		{
 			// Will be popped by UI.
-			await m_PlayerContext.GetPlayerStateStack().PushStateAsync(new SamplePlayPausedState());
+			await m_PlayerContext.GetPlayerLevelStateStack().PushStateAsync(new SamplePlayPausedState());
 			//Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayPausedState());
 		}
 
 		public async void OpenOptions()
 		{
 			// Will be popped by UI.
-			await m_PlayerContext.GetPlayerStateStack().PushStateAsync(new SamplePlayOptionsState());
+			await m_PlayerContext.GetPlayerLevelStateStack().PushStateAsync(new SamplePlayOptionsState());
 			//Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayOptionsState());
 		}
 
 		public void ExitToMainMenu()
 		{
 #if GFRAME_ASYNC
-			m_PlayerContext.GetLevelManager().SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
+			Game.SampleLevelsManager.Instance.SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
 			//Game.SampleLevelsManager.Instance.SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
 #else
-			m_PlayerContext.GetLevelManager().SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
+			Game.SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 			//Game.SampleLevelsManager.Instance.SwitchLevel(new MainMenu.SampleMainMenuLevelSupervisor());
 #endif
 		}

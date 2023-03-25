@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,7 +22,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private Rigidbody m_Rigidbody;
 		private Vector3 m_Velocity;
 
-		private LevelsManager m_LevelManager;
+		private IPlayerContext m_PlayerContext;
 
 		void Awake()
 		{
@@ -33,7 +34,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			// Implementation for ILevelLoadListener
 			// Add here logic that should happen after the level was loaded.
 
-			contextReferences.SetByType(out m_LevelManager);
+			contextReferences.SetByType(out m_PlayerContext);
 		}
 
 		public void OnLevelUnloading()
@@ -56,12 +57,12 @@ namespace DevLocker.GFrame.SampleGame.Play
 			}
 		}
 
-		public void SwitchToChopper()
+		public async void SwitchToChopper()
 		{
 			m_Rigidbody.isKinematic = true;
 			m_Velocity = Vector3.zero;
 
-			m_LevelManager.SetLevelState(new SamplePlayChopperState());
+			await m_PlayerContext.GetPlayerLevelStateStack().SetStateAsync(new SamplePlayChopperState());
 		}
 
 		#endregion
@@ -74,12 +75,12 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_Velocity = movement;
 		}
 
-		public void SwitchToJumper()
+		public async void SwitchToJumper()
 		{
 			m_Rigidbody.isKinematic = false;
 			m_Velocity = Vector3.zero;
 
-			m_LevelManager.SetLevelState(new SamplePlayJumperState());
+			await m_PlayerContext.GetPlayerLevelStateStack().SetStateAsync(new SamplePlayJumperState());
 		}
 
 		#endregion

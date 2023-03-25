@@ -139,6 +139,15 @@ namespace DevLocker.GFrame.Input
 		/// Get the top-most root object.
 		/// </summary>
 		PlayerContextUIRootObject GetRootObject();
+
+
+		/// <summary>
+		/// Called when setup (<see cref="PlayerContextUIRootObject.SetupGlobal"/> or <see cref="PlayerContextUIRootObject.SetupPlayer"/>) happens or immediately if setup was already done.
+		/// Use this to delay your initialization if you need the InputContext on Awake() or OnEnable(), but it is not yet available.
+		/// Once called after setup, the callback is lost - won't be called again so no need to unsubscribe.
+		/// </summary>
+		void AddSetupCallback(SetupCallbackDelegate setupReadyCallback);
+		delegate void SetupCallbackDelegate(bool delayedSetup);
 	}
 
 	/// <summary>

@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,11 +11,16 @@ namespace DevLocker.GFrame.UIUtils
 	{
 		private Button m_Button;
 
+		// Used for multiple event systems (e.g. split screen).
+		protected IPlayerContext m_PlayerContext;
+
 		void Awake()
 		{
 			m_Button = GetComponent<Button>();
 
 			m_Button.onClick.AddListener(OnButtonClick);
+
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
 
 		private void OnDestroy()
@@ -24,12 +30,9 @@ namespace DevLocker.GFrame.UIUtils
 			}
 		}
 
-		private void OnButtonClick()
+		private async void OnButtonClick()
 		{
-			// Assuming there is only one instance.
-			// Singleton (if present) is implemented by the user code which is not accessible here.
-			var levelsManager = GameObject.FindObjectOfType<LevelsManager>();
-			levelsManager.PopLevelState();
+			await m_PlayerContext.GetPlayerLevelStateStack().PopStateAsync();
 		}
 	}
 }

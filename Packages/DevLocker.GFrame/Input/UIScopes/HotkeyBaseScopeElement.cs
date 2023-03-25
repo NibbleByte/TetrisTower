@@ -29,13 +29,26 @@ namespace DevLocker.GFrame.Input.UIScope
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
+		protected bool m_HasInitialized = false;
+
 		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+
+			m_PlayerContext.AddSetupCallback((delayedSetup) => {
+				m_HasInitialized = true;
+
+				if (delayedSetup && isActiveAndEnabled) {
+					OnEnable();
+				}
+			});
 		}
 
 		protected virtual void OnEnable()
 		{
+			if (!m_HasInitialized)
+				return;
+
 			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
@@ -52,6 +65,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnDisable()
 		{
+			if (!m_HasInitialized)
+				return;
+
 			if (m_PlayerContext.InputContext == null)
 				return;
 
@@ -165,9 +181,12 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public IEnumerable<InputAction> GetUsedActions()
 		{
-			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
-				Enumerable.Empty<InputAction>();
+			if (m_PlayerContext?.InputContext == null) {
+				// UIScope scans for inactive elements as well. Not sure if that is ok.
+				if (m_HasInitialized) {
+					Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
+				}
+				yield break;
 			}
 
 			// Don't use m_SubscribedActions directly as the behaviour may not yet be enabled when this method is called.

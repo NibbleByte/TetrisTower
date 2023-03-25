@@ -98,11 +98,10 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Short-cut to create <see cref="LevelStateStack"/> specific to this player.
 		/// </summary>
-		public static LevelStateStack CreatePlayerStack(this Input.Contexts.PlayerContextUIRootObject playerRoot, LevelsManager levelManager, params object[] references)
+		public static LevelStateStack CreatePlayerStack(this Input.Contexts.PlayerContextUIRootObject playerRoot, params object[] references)
 		{
 			var stack = new LevelStateStack(references);
 			playerRoot.AddContextReference(stack);
-			stack.ContextReferences.AddReference(levelManager);
 			stack.ContextReferences.AddReference(playerRoot);
 			return stack;
 		}
@@ -110,7 +109,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Short-cut to get the <see cref="LevelStateStack"/> for this player.
 		/// </summary>
-		public static LevelStateStack GetPlayerStateStack(this Input.IPlayerContext playerRoot)
+		public static LevelStateStack GetPlayerLevelStateStack(this Input.IPlayerContext playerRoot)
 		{
 			return playerRoot.GetContextReference<LevelStateStack>();
 		}
@@ -120,7 +119,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public static LevelsManager GetLevelManager(this Input.IPlayerContext playerRoot)
 		{
-			return playerRoot.GetPlayerStateStack().ContextReferences.TryFindByType<LevelsManager>();
+			return playerRoot.GetPlayerLevelStateStack().ContextReferences.TryFindByType<LevelsManager>();
 		}
 	}
 }

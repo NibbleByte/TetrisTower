@@ -147,7 +147,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
 
-		private bool m_HasInitialized = false;
+		protected bool m_HasInitialized = false;
 
 		private bool m_GameQuitting = false;
 
@@ -163,9 +163,23 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void Awake()
 		{
-			if (!m_HasInitialized) {
-				Initialize();
-			}
+			// Can be RootObject or RootForward.
+			IPlayerContext playerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+
+			playerContext.AddSetupCallback((delayedSetup) => {
+
+				bool result = Initialize();
+				if (!result) {
+					Debug.LogError($"UIScope {name} initialize failed, which should be impossible! Delayed setup: {delayedSetup}.");
+					return;
+				}
+
+				m_HasInitialized = true;
+
+				if (delayedSetup && isActiveAndEnabled) {
+					OnEnable();
+				}
+			});
 		}
 
 		void OnApplicationQuit()
@@ -206,15 +220,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			ScanForChildScopeElements();
 
 			return true;
-		}
-
-		protected virtual void Update()
-		{
-			if (!m_HasInitialized) {
-				if (Initialize()) {
-					OnEnable();
-				}
-			}
 		}
 
 		void OnEnable()
@@ -450,10 +455,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void ForceRefocusScope()
 		{
 			if (!m_HasInitialized) {
-				if (!Initialize()) {
-					Debug.LogWarning($"Couldn't focus on {name} as it isn't initialized.", this);
-					return;
-				}
+				Debug.LogWarning($"Couldn't focus on {name} as it isn't initialized.", this);
+				return;
 			}
 
 			if (!AutomaticFocus) {
@@ -485,10 +488,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void ScanForChildScopeElements()
 		{
 			if (!m_HasInitialized) {
-				if (!Initialize()) {
-					Debug.LogWarning($"Couldn't scan child scope elements for {name} as it isn't initialized.", this);
-					return;
-				}
+				Debug.LogWarning($"Couldn't scan child scope elements for {name} as it isn't initialized.", this);
+				return;
 			}
 
 			m_ScopeElements.Clear();
@@ -603,8 +604,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			// If this scope isn't still initialized, do it now, or no elements will be enabled.
 			// This happens when child scope tries to activate the parent scope for the first time, while the parent was still inactive.
 			if (!m_HasInitialized) {
-				if (!Initialize())
-					return;
+				return;
 			}
 
 			foreach(IScopeElement scopeElement in m_ScopeElements) {
