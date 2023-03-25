@@ -21,7 +21,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// </summary>
 	public interface IHotkeyWithInputAction
 	{
-		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions();
+		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions(IInputContext inputContext);
 	}
 #endif
 
@@ -652,7 +652,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (EnableUsedInputActions || PushInputStack) {
 					foreach (var action in m_ScopeElements
 						.OfType<IHotkeyWithInputAction>()
-						.SelectMany(element => element.GetUsedActions())
+						.SelectMany(element => element.GetUsedActions(context))
 						.Distinct()) {
 
 						// MessageBox has multiple buttons with the same hotkey, but only one is active.
@@ -671,7 +671,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				} else if (EnableUsedInputActions) {
 
 					foreach (IHotkeyWithInputAction hotkeyElement in m_ScopeElements.OfType<IHotkeyWithInputAction>()) {
-						foreach (var action in hotkeyElement.GetUsedActions()) {
+						foreach (var action in hotkeyElement.GetUsedActions(context)) {
 							// This can often be a valid case since the code may push a new state in the input stack, resetting all the actions, before changing the UIScopes.
 							//if (!action.enabled) {
 							//	Debug.LogWarning($"{nameof(UIScope)} {name} is disabling action {action.name} that is already disabled. This is a sign of an input conflict!", this);
@@ -747,7 +747,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					bool actionsActive = uiScope.enabled
 						&& uiScope.gameObject.activeInHierarchy
 						&& uiScope.m_PlayerContext?.InputContext != null
-						&& hotkeyElement.GetUsedActions().Any(a => a.enabled);
+						&& hotkeyElement.GetUsedActions(uiScope.m_PlayerContext.InputContext).Any(a => a.enabled);
 
 					string activeStr = actionsActive ? "Active" : "Inactive";
 					GUI.color = actionsActive ? Color.green : Color.red;

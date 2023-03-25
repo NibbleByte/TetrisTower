@@ -55,7 +55,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 			}
 
-			foreach(InputAction action in GetUsedActions()) {
+			foreach(InputAction action in GetUsedActions(m_PlayerContext.InputContext)) {
 				m_SubscribedActions.Add(action);
 				action.started += OnInputStarted;
 				action.performed += OnInputPerformed;
@@ -179,19 +179,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected abstract void OnInvoke();
 		protected virtual void OnCancel() { }
 
-		public IEnumerable<InputAction> GetUsedActions()
+		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)
 		{
-			if (m_PlayerContext?.InputContext == null) {
-				// UIScope scans for inactive elements as well. Not sure if that is ok.
-				if (m_HasInitialized) {
-					Debug.LogWarning($"{nameof(HotkeyButtonScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
-				}
-				yield break;
-			}
-
 			// Don't use m_SubscribedActions directly as the behaviour may not yet be enabled when this method is called.
 
-			InputAction action = m_PlayerContext.InputContext.FindActionFor(m_InputAction.name);
+			InputAction action = inputContext.FindActionFor(m_InputAction.name);
 			if (action != null) {
 				yield return action;
 			}
