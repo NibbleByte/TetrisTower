@@ -74,7 +74,7 @@ namespace TetrisTower.TowerLevels.UI
 
 		public void PauseLevel()
 		{
-			Game.GameManager.Instance.PushLevelState(new TowerPausedState());
+			Game.GameManager.Instance.PushGlobalState(new TowerPausedState());
 		}
 
 		public void ResumeLevel()
@@ -84,7 +84,7 @@ namespace TetrisTower.TowerLevels.UI
 
 		public void OpenOptions()
 		{
-			Game.GameManager.Instance.PushLevelState(new TowerOptionsState());
+			Game.GameManager.Instance.PushGlobalState(new TowerOptionsState());
 		}
 
 		public void ExitToHomeScreen()

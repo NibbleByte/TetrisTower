@@ -1,3 +1,5 @@
+using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Input.Contexts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +24,6 @@ namespace DevLocker.GFrame
 		public bool ShowLoadingScreenBeforeLevelStates = false;
 
 		public ILevelSupervisor LevelSupervisor { get; private set; }
-		private LevelStateStack m_LevelStatesStack => LevelSupervisor?.StatesStack;
 
 		// Listen for supervisor change.
 		// NOTE: avoid using events with more complex logic as it will blow up in your face.
@@ -38,8 +39,11 @@ namespace DevLocker.GFrame
 				updateSupervisor.Update();
 			}
 
-			if (m_LevelStatesStack?.CurrentState is IUpdateListener updateState && !m_LevelStatesStack.ChangingStates) {
-				updateState.Update();
+			foreach(PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+
+				if (playerContext.StatesStack?.CurrentState is IUpdateListener updateState && !playerContext.StatesStack.ChangingStates) {
+					updateState.Update();
+				}
 			}
 		}
 
@@ -49,8 +53,11 @@ namespace DevLocker.GFrame
 				updateSupervisor.FixedUpdate();
 			}
 
-			if (m_LevelStatesStack?.CurrentState is IFixedUpdateListener updateState && !m_LevelStatesStack.ChangingStates) {
-				updateState.FixedUpdate();
+			foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+
+				if (playerContext.StatesStack?.CurrentState is IFixedUpdateListener updateState && !playerContext.StatesStack.ChangingStates) {
+					updateState.FixedUpdate();
+				}
 			}
 		}
 
@@ -60,9 +67,13 @@ namespace DevLocker.GFrame
 				updateSupervisor.LateUpdate();
 			}
 
-			if (m_LevelStatesStack?.CurrentState is ILateUpdateListener updateState && !m_LevelStatesStack.ChangingStates) {
-				updateState.LateUpdate();
+			foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+
+				if (playerContext.StatesStack?.CurrentState is ILateUpdateListener updateState && !playerContext.StatesStack.ChangingStates) {
+					updateState.LateUpdate();
+				}
 			}
+
 		}
 
 #if GFRAME_ASYNC
@@ -81,9 +92,13 @@ namespace DevLocker.GFrame
 					await LevelLoadingScreen.ShowAsync();
 				}
 
-				if (m_LevelStatesStack != null && !m_LevelStatesStack.IsEmpty) {
-					await m_LevelStatesStack.ClearStackAndStateAsync();
+				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+
+					if (playerContext.StatesStack != null && !playerContext.StatesStack.IsEmpty) {
+						await playerContext.DisposePlayerStackAsync();
+					}
 				}
+
 
 				if (!ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
 					await LevelLoadingScreen.ShowAsync();
@@ -148,13 +163,6 @@ namespace DevLocker.GFrame
 		/// </summary>
 		protected virtual Task LoadedSupervisorAsync()
 		{
-			if (LevelSupervisor.StatesStack == null) {
-				// In case the scopes were already active when the supervisor kicked in and it pushed
-				// a new state onto the InputActionsStack (resetting the previous actions).
-				// Do this only if there is no StatesStack, as it will do the same thing on setting a state.
-				Input.UIScope.UIScope.RefocusActiveScopes();
-			}
-
 			LoadedSupervisor?.Invoke();
 
 			return Task.CompletedTask;
@@ -162,60 +170,58 @@ namespace DevLocker.GFrame
 
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void PushLevelState(ILevelState state)
+		public async void PushGlobalState(IPlayerState state)
 		{
-			await m_LevelStatesStack.PushStateAsync(state);
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushStateAsync(state);
 		}
 
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void SetLevelState(ILevelState state)
+		public async void SetLevelState(IPlayerState state)
 		{
-			await m_LevelStatesStack.SetStateAsync(state);
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(state);
 		}
 
 		/// <summary>
 		/// Pop a single state from the state stack.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
 		public async void PopLevelState()
 		{
-			await m_LevelStatesStack.PopStateAsync();
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStateAsync();
 		}
 
 		/// <summary>
 		/// Pops multiple states from the state stack.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
 		public async void PopLevelStates(int count)
 		{
-			await m_LevelStatesStack.PopStatesAsync(count);
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStatesAsync(count);
 		}
 
 		/// <summary>
 		/// Pop and push back the state at the top. Will trigger changing state events.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
 		public async void ReenterCurrentLevelState()
 		{
-			await m_LevelStatesStack.ReenterCurrentStateAsync();
-		}
-
-		/// <summary>
-		/// Exits the state and leaves the stack empty.
-		/// </summary>
-		public async void ClearLevelStackAndState()
-		{
-			await m_LevelStatesStack.ClearStackAndStateAsync();
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentStateAsync();
 		}
 
 		/// <summary>
 		/// Change the current state and add it to the state stack.
 		/// Will notify the state itself.
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void ChangeLevelState(ILevelState state, StackAction stackAction)
+		public async void ChangeLevelState(IPlayerState state, StackAction stackAction)
 		{
-			await m_LevelStatesStack.ChangeStateAsync(state, stackAction);
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeStateAsync(state, stackAction);
 		}
 
 #else
@@ -238,9 +244,13 @@ namespace DevLocker.GFrame
 					yield return LevelLoadingScreen.Show();
 				}
 
-				if (m_LevelStatesStack != null && !m_LevelStatesStack.IsEmpty) {
-					yield return m_LevelStatesStack.ClearStackAndStateCrt();
+				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+
+					if (playerContext.StatesStack != null && !playerContext.StatesStack.IsEmpty) {
+						yield return playerContext.ClearPlayerStackCrt();
+					}
 				}
+
 
 				if (!ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
 					yield return LevelLoadingScreen.Show();
@@ -323,7 +333,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void PushLevelState(ILevelState state)
 		{
-			StartCoroutine(m_LevelStatesStack.PushStateCrt(state));
+			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushStateCrt(state));
 		}
 
 		/// <summary>
@@ -331,7 +341,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void SetLevelState(ILevelState state)
 		{
-			StartCoroutine(m_LevelStatesStack.SetStateCrt(state));
+			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateCrt(state));
 		}
 
 		/// <summary>
@@ -339,7 +349,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void PopLevelState()
 		{
-			StartCoroutine(m_LevelStatesStack.PopStateCrt());
+			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStateCrt());
 		}
 
 		/// <summary>
@@ -347,7 +357,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void PopLevelStates(int count)
 		{
-			StartCoroutine(m_LevelStatesStack.PopStatesCrt(count));
+			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStatesCrt(count));
 		}
 
 		/// <summary>
@@ -355,15 +365,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void ReenterCurrentLevelState()
 		{
-			StartCoroutine(m_LevelStatesStack.ReenterCurrentStateCrt());
-		}
-
-		/// <summary>
-		/// Exits the state and leaves the stack empty.
-		/// </summary>
-		public void ClearLevelStackAndState()
-		{
-			StartCoroutine(m_LevelStatesStack.ClearStackAndStateCrt());
+			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentStateCrt());
 		}
 
 		/// <summary>
@@ -373,7 +375,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void ChangeLevelState(ILevelState state, StackAction stackAction)
 		{
-			StartCoroutine(m_LevelStatesStack.ChangeStateCrt(state, stackAction));
+			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeStateCrt(state, stackAction));
 		}
 #endif
 

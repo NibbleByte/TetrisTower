@@ -12,7 +12,7 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerLostState : ILevelState, PlayerControls.ICommonHotkeysActions
+	public class TowerLostState : IPlayerState, PlayerControls.ICommonHotkeysActions
 	{
 		private PlayerControls m_PlayerControls;
 		private GridLevelController m_LevelController;
@@ -27,13 +27,13 @@ namespace TetrisTower.TowerLevels
 
 		private float m_StartTime;
 
-		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_UIController);
-			contextReferences.SetByType(out m_PlayerControls);
-			contextReferences.SetByType(out m_LevelController);
-			contextReferences.SetByType(out m_VisualsGrid);
-			contextReferences.SetByType(out m_VisualsController);
+			context.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerControls);
+			context.SetByType(out m_LevelController);
+			context.SetByType(out m_VisualsGrid);
+			context.SetByType(out m_VisualsController);
 
 
 			m_InputEnabler = new InputEnabler(this);
@@ -52,9 +52,9 @@ namespace TetrisTower.TowerLevels
 
 			m_StartTime = Time.time;
 
-			var lostAnimations = contextReferences.TryFindByType<ILostAnimationExecutor[]>();
+			var lostAnimations = context.TryFindByType<ILostAnimationExecutor[]>();
 			if (lostAnimations == null || lostAnimations.Length == 0) {
-				GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+				GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
 			}
 
 			int totalChance = lostAnimations.Sum(la => la.Chance);
@@ -98,7 +98,7 @@ namespace TetrisTower.TowerLevels
 				m_CurrentAnimation.Interrupt();
 			}
 
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
 		}
 
 		private IEnumerator LostAnimationCoroutine()
@@ -121,7 +121,7 @@ namespace TetrisTower.TowerLevels
 			if (m_Interrupted)
 				yield break;
 
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
 		}
 
 		public void OnBack(InputAction.CallbackContext context)

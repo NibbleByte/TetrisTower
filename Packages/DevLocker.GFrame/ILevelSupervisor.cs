@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using System.Collections;
 using System.Threading.Tasks;
 
@@ -29,7 +30,6 @@ namespace DevLocker.GFrame
 	/// </summary>
 	public interface ILevelSupervisor
 	{
-		LevelStateStack StatesStack { get; }
 
 #if GFRAME_ASYNC
 		Task LoadAsync();
@@ -44,15 +44,15 @@ namespace DevLocker.GFrame
 
 	/// <summary>
 	/// Use this interface in your supervisors to notify your scene behaviours and controllers that the level is currently loading.
-	/// The supervisor should wait on the <see cref="OnLevelLoading(LevelStateContextReferences)"/>, as the behaviours can loading on their own.
+	/// The supervisor should wait on the <see cref="OnLevelLoading(PlayerStatesContext)"/>, as the behaviours can loading on their own.
 	/// This interface is optional and you can make another one that suits your needs.
 	/// </summary>
 	public interface ILevelLoadingListener
 	{
 #if GFRAME_ASYNC
-		Task OnLevelLoadingAsync(LevelStateContextReferences contextReferences);
+		Task OnLevelLoadingAsync(PlayerStatesContext context);
 #else
-		IEnumerator OnLevelLoading(LevelStateContextReferences contextReferences);
+		IEnumerator OnLevelLoading(PlayerStateContext context);
 #endif
 	}
 
@@ -62,7 +62,7 @@ namespace DevLocker.GFrame
 	/// </summary>
 	public interface ILevelLoadedListener
 	{
-		void OnLevelLoaded(LevelStateContextReferences contextReferences);
+		void OnLevelLoaded(PlayerStatesContext context);
 		void OnLevelUnloading();
 	}
 
@@ -88,38 +88,5 @@ namespace DevLocker.GFrame
 	public interface ILateUpdateListener
 	{
 		void LateUpdate();
-	}
-
-	/// <summary>
-	/// Bridge between per-player input and level states.
-	/// </summary>
-	public static class LevelPlayerContextUtils
-	{
-		/// <summary>
-		/// Short-cut to create <see cref="LevelStateStack"/> specific to this player.
-		/// </summary>
-		public static LevelStateStack CreatePlayerStack(this Input.Contexts.PlayerContextUIRootObject playerRoot, params object[] references)
-		{
-			var stack = new LevelStateStack(references);
-			playerRoot.AddContextReference(stack);
-			stack.ContextReferences.AddReference(playerRoot);
-			return stack;
-		}
-
-		/// <summary>
-		/// Short-cut to get the <see cref="LevelStateStack"/> for this player.
-		/// </summary>
-		public static LevelStateStack GetPlayerLevelStateStack(this Input.IPlayerContext playerRoot)
-		{
-			return playerRoot.GetContextReference<LevelStateStack>();
-		}
-
-		/// <summary>
-		/// Short-cut to get the <see cref="LevelsManager"/>. It should be the same for all the players.
-		/// </summary>
-		public static LevelsManager GetLevelManager(this Input.IPlayerContext playerRoot)
-		{
-			return playerRoot.GetPlayerLevelStateStack().ContextReferences.TryFindByType<LevelsManager>();
-		}
 	}
 }

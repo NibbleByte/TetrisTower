@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System.Collections;
 using TetrisTower.Logic;
 using TMPro;
@@ -15,10 +16,10 @@ namespace TetrisTower.TowerLevels.UI
 
 		private GridLevelController m_TowerLevel;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			m_Text = GetComponent<TextMeshProUGUI>();
-			contextReferences.SetByType(out m_TowerLevel);
+			context.SetByType(out m_TowerLevel);
 
 			if (m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing && !string.IsNullOrEmpty(m_TowerLevel.LevelData.GreetMessage)) {
 				m_Text.text = m_TowerLevel.LevelData.GreetMessage

@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,10 +27,10 @@ namespace TetrisTower.TowerLevels.UI
 
 		public TextMeshProUGUI DisplayText;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_TowerLevel);
-			contextReferences.SetByType(out m_PlaythroughData);
+			context.SetByType(out m_TowerLevel);
+			context.SetByType(out m_PlaythroughData);
 		}
 
 		public void OnLevelUnloading()

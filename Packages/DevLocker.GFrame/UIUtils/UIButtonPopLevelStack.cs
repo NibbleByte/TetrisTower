@@ -32,7 +32,7 @@ namespace DevLocker.GFrame.UIUtils
 
 		private async void OnButtonClick()
 		{
-			await m_PlayerContext.GetPlayerLevelStateStack().PopStateAsync();
+			await m_PlayerContext.StatesStack.PopStateAsync();
 		}
 	}
 }

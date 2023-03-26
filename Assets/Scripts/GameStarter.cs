@@ -1,4 +1,3 @@
-using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
@@ -47,7 +46,7 @@ namespace TetrisTower.GameStarter
 
 			var inputContext = new InputCollectionContext(playerControls, playerControls.InputStack, playerControls.UI.Get(), GameConfig.BindingDisplayAssets);
 
-			PlayerContextUtils.GlobalPlayerContext.SetupGlobal(uiInputModule.GetComponent<EventSystem>(), inputContext);
+			PlayerContextUIRootObject.GlobalPlayerContext.SetupGlobal(uiInputModule.GetComponent<EventSystem>(), inputContext);
 
 			GameContext = new GameContext(GameConfig, playerControls, inputContext);
 

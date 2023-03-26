@@ -8,7 +8,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 	/// <summary>
 	/// Options is displayed.
 	/// </summary>
-	public class SamplePlayOptionsState : ILevelState
+	public class SamplePlayOptionsState : IPlayerState
 	{
 		private SamplePlayerControls m_PlayerControls;
 		private SamplePlayUIController m_UIController;
@@ -16,13 +16,13 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private InputEnabler m_InputEnabler;
 
 #if GFRAME_ASYNC
-		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(PlayerStatesContext context)
 #else
-		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
+		public IEnumerator EnterState(PlayerStateContext context)
 #endif
 		{
-			contextReferences.SetByType(out m_PlayerControls);
-			contextReferences.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerControls);
+			context.SetByType(out m_UIController);
 
 			m_InputEnabler = new InputEnabler(this);
 			m_InputEnabler.Enable(m_PlayerControls.UI);

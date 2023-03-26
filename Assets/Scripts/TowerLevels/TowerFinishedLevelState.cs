@@ -7,17 +7,17 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerFinishedLevelState : ILevelState
+	public class TowerFinishedLevelState : IPlayerState
 	{
 		private PlayerControls m_PlayerControls;
 		private UI.TowerLevelUIController m_UIController;
 
 		private InputEnabler m_InputEnabler;
 
-		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_UIController);
-			contextReferences.SetByType(out m_PlayerControls);
+			context.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerControls);
 
 			m_InputEnabler = new InputEnabler(this);
 			m_InputEnabler.Enable(m_PlayerControls.UI);

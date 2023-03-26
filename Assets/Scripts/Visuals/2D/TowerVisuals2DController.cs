@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TetrisTower.Logic;
 using UnityEngine;
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 
 namespace TetrisTower.Visuals2D
 {
@@ -23,12 +24,12 @@ namespace TetrisTower.Visuals2D
 
 		private Transform FallingVisualsContainer;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			if (!isActiveAndEnabled)
 				return;
 
-			contextReferences.SetByType(out m_TowerLevel);
+			context.SetByType(out m_TowerLevel);
 
 			m_TowerLevel.PlacingFallingShape += OnPlacingFallingShape;
 			m_TowerLevel.PlacedOutsideGrid += DestroyFallingVisuals;

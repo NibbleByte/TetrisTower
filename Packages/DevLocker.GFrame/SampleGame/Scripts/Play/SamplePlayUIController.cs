@@ -96,14 +96,14 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public async void PauseLevel()
 		{
 			// Will be popped by UI.
-			await m_PlayerContext.GetPlayerLevelStateStack().PushStateAsync(new SamplePlayPausedState());
+			await m_PlayerContext.StatesStack.PushStateAsync(new SamplePlayPausedState());
 			//Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayPausedState());
 		}
 
 		public async void OpenOptions()
 		{
 			// Will be popped by UI.
-			await m_PlayerContext.GetPlayerLevelStateStack().PushStateAsync(new SamplePlayOptionsState());
+			await m_PlayerContext.StatesStack.PushStateAsync(new SamplePlayOptionsState());
 			//Game.SampleLevelsManager.Instance.PushLevelState(new SamplePlayOptionsState());
 		}
 

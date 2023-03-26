@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,9 @@ namespace TetrisTower.Visuals.Environment
 
 		private GridLevelController m_TowerLevel;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_TowerLevel);
+			context.SetByType(out m_TowerLevel);
 
 			m_TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
 		}

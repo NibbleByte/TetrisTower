@@ -1,4 +1,5 @@
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.SampleGame.Game;
 using System.Collections;
 using System.Threading.Tasks;
@@ -11,8 +12,6 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 	/// </summary>
 	public class SampleMainMenuLevelSupervisor : ILevelSupervisor
 	{
-		public LevelStateStack StatesStack { get; private set; }
-
 		private InputEnabler m_InputEnabler;
 
 #if GFRAME_ASYNC
@@ -55,7 +54,7 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 			//var levelController = GameObject.FindObjectOfType<SampleMainMenuController>();
 			//
 
-			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
+			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext.PlayerControls
 				);
 
@@ -71,8 +70,6 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 #endif
 		{
 			m_InputEnabler.Dispose();
-
-			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;

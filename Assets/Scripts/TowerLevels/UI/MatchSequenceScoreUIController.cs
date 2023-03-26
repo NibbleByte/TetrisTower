@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Pools;
 using DG.Tweening;
 using System;
@@ -32,9 +33,9 @@ namespace TetrisTower.TowerLevels.UI
 
 		private ConeVisualsGrid m_VisualsGrid;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_VisualsGrid);
+			context.SetByType(out m_VisualsGrid);
 
 			m_VisualsGrid.ScoreUpdated += OnUpdateScore;
 			//m_VisualsGrid.ScoreFinished += OnFinishScore;

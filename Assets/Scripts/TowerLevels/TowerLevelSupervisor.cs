@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.MessageBox;
 using DevLocker.Utils;
 using System;
@@ -16,8 +17,6 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerLevelSupervisor : ILevelSupervisor
 	{
-		public LevelStateStack StatesStack { get; private set; }
-
 		private SceneReference m_OverrideScene;
 
 		public TowerLevelSupervisor() { }
@@ -174,7 +173,7 @@ namespace TetrisTower.TowerLevels
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
-			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
+			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext,
 				gameContext.GameConfig,
 				gameContext.PlayerControls,
@@ -191,17 +190,17 @@ namespace TetrisTower.TowerLevels
 
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
-				await listener.OnLevelLoadingAsync(StatesStack.ContextReferences);
+				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
 			// Other visuals depend on this, so init it first.
-			behaviours.OfType<TowerConeVisualsController>().First().Init(StatesStack.ContextReferences);
+			behaviours.OfType<TowerConeVisualsController>().First().Init(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
-				listener.OnLevelLoaded(StatesStack.ContextReferences);
+				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
-			await StatesStack.SetStateAsync(new TowerPlayState());
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(new TowerPlayState());
 
 			if (gameContext.CurrentPlaythrough.TowerLevel.IsPlaying) {
 				GridLevelData levelData = gameContext.CurrentPlaythrough.TowerLevel;
@@ -232,8 +231,6 @@ namespace TetrisTower.TowerLevels
 			}
 
 			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
-
-			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
 
 			return Task.CompletedTask;
 		}

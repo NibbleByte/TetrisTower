@@ -6,6 +6,7 @@ using UnityEngine;
 using TetrisTower.Core;
 using DevLocker.GFrame;
 using System.Linq;
+using DevLocker.GFrame.Input;
 
 namespace TetrisTower.Visuals
 {
@@ -48,12 +49,12 @@ namespace TetrisTower.Visuals
 		private Tuple<int, int, bool>[] m_RotatingFallingShapeCoordsChange;
 		private float m_RotatingFallingShapeAnalogLastProgress;
 
-		public void Init(LevelStateContextReferences contextReferences)
+		public void Init(PlayerStatesContext context)
 		{
 			if (!isActiveAndEnabled)
 				return;
 
-			contextReferences.SetByType(out m_TowerLevel);
+			context.SetByType(out m_TowerLevel);
 
 			m_TowerLevel.PlacingFallingShape += OnPlacingFallingShape;
 			m_TowerLevel.PlacedOutsideGrid += DestroyFallingVisuals;
@@ -66,7 +67,7 @@ namespace TetrisTower.Visuals
 			FallingVisualsContainer.localPosition = Vector3.zero;
 
 			m_TowerLevel.Grids.Add(VisualsGrid);
-			VisualsGrid.Init(contextReferences);
+			VisualsGrid.Init(context);
 
 			DestroyFallingVisuals();
 

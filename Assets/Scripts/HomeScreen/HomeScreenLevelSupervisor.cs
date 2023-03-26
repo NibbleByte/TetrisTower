@@ -13,8 +13,6 @@ namespace TetrisTower.HomeScreen
 {
 	public class HomeScreenLevelSupervisor : ILevelSupervisor
 	{
-		public LevelStateStack StatesStack { get; private set; }
-
 		private InputEnabler m_InputEnabler;
 
 		public async Task LoadAsync()
@@ -40,7 +38,7 @@ namespace TetrisTower.HomeScreen
 			// StateStack not needed for now.
 			//var levelController = GameObject.FindObjectOfType<HomeScreenController>();
 			//
-			//StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
+			//StatesStack = PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 			//	GameContext.GameConfig,
 			//	GameContext.Options,
 			//	GameContext.PlayerControls,

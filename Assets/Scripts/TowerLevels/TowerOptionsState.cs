@@ -6,17 +6,17 @@ using TetrisTower.Game;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerOptionsState : ILevelState
+	public class TowerOptionsState : IPlayerState
 	{
 		private UI.TowerLevelUIController m_UIController;
 		private PlayerControls m_PlayerControls;
 
 		private InputEnabler m_InputEnabler;
 
-		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_UIController);
-			contextReferences.SetByType(out m_PlayerControls);
+			context.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerControls);
 
 			m_InputEnabler = new InputEnabler(this);
 			m_InputEnabler.Enable(m_PlayerControls.UI);

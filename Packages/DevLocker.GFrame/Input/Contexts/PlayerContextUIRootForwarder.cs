@@ -20,13 +20,13 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public IInputContext InputContext => PlayerRootObject?.InputContext;
 
+		public PlayerStateStack StatesStack => PlayerRootObject?.StatesStack;
+
 		public EventSystem EventSystem => PlayerRootObject?.EventSystem;
 
 		public GameObject SelectedGameObject => PlayerRootObject?.SelectedGameObject;
 
 		public void SetSelectedGameObject(GameObject selected) => PlayerRootObject?.SetSelectedGameObject(selected);
-
-		public T GetContextReference<T>() => PlayerRootObject != null ? PlayerRootObject.GetContextReference<T>() : default;
 
 		public PlayerContextUIRootObject GetRootObject() => PlayerRootObject?.GetRootObject();
 

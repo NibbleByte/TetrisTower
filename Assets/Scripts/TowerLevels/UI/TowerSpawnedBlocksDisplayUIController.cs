@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System;
 using System.Linq;
 using TetrisTower.Logic;
@@ -16,10 +17,10 @@ namespace TetrisTower.TowerLevels.UI
 
 		private FlashMessageUIController m_FlashMessage;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_TowerLevel);
-			contextReferences.SetByType(out m_FlashMessage);
+			context.SetByType(out m_TowerLevel);
+			context.SetByType(out m_FlashMessage);
 
 			m_TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
 			m_TowerLevel.SpawnBlockTypesCountChanged += OnSpawnBlockTypesCountChanged;

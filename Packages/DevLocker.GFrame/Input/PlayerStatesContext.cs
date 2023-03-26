@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace DevLocker.GFrame
+namespace DevLocker.GFrame.Input
 {
 	/// <summary>
-	/// Contains static shared level references that can be accessed by the level state.
+	/// Contains static shared player references that can be accessed by the <see cref="IPlayerState"/>.
 	/// Use them explicitly or implicitly (by reflection).
 	/// References are provided by the level supervisor on initialization.
 	/// </summary>
-	public class LevelStateContextReferences
+	public class PlayerStatesContext
 	{
-		private List<object> m_ContextReferences;
+		private List<object> m_Context;
 
-		public LevelStateContextReferences(IEnumerable<object> contextReferences)
+		public PlayerStatesContext(IEnumerable<object> context)
 		{
-			m_ContextReferences = contextReferences.Where(obj => obj != null).ToList();
+			m_Context = context.Where(obj => obj != null).ToList();
 
-			var duplicateGroups = m_ContextReferences.GroupBy(r => r.GetType()).Where(g => g.Count() > 1);
+			var duplicateGroups = m_Context.GroupBy(r => r.GetType()).Where(g => g.Count() > 1);
 			if (duplicateGroups.Any()) {
 				throw new ArgumentException($"Trying to add references of the same type: {duplicateGroups.First().Key}");
 			}
@@ -30,7 +30,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void SetByType<T>(out T reference)
 		{
-			reference = m_ContextReferences.OfType<T>().First();
+			reference = m_Context.OfType<T>().First();
 		}
 
 		/// <summary>
@@ -40,7 +40,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public bool TrySetByType<T>(out T reference)
 		{
-			reference = m_ContextReferences.OfType<T>().FirstOrDefault();
+			reference = m_Context.OfType<T>().FirstOrDefault();
 
 			return reference != null;
 		}
@@ -49,13 +49,13 @@ namespace DevLocker.GFrame
 		/// Find reference from the current context.
 		/// The level supervisor should have added all the needed references for you.
 		/// </summary>
-		public T FindByType<T>() => m_ContextReferences.OfType<T>().First();
+		public T FindByType<T>() => m_Context.OfType<T>().First();
 
 		/// <summary>
 		/// Try to find reference from the current context.
 		/// The level supervisor should have added all the needed references for you.
 		/// </summary>
-		public T TryFindByType<T>() => m_ContextReferences.OfType<T>().FirstOrDefault();
+		public T TryFindByType<T>() => m_Context.OfType<T>().FirstOrDefault();
 
 		/// <summary>
 		/// Fill in all your references implicitly via reflection from the current context.
@@ -71,7 +71,7 @@ namespace DevLocker.GFrame
 				if (field.IsInitOnly)
 					continue;
 
-				foreach (var reference in m_ContextReferences) {
+				foreach (var reference in m_Context) {
 					if (field.FieldType.IsAssignableFrom(reference.GetType())) {
 						field.SetValue(state, reference);
 						break;
@@ -83,7 +83,7 @@ namespace DevLocker.GFrame
 				if (!property.CanWrite)
 					continue;
 
-				foreach (var reference in m_ContextReferences) {
+				foreach (var reference in m_Context) {
 					if (property.PropertyType.IsAssignableFrom(reference.GetType())) {
 						property.SetValue(state, reference);
 						break;
@@ -97,10 +97,10 @@ namespace DevLocker.GFrame
 		/// </summary>
 		public void AddReference<T>(T reference)
 		{
-			if (m_ContextReferences.OfType<T>().Any())
+			if (m_Context.OfType<T>().Any())
 				throw new ArgumentException($"Trying to add reference of type \"{nameof(T)}\" that already exists. {reference}");
 
-			m_ContextReferences.Add(reference);
+			m_Context.Add(reference);
 		}
 
 		/// <summary>
@@ -109,9 +109,9 @@ namespace DevLocker.GFrame
 		/// <returns>true if successfully removed, otherwise false.</returns>
 		public bool RemoveByType<T>()
 		{
-			for(int i = 0; i < m_ContextReferences.Count; ++i) {
-				if (m_ContextReferences[i] is T) {
-					m_ContextReferences.RemoveAt(i);
+			for(int i = 0; i < m_Context.Count; ++i) {
+				if (m_Context[i] is T) {
+					m_Context.RemoveAt(i);
 					return true;
 				}
 			}

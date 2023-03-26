@@ -1,4 +1,5 @@
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.SampleGame.Game;
 using System;
 using System.Collections;
@@ -15,8 +16,6 @@ namespace DevLocker.GFrame.SampleGame.Play
 	/// </summary>
 	public class SamplePlaySupervisor : ILevelSupervisor
 	{
-		public LevelStateStack StatesStack { get; private set; }
-
 #if GFRAME_ASYNC
 		public async Task LoadAsync()
 #else
@@ -57,7 +56,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 			var uiController = GameObject.FindObjectOfType<SamplePlayUIController>(true);
 
-			StatesStack = PlayerContextUtils.GlobalPlayerContext.CreatePlayerStack(
+			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext.PlayerControls,
 				playerController,
 				uiController
@@ -68,20 +67,20 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 #if GFRAME_ASYNC
-				await listener.OnLevelLoadingAsync(StatesStack.ContextReferences);
+				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 #else
-				yield return listener.OnLevelLoading(StatesStack.ContextReferences);
+				yield return listener.OnLevelLoading(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 #endif
 			}
 
 			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
-				listener.OnLevelLoaded(StatesStack.ContextReferences);
+				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
 #if GFRAME_ASYNC
-			await StatesStack.SetStateAsync(new SamplePlayJumperState());
+			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(new SamplePlayJumperState());
 #else
-			yield return StatesStack.SetStateCrt(new SamplePlayJumperState());
+			yield return PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateCrt(new SamplePlayJumperState());
 #endif
 		}
 
@@ -96,8 +95,6 @@ namespace DevLocker.GFrame.SampleGame.Play
 			foreach (var listener in levelListeners) {
 				listener.OnLevelUnloading();
 			}
-
-			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;

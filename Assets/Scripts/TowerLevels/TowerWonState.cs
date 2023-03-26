@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerWonState : ILevelState, PlayerControls.ICommonHotkeysActions, IUpdateListener
+	public class TowerWonState : IPlayerState, PlayerControls.ICommonHotkeysActions, IUpdateListener
 	{
 		private GameConfig m_GameConfig;
 		private PlayerControls m_PlayerControls;
@@ -28,13 +28,13 @@ namespace TetrisTower.TowerLevels
 
 		private InputEnabler m_InputEnabler;
 
-		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_GameConfig);
-			contextReferences.SetByType(out m_UIController);
-			contextReferences.SetByType(out m_PlayerControls);
-			contextReferences.SetByType(out m_LevelController);
-			contextReferences.SetByType(out m_FlashMessage);
+			context.SetByType(out m_GameConfig);
+			context.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerControls);
+			context.SetByType(out m_LevelController);
+			context.SetByType(out m_FlashMessage);
 
 
 			m_InputEnabler = new InputEnabler(this);
@@ -79,7 +79,7 @@ namespace TetrisTower.TowerLevels
 				return;
 
 			InterruptAnimation();
-			GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+			GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
 		}
 
 		public void OnBack(InputAction.CallbackContext context)
@@ -146,7 +146,7 @@ namespace TetrisTower.TowerLevels
 		{
 			if (!float.IsNaN(m_BonusFillUpTime)) {
 				if (m_BonusFillUpTime + 2f < Time.time) {
-					GameManager.Instance.PushLevelState(new TowerFinishedLevelState());
+					GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
 				}
 
 				return;

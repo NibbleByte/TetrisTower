@@ -3,20 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DevLocker.GFrame
+namespace DevLocker.GFrame.Input
 {
 	/// <summary>
-	/// Single level state. It can be different playing modes (walking, driving, swimming) or UI screens (Menu, Game, Options).
-	/// To avoid coupling & singletons, get the needed references to other systems using the contextReferences collection.
+	/// Single player state. It can be different playing modes (walking, driving, swimming) or UI screens (Menu, Game, Options).
+	/// To avoid coupling & singletons, get the needed references to other systems using the <see cref="PlayerStatesContext"/> references collection.
 	/// References are provided by the level supervisor on initialization.
 	/// </summary>
-	public interface ILevelState
+	public interface IPlayerState
 	{
 #if GFRAME_ASYNC
-		Task EnterStateAsync(LevelStateContextReferences contextReferences);
+		Task EnterStateAsync(PlayerStatesContext context);
 		Task ExitStateAsync();
 #else
-		IEnumerator EnterState(LevelStateContextReferences contextReferences);
+		IEnumerator EnterState(PlayerStateContext context);
 		IEnumerator ExitState();
 #endif
 	}
@@ -30,26 +30,26 @@ namespace DevLocker.GFrame
 
 
 	/// <summary>
-	/// Stack of level states. States can be pushed in / replaced / popped out of the stack.
+	/// Stack of player states. States can be pushed in / replaced / popped out of the stack.
 	/// On switching states, EnterState() & ExitState() methods are invoked.
-	/// To avoid coupling & singletons, states should get the needed references to other systems using the ContextReferences collection.
+	/// To avoid coupling & singletons, states should get the needed references to other systems using the <see cref="PlayerStatesContext"/> references collection.
 	/// References are provided by the level supervisor on initialization.
 	/// </summary>
-	public class LevelStateStack
+	public class PlayerStateStack
 	{
 		private class PendingStateArgs
 		{
-			public ILevelState State;
+			public IPlayerState State;
 			public StackAction StackAction;
 
-			public PendingStateArgs(ILevelState state, StackAction action)
+			public PendingStateArgs(IPlayerState state, StackAction action)
 			{
 				State = state;
 				StackAction = action;
 			}
 		}
 
-		public ILevelState CurrentState => IsEmpty ? null : m_StackedStates.Peek();
+		public IPlayerState CurrentState => IsEmpty ? null : m_StackedStates.Peek();
 		public bool IsEmpty => m_StackedStates.Count == 0;
 
 		public int StackedStatesCount => m_StackedStates.Count;
@@ -58,7 +58,7 @@ namespace DevLocker.GFrame
 		/// Collection of static level references to be accessed by the states.
 		/// References are provided by the level supervisor on initialization.
 		/// </summary>
-		public LevelStateContextReferences ContextReferences { get; private set; }
+		public PlayerStatesContext Context { get; private set; }
 
 
 		// Listen for state change.
@@ -69,7 +69,7 @@ namespace DevLocker.GFrame
 		public event Action EnteringState;
 		public event Action EnteredState;
 
-		private readonly Stack<ILevelState> m_StackedStates = new Stack<ILevelState>();
+		private readonly Stack<IPlayerState> m_StackedStates = new Stack<IPlayerState>();
 
 		// Used when state is changed inside another state change event.
 		public bool ChangingStates { get; private set; } = false;
@@ -78,9 +78,9 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Pass in a list of static context level references to be used by the states.
 		/// </summary>
-		public LevelStateStack(params object[] contextReferences)
+		public PlayerStateStack(params object[] context)
 		{
-			ContextReferences = new LevelStateContextReferences(contextReferences);
+			Context = new PlayerStatesContext(context);
 		}
 
 #if GFRAME_ASYNC
@@ -88,7 +88,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
 		/// </summary>
-		public async Task PushStateAsync(ILevelState state)
+		public async Task PushStateAsync(IPlayerState state)
 		{
 			await ChangeStateAsync(state, StackAction.Push);
 		}
@@ -96,7 +96,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// </summary>
-		public async Task SetStateAsync(ILevelState state)
+		public async Task SetStateAsync(IPlayerState state)
 		{
 			await ChangeStateAsync(state, StackAction.ClearAndPush);
 		}
@@ -130,7 +130,7 @@ namespace DevLocker.GFrame
 			}
 
 			await EnteringStateAsync();
-			await (CurrentState?.EnterStateAsync(ContextReferences) ?? Task.CompletedTask);
+			await (CurrentState?.EnterStateAsync(Context) ?? Task.CompletedTask);
 			await EnteredStateAsync();
 		}
 
@@ -156,7 +156,7 @@ namespace DevLocker.GFrame
 		/// Will notify the state itself.
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// </summary>
-		public async Task ChangeStateAsync(ILevelState state, StackAction stackAction)
+		public async Task ChangeStateAsync(IPlayerState state, StackAction stackAction)
 		{
 			// Sanity check.
 			if (m_StackedStates.Count > 7 && stackAction == StackAction.Push) {
@@ -192,7 +192,7 @@ namespace DevLocker.GFrame
 			m_StackedStates.Push(state);
 
 			await EnteringStateAsync();
-			await CurrentState.EnterStateAsync(ContextReferences);
+			await CurrentState.EnterStateAsync(Context);
 			await EnteredStateAsync();
 
 			ChangingStates = false;
@@ -297,7 +297,7 @@ namespace DevLocker.GFrame
 			}
 
 			yield return EnteringStateCrt();
-			yield return CurrentState?.EnterState(ContextReferences);
+			yield return CurrentState?.EnterState(Context);
 			yield return EnteredStateCrt();
 		}
 
@@ -359,7 +359,7 @@ namespace DevLocker.GFrame
 			m_StackedStates.Push(state);
 
 			yield return EnteringStateCrt();
-			yield return CurrentState.EnterState(ContextReferences);
+			yield return CurrentState.EnterState(Context);
 			yield return EnteredStateCrt();
 
 			ChangingStates = false;

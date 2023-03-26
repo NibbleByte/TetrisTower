@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,9 +28,9 @@ namespace TetrisTower.Visuals.Environment
 		private int m_LastTimeIndex = 0;
 		private int m_LoopCount = 0;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_TowerLevel);
+			context.SetByType(out m_TowerLevel);
 
 			Array.Sort(LightningSecondsSinceStart);
 			m_LastTimeIndex = 0;

@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.MessageBox;
 using System.Collections.Generic;
 using TetrisTower.Game;
@@ -29,11 +30,11 @@ namespace TetrisTower.TowerLevels
 			__DebugInitialTowerLevel = string.Empty;
 		}
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_TowerLevel);
-			contextReferences.SetByType(out m_Context);
-			contextReferences.SetByType(out m_FlashMessage);
+			context.SetByType(out m_TowerLevel);
+			context.SetByType(out m_Context);
+			context.SetByType(out m_FlashMessage);
 		}
 
 		public void OnLevelUnloading()

@@ -22,7 +22,6 @@ namespace DevLocker.GFrame.SampleGame.Play
 	/// </summary>
 	public class SampleMultiPlaySupervisor : ILevelSupervisor
 	{
-		public LevelStateStack StatesStack { get; private set; }
 
 #if GFRAME_ASYNC
 		public async Task LoadAsync()
@@ -97,7 +96,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 				//
 				playerContext.SetupPlayer(eventSystem, inputContext);
 
-				LevelStateStack statesStack = playerContext.CreatePlayerStack(
+				playerContext.CreatePlayerStack(
 					playerControls,
 					playerController,
 					uiController
@@ -109,21 +108,21 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 				foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 #if GFRAME_ASYNC
-					await listener.OnLevelLoadingAsync(statesStack.ContextReferences);
+					await listener.OnLevelLoadingAsync(playerContext.StatesStack.Context);
 #else
-					yield return listener.OnLevelLoading(statesStack.ContextReferences);
+					yield return listener.OnLevelLoading(playerContext.StatesStack.Context);
 #endif
 				}
 
 				foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
-					listener.OnLevelLoaded(statesStack.ContextReferences);
+					listener.OnLevelLoaded(playerContext.StatesStack.Context);
 				}
 
 
 #if GFRAME_ASYNC
-				await statesStack.SetStateAsync(new SamplePlayJumperState());
+				await playerContext.StatesStack.SetStateAsync(new SamplePlayJumperState());
 #else
-				yield return statesStack.SetStateCrt(new SamplePlayJumperState());
+				yield return playerContext.StatesStack.SetStateCrt(new SamplePlayJumperState());
 #endif
 			}
 		}
@@ -149,8 +148,6 @@ namespace DevLocker.GFrame.SampleGame.Play
 			foreach (var listener in levelListeners) {
 				listener.OnLevelUnloading();
 			}
-
-			PlayerContextUtils.GlobalPlayerContext.ClearContextReferences();
 
 			SampleLevelsManager.Instance.GameContext.PlayerInput.gameObject.SetActive(true);
 

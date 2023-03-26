@@ -85,11 +85,14 @@ namespace DevLocker.GFrame.Input.Contexts
 #endif
 
 		/// <summary>
+		/// Stack of player states. States can be pushed in / replaced / popped out of the stack.
+		/// </summary>
+		public PlayerStateStack StatesStack { get; private set; }
+
+		/// <summary>
 		/// Event system used by this player.
 		/// </summary>
 		public EventSystem EventSystem { get; private set; }
-
-		private List<object> m_ContextReferences = new List<object>();
 
 		/// <summary>
 		/// Short-cut - get selected UI object for this player.
@@ -107,41 +110,36 @@ namespace DevLocker.GFrame.Input.Contexts
 		public PlayerContextUIRootObject GetRootObject() => this;
 
 		/// <summary>
-		/// Add arbitrary object to this player root. Useful for attaching level state stack or similar per player.
+		/// Create the <see cref="PlayerStateStack"/> for this player. The passed on references will be used as context.
 		/// </summary>
-		public void AddContextReference<T>(T reference)
+		public void CreatePlayerStack(params object[] references)
 		{
-			if (GetContextReference<T>() != null) {
-				Debug.LogError($"Trying to add duplicate reference: {reference}!");
-				return;
-			}
-
-			m_ContextReferences.Add(reference);
+			StatesStack = new PlayerStateStack(references);
+			StatesStack.Context.AddReference(this);
 		}
 
-		/// <summary>
-		/// Get arbitrary object from this player root. Useful for attaching level state stack or similar per player.
-		/// </summary>
-		public T GetContextReference<T>() => m_ContextReferences.OfType<T>().FirstOrDefault();
+#if GFRAME_ASYNC
 
 		/// <summary>
-		/// Remove arbitrary object from this player root. Useful for attaching level state stack or similar per player.
+		/// Dispose of the states stack. Do this when switching levels, especially with the <see cref="GlobalPlayerContext"/>
 		/// </summary>
-		public bool RemoveContextReference<T>() {
-			int index = m_ContextReferences.FindIndex(obj => obj is T);
-			if (index >= 0) {
-				m_ContextReferences.RemoveAt(index);
-				return true;
-			}
-
-			return false;
+		public async System.Threading.Tasks.Task DisposePlayerStackAsync()
+		{
+			await StatesStack.ClearStackAndStateAsync();
+			StatesStack = null;
 		}
 
-		/// <summary>
-		/// Remove all context references.
-		/// </summary>
-		public void ClearContextReferences() => m_ContextReferences.Clear();
+#else
 
+		/// <summary>
+		/// Clear the StatesStack. Do this when switching levels, especially with the <see cref="GlobalPlayerContext"/>
+		/// </summary>
+		public IEnumerator ClearPlayerStackCrt()
+		{
+			yield return StatesStack.ClearStackAndStateCrt();
+			StatesStack = null;
+		}
+#endif
 
 		/// <summary>
 		/// Called when assembly reload is disabled.

@@ -93,7 +93,7 @@ namespace DevLocker.GFrame.Input
 	}
 
 	/// <summary>
-	/// Manages player context and input. This also should be a MonoBehavior marking the UI hierarchy used by the specific player.
+	/// Manages player context and input. This also should be a MonoBehavior marking the UI hierarchy used by the specific player (use <see cref="PlayerContextUtils.GetPlayerContextFor"/>.
 	/// For more info check <see cref="PlayerContextUIRootObject"/> and <see cref="PlayerContextUIRootForwarder"/>.
 	/// Remember, you have a Global player root as well - <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>
 	/// </summary>
@@ -116,6 +116,14 @@ namespace DevLocker.GFrame.Input
 		IInputContext InputContext { get; }
 
 		/// <summary>
+		/// Stack of player states. States can be pushed in / replaced / popped out of the stack.
+		/// This is optional, you can go without one for simple games.
+		///
+		/// NOTE: Context is automatically disposed of on switching level supervisors.
+		/// </summary>
+		PlayerStateStack StatesStack { get; }
+
+		/// <summary>
 		/// Event system used by this player.
 		/// </summary>
 		EventSystem EventSystem { get; }
@@ -129,11 +137,6 @@ namespace DevLocker.GFrame.Input
 		/// Short-cut - set selected UI object for this player.
 		/// </summary>
 		void SetSelectedGameObject(GameObject selected);
-
-		/// <summary>
-		/// Get arbitrary object from this player root. Useful for attaching level state stack or similar per player.
-		/// </summary>
-		T GetContextReference<T>();
 
 		/// <summary>
 		/// Get the top-most root object.
@@ -337,8 +340,6 @@ namespace DevLocker.GFrame.Input
 
 	public class PlayerContextUtils
 	{
-		public static PlayerContextUIRootObject GlobalPlayerContext => PlayerContextUIRootObject.GlobalPlayerContext;
-
 		/// <summary>
 		/// Get the owning player context root. If no owner found, <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/> is returned.
 		/// </summary>

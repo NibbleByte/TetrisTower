@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,9 +93,9 @@ namespace TetrisTower.Visuals
 
 		private Effects.FairyMatchingController m_Fairy;
 
-		public void Init(LevelStateContextReferences contextReferences)
+		public void Init(PlayerStatesContext context)
 		{
-			GridLevelController towerLevel = contextReferences.FindByType<GridLevelController>();
+			GridLevelController towerLevel = context.FindByType<GridLevelController>();
 			BlocksGrid grid = towerLevel.Grid;
 
 			if (m_Blocks != null) {
@@ -125,7 +126,7 @@ namespace TetrisTower.Visuals
 				}
 			}
 
-			if (contextReferences.TrySetByType(out m_Fairy)) {
+			if (context.TrySetByType(out m_Fairy)) {
 
 				GameObject[] found = GameObject.FindGameObjectsWithTag(Game.GameTags.FairyRestPoint);
 				var fairyRestPoints = found.Where(go => go.transform.IsChildOf(transform)).Select(go => go.transform).ToArray();
@@ -135,7 +136,7 @@ namespace TetrisTower.Visuals
 				} else {
 					Debug.LogWarning("Couldn't find enough fairy rest point. Need at least 2. Destroying the fairy.", this);
 
-					contextReferences.RemoveByType<Effects.FairyMatchingController>();
+					context.RemoveByType<Effects.FairyMatchingController>();
 					Destroy(m_Fairy.gameObject);
 					m_Fairy = null;
 				}

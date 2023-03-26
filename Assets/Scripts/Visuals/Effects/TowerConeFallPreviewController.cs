@@ -3,6 +3,7 @@ using TetrisTower.Logic;
 using UnityEngine;
 using DevLocker.GFrame;
 using TetrisTower.Core;
+using DevLocker.GFrame.Input;
 
 namespace TetrisTower.Visuals.Effects
 {
@@ -20,7 +21,7 @@ namespace TetrisTower.Visuals.Effects
 
 		private int m_CurrentPreviewColumn = 0;
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			if (!isActiveAndEnabled)
 				return;
@@ -35,7 +36,7 @@ namespace TetrisTower.Visuals.Effects
 			m_PreviewRenderer.name = "-- Fall Preview Block --";
 			m_PreviewMaterial = m_PreviewRenderer.material = new Material(m_PreviewRenderer.sharedMaterial);
 
-			contextReferences.SetByType(out m_TowerLevel);
+			context.SetByType(out m_TowerLevel);
 
 			m_TowerLevel.FallingColumnChanged += OnFallingColumnChanged;
 			m_TowerLevel.FallingShapeSelected += OnFallingShapeSelected;

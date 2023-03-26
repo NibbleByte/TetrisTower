@@ -29,12 +29,12 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_Rigidbody = GetComponent<Rigidbody>();
 		}
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			// Implementation for ILevelLoadListener
 			// Add here logic that should happen after the level was loaded.
 
-			contextReferences.SetByType(out m_PlayerContext);
+			context.SetByType(out m_PlayerContext);
 		}
 
 		public void OnLevelUnloading()
@@ -62,7 +62,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_Rigidbody.isKinematic = true;
 			m_Velocity = Vector3.zero;
 
-			await m_PlayerContext.GetPlayerLevelStateStack().SetStateAsync(new SamplePlayChopperState());
+			await m_PlayerContext.StatesStack.SetStateAsync(new SamplePlayChopperState());
 		}
 
 		#endregion
@@ -80,7 +80,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_Rigidbody.isKinematic = false;
 			m_Velocity = Vector3.zero;
 
-			await m_PlayerContext.GetPlayerLevelStateStack().SetStateAsync(new SamplePlayJumperState());
+			await m_PlayerContext.StatesStack.SetStateAsync(new SamplePlayJumperState());
 		}
 
 		#endregion

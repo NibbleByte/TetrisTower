@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System;
 using System.Linq;
 using TetrisTower.Logic;
@@ -24,9 +25,9 @@ namespace TetrisTower.TowerLevels.UI
 			}
 		}
 
-		public void OnLevelLoaded(LevelStateContextReferences contextReferences)
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_TowerLevel);
+			context.SetByType(out m_TowerLevel);
 
 			m_TowerLevel.FallingShapeSelected += RecreatePreview;
 

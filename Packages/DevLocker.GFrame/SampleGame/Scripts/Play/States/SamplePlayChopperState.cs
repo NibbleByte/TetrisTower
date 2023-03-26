@@ -11,7 +11,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 	/// Player is in chopper state - can move freely in all directions with gravity turned off.
 	/// This state also controls what is displayed on the UI via the UIController.
 	/// </summary>
-	public class SamplePlayChopperState : ILevelState, SamplePlayerControls.IPlayChopperActions
+	public class SamplePlayChopperState : IPlayerState, SamplePlayerControls.IPlayChopperActions
 	{
 		private SamplePlayerControls m_PlayerControls;
 		private SamplePlayerController m_PlayerController;
@@ -20,14 +20,14 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private InputEnabler m_InputEnabler;
 
 #if GFRAME_ASYNC
-		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(PlayerStatesContext context)
 #else
-		public IEnumerator EnterState(LevelStateContextReferences contextReferences)
+		public IEnumerator EnterState(PlayerStateContext context)
 #endif
 		{
-			contextReferences.SetByType(out m_PlayerControls);
-			contextReferences.SetByType(out m_PlayerController);
-			contextReferences.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerControls);
+			context.SetByType(out m_PlayerController);
+			context.SetByType(out m_UIController);
 
 			m_InputEnabler = new InputEnabler(this);
 			m_InputEnabler.Enable(m_PlayerControls.UI);

@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerPausedState : ILevelState, PlayerControls.ITowerLevelPausedActions
+	public class TowerPausedState : IPlayerState, PlayerControls.ITowerLevelPausedActions
 	{
 		private GridLevelController m_LevelController;
 		private PlayerControls m_PlayerControls;
@@ -16,11 +16,11 @@ namespace TetrisTower.TowerLevels
 
 		private InputEnabler m_InputEnabler;
 
-		public Task EnterStateAsync(LevelStateContextReferences contextReferences)
+		public Task EnterStateAsync(PlayerStatesContext context)
 		{
-			contextReferences.SetByType(out m_LevelController);
-			contextReferences.SetByType(out m_PlayerControls);
-			contextReferences.SetByType(out m_UIController);
+			context.SetByType(out m_LevelController);
+			context.SetByType(out m_PlayerControls);
+			context.SetByType(out m_UIController);
 
 			m_InputEnabler = new InputEnabler(this);
 			m_InputEnabler.Enable(m_PlayerControls.UI);
