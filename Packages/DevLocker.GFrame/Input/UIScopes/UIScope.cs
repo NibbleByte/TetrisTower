@@ -479,7 +479,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 		}
 
-		public static bool IsScopeActive(UIScope scope) => scope.m_PlayerSet.ActiveScopes.Contains(scope);
+		/// <summary>
+		/// Is this scope active due to one of its children being focused, or being the focused one.
+		/// </summary>
+		public bool IsActive => m_PlayerSet.ActiveScopes.Contains(this);
 
 		/// <summary>
 		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.

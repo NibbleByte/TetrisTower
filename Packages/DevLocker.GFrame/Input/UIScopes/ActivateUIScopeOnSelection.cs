@@ -37,7 +37,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (m_LastSelectedObject != m_PlayerContext.SelectedGameObject) {
 				m_LastSelectedObject = m_PlayerContext.SelectedGameObject;
 
-				if (!UIScope.IsScopeActive(Scope) && m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(transform)) {
+				if (!Scope.IsActive && m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(transform)) {
 					Scope.ForceRefocusScope();
 				}
 			}
