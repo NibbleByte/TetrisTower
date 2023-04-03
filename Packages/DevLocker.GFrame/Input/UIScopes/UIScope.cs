@@ -17,23 +17,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 #if USE_INPUT_SYSTEM
 	/// <summary>
-	/// Used with Unity InputSystem for pushing and popping states in the InputActionsStack.
+	/// Used for displaying InputActions state for debugging.
 	/// </summary>
-	public interface IHotkeyWithInputAction
+	public interface IHotkeysWithInputActions
 	{
 		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions(IInputContext inputContext);
 	}
 #endif
-
-	/// <summary>
-	/// Used to skip hotkeys in some cases.
-	/// </summary>
-	[Flags]
-	public enum SkipHotkeyOption
-	{
-		InputFieldTextFocused = 1 << 0,
-		NonTextSelectableFocused = 1 << 1,
-	}
 
 	/// <summary>
 	/// When working with more hotkeys, selections, etc. on screen, some conflicts may arise.
@@ -98,8 +88,6 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool ResetAllActionsOnEnable = true;
 
 		[Space]
-		[Tooltip("When scope gets enabled this will activate the input actions (hotkeys) that are used by the scope elements under it.\nOn disabling it will deactivate the actions.\nNOTE: to avoid input conflicts, don't control the same actions from the code.")]
-		public bool EnableUsedInputActions = true;
 		[Tooltip("Use this for modal windows to suppress background hotkeys.\n\nPushes a new input state in the stack.\nOn deactivating, will pop this state and restore the previous one.\nThe only enabled actions will be the used ones by (under) this scope.")]
 		public bool PushInputStack = false;
 		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
@@ -610,14 +598,21 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 			}
 
+			PreProcessInput(active);
+
 			foreach(IScopeElement scopeElement in m_ScopeElements) {
+
+				// If scope is already in this state, it is probably the initial run.
+				// Make sure it toggles so it initializes correctly (e.g. hide objects on disable, instead of leaving them out there).
+				if (scopeElement.enabled == active) {
+					scopeElement.enabled = !active;
+				}
+
 				scopeElement.enabled = active;
 			}
-
-			ProcessInput(active);
 		}
 
-		protected void ProcessInput(bool active)
+		protected void PreProcessInput(bool active)
 		{
 #if USE_INPUT_SYSTEM
 			var context = m_PlayerContext.InputContext;
@@ -651,38 +646,10 @@ namespace DevLocker.GFrame.Input.UIScope
 					}
 				}
 
-				// Because the PushInputStack will have disabled all input actions.
-				if (EnableUsedInputActions || PushInputStack) {
-					foreach (var action in m_ScopeElements
-						.OfType<IHotkeyWithInputAction>()
-						.SelectMany(element => element.GetUsedActions(context))
-						.Distinct()) {
-
-						// MessageBox has multiple buttons with the same hotkey, but only one is active.
-						if (action.enabled) {
-							Debug.LogWarning($"{nameof(UIScope)} {name} is enabling action {action.name} that is already enabled. This is a sign of an input conflict!", this);
-						}
-						action.Enable();
-					}
-				}
-
 			} else {
 
 				if (PushInputStack) {
 					context.PopActionsState(this);
-
-				} else if (EnableUsedInputActions) {
-
-					foreach (IHotkeyWithInputAction hotkeyElement in m_ScopeElements.OfType<IHotkeyWithInputAction>()) {
-						foreach (var action in hotkeyElement.GetUsedActions(context)) {
-							// This can often be a valid case since the code may push a new state in the input stack, resetting all the actions, before changing the UIScopes.
-							//if (!action.enabled) {
-							//	Debug.LogWarning($"{nameof(UIScope)} {name} is disabling action {action.name} that is already disabled. This is a sign of an input conflict!", this);
-							//}
-							action.Disable();
-						}
-					}
-
 				}
 			}
 #endif
@@ -719,7 +686,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.ResetAllActionsOnEnable)));
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.EnableUsedInputActions)));
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.PushInputStack)));
 			if (uiScope.PushInputStack) {
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IncludeUIActions)));
@@ -743,7 +709,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				UnityEditor.EditorGUILayout.ObjectField(element as UnityEngine.Object, typeof(IScopeElement), true);
 
 #if USE_INPUT_SYSTEM
-				if (element is IHotkeyWithInputAction hotkeyElement) {
+				if (element is IHotkeysWithInputActions hotkeyElement) {
 
 					var prevColor = GUI.color;
 

@@ -234,11 +234,21 @@ namespace DevLocker.GFrame.Input
 	}
 
 	/// <summary>
+	/// Used to skip hotkeys in some cases.
+	/// </summary>
+	[Flags]
+	public enum SkipHotkeyOption
+	{
+		InputFieldTextFocused = 1 << 0,
+		NonTextSelectableFocused = 1 << 1,
+	}
+
+	/// <summary>
 	/// Use this to specify what <see cref="InputAction"/>s should be enabled.
 	/// When you're done using them call <see cref="Dispose"/> to disable them back.
 	/// Has checks to see if action state is what is expected and will warn if there are some conflicts.
 	/// </summary>
-	public class InputEnabler : IDisposable
+	public class InputEnabler : IDisposable, IEnumerable<InputAction>
 	{
 		private object m_Source;
 		private List<InputAction> m_Actions = new List<InputAction>();
@@ -259,6 +269,14 @@ namespace DevLocker.GFrame.Input
 			if (actions.Length == 0)
 				throw new ArgumentException("Empty actions array");
 
+			Enable((IEnumerable<InputAction>)actions);
+		}
+
+		/// <summary>
+		/// Enable specified actions and remember them for later.
+		/// </summary>
+		public void Enable(IEnumerable<InputAction> actions)
+		{
 			foreach (InputAction action in actions) {
 
 				if (m_Actions.Contains(action)) {
@@ -284,6 +302,14 @@ namespace DevLocker.GFrame.Input
 			if (actions.Length == 0)
 				throw new ArgumentException("Empty actions array");
 
+			Disable((IEnumerable<InputAction>)actions);
+		}
+
+		/// <summary>
+		/// Disable and forget specified actions.
+		/// </summary>
+		public void Disable(IEnumerable<InputAction> actions)
+		{
 			foreach (InputAction action in actions) {
 
 				if (!m_Actions.Contains(action)) {
@@ -336,6 +362,12 @@ namespace DevLocker.GFrame.Input
 			m_Source = null;
 			m_Actions = null;
 		}
+
+		public int Count => m_Actions.Count;
+
+		public IEnumerator<InputAction> GetEnumerator() => m_Actions.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => m_Actions.GetEnumerator();
 	}
 
 	public class PlayerContextUtils
@@ -352,6 +384,37 @@ namespace DevLocker.GFrame.Input
 			}
 
 			return PlayerContextUIRootObject.GlobalPlayerContext;
+		}
+
+		public static bool ShouldSkipHotkey(IPlayerContext context, SkipHotkeyOption option)
+		{
+			if (context == null)
+				return true;
+
+			var selected = context.SelectedGameObject;
+
+			if ((option & SkipHotkeyOption.NonTextSelectableFocused) != 0
+				&& selected
+				&& !selected.GetComponent<UnityEngine.UI.InputField>()
+#if USE_TEXT_MESH_PRO
+				&& !selected.GetComponent<TMPro.TMP_InputField>()
+#endif
+				)
+				return true;
+
+			if ((option & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
+				var inputField = selected.GetComponent<UnityEngine.UI.InputField>();
+				if (inputField && inputField.isFocused)
+					return true;
+
+#if USE_TEXT_MESH_PRO
+				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
+				if (inputFieldTMP && inputFieldTMP.isFocused)
+					return true;
+#endif
+			}
+
+			return false;
 		}
 	}
 

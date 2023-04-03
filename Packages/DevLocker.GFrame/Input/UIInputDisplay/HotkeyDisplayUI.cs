@@ -91,7 +91,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		private InputDevice m_LastDevice;
 
-		private bool m_GameQuitting = false;
+		protected bool m_GameQuitting = false;
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
@@ -259,7 +259,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			SetAdditionalObjects(shown);
 		}
 
-		private void Awake()
+		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 
@@ -272,7 +272,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			});
 		}
 
-		void OnEnable()
+		protected virtual void OnEnable()
 		{
 			if (!m_HasInitialized)
 				return;
@@ -288,7 +288,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			RefreshDisplay(m_PlayerContext.InputContext);
 		}
 
-		void OnDisable()
+		protected virtual void OnDisable()
 		{
 			if (!m_HasInitialized)
 				return;
@@ -345,7 +345,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			RefreshDisplay(m_PlayerContext.InputContext);
 		}
 
-		void OnValidate()
+		protected virtual void OnValidate()
 		{
 			Utils.Validation.ValidateMissingObject(this, InputAction, nameof(InputAction));
 			Utils.Validation.ValidateMissingObject(this, Icon, nameof(Icon));

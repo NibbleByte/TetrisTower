@@ -1,5 +1,7 @@
 #if USE_INPUT_SYSTEM
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.Input.UIInputDisplay
 {
@@ -8,9 +10,18 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 	/// Refreshes if devices change.
 	/// Will be controlled by UIScope.
 	/// </summary>
-	public class HotkeyDisplayUIScopeElement : HotkeyDisplayUI, UIScope.IScopeElement
+	public class HotkeyDisplayUIScopeElement : HotkeyDisplayUI, UIScope.IScopeElement, UIScope.IHotkeysWithInputActions
 	{
+		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)
+		{
+			if (InputAction == null)
+				yield break;
 
+			InputAction action = inputContext.FindActionFor(InputAction.name);
+			if (action != null) {
+				yield return action;
+			}
+		}
 	}
 
 }

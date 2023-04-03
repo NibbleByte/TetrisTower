@@ -1,5 +1,8 @@
 #if USE_INPUT_SYSTEM
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -10,8 +13,15 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// <summary>
 	/// Will display progress of Hotkey interaction (e.g. hold / long press etc.)
 	/// </summary>
-	public class HotkeyProgressUIScopeElement : HotkeyBaseScopeElement
+	public class HotkeyProgressUIScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions
 	{
+		[Tooltip("Skip the hotkey on the selected condition.")]
+		[Utils.EnumMask]
+		public SkipHotkeyOption SkipHotkey;
+
+		[SerializeField]
+		public InputActionReference InputAction;
+
 		[Tooltip("Image to be used as a progress bar of the action. It will fill it from 0 to 1.\nLeave empty to use the image of the current game object.")]
 		public Image FillImage;
 
@@ -30,10 +40,40 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Space]
 		public UnityEvent Started;
 		public UnityEvent Performed;
+		public UnityEvent Cancelled;
 
-		protected override void OnEnable()
+		protected InputAction m_InputAction { get; private set; }
+
+		protected bool m_ActionStarted { get; private set; } = false;
+		protected bool m_ActionPerformed { get; private set; } = false;
+
+		// Used for multiple event systems (e.g. split screen).
+		protected IPlayerContext m_PlayerContext;
+
+		protected bool m_HasInitialized = false;
+
+		protected virtual void Awake()
 		{
-			base.OnEnable();
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+
+			m_PlayerContext.AddSetupCallback((delayedSetup) => {
+				m_HasInitialized = true;
+
+				if (delayedSetup && isActiveAndEnabled) {
+					OnEnable();
+				}
+			});
+		}
+
+		protected virtual void OnEnable()
+		{
+			if (!m_HasInitialized)
+				return;
+
+			m_InputAction = GetUsedActions(m_PlayerContext.InputContext).FirstOrDefault();
+
+			if (m_InputAction == null)
+				return;
 
 			if (FillImage == null) {
 				FillImage = GetComponent<Image>();
@@ -45,36 +85,94 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			FillImage.fillAmount = 0f;
+
+			m_InputAction.started += OnInputStarted;
+			m_InputAction.performed += OnInputPerformed;
+			m_InputAction.canceled += OnInputCancel;
 		}
 
-		protected override void OnStarted()
+		protected virtual void OnDisable()
 		{
+			if (!m_HasInitialized)
+				return;
+
+			m_ActionStarted = false;
+			m_ActionPerformed = false;
+
+			if (m_InputAction == null)
+				return;
+
+			m_InputAction.started -= OnInputStarted;
+			m_InputAction.performed -= OnInputPerformed;
+			m_InputAction.canceled -= OnInputCancel;
+		}
+
+		private void OnInputStarted(InputAction.CallbackContext obj)
+		{
+			// Copy-pasted from HotkeyBaseScopeElement
+
+			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
+				return;
+
+			m_ActionStarted = true;
+
 			Started.Invoke();
 		}
 
-		protected override void OnInvoke()
+		private void OnInputPerformed(InputAction.CallbackContext obj)
 		{
+			// Copy-pasted from HotkeyBaseScopeElement
+
+			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
+				return;
+
+			m_ActionStarted = false;
+			m_ActionPerformed = true;
+
 			Performed.Invoke();
 		}
 
-		void Update()
+		private void OnInputCancel(InputAction.CallbackContext obj)
 		{
-			if (m_ActionStarted) {
-				float progressSum = 0f;
-				foreach(InputAction action in m_SubscribedActions) {
-					progressSum += action.GetTimeoutCompletionPercentage();
-				}
+			// Copy-pasted from HotkeyBaseScopeElement
 
-				float averageProgress = progressSum / m_SubscribedActions.Count;
-				FillImage.fillAmount = averageProgress;
+			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
+				return;
+
+			m_ActionStarted = false;
+			m_ActionPerformed = false;
+
+			Cancelled.Invoke();
+		}
+
+
+		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)
+		{
+			if (InputAction == null)
+				yield break;
+
+			InputAction action = inputContext.FindActionFor(InputAction.name);
+			if (action != null) {
+				yield return action;
+			}
+		}
+
+		protected virtual void Update()
+		{
+			if (m_InputAction == null)
+				return;
+
+			if (m_ActionStarted) {
+				float progress = m_InputAction.GetTimeoutCompletionPercentage();
+				FillImage.fillAmount = progress;
 
 				if (Text) {
-					Text.text = FormatText.Replace("{value}", Mathf.RoundToInt(averageProgress * 100).ToString());
+					Text.text = FormatText.Replace("{value}", Mathf.RoundToInt(progress * 100).ToString());
 				}
 
 #if USE_TEXT_MESH_PRO
 				if (TextMeshProText) {
-					TextMeshProText.text = FormatText.Replace("{value}", Mathf.RoundToInt(averageProgress * 100).ToString());
+					TextMeshProText.text = FormatText.Replace("{value}", Mathf.RoundToInt(progress * 100).ToString());
 				}
 #endif
 
@@ -91,6 +189,11 @@ namespace DevLocker.GFrame.Input.UIScope
 				}
 #endif
 			}
+		}
+
+		protected virtual void OnValidate()
+		{
+			Utils.Validation.ValidateMissingObject(this, InputAction, nameof(InputAction));
 		}
 	}
 }

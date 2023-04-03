@@ -12,7 +12,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// Base class for hotkey scope elements (that use Unity's Input System).
 	/// Note that this action has to be enabled in order to be invoked.
 	/// </summary>
-	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeyWithInputAction
+	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions
 	{
 		[Tooltip("Skip the hotkey based on the selected condition.")]
 		[Utils.EnumMask]
@@ -24,15 +24,23 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected bool m_ActionStarted { get; private set; } = false;
 		protected bool m_ActionPerformed { get; private set; } = false;
 
-		protected List<InputAction> m_SubscribedActions = new List<InputAction>();
+		protected InputEnabler m_InputEnabler;
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
 		protected bool m_HasInitialized = false;
 
+		protected virtual void Reset()
+		{
+			// Let scopes do the enabling or else you'll get warnings for hotkey conflicts for multiple scopes with the same hotkey on screen.
+			enabled = false;
+		}
+
 		protected virtual void Awake()
 		{
+			m_InputEnabler = new InputEnabler(this);
+
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {
@@ -56,10 +64,11 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			foreach(InputAction action in GetUsedActions(m_PlayerContext.InputContext)) {
-				m_SubscribedActions.Add(action);
 				action.started += OnInputStarted;
 				action.performed += OnInputPerformed;
 				action.canceled += OnInputCancel;
+
+				m_InputEnabler.Enable(action);
 			}
 		}
 
@@ -68,45 +77,25 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_HasInitialized)
 				return;
 
-			if (m_PlayerContext.InputContext == null)
-				return;
+			// Not needed. Better unsubscribe even if context got disposed.
+			//if (m_PlayerContext.InputContext == null)
+			//	return;
 
 			m_ActionStarted = false;
 			m_ActionPerformed = false;
 
-			foreach (InputAction action in m_SubscribedActions) {
+			foreach (InputAction action in m_InputEnabler.ToList()) {
 				action.started -= OnInputStarted;
 				action.performed -= OnInputPerformed;
 				action.canceled -= OnInputCancel;
+				m_InputEnabler.Disable(action);
 			}
-
-			m_SubscribedActions.Clear();
 		}
 
 		private void OnInputStarted(InputAction.CallbackContext obj)
 		{
-			var selected = m_PlayerContext.SelectedGameObject;
-
-			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
-				&& selected
-				&& !selected.GetComponent<InputField>()
-#if USE_TEXT_MESH_PRO
-				&& !selected.GetComponent<TMPro.TMP_InputField>()
-#endif
-				)
+			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
-
-			if ((SkipHotkey & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
-				var inputField = selected.GetComponent<InputField>();
-				if (inputField && inputField.isFocused)
-					return;
-
-#if USE_TEXT_MESH_PRO
-				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
-				if (inputFieldTMP && inputFieldTMP.isFocused)
-					return;
-#endif
-			}
 
 			m_ActionStarted = true;
 
@@ -115,28 +104,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputPerformed(InputAction.CallbackContext obj)
 		{
-			var selected = m_PlayerContext.SelectedGameObject;
-
-			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
-				&& selected
-				&& !selected.GetComponent<InputField>()
-#if USE_TEXT_MESH_PRO
-				&& !selected.GetComponent<TMPro.TMP_InputField>()
-#endif
-				)
+			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
-
-			if ((SkipHotkey & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
-				var inputField = selected.GetComponent<InputField>();
-				if (inputField && inputField.isFocused)
-					return;
-
-#if USE_TEXT_MESH_PRO
-				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
-				if (inputFieldTMP && inputFieldTMP.isFocused)
-					return;
-#endif
-			}
 
 			m_ActionStarted = false;
 			m_ActionPerformed = true;
@@ -146,28 +115,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void OnInputCancel(InputAction.CallbackContext obj)
 		{
-			var selected = m_PlayerContext.SelectedGameObject;
-
-			if ((SkipHotkey & SkipHotkeyOption.NonTextSelectableFocused) != 0
-				&& selected
-				&& !selected.GetComponent<InputField>()
-#if USE_TEXT_MESH_PRO
-				&& !selected.GetComponent<TMPro.TMP_InputField>()
-#endif
-				)
+			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
-
-			if ((SkipHotkey & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
-				var inputField = selected.GetComponent<InputField>();
-				if (inputField && inputField.isFocused)
-					return;
-
-#if USE_TEXT_MESH_PRO
-				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
-				if (inputFieldTMP && inputFieldTMP.isFocused)
-					return;
-#endif
-			}
 
 			m_ActionStarted = false;
 			m_ActionPerformed = false;
@@ -181,7 +130,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)
 		{
-			// Don't use m_SubscribedActions directly as the behaviour may not yet be enabled when this method is called.
+			if (m_InputAction == null)
+				yield break;
 
 			InputAction action = inputContext.FindActionFor(m_InputAction.name);
 			if (action != null) {
@@ -192,6 +142,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected virtual void OnValidate()
 		{
 			Utils.Validation.ValidateMissingObject(this, m_InputAction, nameof(m_InputAction));
+
+			// Check the Reset() message.
+			if (!Application.isPlaying && enabled) {
+				enabled = false;
+			}
 		}
 	}
 }
