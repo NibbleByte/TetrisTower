@@ -27,6 +27,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Tooltip("What should happen if no object is selected (e.g. user mouse-clicks on empty space and selection is lost)? Useful with FilterControlScheme.")]
 		public NoSelectionActionType NoSelectionAction = NoSelectionActionType.SelectLastSelectedObject;
 
+		[Tooltip("Should it consider only selections that are child of this component for persistent or last selected object?")]
+		public bool TrackOnlyChildren = true;
+
 		[InputControlSchemePicker]
 		[Tooltip("Control schemes to update for. One control scheme can match multiple devices (e.g. XBox and PS gamepads). Use the picker to avoid typos.")]
 		public string[] FilterControlScheme;
@@ -117,8 +120,12 @@ namespace DevLocker.GFrame.Input.UIScope
 			} else {
 
 				if (m_ControlSchemeMatched) {
-					if (m_PlayerContext.SelectedGameObject) {
-						m_PersistedSelection = m_PlayerContext.SelectedGameObject;
+					if (m_PlayerContext.SelectedGameObject && m_PlayerContext.SelectedGameObject.activeInHierarchy) {
+
+						if (!TrackOnlyChildren || m_PlayerContext.SelectedGameObject.transform.IsChildOf(transform)) {
+							m_PersistedSelection = m_PlayerContext.SelectedGameObject;
+						}
+
 					} else {
 						DoNoSelectionAction();
 					}
@@ -153,13 +160,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			switch (NoSelectionAction) {
 
 				case NoSelectionActionType.SelectLastSelectedObject:
+					m_PlayerContext.SetSelectedGameObject(m_PersistedSelection && m_PersistedSelection.activeInHierarchy ? m_PersistedSelection : StartSelection.gameObject);
 					OnSelected();
-					m_PlayerContext.SetSelectedGameObject(m_PersistedSelection);
 					break;
 
 				case NoSelectionActionType.SelectStartObject:
-					OnSelected();
 					m_PlayerContext.SetSelectedGameObject(StartSelection.gameObject);
+					OnSelected();
 					break;
 
 				case NoSelectionActionType.DoNothing:
