@@ -125,8 +125,11 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 				// HACK: Prevent from spamming on PC.
 				//		 Keyboard & Mouse are be considered (usually) the same. Gamepads are not - each one comes with its own assets.
-				if ((device is Keyboard && m_LastDevice is Mouse) || (device is Mouse && m_LastDevice is Keyboard))
+				// NOTE: Don't check for (device == m_LastDevice). Keyboard refresh is triggered on changing layout (switching language), but device remains the same.
+				if ((device is Keyboard && m_LastDevice is Mouse) || (device is Mouse && m_LastDevice is Keyboard)) {
+					m_LastDevice = device;
 					return;
+				}
 
 				m_LastDevice = device;
 
@@ -341,6 +344,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				enabled = false;
 				return;
 			}
+
+			// Keyboard/Mouse check is done in the RefreshDisplay() method. Don't do it here.
 
 			RefreshDisplay(m_PlayerContext.InputContext);
 		}
