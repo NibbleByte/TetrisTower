@@ -44,9 +44,6 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
 			m_InputEnabler.Enable(m_PlayerControls.TowerLevelPlay.PointerPress);
 
-			// These are still active (Menu hotkey).
-			m_PlayerControls.TowerLevelShared.Disable();
-
 			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
