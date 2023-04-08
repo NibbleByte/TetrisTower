@@ -73,6 +73,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public ShowPrioritySelection ShowPriority = ShowPrioritySelection.IconIsPriority;
 
 		public Image Icon;
+
 		public Text Text;
 
 #if USE_TEXT_MESH_PRO
@@ -84,12 +85,17 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		[Tooltip("Optional - enter how the hotkey text should be displayed. Use \"{Hotkey}\" to be replaced with the matched text.\nLeave empty to skip.")]
 		public string FormatText;
 
+		[Tooltip("When updating the icon, should it resize the image rect to fit the new sprite relative to the initial rect/sprite size ratio.")]
+		public bool AdjustSize = true;
+
 		[Tooltip("Optional - list of objects to be activated when hotkeys are displayed. Useful for labels indicating the result of the action.")]
 		public GameObject[] AdditionalObjectsToActivate;
 
 		public InputBindingDisplayData CurrentlyDisplayedData { get; private set; }
 
 		private InputDevice m_LastDevice;
+
+		private Vector2 m_RectSpriteRatio = new Vector2(1f, 1f);
 
 		protected bool m_GameQuitting = false;
 
@@ -222,6 +228,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 				Icon.gameObject.SetActive(CurrentlyDisplayedData.HasIcon && iconIsPriority);
 				Icon.sprite = CurrentlyDisplayedData.Icon;
+
+				if (AdjustSize && Icon.sprite) {
+					Vector2 rectSize = Icon.sprite.rect.size * m_RectSpriteRatio;
+					// Vector2 == means approximately equality.
+					if (rectSize != Icon.rectTransform.sizeDelta) {
+						Icon.rectTransform.sizeDelta = rectSize;
+					}
+				}
 			}
 
 #if USE_TEXT_MESH_PRO
@@ -268,6 +282,12 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {
 				m_HasInitialized = true;
+
+				if (Icon && Icon.sprite) {
+					m_RectSpriteRatio = Icon.rectTransform.sizeDelta / Icon.sprite.rect.size;
+				} else {
+					m_RectSpriteRatio = new Vector2(1f, 1f);
+				}
 
 				if (delayedSetup && isActiveAndEnabled) {
 					OnEnable();
