@@ -31,13 +31,12 @@ namespace TetrisTower.Game.Build
 
 			scenes.Add(isMobile ? gameConfig.BootSceneMobile.ScenePath : gameConfig.BootScene.ScenePath);
 
-			var levels = AssetDatabase.FindAssets("t:PlaythroughTemplate")
+			var levels = AssetDatabase.FindAssets("t:PlaythroughTemplateBase")
 				.Select(AssetDatabase.GUIDToAssetPath)
 				.Where(p => !Path.GetFileName(p).StartsWith("_") && p.IndexOf("/Editor/", StringComparison.OrdinalIgnoreCase) == -1)   // Starting with "_" means dev playthrough.
-				.Select(AssetDatabase.LoadAssetAtPath<PlaythroughTemplate>)
-				.Select(pt => pt.__GetPlaythroughData())
-				.Where(ptd => ptd.TowerLevel == null)   // Must not have active level.
-				.SelectMany(ptd => ptd.Levels)
+				.Select(AssetDatabase.LoadAssetAtPath<PlaythroughTemplateBase>)
+				.Where(pt => !pt.HasActiveLevel)   // Must not have active level.
+				.SelectMany(pt => pt.GetAllLevels())
 				.Select(l => isMobile ? l.BackgroundSceneMobile.ScenePath : l.BackgroundScene.ScenePath)
 				.Distinct()
 				.ToArray();

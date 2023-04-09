@@ -66,7 +66,7 @@ namespace TetrisTower.Game
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
 			if (Rules.ObjectiveType == 0) {
-				Debug.LogError($"{nameof(PlaythroughData)} has no ObjectiveType set.", context);
+				Debug.LogError($"{context} has no ObjectiveType set.", context);
 			}
 
 #if UNITY_EDITOR

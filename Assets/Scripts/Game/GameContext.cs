@@ -31,18 +31,18 @@ namespace TetrisTower.Game
 
 		public PlayerControls PlayerControls { get; }
 
-		public PlaythroughData CurrentPlaythrough { get; private set; }
-		[SerializeReference] private PlaythroughData m_DebugPlaythroughData;
+		public IPlaythroughData CurrentPlaythrough { get; private set; }
+		[SerializeReference] private IPlaythroughData m_DebugPlaythroughData;
 
 		public IInputContext InputContext { get; }
 
-		public void SetCurrentPlaythrough(PlaythroughTemplate playthroughTemplate)
+		public void SetCurrentPlaythrough(PlaythroughTemplateBase playthroughTemplate)
 		{
-			PlaythroughData playthroughData = playthroughTemplate.GeneratePlaythroughData(GameConfig);
+			IPlaythroughData playthroughData = playthroughTemplate.GeneratePlaythroughData(GameConfig);
 			SetCurrentPlaythrough(playthroughData);
 		}
 
-		public void SetCurrentPlaythrough(PlaythroughData playthrough)
+		public void SetCurrentPlaythrough(IPlaythroughData playthrough)
 		{
 			CurrentPlaythrough = m_DebugPlaythroughData = playthrough;
 		}

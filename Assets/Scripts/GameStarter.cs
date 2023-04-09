@@ -14,7 +14,7 @@ namespace TetrisTower.GameStarter
 		public GameConfig GameConfig;
 
 		[Tooltip("If starting tower level directly, override starting playthrough with this one, if specified.")]
-		public PlaythroughTemplate StartingPlaythroughTemplate;
+		public PlaythroughTemplateBase StartingPlaythroughTemplate;
 
 		[Tooltip("Leave the starting seed to 0 for random seed every time.")]
 		public int StartingRandomSeed = 0;
@@ -76,7 +76,7 @@ namespace TetrisTower.GameStarter
 
 				if (StartingPlaythroughTemplate) {
 
-					PlaythroughData playthroughData = StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
+					IPlaythroughData playthroughData = StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
 					string scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
 
 					if (playthroughData.TowerLevel != null) {
@@ -94,7 +94,11 @@ namespace TetrisTower.GameStarter
 					GameContext.SetCurrentPlaythrough(playthroughData);
 
 				} else {
-					GameContext.SetCurrentPlaythrough(GameConfig.NormalPlaythgrough);
+#if UNITY_EDITOR
+					GameContext.SetCurrentPlaythrough(GameConfig.DevDefaultPlaythgrough);
+#else
+					throw new System.NotImplementedException();
+#endif
 				}
 
 				GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor(overrideScene));

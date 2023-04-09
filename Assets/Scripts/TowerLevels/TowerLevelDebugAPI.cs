@@ -110,7 +110,7 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
-			var playthrough = Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(savedData, context.GameConfig.Converters);
+			var playthrough = Newtonsoft.Json.JsonConvert.DeserializeObject<IPlaythroughData>(savedData, context.GameConfig.Converters);
 			context.SetCurrentPlaythrough(playthrough);
 			GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
 		}

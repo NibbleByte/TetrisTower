@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TetrisTower.TowerLevels.Playthroughs;
 using TetrisTower.Visuals;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,7 +29,7 @@ namespace TetrisTower.TowerLevels
 		public async Task LoadAsync()
 		{
 			GameContext gameContext = GameManager.Instance.GameContext;
-			PlaythroughData playthroughData = gameContext.CurrentPlaythrough;
+			SeqPlaythroughData playthroughData = (SeqPlaythroughData) gameContext.CurrentPlaythrough;
 			Debug.Assert(playthroughData != null);
 
 			if (MessageBox.Instance) {

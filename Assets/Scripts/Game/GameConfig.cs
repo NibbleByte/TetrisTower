@@ -47,7 +47,7 @@ namespace TetrisTower.Game
 				new RandomXoShiRo128starstarJsonConverter(),
 		};
 
-		public PlaythroughTemplate NormalPlaythgrough;
+		public PlaythroughTemplateBase DevDefaultPlaythgrough;
 
 		void OnValidate()
 		{

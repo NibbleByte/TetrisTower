@@ -17,7 +17,7 @@ namespace TetrisTower.TowerLevels.UI
 
 		private GridLevelData m_LevelData => m_TowerLevel.LevelData;
 
-		private PlaythroughData m_PlaythroughData;
+		private IPlaythroughData m_PlaythroughData;
 
 		[Tooltip("Use the C# TimeStamp formatting. Use {totalSeconds} to display time in seconds (no minutes).\nNOTE: use '' for arbitrary text.")]
 		public string DisplayFormat = @"'Play time: 'mm\:ss\.fff";

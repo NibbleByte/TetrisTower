@@ -16,7 +16,7 @@ namespace TetrisTower.TowerLevels.UI
 
 		private GridLevelData m_LevelData => m_TowerLevel.LevelData;
 
-		private PlaythroughData m_PlaythroughData;
+		private IPlaythroughData m_PlaythroughData;
 
 		[Header("Prefixes")]
 		public string TotalScorePrefix = "Total: ";

@@ -16,9 +16,17 @@ namespace TetrisTower.TowerLevels.UI
 
 		private GridLevelController m_TowerLevel;
 
-		public void OnLevelLoaded(PlayerStatesContext context)
+		void Awake()
 		{
 			m_Text = GetComponent<TextMeshProUGUI>();
+		}
+
+		public void OnLevelLoaded(PlayerStatesContext context)
+		{
+			if (m_Text == null) {
+				m_Text = GetComponent<TextMeshProUGUI>();
+			}
+
 			context.SetByType(out m_TowerLevel);
 
 			if (m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing && !string.IsNullOrEmpty(m_TowerLevel.LevelData.GreetMessage)) {

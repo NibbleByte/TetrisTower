@@ -9,7 +9,7 @@ namespace TetrisTower.HomeScreen
 		public HomeScreenController HomeScreenController;
 		public HomeScreenState LoadingState;
 
-		public void StartNewGame(PlaythroughTemplate template)
+		public void StartNewGame(PlaythroughTemplateBase template)
 		{
 			var gameContext = GameManager.Instance.GameContext;
 

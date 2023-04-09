@@ -1,24 +1,37 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using TetrisTower.Game;
 using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.Game
+namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 {
+	/// <summary>
+	/// Sequential play through in which players play levels one after another until end is reached.
+	/// </summary>
 	[CreateAssetMenu(fileName = "UnknownPlaythroughTemplate", menuName = "Tetris Tower/Playthrough Template")]
-	public class PlaythroughTemplate : ScriptableObject
+	public class SeqPlaythroughTemplate : PlaythroughTemplateBase
 	{
-		[SerializeField] private PlaythroughData m_PlayerData;
+		[SerializeField] private SeqPlaythroughData m_PlayerData;
 
-		public PlaythroughData GeneratePlaythroughData(GameConfig config)
+		public override bool HasActiveLevel => m_PlayerData.TowerLevel != null;
+
+		public override IPlaythroughData GeneratePlaythroughData(GameConfig config)
 		{
 			m_PlayerData.Validate(config.AssetsRepository, this);
 
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
 			var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(m_PlayerData, config.Converters);
 
-			return Newtonsoft.Json.JsonConvert.DeserializeObject<PlaythroughData>(serialized, config.Converters);
+			return Newtonsoft.Json.JsonConvert.DeserializeObject<SeqPlaythroughData>(serialized, config.Converters);
 		}
+
+		public override IEnumerable<LevelParamData> GetAllLevels()
+		{
+			return m_PlayerData.Levels;
+		}
+
 
 #if UNITY_EDITOR
 
@@ -32,8 +45,6 @@ namespace TetrisTower.Game
 				m_PlayerData.Validate(gameConfig.AssetsRepository, this);
 			}
 		}
-
-		public PlaythroughData __GetPlaythroughData() => m_PlayerData;
 
 		// Just modify the hard-coded array. Copy one from the unit tests.
 		[ContextMenu("Setup From Array")]

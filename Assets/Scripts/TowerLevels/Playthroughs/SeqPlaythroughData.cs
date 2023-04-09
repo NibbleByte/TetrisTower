@@ -3,15 +3,19 @@ using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using TetrisTower.Game;
 using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace TetrisTower.Game
+namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 {
+	/// <summary>
+	/// Sequential play through in which players play levels one after another until end is reached.
+	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class PlaythroughData
+	public class SeqPlaythroughData : IPlaythroughData
 	{
 		[SerializeReference]
 		[FormerlySerializedAs("TowerLevel")]
@@ -215,8 +219,8 @@ namespace TetrisTower.Game
 	}
 
 #if UNITY_EDITOR
-	[UnityEditor.CustomPropertyDrawer(typeof(PlaythroughData))]
-	public class PlaythroughDataDrawer : SerializeReferenceCreatorDrawer<PlaythroughData>
+	[UnityEditor.CustomPropertyDrawer(typeof(SeqPlaythroughData))]
+	public class PlaythroughDataDrawer : SerializeReferenceCreatorDrawer<SeqPlaythroughData>
 	{
 	}
 #endif

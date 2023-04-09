@@ -497,7 +497,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -516,6 +515,7 @@ MonoBehaviour:
   StartSelection: {fileID: 1963389932}
   PersistentSelection: 1
   NoSelectionAction: 8
+  TrackOnlyChildren: 1
   FilterControlScheme:
   - Gamepad
   RemoveSelectionOnControlSchemeMismatch: 1
@@ -1228,12 +1228,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 842093532}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 0
   SkipHotkey: 0
   m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1001 &959942194
@@ -1273,7 +1272,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 2162966bc91da954291384e1534ec3a2, type: 2}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: TetrisTower.Game.PlaythroughTemplate, TetrisTower.Game
+      value: TetrisTower.Game.PlaythroughTemplateBase, TetrisTower.Game
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832821, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_Pivot.x
@@ -1809,12 +1808,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141675060}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 0
   SkipHotkey: 0
   m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1001 &1167874858
@@ -2096,7 +2094,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -2115,6 +2112,7 @@ MonoBehaviour:
   StartSelection: {fileID: 2032308269}
   PersistentSelection: 0
   NoSelectionAction: 8
+  TrackOnlyChildren: 1
   FilterControlScheme:
   - Gamepad
   RemoveSelectionOnControlSchemeMismatch: 1
@@ -2599,7 +2597,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -2618,6 +2615,7 @@ MonoBehaviour:
   StartSelection: {fileID: 1141675059}
   PersistentSelection: 0
   NoSelectionAction: 8
+  TrackOnlyChildren: 1
   FilterControlScheme:
   - Gamepad
   RemoveSelectionOnControlSchemeMismatch: 1
@@ -2867,12 +2865,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1770499102}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 0
   SkipHotkey: 0
   m_InputAction: {fileID: -7452923264383808493, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
 --- !u!1 &1819719998
@@ -3084,7 +3081,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: adeadf70ba489c64ca83e6600a58c20b, type: 2}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: TetrisTower.Game.PlaythroughTemplate, TetrisTower.Game
+      value: TetrisTower.Game.PlaythroughTemplateBase, TetrisTower.Game
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832821, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_Pivot.x
@@ -3693,7 +3690,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 689add6d47e824640984d55d631805b4, type: 2}
     - target: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: TetrisTower.Game.PlaythroughTemplate, TetrisTower.Game
+      value: TetrisTower.Game.PlaythroughTemplateBase, TetrisTower.Game
       objectReference: {fileID: 0}
     - target: {fileID: 1367408335253832821, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
       propertyPath: m_Pivot.x
