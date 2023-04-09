@@ -162,6 +162,7 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 			foreach (var pair in m_ShownData.ButtonsOverrideLabels) {
 				var button = GetButtons(pair.Key).First();
 
+#if USE_UGUI_TEXT
 				var label = button.GetComponentInChildren<Text>();
 				if (label) {
 					m_ButtonsOriginalLabels.Add(pair.Key, label.text);
@@ -169,6 +170,7 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 					label.text = pair.Value;
 					continue;
 				}
+#endif
 
 #if USE_TEXT_MESH_PRO
 				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshProUGUI>();
@@ -186,11 +188,13 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 			foreach (var pair in m_ShownData.ButtonsOverrideLabels) {
 				var button = GetButtons(pair.Key).First();
 
+#if USE_UGUI_TEXT
 				var label = button.GetComponentInChildren<Text>();
 				if (label) {
 					label.text = m_ButtonsOriginalLabels[pair.Key];
 					continue;
 				}
+#endif
 
 #if USE_TEXT_MESH_PRO
 				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshProUGUI>();

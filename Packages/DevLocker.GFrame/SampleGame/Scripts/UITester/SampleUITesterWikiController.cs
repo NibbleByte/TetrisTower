@@ -41,8 +41,10 @@ namespace DevLocker.GFrame.SampleGame.UITester
 				GameObject tabGO = GameObject.Instantiate(WikiEntryTab.gameObject, wikiTabsParent);
 				GameObject contentGO = GameObject.Instantiate(WikiEntryContent.gameObject, wikiContentsParent);
 
+#if USE_UGUI_TEXT
 				if (tabGO.GetComponentInChildren<Text>(true)) tabGO.GetComponentInChildren<Text>(true).text = $"Entry {i}";
 				if (contentGO.GetComponentInChildren<Text>(true)) contentGO.GetComponentInChildren<Text>(true).text = $"Some content {i}";
+#endif
 
 #if USE_TEXT_MESH_PRO
 				if (tabGO.GetComponentInChildren<TMPro.TextMeshProUGUI>(true)) tabGO.GetComponentInChildren<TMPro.TextMeshProUGUI>(true).text = $"Entry {i}";
