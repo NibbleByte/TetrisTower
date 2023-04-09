@@ -1,3 +1,4 @@
+using DevLocker.GFrame;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
@@ -62,6 +63,8 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 
 		public abstract bool IsFinalLevel { get; }
 		public abstract bool HaveFinishedLevels { get; }
+
+		public abstract ILevelSupervisor PrepareSupervisor();
 
 		public void ReplaceCurrentLevel(GridLevelData levelData)
 		{

@@ -15,7 +15,7 @@ namespace TetrisTower.HomeScreen
 
 			gameContext.SetCurrentPlaythrough(template);
 
-			GameManager.Instance.SwitchLevelAsync(new TowerLevels.TowerLevelSupervisor());
+			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
 
 			HomeScreenController.SwitchState(LoadingState);
 		}

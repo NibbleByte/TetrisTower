@@ -24,6 +24,7 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
 			var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(m_PlayerData, config.Converters);
 
+			// No need to have the json "TypeNameHandling = Auto" of the root object serialized, as we specify the type in the generics parameter.
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<SeqPlaythroughData>(serialized, config.Converters);
 		}
 

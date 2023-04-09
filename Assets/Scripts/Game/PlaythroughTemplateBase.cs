@@ -1,3 +1,4 @@
+using DevLocker.GFrame;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ namespace TetrisTower.Game
 
 		public float TotalPlayTime { get; }
 		public int TotalScore { get; }
+
+		ILevelSupervisor PrepareSupervisor();
 
 		void RetryLevel();
 		void FinishLevel();

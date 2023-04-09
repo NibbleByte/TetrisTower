@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.MessageBox;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using TetrisTower.Game;
 using TetrisTower.Logic;
@@ -93,7 +94,12 @@ namespace TetrisTower.TowerLevels
 		public static void SaveGame(GameContext context)
 		{
 			if (context.CurrentPlaythrough != null) {
-				string savedData = Newtonsoft.Json.JsonConvert.SerializeObject(context.CurrentPlaythrough, context.GameConfig.Converters);
+				// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
+				string savedData = JsonConvert.SerializeObject(context.CurrentPlaythrough, typeof(IPlaythroughData), new JsonSerializerSettings() {
+					Converters = context.GameConfig.Converters,
+					TypeNameHandling = TypeNameHandling.Auto,
+					//Formatting = Formatting.Indented,
+				});
 				PlayerPrefs.SetString("Debug_SavedGame", savedData);
 				PlayerPrefs.Save();
 				Debug.Log(savedData);
@@ -110,9 +116,13 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
-			var playthrough = Newtonsoft.Json.JsonConvert.DeserializeObject<IPlaythroughData>(savedData, context.GameConfig.Converters);
+			var playthrough = JsonConvert.DeserializeObject<IPlaythroughData>(savedData, new JsonSerializerSettings() {
+				Converters = context.GameConfig.Converters,
+				TypeNameHandling = TypeNameHandling.Auto,
+			});
+
 			context.SetCurrentPlaythrough(playthrough);
-			GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
+			GameManager.Instance.SwitchLevelAsync(playthrough.PrepareSupervisor());
 		}
 
 		public void ToggleBirds()

@@ -100,7 +100,7 @@ namespace TetrisTower.TowerLevels.UI
 				var config = Game.GameManager.Instance.GameContext.GameConfig;
 
 				playthroughData.ReplaceCurrentLevel(Newtonsoft.Json.JsonConvert.DeserializeObject<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, config.Converters));
-				Game.GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
+				Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
 				return;
 			}
 
@@ -108,7 +108,7 @@ namespace TetrisTower.TowerLevels.UI
 
 			playthroughData.RetryLevel();
 
-			Game.GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
+			Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
 		}
 
 		public void GoToNextLevel()
@@ -128,7 +128,7 @@ namespace TetrisTower.TowerLevels.UI
 			if (playthroughData.HaveFinishedLevels) {
 				ExitToHomeScreen();
 			} else {
-				Game.GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor());
+				Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
 			}
 
 		}

@@ -1,9 +1,11 @@
+using DevLocker.GFrame;
 using DevLocker.GFrame.Utils;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
 using TetrisTower.Game;
+using TetrisTower.TowerLevels;
 using UnityEngine;
 
 namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
@@ -20,6 +22,11 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 
 		public override bool IsFinalLevel => CurrentLevelIndex == Levels.Length - 1;
 		public override bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;
+
+		public override ILevelSupervisor PrepareSupervisor()
+		{
+			return new TowerLevelSupervisor(this);
+		}
 
 		public void SetupCurrentLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{

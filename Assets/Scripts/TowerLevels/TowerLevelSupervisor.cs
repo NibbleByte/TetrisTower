@@ -18,10 +18,15 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerLevelSupervisor : ILevelSupervisor
 	{
+		private SeqPlaythroughData m_PlaythroughData;
 		private SceneReference m_OverrideScene;
 
-		public TowerLevelSupervisor() { }
-		public TowerLevelSupervisor(SceneReference overrideScene)
+		public TowerLevelSupervisor(SeqPlaythroughData playthroughData)
+		{
+			m_PlaythroughData = playthroughData;
+		}
+
+		public void SetSceneOverride(SceneReference overrideScene)
 		{
 			m_OverrideScene = overrideScene;
 		}
@@ -29,27 +34,25 @@ namespace TetrisTower.TowerLevels
 		public async Task LoadAsync()
 		{
 			GameContext gameContext = GameManager.Instance.GameContext;
-			SeqPlaythroughData playthroughData = (SeqPlaythroughData) gameContext.CurrentPlaythrough;
-			Debug.Assert(playthroughData != null);
 
 			if (MessageBox.Instance) {
 				MessageBox.Instance.ForceCloseAllMessages();
 			}
 
-			if (playthroughData.TowerLevel == null) {
+			if (m_PlaythroughData.TowerLevel == null) {
 
-				playthroughData.SetupCurrentLevel(gameContext.GameConfig, m_OverrideScene);
+				m_PlaythroughData.SetupCurrentLevel(gameContext.GameConfig, m_OverrideScene);
 
-				if (playthroughData.TowerLevel == null) {
+				if (m_PlaythroughData.TowerLevel == null) {
 					CriticalError($"No available level.", true);
 					return;
 				}
 
-				if (playthroughData.TowerLevel.BackgroundScene.IsEmpty) {
+				if (m_PlaythroughData.TowerLevel.BackgroundScene.IsEmpty) {
 					Debug.LogError($"No appropriate scene found in current level! Setting dev one.");
-					playthroughData.TowerLevel.BackgroundScene = new SceneReference("Assets/Scenes/_DevTowerScene.unity");
+					m_PlaythroughData.TowerLevel.BackgroundScene = new SceneReference("Assets/Scenes/_DevTowerScene.unity");
 
-					bool isValidFallback = SceneUtility.GetBuildIndexByScenePath(playthroughData.TowerLevel.BackgroundScene.ScenePath) >= 0;
+					bool isValidFallback = SceneUtility.GetBuildIndexByScenePath(m_PlaythroughData.TowerLevel.BackgroundScene.ScenePath) >= 0;
 
 					CriticalError($"Current level did not have scene specified. Loading fallback.", !isValidFallback);
 
@@ -58,21 +61,21 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 
-			} else if (playthroughData.TowerLevel.BlocksSkinStack == null || playthroughData.TowerLevel.BlocksSkinStack.IsEmpty) {
+			} else if (m_PlaythroughData.TowerLevel.BlocksSkinStack == null || m_PlaythroughData.TowerLevel.BlocksSkinStack.IsEmpty) {
 
 				// For debug saves, blocks may be missing. Fill them up with the defaults.
-				playthroughData.TowerLevel.BlocksSkinStack = new BlocksSkinStack(gameContext.GameConfig.DefaultBlocksSet, playthroughData.BlocksSet);
-				playthroughData.TowerLevel.BlocksSkinStack.Validate(gameContext.GameConfig.AssetsRepository, gameContext.GameConfig);
+				m_PlaythroughData.TowerLevel.BlocksSkinStack = new BlocksSkinStack(gameContext.GameConfig.DefaultBlocksSet, m_PlaythroughData.BlocksSet);
+				m_PlaythroughData.TowerLevel.BlocksSkinStack.Validate(gameContext.GameConfig.AssetsRepository, gameContext.GameConfig);
 			}
 
-			var backgroundScene = playthroughData.TowerLevel.BackgroundScene;
+			var backgroundScene = m_PlaythroughData.TowerLevel.BackgroundScene;
 			if (SceneManager.GetActiveScene().name != backgroundScene.SceneName) {
 				var loadOp = SceneManager.LoadSceneAsync(backgroundScene.ScenePath, LoadSceneMode.Single);
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
-			if (playthroughData.TowerLevel.RunningState == TowerLevelRunningState.Preparing) {
-				TryShowRulesGreetMessage(playthroughData.TowerLevel);
+			if (m_PlaythroughData.TowerLevel.RunningState == TowerLevelRunningState.Preparing) {
+				TryShowRulesGreetMessage(m_PlaythroughData.TowerLevel);
 			}
 
 			var levelController = GameObject.FindObjectOfType<GridLevelController>();
@@ -153,7 +156,7 @@ namespace TetrisTower.TowerLevels
 
 			SetupLights(levelController);
 
-			levelController.Init(playthroughData.TowerLevel);
+			levelController.Init(m_PlaythroughData.TowerLevel);
 
 			var uiController = GameObject.FindObjectOfType<UI.TowerLevelUIController>(true);
 			if (uiController == null) {
@@ -179,7 +182,7 @@ namespace TetrisTower.TowerLevels
 				gameContext.GameConfig,
 				gameContext.PlayerControls,
 				gameContext.Options,
-				gameContext.CurrentPlaythrough,
+				m_PlaythroughData,
 				levelController,
 				uiController,
 				behaviours.OfType<UI.FlashMessageUIController>().FirstOrDefault(),
@@ -203,8 +206,8 @@ namespace TetrisTower.TowerLevels
 
 			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(new TowerPlayState());
 
-			if (gameContext.CurrentPlaythrough.TowerLevel.IsPlaying) {
-				GridLevelData levelData = gameContext.CurrentPlaythrough.TowerLevel;
+			if (m_PlaythroughData.TowerLevel.IsPlaying) {
+				GridLevelData levelData = m_PlaythroughData.TowerLevel;
 				// If save came with available matches, or pending actions, do them.
 				var pendingActions = GameGridEvaluation.Evaluate(levelData.Grid, levelData.Rules);
 				if (pendingActions.Count > 0) {

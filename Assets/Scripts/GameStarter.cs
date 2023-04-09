@@ -101,7 +101,13 @@ namespace TetrisTower.GameStarter
 #endif
 				}
 
-				GameManager.Instance.SwitchLevelAsync(new TowerLevelSupervisor(overrideScene));
+				var supervisor = GameContext.CurrentPlaythrough.PrepareSupervisor();
+				if (supervisor is TowerLevelSupervisor seqSupervisor) {
+					seqSupervisor.SetSceneOverride(overrideScene);
+				} else {
+					Debug.LogWarning($"Unsupported supervisor {supervisor}", this);
+				}
+				GameManager.Instance.SwitchLevelAsync(supervisor);
 				return;
 			}
 
