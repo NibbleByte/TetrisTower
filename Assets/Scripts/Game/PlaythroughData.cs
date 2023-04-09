@@ -81,7 +81,7 @@ namespace TetrisTower.Game
 			}
 #endif
 
-			m_TowerLevel = Levels[CurrentLevelIndex].GenerateTowerLevelData(gameConfig, this);
+			m_TowerLevel = GenerateTowerLevelData(gameConfig, Levels[CurrentLevelIndex]);
 
 			if (overrideScene != null) {
 				TowerLevel.BackgroundScene = overrideScene;
@@ -135,6 +135,69 @@ namespace TetrisTower.Game
 			}
 		}
 
+		public GridLevelData GenerateTowerLevelData(GameConfig config, LevelParamData lp)
+		{
+			if (Random == null) {
+				SetupRandomGenerator();
+			}
+			int seed = Random.Next();
+
+			if (BlocksSet && config.DefaultBlocksSet.BlockSkins.Length != BlocksSet.BlockSkins.Length) {
+				Debug.LogError($"Playthrough blocks count {BlocksSet.BlockSkins.Length} doesn't match the ones in the game config {config.DefaultBlocksSet.BlockSkins.Length}");
+			}
+
+			BlocksSkinStack skinsStack = new BlocksSkinStack(config.DefaultBlocksSet, BlocksSet);
+			if (lp.SkinOverrides != null) {    // SO may not have filled this field yet...?
+				skinsStack.AppendSkinSets(lp.SkinOverrides);
+			}
+
+			GridShapeTemplate[] shapeTemplates = lp.ShapeTemplates.Length != 0 ? lp.ShapeTemplates : config.ShapeTemplates;
+
+			var pinnedBlocks = (lp.StartGridWithPinnedBlocks && lp.StartGrid != null)
+				? lp.StartGrid.EnumerateOccupiedCoords()
+				: Enumerable.Empty<GridCoords>()
+				;
+
+			// No, we don't need '+1'. 9 + 3 = 12 (0 - 11). Placing on the 9 takes (9, 10, 11).
+			int extraRows = shapeTemplates.Max(st => st.Rows);
+
+			// The shapes are spawned at the top of the grid (totalRows).
+			// We need twice the shape size, to accommodate for shape placed ON TOP of the playable area
+			// (e.g. 3 blocks flashing) + another shape on top for game over.
+			int totalRows = lp.GridRows + extraRows * 2;
+
+			var levelData = new GridLevelData() {
+				BackgroundScene = lp.GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
+				GreetMessage = lp.GreetMessage,
+
+				ShapeTemplates = shapeTemplates.ToArray(),
+				BlocksSkinStack = skinsStack,
+
+				FallSpeedNormalized = FallSpeedNormalized,
+				FallSpeedupPerAction = FallSpeedupPerAction,
+
+				InitialSpawnBlockTypesCount = lp.InitialSpawnBlockTypesCount,
+				SpawnBlockTypesRange = new Vector2Int(0, lp.InitialSpawnBlockTypesCount),
+				MatchesToModifySpawnedBlocksRange = MatchesToModifySpawnedBlocksRange,
+				ModifyBlocksRangeType = ModifyBlocksRangeType,
+
+				RandomInitialLevelSeed = seed,
+				Random = new Xoshiro.PRNG32.XoShiRo128starstar(seed),
+
+				SpawnWildBlocksChance = lp.SpawnWildBlocks ? WildBlockChance : 0f,
+				SpawnBlockSmiteChance = lp.SpawnBlockSmites ? BlockSmiteChance : 0f,
+				SpawnRowSmiteChance = lp.SpawnRowSmites ? RowSmiteChance : 0f,
+
+				Rules = lp.Rules,
+				Grid = lp.StartGrid != null ? new BlocksGrid(lp.StartGrid, totalRows, lp.GridColumns, pinnedBlocks) : new BlocksGrid(totalRows, lp.GridColumns),
+				PlayableSize = new GridCoords(lp.GridRows, lp.GridColumns),
+
+				ObjectiveEndCount = lp.ObjectiveEndCount,
+			};
+
+			return levelData;
+		}
+
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
 			if (m_TowerLevel != null) {
@@ -147,158 +210,6 @@ namespace TetrisTower.Game
 
 			foreach (var level in Levels) {
 				level.Validate(repo, context);
-			}
-		}
-	}
-
-	[Serializable]
-	[JsonObject(MemberSerialization.Fields)]
-	public class LevelParamData
-	{
-		public SceneReference BackgroundScene;
-
-		public SceneReference BackgroundSceneMobile;
-
-		[Multiline]
-		public string GreetMessage = "";
-
-		// Spawn blocks from the array in range [0, TypesCount).
-		public int InitialSpawnBlockTypesCount = 3;
-
-		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
-		public int ObjectiveEndCount;
-
-		[Tooltip("If true WildBlocks will be spawned with chance configured above. They match with any other type of block.")]
-		public bool SpawnWildBlocks = false;
-
-		[Tooltip("If true BlockSmite blocks will be spawned with chance configured above. They clear every block of the type it lands on.")]
-		public bool SpawnBlockSmites = false;
-
-		[Tooltip("If true RowSmite blocks will be spawned with chance configured above. They clear the row it lands on.")]
-		public bool SpawnRowSmites = false;
-
-		public GridRules Rules;
-
-		[Range(5, 20)]
-		public int GridRows = 9;
-
-		// Validation value - cone visuals require different visual models for each size.
-		// We don't support any other values for now.
-		public const int SupportedColumnsCount = 13;
-		[Range(SupportedColumnsCount, SupportedColumnsCount)]
-		public int GridColumns = SupportedColumnsCount;
-
-		public GridShapeTemplate[] ShapeTemplates;
-
-
-		public bool StartGridWithPinnedBlocks = false;
-
-		[SerializeReference]
-		public BlocksGrid StartGrid;
-
-		public BlocksSkinSet[] SkinOverrides;
-
-		public SceneReference GetAppropriateBackgroundScene()
-		{
-			if (Platforms.PlatformsUtils.IsMobile) {
-				return BackgroundSceneMobile.IsEmpty ? BackgroundScene : BackgroundSceneMobile;
-			} else {
-				return BackgroundScene;
-			}
-		}
-
-		public GridLevelData GenerateTowerLevelData(GameConfig config, PlaythroughData playthrough)
-		{
-			if (playthrough.Random == null) {
-				playthrough.SetupRandomGenerator();
-			}
-			int seed = playthrough.Random.Next();
-
-			if (playthrough.BlocksSet && config.DefaultBlocksSet.BlockSkins.Length != playthrough.BlocksSet.BlockSkins.Length) {
-				Debug.LogError($"Playthrough blocks count {playthrough.BlocksSet.BlockSkins.Length} doesn't match the ones in the game config {config.DefaultBlocksSet.BlockSkins.Length}");
-			}
-
-			BlocksSkinStack skinsStack = new BlocksSkinStack(config.DefaultBlocksSet, playthrough.BlocksSet);
-			if (SkinOverrides != null) {	// SO may not have filled this field yet...?
-				skinsStack.AppendSkinSets(SkinOverrides);
-			}
-
-			GridShapeTemplate[] shapeTemplates = ShapeTemplates.Length != 0 ? ShapeTemplates : config.ShapeTemplates;
-
-			var pinnedBlocks = (StartGridWithPinnedBlocks && StartGrid != null)
-				? StartGrid.EnumerateOccupiedCoords()
-				: Enumerable.Empty<GridCoords>()
-				;
-
-			// No, we don't need '+1'. 9 + 3 = 12 (0 - 11). Placing on the 9 takes (9, 10, 11).
-			int extraRows = shapeTemplates.Max(st => st.Rows);
-
-			// The shapes are spawned at the top of the grid (totalRows).
-			// We need twice the shape size, to accommodate for shape placed ON TOP of the playable area
-			// (e.g. 3 blocks flashing) + another shape on top for game over.
-			int totalRows = GridRows + extraRows * 2;
-
-			var levelData = new GridLevelData() {
-				BackgroundScene = GetAppropriateBackgroundScene()?.Clone() ?? new SceneReference(),
-				GreetMessage = GreetMessage,
-
-				ShapeTemplates = shapeTemplates.ToArray(),
-				BlocksSkinStack = skinsStack,
-
-				FallSpeedNormalized = playthrough.FallSpeedNormalized,
-				FallSpeedupPerAction = playthrough.FallSpeedupPerAction,
-
-				InitialSpawnBlockTypesCount = InitialSpawnBlockTypesCount,
-				SpawnBlockTypesRange = new Vector2Int(0, InitialSpawnBlockTypesCount),
-				MatchesToModifySpawnedBlocksRange = playthrough.MatchesToModifySpawnedBlocksRange,
-				ModifyBlocksRangeType = playthrough.ModifyBlocksRangeType,
-
-				RandomInitialLevelSeed = seed,
-				Random = new Xoshiro.PRNG32.XoShiRo128starstar(seed),
-
-				SpawnWildBlocksChance = SpawnWildBlocks ? playthrough.WildBlockChance : 0f,
-				SpawnBlockSmiteChance = SpawnBlockSmites ? playthrough.BlockSmiteChance : 0f,
-				SpawnRowSmiteChance = SpawnRowSmites ? playthrough.RowSmiteChance : 0f,
-
-				Rules = Rules,
-				Grid = StartGrid != null ? new BlocksGrid(StartGrid, totalRows, GridColumns, pinnedBlocks) : new BlocksGrid(totalRows, GridColumns),
-				PlayableSize = new GridCoords(GridRows, GridColumns),
-
-				ObjectiveEndCount = ObjectiveEndCount,
-			};
-
-			return levelData;
-		}
-
-		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
-		{
-			if (Rules.ObjectiveType == 0) {
-				Debug.LogError($"{nameof(PlaythroughData)} has no ObjectiveType set.", context);
-			}
-
-#if UNITY_EDITOR
-			if (GridRows == 0 || GridColumns == 0) {
-				GridRows = 9;
-				GridColumns = SupportedColumnsCount;
-				UnityEditor.EditorUtility.SetDirty(context);
-			}
-
-			if (StartGrid != null && StartGrid.Rows == 0) {
-				StartGrid = new BlocksGrid(GridRows, GridColumns);
-				UnityEditor.EditorUtility.SetDirty(context);
-			}
-#endif
-
-			if (GridRows == 0 || GridColumns == 0) {
-				Debug.LogError($"Level param {BackgroundScene} has invalid grid size set.", context);
-			}
-
-			if (StartGrid != null && (StartGrid.Rows != GridRows || StartGrid.Columns != GridColumns)) {
-				Debug.LogError($"Level param {BackgroundScene} has starting grid with wrong size.", context);
-			}
-
-			if (SkinOverrides != null && SkinOverrides.Any(s => !repo.IsRegistered(s))) {
-				Debug.LogError($"Level param {nameof(SkinOverrides)} has sets that are not registered as serializable.", context);
 			}
 		}
 	}
