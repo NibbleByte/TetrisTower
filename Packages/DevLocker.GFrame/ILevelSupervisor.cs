@@ -52,7 +52,7 @@ namespace DevLocker.GFrame
 #if GFRAME_ASYNC
 		Task OnLevelLoadingAsync(PlayerStatesContext context);
 #else
-		IEnumerator OnLevelLoading(PlayerStateContext context);
+		IEnumerator OnLevelLoading(PlayerStatesContext context);
 #endif
 	}
 

@@ -29,10 +29,17 @@ namespace DevLocker.GFrame.UIUtils
 				m_Button.onClick.RemoveListener(OnButtonClick);
 			}
 		}
-
+		
+#if GFRAME_ASYNC
 		private async void OnButtonClick()
 		{
 			await m_PlayerContext.StatesStack.PopStateAsync();
 		}
+#else
+		private void OnButtonClick()
+		{
+			StartCoroutine(m_PlayerContext.StatesStack.PopStateCrt());
+		}
+#endif
 	}
 }

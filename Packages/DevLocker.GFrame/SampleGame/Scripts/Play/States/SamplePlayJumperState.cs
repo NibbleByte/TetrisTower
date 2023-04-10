@@ -22,7 +22,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 #if GFRAME_ASYNC
 		public Task EnterStateAsync(PlayerStatesContext context)
 #else
-		public IEnumerator EnterState(PlayerStateContext context)
+		public IEnumerator EnterState(PlayerStatesContext context)
 #endif
 		{
 			context.SetByType(out m_PlayerControls);

@@ -315,13 +315,6 @@ namespace DevLocker.GFrame
 		/// </summary>
 		protected virtual IEnumerator LoadedSupervisorCrt()
 		{
-			if (LevelSupervisor.StatesStack == null) {
-				// In case the scopes were already active when the supervisor kicked in and it pushed
-				// a new state onto the InputActionsStack (resetting the previous actions).
-				// Do this only if there is no StatesStack, as it will do the same thing on setting a state.
-				Input.UIScope.UIScope.RefocusActiveScopes();
-			}
-
 			LoadedSupervisor?.Invoke();
 
 			yield break;
@@ -331,7 +324,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
 		/// </summary>
-		public void PushLevelState(ILevelState state)
+		public void PushLevelState(IPlayerState state)
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushStateCrt(state));
 		}
@@ -339,7 +332,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// </summary>
-		public void SetLevelState(ILevelState state)
+		public void SetLevelState(IPlayerState state)
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateCrt(state));
 		}
@@ -373,7 +366,7 @@ namespace DevLocker.GFrame
 		/// Will notify the state itself.
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// </summary>
-		public void ChangeLevelState(ILevelState state, StackAction stackAction)
+		public void ChangeLevelState(IPlayerState state, StackAction stackAction)
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeStateCrt(state, stackAction));
 		}

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+#if GFRAME_ASYNC
 using System.Threading.Tasks;
+#endif
 
 namespace DevLocker.GFrame.Input
 {
@@ -16,7 +18,7 @@ namespace DevLocker.GFrame.Input
 		Task EnterStateAsync(PlayerStatesContext context);
 		Task ExitStateAsync();
 #else
-		IEnumerator EnterState(PlayerStateContext context);
+		IEnumerator EnterState(PlayerStatesContext context);
 		IEnumerator ExitState();
 #endif
 	}
@@ -255,7 +257,7 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
 		/// </summary>
-		public IEnumerator PushStateCrt(ILevelState state)
+		public IEnumerator PushStateCrt(IPlayerState state)
 		{
 			yield return ChangeStateCrt(state, StackAction.Push);
 		}
@@ -263,7 +265,7 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// </summary>
-		public IEnumerator SetStateCrt(ILevelState state)
+		public IEnumerator SetStateCrt(IPlayerState state)
 		{
 			yield return ChangeStateCrt(state, StackAction.ClearAndPush);
 		}
@@ -323,7 +325,7 @@ namespace DevLocker.GFrame.Input
 		/// Will notify the state itself.
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// </summary>
-		public IEnumerator ChangeStateCrt(ILevelState state, StackAction stackAction)
+		public IEnumerator ChangeStateCrt(IPlayerState state, StackAction stackAction)
 		{
 			// Sanity check.
 			if (m_StackedStates.Count > 7 && stackAction == StackAction.Push) {
