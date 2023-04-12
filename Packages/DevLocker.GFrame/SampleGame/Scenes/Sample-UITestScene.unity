@@ -829,6 +829,7 @@ GameObject:
   - component: {fileID: 41229044}
   - component: {fileID: 41229043}
   - component: {fileID: 41229046}
+  - component: {fileID: 41229047}
   m_Layer: 5
   m_Name: Topics
   m_TagString: Untagged
@@ -951,6 +952,19 @@ MonoBehaviour:
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
+--- !u!114 &41229047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 41229041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37f10e6bb4aa13b45941e5fc25c9724e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Scope: {fileID: 41229046}
 --- !u!1 &42564298
 GameObject:
   m_ObjectHideFlags: 0
@@ -6401,7 +6415,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &329005678
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9998,6 +10012,7 @@ GameObject:
   - component: {fileID: 516266828}
   - component: {fileID: 516266827}
   - component: {fileID: 516266829}
+  - component: {fileID: 516266831}
   - component: {fileID: 516266830}
   m_Layer: 5
   m_Name: Contents
@@ -10110,6 +10125,19 @@ MonoBehaviour:
   - {fileID: 755455005}
   ActivatedObjects:
   - {fileID: 568531889}
+--- !u!114 &516266831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516266825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37f10e6bb4aa13b45941e5fc25c9724e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Scope: {fileID: 516266829}
 --- !u!1001 &520176043
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10511,7 +10539,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &536400305
 RectTransform:
   m_ObjectHideFlags: 0
@@ -39687,7 +39715,19 @@ MonoBehaviour:
   ActivateInitialTabOnEnable: 1
   TabOpened:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 41229046}
+        m_TargetAssemblyTypeName: DevLocker.GFrame.Input.UIScope.UIScope, DevLocker.GFrame.Input
+        m_MethodName: Focus
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   TabClosed:
     m_PersistentCalls:
       m_Calls: []

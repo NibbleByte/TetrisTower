@@ -502,7 +502,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				case WrapMode.FocusScope:
 					// It already checks for activeInHierarchy.
 					if (wrapBehaviour.Scope) {
-						wrapBehaviour.Scope.ForceRefocusScope();
+						wrapBehaviour.Scope.Focus();
 						eventData.Use();
 					}
 					break;

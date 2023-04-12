@@ -24,7 +24,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 			}
 
-			FocusScope.ForceRefocusScope();
+			FocusScope.Focus();
 		}
 	}
 }

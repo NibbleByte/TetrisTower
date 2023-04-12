@@ -422,7 +422,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			// Force full re-initialization of all the scopes.
 			SwitchActiveScopes(playerSet, ref playerSet.ActiveScopes, new UIScope[0]);
-			lastActive.ForceRefocusScope();
+			lastActive.Focus();
 		}
 
 		/// <summary>
@@ -439,8 +439,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Force selected scope to be active, instead of the last enabled.
 		/// </summary>
-		[ContextMenu("Force activate scope")]
-		public void ForceRefocusScope()
+		[ContextMenu("Focus scope")]
+		public void Focus()
 		{
 			if (!m_HasInitialized) {
 				Debug.LogWarning($"Couldn't focus on {name} as it isn't initialized.", this);
@@ -498,7 +498,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				// Force full re-initialization of all the scopes including this one.
 				SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, new UIScope[0]);
-				lastActive.ForceRefocusScope();
+				lastActive.Focus();
 
 			} else {
 
