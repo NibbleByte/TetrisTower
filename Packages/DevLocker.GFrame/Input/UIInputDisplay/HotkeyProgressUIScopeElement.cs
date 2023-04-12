@@ -116,6 +116,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
 
+			if (!Utils.UIUtils.IsClickable(gameObject))
+				return;
+
 			m_ActionStarted = true;
 
 			Started.Invoke();
@@ -126,6 +129,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			// Copy-pasted from HotkeyBaseScopeElement
 
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
+				return;
+
+			if (!Utils.UIUtils.IsClickable(gameObject))
 				return;
 
 			m_ActionStarted = false;
@@ -139,6 +145,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			// Copy-pasted from HotkeyBaseScopeElement
 
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
+				return;
+
+			if (!Utils.UIUtils.IsClickable(gameObject))
 				return;
 
 			m_ActionStarted = false;

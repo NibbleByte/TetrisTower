@@ -97,6 +97,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
 
+			if (!Utils.UIUtils.IsClickable(gameObject))
+				return;
+
 			m_ActionStarted = true;
 
 			OnStarted();
@@ -105,6 +108,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		private void OnInputPerformed(InputAction.CallbackContext obj)
 		{
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
+				return;
+
+			if (!Utils.UIUtils.IsClickable(gameObject))
 				return;
 
 			m_ActionStarted = false;
@@ -116,6 +122,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		private void OnInputCancel(InputAction.CallbackContext obj)
 		{
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
+				return;
+
+			if (!Utils.UIUtils.IsClickable(gameObject))
 				return;
 
 			m_ActionStarted = false;
