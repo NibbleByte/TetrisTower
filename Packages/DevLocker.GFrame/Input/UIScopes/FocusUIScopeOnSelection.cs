@@ -1,13 +1,12 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
-	/// When UI selectable is selected under this component target UIScope is force activated.
+	/// When UI selectable is selected under this component target UIScope is forced to be focused.
 	/// With it, hotkey icons etc. may pop up.
 	/// </summary>
-	public class ActivateUIScopeOnSelection : MonoBehaviour
+	public class FocusUIScopeOnSelection : MonoBehaviour
 	{
 		public UIScope Scope;
 
