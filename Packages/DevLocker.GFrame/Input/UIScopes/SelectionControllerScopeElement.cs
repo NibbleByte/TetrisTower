@@ -8,7 +8,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// </summary>
 	public class SelectionControllerScopeElement : SelectionController, IScopeElement
 	{
-		public bool ClearSelectionOnDisable = false;
+		public bool ClearSelectionOnDisable = true;
 
 		protected override void OnDisable()
 		{

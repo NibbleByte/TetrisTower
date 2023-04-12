@@ -44,6 +44,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private static Dictionary<PlayerContextUIRootObject, SelectionController> m_ActiveInstances = new Dictionary<PlayerContextUIRootObject, SelectionController>();
 
+		private List<CanvasGroup> m_CanvasGroups = new List<CanvasGroup>();
+
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
@@ -55,6 +57,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected virtual void OnEnable()
 		{
 			m_SelectRequested = true;
+
+			CollectParentCanvasGroups();
 		}
 
 		void Update()
@@ -65,6 +69,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (FilterControlScheme.Length != 0 && m_PlayerContext.InputContext != null) {
 				UpdateControlScheme();
 			}
+
+			// Wait till clickable to work with selection.
+			if (!IsClickable())
+				return;
 
 			if (m_SelectRequested) {
 
@@ -196,6 +204,39 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_ActiveInstances.TryGetValue(rootObject, out result);
 
 			return result;
+		}
+
+		private void CollectParentCanvasGroups()
+		{
+			m_CanvasGroups.Clear();
+
+			var group = gameObject.GetComponentInParent<CanvasGroup>(true);
+
+			while (group) {
+				m_CanvasGroups.Add(group);
+
+				if (group.ignoreParentGroups)
+					break;
+
+				Transform parent = group.transform.parent;
+				if (parent == null)
+					break;
+
+				group = group.transform.parent.GetComponentInParent<CanvasGroup>(true);
+			}
+		}
+
+		private bool IsClickable()
+		{
+			foreach(CanvasGroup group in m_CanvasGroups) {
+				if (group == null || !group.enabled)
+					continue;
+
+				if (!group.interactable || !group.blocksRaycasts)
+					return false;
+			}
+
+			return true;
 		}
 
 		protected virtual void OnValidate()

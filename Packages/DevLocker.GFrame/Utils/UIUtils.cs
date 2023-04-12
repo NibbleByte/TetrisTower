@@ -45,11 +45,14 @@ namespace DevLocker.GFrame.Utils
 				return true;
 
 			while(group) {
-				if (!group.blocksRaycasts || !group.interactable)
-					return false;
 
-				if (group.ignoreParentGroups)
-					break;
+				if (group.enabled) {
+					if (!group.blocksRaycasts || !group.interactable)
+						return false;
+
+					if (group.ignoreParentGroups)
+						break;
+				}
 
 				Transform parent = group.transform.parent;
 				if (parent == null)
