@@ -3,6 +3,7 @@ using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels;
+using TetrisTower.WorldMap;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
@@ -68,6 +69,12 @@ namespace TetrisTower.GameStarter
 
 		void Start()
 		{
+			if (GameObject.FindObjectOfType<WorldMapController>()) {
+				// TODO: Have proper setup for WorldMap.
+				GameManager.Instance.SwitchLevelAsync(new WorldMapLevelSupervisor(null));
+				return;
+			}
+
 			// Boot game from current scene
 			var towerLevelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (towerLevelController || GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag)) {

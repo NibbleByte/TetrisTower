@@ -26,6 +26,9 @@ namespace TetrisTower.Game
 		public SceneReference BootScene;
 		public SceneReference BootSceneMobile;
 
+		public SceneReference WorldMapScene;
+		public SceneReference WorldMapSceneMobile;
+
 		public GameObject[] UIPrefabs;
 		public GameObject[] UIPrefabsMobile;
 

@@ -1,0 +1,32 @@
+Instructions on how to generate the world map textures for the discworld.
+
+Images can be downloaded for free from: https://www.shadedrelief.com/natural3/pages/textures.html
+
+Use Paint.NET + "Polar + Rectangular transformations Plugin" https://forums.getpaint.net/topic/9364-polar-transformations-plugin-ymd100718/
+
+Albedo Texture:
+1. Open 16k image.
+2. Shrink the image to be square with best quality algorithm.
+3. Start "Effects/Distort/Polar Transform".
+4. Rect to Polar
+5. Leave offset center to (0, 0)
+6. Set angle to 20.
+7. Boost the quality to 5.
+8. Resize canvas to be power of two.
+9. Save to jpg with 95% quality and best chroma subsampling.
+
+Height/Normal map and Water mask: repeat the same steps using 16k images (8k have different resolution ratio).
+
+Make blender cone with diameter 400m. That is 50 000 times smaller than earth meridian.
+- Vertices - 256,
+- Radius 1 - 200m
+- Radius 2 - 190m
+- Depth - 20m
+- Base Fill Type N-Gon
+- DON'T SET Z & ROTATION HERE!
+
+- Apply the cone. Move and rotate it so it points up at (0, 0, 0)
+- Set the origin to the correct place.
+
+Earth length along the Equator is 40 075 km. Meridian 
+A meridian is half of a great circle on Earth's surface. The length of a meridian on a modern ellipsoid model of Earth (WGS 84) has been estimated as 20,003.93 km.
