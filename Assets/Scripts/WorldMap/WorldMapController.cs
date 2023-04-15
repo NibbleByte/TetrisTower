@@ -25,6 +25,7 @@ namespace TetrisTower.WorldMap
 				return;
 
 			Discworld.Rotate(Vector3.up, rotate * Time.deltaTime * RotateSpeed);
+			transform.Rotate(Vector3.up, -rotate * Time.deltaTime * RotateSpeed * 0.25f, Space.Self);
 		}
 
 		public void MoveCamera(float move)
