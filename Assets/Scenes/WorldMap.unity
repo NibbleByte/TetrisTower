@@ -259,10 +259,35 @@ MonoBehaviour:
   Sun: {fileID: 2011307993}
   MoveRange: {x: -100, y: 0}
   ZoomRange: {x: 25, y: 150}
-  RotateSpeed: 20
-  MoveSpeed: 15
-  ZoomSpeed: 30
+  RotateSpeed: 35
+  MoveSpeed: 25
+  ZoomSpeed: 35
   SunSpeed: 20
+  ZoomToDrag:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.25
+      inSlope: -0.2579434
+      outSlope: -0.2579434
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.07325383
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.24112113
+      outSlope: -0.24112113
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.07836455
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  DragDamp: 0.2
 --- !u!1 &1492642052
 GameObject:
   m_ObjectHideFlags: 0

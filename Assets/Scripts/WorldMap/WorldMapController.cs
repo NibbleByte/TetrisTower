@@ -19,6 +19,12 @@ namespace TetrisTower.WorldMap
 
 		public float SunSpeed = 20f;
 
+		// Normalized means 0 is farthest out, 1 is on the discworld surface (which should be impossible).
+		public float ZoomNormalized => 1 - Camera.localPosition.y / ZoomRange.y;
+
+		public AnimationCurve ZoomToDrag = AnimationCurve.Linear(0f, 0.4f, 1f, 0f);
+		public float DragDamp = 0.2f;
+
 		public void RotateDiscworld(float rotate)
 		{
 			if (rotate == 0f)

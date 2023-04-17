@@ -297,6 +297,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Pointer-Press",
+                    "type": "PassThrough",
+                    "id": "0bece59f-a184-4b66-b8c6-3601d1e347fe",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -422,6 +431,17 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "",
+                    "id": "97d5ff08-4168-423c-bfd0-d4da0bde5d2a",
+                    "path": "<Pointer>/press",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse;Touch",
+                    "action": "Pointer-Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "PageUpDown",
                     "id": "89a70858-72e3-41a9-9bae-ff0ffc120c2c",
                     "path": "1DAxis",
@@ -492,7 +512,7 @@
                     "id": "9593e15b-365c-4b82-808e-9a598ff297ac",
                     "path": "1DAxis",
                     "interactions": "",
-                    "processors": "Scale(factor=100)",
+                    "processors": "Scale(factor=0.15)",
                     "groups": "",
                     "action": "DiscworldZoom",
                     "isComposite": true,
