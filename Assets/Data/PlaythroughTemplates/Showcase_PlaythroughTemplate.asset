@@ -15,15 +15,11 @@ MonoBehaviour:
   m_PlayerData:
     m_TowerLevel:
       rid: -2
-    FallSpeedNormalized: 2
-    FallSpeedupPerAction: 0.02
-    MatchesToModifySpawnedBlocksRange: 120
-    ModifyBlocksRangeType: 0
+    m_BlocksSet: {fileID: 0}
     RandomSeed: 0
     RandomInitialSeed: 0
-    WildBlockChance: 0.05
-    BlockSmiteChance: 0.005
-    RowSmiteChance: 0.005
+    ScoreOnLevelStart: 0
+    PlayTimeOnLevelStart: 0
     CurrentLevelIndex: 0
     Levels:
     - BackgroundScene:
@@ -40,14 +36,18 @@ MonoBehaviour:
         blocks to win!'
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 100
-      SpawnWildBlocks: 0
-      SpawnBlockSmites: 0
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
@@ -68,14 +68,18 @@ MonoBehaviour:
       GreetMessage: Drop the first blocks to start!
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 260
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 0
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
@@ -96,14 +100,18 @@ MonoBehaviour:
       GreetMessage: '"Veni, vidi, vici"'
       InitialSpawnBlockTypesCount: 3
       ObjectiveEndCount: 300
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 0
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
@@ -129,14 +137,18 @@ MonoBehaviour:
         Lived a strange race of people... the Druids'
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 300
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 0
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
@@ -158,14 +170,18 @@ MonoBehaviour:
       GreetMessage: 
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 300
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 0
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 5
@@ -187,14 +203,18 @@ MonoBehaviour:
       GreetMessage: 
       InitialSpawnBlockTypesCount: 5
       ObjectiveEndCount: 40
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 0
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: 1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
@@ -216,14 +236,18 @@ MonoBehaviour:
       GreetMessage: 
       InitialSpawnBlockTypesCount: 5
       ObjectiveEndCount: 300
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 0
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
@@ -244,14 +268,18 @@ MonoBehaviour:
       GreetMessage: 
       InitialSpawnBlockTypesCount: 6
       ObjectiveEndCount: 0
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 1
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
@@ -261,8 +289,6 @@ MonoBehaviour:
       StartGrid:
         rid: -2
       SkinOverrides: []
-    ScoreOnLevelStart: 0
-    PlayTimeOnLevelStart: 0
   references:
     version: 2
     RefIds:

@@ -33,7 +33,7 @@ namespace TetrisTower.Logic
 		private const int MaxRows = 13;
 		private const int MaxColumns = 13;
 
-		private static readonly GridRules DefaultRules = new GridRules {
+		private static GridRules DefaultRules => new GridRules {
 			MatchHorizontalLines = 3,
 			MatchVerticalLines = 3,
 			MatchDiagonalsLines = 3,

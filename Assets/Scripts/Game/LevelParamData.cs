@@ -24,16 +24,7 @@ namespace TetrisTower.Game
 		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
 		public int ObjectiveEndCount;
 
-		[Tooltip("If true WildBlocks will be spawned with chance configured above. They match with any other type of block.")]
-		public bool SpawnWildBlocks = false;
-
-		[Tooltip("If true BlockSmite blocks will be spawned with chance configured above. They clear every block of the type it lands on.")]
-		public bool SpawnBlockSmites = false;
-
-		[Tooltip("If true RowSmite blocks will be spawned with chance configured above. They clear the row it lands on.")]
-		public bool SpawnRowSmites = false;
-
-		public GridRules Rules;
+		public GridRules Rules = new GridRules();
 
 		[Range(5, 20)]
 		public int GridRows = 9;

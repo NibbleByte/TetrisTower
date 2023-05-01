@@ -2,6 +2,7 @@ using DevLocker.GFrame.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace TetrisTower.Logic
 {
@@ -12,23 +13,54 @@ namespace TetrisTower.Logic
 		Diagonals = 1 << 2,
 	}
 
-	[System.Serializable]
-	public struct GridRules
+	[Serializable]
+	public class GridRules
 	{
-		public int MatchHorizontalLines;
-		public int MatchVerticalLines;
-		public int MatchDiagonalsLines;
+		[Header("Match Rules")]
+		public int MatchHorizontalLines = 3;
+		public int MatchVerticalLines = 3;
+		public int MatchDiagonalsLines = 3;
 
+		[Header("Scoring")]
 		[EnumMask]
-		public MatchScoringType ObjectiveType;
+		public MatchScoringType ObjectiveType = MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals;
 		public bool IsObjectiveAllMatchTypes =>
 			ObjectiveType == (MatchScoringType)~0 ||
 			ObjectiveType == (MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals)
 			;
 
+		[Header("Special Blocks")]
+		[Tooltip("Chance WildBlocks to spawn. They match with any other type of block.")]
+		[Range(0f, 2f)]
+		public float WildBlockChance = 0.05f;
+
+		[Tooltip("Chance BlockSmite blocks to spawn. They clear every block of the type it lands on.")]
+		[Range(0f, 2f)]
+		public float BlockSmiteChance = 0.005f;
+
+		[Tooltip("Chance RowSmite blocks to spawn. They clear the row it lands on.")]
+		[Range(0f, 2f)]
+		public float RowSmiteChance = 0.005f;
+
+		[Header("Pacing")]
+		public float FallSpeedNormalized = 2f;
+		public float FallSpeedupPerAction = 0.02f;
+
+
+		[Header("Progressing")]
+		[Tooltip("Every x matches done by the player, increase the range of the spawned types. 0 means ranges won't be modified.")]
+		public int MatchesToModifySpawnedBlocksRange = 120;
+
+		[Tooltip("Selects what should happen when score to modify is reached.")]
+		public ModifyBlocksRangeType ModifyBlocksRangeType;
+
+
+		[Header("Wrapping")]
 		// Will wrap around the first and last column when matching and moving.
 		public bool WrapSidesOnMatch;
 		public bool WrapSidesOnMove;
+
+		public GridRules Clone() => (GridRules) MemberwiseClone();
 	}
 
 	public static class GameGridEvaluation
@@ -122,7 +154,7 @@ namespace TetrisTower.Logic
 
 		private static void EvaluateMatchesAlongLine(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, MatchScoringType matchType, List<GridAction> actions)
 		{
-			UnityEngine.Debug.Assert(direction.Row == 0 || direction.Column == 0);
+			Debug.Assert(direction.Row == 0 || direction.Column == 0);
 
 			GridCoords coords = new GridCoords(0, 0);
 			List<GridCoords> matched = new List<GridCoords>();
@@ -265,7 +297,7 @@ namespace TetrisTower.Logic
 
 		private static void EvaluateMatchesAlongDiagonal(GridCoords direction, BlocksGrid grid, int matchCount, bool wrapColumns, List<GridAction> actions)
 		{
-			UnityEngine.Debug.Assert(direction.Row !=0 && direction.Column != 0);
+			Debug.Assert(direction.Row !=0 && direction.Column != 0);
 
 			GridCoords coords;
 			List<GridCoords> matched = new List<GridCoords>();

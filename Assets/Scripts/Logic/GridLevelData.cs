@@ -49,24 +49,13 @@ namespace TetrisTower.Logic
 		// Spawn blocks from the array in range [0, TypesCount).
 		public Vector2Int SpawnBlockTypesRange = new Vector2Int(0, 3);
 
-		[Tooltip("Every x matches done by the player, increase the range of the spawned types. 0 means ranges won't be modified.")]
-		public int MatchesToModifySpawnedBlocksRange = 150;
-
-		[Tooltip("Selects what should happen when score to modify is reached.")]
-		public ModifyBlocksRangeType ModifyBlocksRangeType;
-
-
 		[Tooltip("Read-only. Used for debug.")]
 		public int RandomInitialLevelSeed;
 
 		// NOTE: This is not the same object as in PlaythroughData. Serializing doesn't work (easily) with references.
 		public System.Random Random = null;
 
-		public float SpawnWildBlocksChance = 0f;
-		public float SpawnBlockSmiteChance = 0f;
-		public float SpawnRowSmiteChance = 0f;
-
-		public GridRules Rules;
+		public GridRules Rules = new GridRules();
 
 		// Rows from bottom to top go from 0 to n (up direction).
 		public BlocksGrid Grid;

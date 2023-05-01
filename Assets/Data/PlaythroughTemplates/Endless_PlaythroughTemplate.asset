@@ -13,18 +13,13 @@ MonoBehaviour:
   m_Name: Endless_PlaythroughTemplate
   m_EditorClassIdentifier: 
   m_PlayerData:
-    TowerLevel:
+    m_TowerLevel:
       rid: -2
-    BlocksSet: {fileID: 0}
-    FallSpeedNormalized: 2
-    FallSpeedupPerAction: 0.01
-    MatchesToModifySpawnedBlocksRange: 100
-    ModifyBlocksRangeType: 0
+    m_BlocksSet: {fileID: 0}
     RandomSeed: 0
     RandomInitialSeed: 0
-    WildBlockChance: 0.05
-    BlockSmiteChance: 0.005
-    RowSmiteChance: 0.005
+    ScoreOnLevelStart: 0
+    PlayTimeOnLevelStart: 0
     CurrentLevelIndex: 0
     Levels:
     - BackgroundScene:
@@ -35,23 +30,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 5
       ObjectiveEndCount: 0
-      SpawnWildBlocks: 1
-      SpawnBlockSmites: 1
-      SpawnRowSmites: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
-    ScoreOnLevelStart: 0
-    PlayTimeOnLevelStart: 0
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
   references:
     version: 2
     RefIds:

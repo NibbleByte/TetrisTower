@@ -38,6 +38,7 @@ namespace UnityTools.AssetProcessingTools
 					TextAnchor.LowerLeft => TMPro.TextAlignmentOptions.BottomLeft,
 					TextAnchor.LowerCenter => TMPro.TextAlignmentOptions.Bottom,
 					TextAnchor.LowerRight => TMPro.TextAlignmentOptions.BottomRight,
+					_ => throw new System.NotSupportedException(alignment.ToString()),
 				};
 
 				EditorUtility.SetDirty(tmpro);

@@ -25,18 +25,10 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 
 
 		[Tooltip("Blocks to be used. If empty, default set from the game config is used.")]
+		[SerializeField]
 		[FormerlySerializedAs("BlocksSet")]
 		private BlocksSkinSet m_BlocksSet;
 		public BlocksSkinSet BlocksSet => m_BlocksSet;
-
-		public float FallSpeedNormalized = 2f;
-		public float FallSpeedupPerAction = 0.01f;
-
-		[Tooltip("Every x matches done by the player, increase the range of the spawned types. 0 means ranges won't be modified.")]
-		public int MatchesToModifySpawnedBlocksRange = 150;
-
-		[Tooltip("Selects what should happen when score to modify is reached.")]
-		public ModifyBlocksRangeType ModifyBlocksRangeType;
 
 		[Tooltip("Leave the seed to 0 for random seed every time.")]
 		public int RandomSeed = 0;
@@ -44,15 +36,6 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 
 		[Tooltip("Read-only. Used for debug.")]
 		public int RandomInitialSeed;
-
-		[Range(0f, 2f)]
-		public float WildBlockChance = 0.15f;
-
-		[Range(0f, 2f)]
-		public float BlockSmiteChance = 0.15f;
-
-		[Range(0f, 2f)]
-		public float RowSmiteChance = 0.15f;
 
 
 		public int ScoreOnLevelStart = 0;
@@ -148,22 +131,16 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 				ShapeTemplates = shapeTemplates.ToArray(),
 				BlocksSkinStack = skinsStack,
 
-				FallSpeedNormalized = FallSpeedNormalized,
-				FallSpeedupPerAction = FallSpeedupPerAction,
+				FallSpeedNormalized = lp.Rules.FallSpeedNormalized,
+				FallSpeedupPerAction = lp.Rules.FallSpeedupPerAction,
 
 				InitialSpawnBlockTypesCount = lp.InitialSpawnBlockTypesCount,
 				SpawnBlockTypesRange = new Vector2Int(0, lp.InitialSpawnBlockTypesCount),
-				MatchesToModifySpawnedBlocksRange = MatchesToModifySpawnedBlocksRange,
-				ModifyBlocksRangeType = ModifyBlocksRangeType,
 
 				RandomInitialLevelSeed = seed,
 				Random = new Xoshiro.PRNG32.XoShiRo128starstar(seed),
 
-				SpawnWildBlocksChance = lp.SpawnWildBlocks ? WildBlockChance : 0f,
-				SpawnBlockSmiteChance = lp.SpawnBlockSmites ? BlockSmiteChance : 0f,
-				SpawnRowSmiteChance = lp.SpawnRowSmites ? RowSmiteChance : 0f,
-
-				Rules = lp.Rules,
+				Rules = lp.Rules.Clone(),
 				Grid = lp.StartGrid != null ? new BlocksGrid(lp.StartGrid, totalRows, lp.GridColumns, pinnedBlocks) : new BlocksGrid(totalRows, lp.GridColumns),
 				PlayableSize = new GridCoords(lp.GridRows, lp.GridColumns),
 

@@ -13,16 +13,13 @@ MonoBehaviour:
   m_Name: Classic_PlaythroughTemplate
   m_EditorClassIdentifier: 
   m_PlayerData:
-    TowerLevel:
+    m_TowerLevel:
       rid: -2
-    BlocksSet: {fileID: 0}
-    FallSpeedNormalized: 2
-    FallSpeedupPerAction: 0.01
-    MatchesToModifySpawnedBlocksRange: 160
-    ModifyBlocksRangeType: 0
+    m_BlocksSet: {fileID: 0}
     RandomSeed: 0
     RandomInitialSeed: 0
-    WildBlockChance: 0.15
+    ScoreOnLevelStart: 0
+    PlayTimeOnLevelStart: 0
     CurrentLevelIndex: 0
     Levels:
     - BackgroundScene:
@@ -33,19 +30,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 3
       ObjectiveEndCount: 100
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
@@ -54,19 +62,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 3
       ObjectiveEndCount: 150
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
@@ -75,19 +94,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 3
       ObjectiveEndCount: 200
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
@@ -96,19 +126,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 3
       ObjectiveEndCount: 30
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: 1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
@@ -117,19 +158,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 3
       ObjectiveEndCount: 300
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
@@ -138,19 +190,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 40
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: 2
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
@@ -159,19 +222,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 400
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
@@ -180,19 +254,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 50
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: 4
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
@@ -201,19 +286,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 4
       ObjectiveEndCount: 500
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
@@ -222,21 +318,30 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
       InitialSpawnBlockTypesCount: 5
       ObjectiveEndCount: 0
-      SpawnWildBlocks: 0
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
         ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
         WrapSidesOnMatch: 1
         WrapSidesOnMove: 1
       GridRows: 9
       GridColumns: 13
       ShapeTemplates: []
-    ScoreOnLevelStart: 0
-    PlayTimeOnLevelStart: 0
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
   references:
     version: 2
     RefIds:

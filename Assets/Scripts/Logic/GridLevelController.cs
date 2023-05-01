@@ -95,7 +95,12 @@ namespace TetrisTower.Logic
 
 				// This will make sure no matches happen while not playing (won or lost strate).
 				// For example: endless game wins on placing any blocks outside, but they could be matching.
-				GridRules rules = LevelData.IsPlaying ? LevelData.Rules : new GridRules();
+				GridRules rules = LevelData.IsPlaying ? LevelData.Rules : new GridRules() {
+					MatchHorizontalLines = 0,
+					MatchVerticalLines = 0,
+					MatchDiagonalsLines = 0,
+					ObjectiveType = 0,
+				};
 				actions = GameGridEvaluation.Evaluate(Grid, rules);
 			}
 
@@ -111,14 +116,14 @@ namespace TetrisTower.Logic
 
 			if (LevelData.IsPlaying) {
 
-				int spawnBlockTypesProgress = LevelData.MatchesToModifySpawnedBlocksRange > 0
-					? LevelData.Score.TotalClearedBlocksCount / LevelData.MatchesToModifySpawnedBlocksRange
+				int spawnBlockTypesProgress = LevelData.Rules.MatchesToModifySpawnedBlocksRange > 0
+					? LevelData.Score.TotalClearedBlocksCount / LevelData.Rules.MatchesToModifySpawnedBlocksRange
 					: 0
 					;
 
 				Vector2Int blocksRange = new Vector2Int();
 
-				switch(LevelData.ModifyBlocksRangeType) {
+				switch(LevelData.Rules.ModifyBlocksRangeType) {
 					case ModifyBlocksRangeType.AddRemoveAlternating:
 						int lowerCap = LevelData.NormalBlocksSkins.Length - LevelData.InitialSpawnBlockTypesCount - 1;
 						blocksRange.x = spawnBlockTypesProgress / 2;
@@ -136,7 +141,7 @@ namespace TetrisTower.Logic
 						blocksRange.y = Mathf.Min(LevelData.InitialSpawnBlockTypesCount + spawnBlockTypesProgress, LevelData.NormalBlocksSkins.Length);
 						break;
 
-					default: throw new NotSupportedException(LevelData.ModifyBlocksRangeType.ToString());
+					default: throw new NotSupportedException(LevelData.Rules.ModifyBlocksRangeType.ToString());
 				}
 
 				if (LevelData.ObjectiveRemainingCount == 0 && !LevelData.IsEndlessGame && !AreGridActionsRunning) {
@@ -432,14 +437,14 @@ namespace TetrisTower.Logic
 
 			double totalRange = blocksRange;
 
-			if (LevelData.SpawnWildBlocksChance > 0f) {
-				totalRange += LevelData.SpawnWildBlocksChance;
+			if (LevelData.Rules.WildBlockChance > 0f) {
+				totalRange += LevelData.Rules.WildBlockChance;
 			}
-			if (LevelData.SpawnBlockSmiteChance > 0f) {
-				totalRange += LevelData.SpawnBlockSmiteChance;
+			if (LevelData.Rules.BlockSmiteChance > 0f) {
+				totalRange += LevelData.Rules.BlockSmiteChance;
 			}
-			if (LevelData.SpawnRowSmiteChance > 0f) {
-				totalRange += LevelData.SpawnRowSmiteChance;
+			if (LevelData.Rules.RowSmiteChance > 0f) {
+				totalRange += LevelData.Rules.RowSmiteChance;
 			}
 
 
@@ -453,13 +458,13 @@ namespace TetrisTower.Logic
 				} else {
 					blockIndex -= blocksRange;
 
-					if (blockIndex < LevelData.SpawnWildBlocksChance) {
+					if (blockIndex < LevelData.Rules.WildBlockChance) {
 						blockType = BlockType.SpecialWildBlock;
 
-					} else if (blockIndex < LevelData.SpawnWildBlocksChance + LevelData.SpawnBlockSmiteChance) {
+					} else if (blockIndex < LevelData.Rules.WildBlockChance + LevelData.Rules.BlockSmiteChance) {
 						blockType = BlockType.SpecialBlockSmite;
 
-					} else if (blockIndex < LevelData.SpawnWildBlocksChance + LevelData.SpawnBlockSmiteChance + LevelData.SpawnRowSmiteChance) {
+					} else if (blockIndex < LevelData.Rules.WildBlockChance + LevelData.Rules.BlockSmiteChance + LevelData.Rules.RowSmiteChance) {
 						blockType = BlockType.SpecialRowSmite;
 
 					} else {
