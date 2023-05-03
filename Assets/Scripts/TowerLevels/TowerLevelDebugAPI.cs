@@ -96,7 +96,7 @@ namespace TetrisTower.TowerLevels
 			if (context.CurrentPlaythrough != null) {
 				// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
 				string savedData = JsonConvert.SerializeObject(context.CurrentPlaythrough, typeof(IPlaythroughData), new JsonSerializerSettings() {
-					Converters = context.GameConfig.Converters,
+					Converters = Saves.SaveManager.GetConverters(context.GameConfig),
 					TypeNameHandling = TypeNameHandling.Auto,
 					//Formatting = Formatting.Indented,
 				});
@@ -117,7 +117,7 @@ namespace TetrisTower.TowerLevels
 			}
 
 			var playthrough = JsonConvert.DeserializeObject<IPlaythroughData>(savedData, new JsonSerializerSettings() {
-				Converters = context.GameConfig.Converters,
+				Converters = Saves.SaveManager.GetConverters(context.GameConfig),
 				TypeNameHandling = TypeNameHandling.Auto,
 			});
 

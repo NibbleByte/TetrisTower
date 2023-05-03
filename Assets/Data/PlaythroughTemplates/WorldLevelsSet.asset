@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b31cae0d5e40984e836a9da823bfc49, type: 3}
+  m_Name: WorldLevelsSet
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  Levels:
+  - LevelID: BabylonID
+    LevelAsset: {fileID: 1554497649489288964}
+--- !u!114 &1554497649489288964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: BabylonID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 0}
+      m_IsDirty: 0
+      m_ScenePath: 
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 0}
+      m_IsDirty: 0
+      m_ScenePath: 
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 3
+    ObjectiveEndCount: 0
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      ObjectiveType: 7
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0.005
+      RowSmiteChance: 0.005
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 0
+      WrapSidesOnMove: 0
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }

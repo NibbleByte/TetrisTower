@@ -3,6 +3,7 @@ using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels;
+using TetrisTower.TowerLevels.Playthroughs;
 using TetrisTower.WorldMap;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -70,8 +71,16 @@ namespace TetrisTower.GameStarter
 		void Start()
 		{
 			if (GameObject.FindObjectOfType<WorldMapController>()) {
-				// TODO: Have proper setup for WorldMap.
-				GameManager.Instance.SwitchLevelAsync(new WorldMapLevelSupervisor(null));
+				var playthroughData = (WorldPlaythroughData) StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
+
+				playthroughData.SetupRandomGenerator(StartingRandomSeed);
+
+				GameContext.SetCurrentPlaythrough(playthroughData);
+
+				var supervisor = GameContext.CurrentPlaythrough.PrepareSupervisor();
+
+				GameManager.Instance.SwitchLevelAsync(supervisor);
+
 				return;
 			}
 
@@ -91,7 +100,7 @@ namespace TetrisTower.GameStarter
 
 						playthroughData.SetupRandomGenerator(StartingRandomSeed, true);
 
-						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, GameConfig.Converters);
+						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, Saves.SaveManager.GetConverters(GameConfig));
 
 					} else {
 						overrideScene = new DevLocker.Utils.SceneReference(scenePath);
@@ -132,4 +141,20 @@ namespace TetrisTower.GameStarter
 			}
 		}
 	}
+}
+
+namespace TetrisTower.Saves
+{
+	// TODO: Temporary class till we find better place for these.
+	public static class SaveManager
+	{
+		public static Newtonsoft.Json.JsonConverter[] GetConverters(GameConfig config) => new Newtonsoft.Json.JsonConverter[] {
+				new BlocksSkinSetConverter(config.AssetsRepository),
+				new LevelParamAssetConverter(config.AssetsRepository),
+				new WorldLevelsSetConverter(config.AssetsRepository),
+				new GridShapeTemplateConverter(config.AssetsRepository),
+				new Core.RandomXoShiRo128starstarJsonConverter(),
+		};
+	}
+
 }

@@ -99,7 +99,7 @@ namespace TetrisTower.TowerLevels.UI
 			if (!string.IsNullOrEmpty(TowerLevelDebugAPI.__DebugInitialTowerLevel)) {
 				var config = Game.GameManager.Instance.GameContext.GameConfig;
 
-				playthroughData.ReplaceCurrentLevel(Newtonsoft.Json.JsonConvert.DeserializeObject<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, config.Converters));
+				playthroughData.ReplaceCurrentLevel(Newtonsoft.Json.JsonConvert.DeserializeObject<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, Saves.SaveManager.GetConverters(config)));
 				Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
 				return;
 			}

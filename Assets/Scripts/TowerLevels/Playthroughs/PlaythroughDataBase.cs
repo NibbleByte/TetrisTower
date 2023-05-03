@@ -8,7 +8,7 @@ using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
+namespace TetrisTower.TowerLevels.Playthroughs
 {
 	/// <summary>
 	/// Contains basic parameters for any play through. Inherits need to specify how levels are defined.
@@ -48,6 +48,8 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 		public abstract bool HaveFinishedLevels { get; }
 
 		public abstract ILevelSupervisor PrepareSupervisor();
+
+		public abstract void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 
 		public void ReplaceCurrentLevel(GridLevelData levelData)
 		{

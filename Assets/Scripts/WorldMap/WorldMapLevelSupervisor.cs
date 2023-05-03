@@ -5,7 +5,7 @@ using DevLocker.Utils;
 using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
-using TetrisTower.TetrisTower.TowerLevels.Playthroughs;
+using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,9 +13,9 @@ namespace TetrisTower.WorldMap
 {
 	public class WorldMapLevelSupervisor : ILevelSupervisor
 	{
-		private PlaythroughDataBase m_PlaythroughData;
+		private WorldPlaythroughData m_PlaythroughData;
 
-		public WorldMapLevelSupervisor(PlaythroughDataBase playthroughData)
+		public WorldMapLevelSupervisor(WorldPlaythroughData playthroughData)
 		{
 			m_PlaythroughData = playthroughData;
 		}
@@ -26,6 +26,10 @@ namespace TetrisTower.WorldMap
 
 			if (MessageBox.Instance) {
 				MessageBox.Instance.ForceCloseAllMessages();
+			}
+
+			if (m_PlaythroughData.TowerLevel != null) {
+				CriticalError($"Starting {nameof(WorldMapLevelSupervisor)} with tower level {m_PlaythroughData.TowerLevel.BackgroundScene} in progress. This is not allowed.", true);
 			}
 
 			SceneReference scene = Platforms.PlatformsUtils.IsMobileOrSimulator
@@ -82,6 +86,21 @@ namespace TetrisTower.WorldMap
 			}
 
 			return Task.CompletedTask;
+		}
+
+		private void CriticalError(string errorMessage, bool fallbackToHomescreen)
+		{
+			MessageBox.Instance.ShowSimple(
+				"World Error",
+				errorMessage,
+				MessageBoxIcon.Error,
+				MessageBoxButtons.OK,
+				() => {
+					if (fallbackToHomescreen)
+						GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());
+				},
+				this
+			);
 		}
 	}
 }

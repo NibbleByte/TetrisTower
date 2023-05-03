@@ -1,5 +1,4 @@
 using DevLocker.GFrame;
-using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.MessageBox;
 using DevLocker.Utils;
@@ -9,7 +8,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
-using TetrisTower.TetrisTower.TowerLevels.Playthroughs;
 using TetrisTower.Visuals;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,10 +16,10 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerLevelSupervisor : ILevelSupervisor
 	{
-		private SeqPlaythroughData m_PlaythroughData;
+		private IPlaythroughData m_PlaythroughData;
 		private SceneReference m_OverrideScene;
 
-		public TowerLevelSupervisor(SeqPlaythroughData playthroughData)
+		public TowerLevelSupervisor(IPlaythroughData playthroughData)
 		{
 			m_PlaythroughData = playthroughData;
 		}
@@ -41,7 +39,7 @@ namespace TetrisTower.TowerLevels
 
 			if (m_PlaythroughData.TowerLevel == null) {
 
-				m_PlaythroughData.SetupCurrentLevel(gameContext.GameConfig, m_OverrideScene);
+				m_PlaythroughData.SetupCurrentTowerLevel(gameContext.GameConfig, m_OverrideScene);
 
 				if (m_PlaythroughData.TowerLevel == null) {
 					CriticalError($"No available level.", true);

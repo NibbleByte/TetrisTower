@@ -14,6 +14,16 @@ namespace TetrisTower.Game
 		{
 			LevelParam.Validate(repo, this);
 		}
+
+#if UNITY_EDITOR
+		[ContextMenu("Delete sub asset")]
+		private void DeleteLevelSubAsset()
+		{
+			UnityEditor.AssetDatabase.RemoveObjectFromAsset(this);
+			DestroyImmediate(this, true);
+			UnityEditor.AssetDatabase.SaveAssets();
+		}
+#endif
 	}
 
 	public class LevelParamAssetConverter : SerializableAssetConverter<LevelParamAsset>

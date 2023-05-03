@@ -5,12 +5,12 @@ using TetrisTower.Game;
 using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
+namespace TetrisTower.TowerLevels.Playthroughs
 {
 	/// <summary>
 	/// Sequential play through in which players play levels one after another until end is reached.
 	/// </summary>
-	[CreateAssetMenu(fileName = "UnknownPlaythroughTemplate", menuName = "Tetris Tower/Playthrough Template")]
+	[CreateAssetMenu(fileName = "Unknown_SeqPlaythroughTemplate", menuName = "Tetris Tower/Seq Playthrough Template")]
 	public class SeqPlaythroughTemplate : PlaythroughTemplateBase
 	{
 		[SerializeField] private SeqPlaythroughData m_PlayerData;
@@ -22,10 +22,10 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 			m_PlayerData.Validate(config.AssetsRepository, this);
 
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
-			var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(m_PlayerData, config.Converters);
+			var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(m_PlayerData, Saves.SaveManager.GetConverters(config));
 
 			// No need to have the json "TypeNameHandling = Auto" of the root object serialized, as we specify the type in the generics parameter.
-			return Newtonsoft.Json.JsonConvert.DeserializeObject<SeqPlaythroughData>(serialized, config.Converters);
+			return Newtonsoft.Json.JsonConvert.DeserializeObject<SeqPlaythroughData>(serialized, Saves.SaveManager.GetConverters(config));
 		}
 
 		public override IEnumerable<LevelParamData> GetAllLevels()

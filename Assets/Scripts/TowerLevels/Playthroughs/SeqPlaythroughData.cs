@@ -5,10 +5,10 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using TetrisTower.Game;
-using TetrisTower.TowerLevels;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
+namespace TetrisTower.TowerLevels.Playthroughs
 {
 	/// <summary>
 	/// Sequential play through in which players play levels one after another until end is reached.
@@ -18,7 +18,17 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 	public class SeqPlaythroughData : PlaythroughDataBase
 	{
 		public int CurrentLevelIndex = 0;
-		public LevelParamData[] Levels;
+
+		public LevelParamData[] Levels => m_Levels.Length > 0 ? m_Levels : m_LevelAssets.Select(la => la ? la.LevelParam : null).ToArray();
+
+		[SerializeField]
+		[FormerlySerializedAs("Levels")]
+		[Tooltip("List of levels to use defined in place. Will override the LevelAssets.")]
+		private LevelParamData[] m_Levels = new LevelParamData[0];
+
+		[SerializeField]
+		[Tooltip("List of level assets to use. Will be overridden by Levels if any.")]
+		private LevelParamAsset[] m_LevelAssets = new LevelParamAsset[0];
 
 		public override bool IsFinalLevel => CurrentLevelIndex == Levels.Length - 1;
 		public override bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;
@@ -28,7 +38,7 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 			return new TowerLevelSupervisor(this);
 		}
 
-		public void SetupCurrentLevel(GameConfig gameConfig, SceneReference overrideScene)
+		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
 			if (CurrentLevelIndex >= Levels.Length) {
 				Debug.LogError($"Current level {CurrentLevelIndex} is out of range {Levels.Length}. Abort!");
@@ -66,8 +76,16 @@ namespace TetrisTower.TetrisTower.TowerLevels.Playthroughs
 		{
 			base.Validate(repo, context);
 
+			if (m_Levels.Length > 0 && m_LevelAssets.Length > 0) {
+				Debug.LogError($"{context} has both level and level assets.", context);
+			}
+
 			foreach (var level in Levels) {
-				level.Validate(repo, context);
+				if (level != null) {
+					level.Validate(repo, context);
+				} else {
+					Debug.LogError($"{context} has missing levels.", context);
+				}
 			}
 		}
 	}

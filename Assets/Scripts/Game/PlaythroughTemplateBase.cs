@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.Utils;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,12 +14,16 @@ namespace TetrisTower.Game
 	{
 		GridLevelData TowerLevel { get; }
 
+		public BlocksSkinSet BlocksSet { get; }
+
 		public bool HaveFinishedLevels { get; }
 
 		public float TotalPlayTime { get; }
 		public int TotalScore { get; }
 
 		ILevelSupervisor PrepareSupervisor();
+
+		void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 
 		void RetryLevel();
 		void FinishLevel();

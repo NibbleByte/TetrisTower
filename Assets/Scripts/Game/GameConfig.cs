@@ -44,12 +44,6 @@ namespace TetrisTower.Game
 		[Range(0f, 1f)]
 		public float SwipeConformity = 0.9f;
 
-		public Newtonsoft.Json.JsonConverter[] Converters => new Newtonsoft.Json.JsonConverter[] {
-				new BlocksSkinSetConverter(AssetsRepository),
-				new GridShapeTemplateConverter(AssetsRepository),
-				new RandomXoShiRo128starstarJsonConverter(),
-		};
-
 		public PlaythroughTemplateBase DevDefaultPlaythgrough;
 
 		void OnValidate()
