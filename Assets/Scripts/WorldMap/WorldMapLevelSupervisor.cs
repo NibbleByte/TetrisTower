@@ -45,7 +45,7 @@ namespace TetrisTower.WorldMap
 
 			var levelController = GameObject.FindObjectOfType<WorldMapController>();
 
-			//var uiController = GameObject.FindObjectOfType<UI.WorldMapUIController>(true);
+			var uiController = GameObject.FindObjectOfType<UI.WorldMapUIController>(true);
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
@@ -55,8 +55,8 @@ namespace TetrisTower.WorldMap
 				gameContext.PlayerControls,
 				gameContext.Options,
 				m_PlaythroughData,
-				levelController/*,
-				uiController*/
+				levelController,
+				uiController
 				);
 
 

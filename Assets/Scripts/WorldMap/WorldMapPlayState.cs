@@ -15,6 +15,7 @@ namespace TetrisTower.WorldMap
 	{
 		private PlayerControls m_PlayerControls;
 		private WorldMapController m_LevelController;
+		private UI.WorldMapUIController m_UIController;
 
 		private Vector2 m_MovementInput;
 		private Vector2 m_MovementCurrent;
@@ -33,6 +34,7 @@ namespace TetrisTower.WorldMap
 		{
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_LevelController);
+			context.SetByType(out m_UIController);
 
 			m_InputEnabler = new InputEnabler(this);
 			m_InputEnabler.Enable(m_PlayerControls.UI);
@@ -42,6 +44,8 @@ namespace TetrisTower.WorldMap
 			// You don't want "Return" key to trigger selected buttons.
 			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
 			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
+
+			m_UIController.SwitchState(UI.WorldMapUIState.Play);
 
 			return Task.CompletedTask;
 		}

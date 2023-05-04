@@ -633,6 +633,12 @@ namespace TetrisTower.Game
             ]
         },
         {
+            ""name"": ""WorldMapPaused"",
+            ""id"": ""913315cb-b9b2-476f-b22b-cc6806bf6d06"",
+            ""actions"": [],
+            ""bindings"": []
+        },
+        {
             ""name"": ""LevelsShared"",
             ""id"": ""31910e90-aaf6-4365-8ae6-f48836710769"",
             ""actions"": [
@@ -1333,6 +1339,8 @@ namespace TetrisTower.Game
             m_WorldMapPlay_DiscworldMovement = m_WorldMapPlay.FindAction("DiscworldMovement", throwIfNotFound: true);
             m_WorldMapPlay_DiscworldZoom = m_WorldMapPlay.FindAction("DiscworldZoom", throwIfNotFound: true);
             m_WorldMapPlay_PointerPress = m_WorldMapPlay.FindAction("Pointer-Press", throwIfNotFound: true);
+            // WorldMapPaused
+            m_WorldMapPaused = asset.FindActionMap("WorldMapPaused", throwIfNotFound: true);
             // LevelsShared
             m_LevelsShared = asset.FindActionMap("LevelsShared", throwIfNotFound: true);
             m_LevelsShared_ToggleMenu = m_LevelsShared.FindAction("ToggleMenu", throwIfNotFound: true);
@@ -1564,6 +1572,31 @@ namespace TetrisTower.Game
             }
         }
         public WorldMapPlayActions @WorldMapPlay => new WorldMapPlayActions(this);
+
+        // WorldMapPaused
+        private readonly InputActionMap m_WorldMapPaused;
+        private IWorldMapPausedActions m_WorldMapPausedActionsCallbackInterface;
+        public struct WorldMapPausedActions
+        {
+            private @PlayerControls m_Wrapper;
+            public WorldMapPausedActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+            public InputActionMap Get() { return m_Wrapper.m_WorldMapPaused; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(WorldMapPausedActions set) { return set.Get(); }
+            public void SetCallbacks(IWorldMapPausedActions instance)
+            {
+                if (m_Wrapper.m_WorldMapPausedActionsCallbackInterface != null)
+                {
+                }
+                m_Wrapper.m_WorldMapPausedActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                }
+            }
+        }
+        public WorldMapPausedActions @WorldMapPaused => new WorldMapPausedActions(this);
 
         // LevelsShared
         private readonly InputActionMap m_LevelsShared;
@@ -1804,6 +1837,9 @@ namespace TetrisTower.Game
             void OnDiscworldMovement(InputAction.CallbackContext context);
             void OnDiscworldZoom(InputAction.CallbackContext context);
             void OnPointerPress(InputAction.CallbackContext context);
+        }
+        public interface IWorldMapPausedActions
+        {
         }
         public interface ILevelsSharedActions
         {

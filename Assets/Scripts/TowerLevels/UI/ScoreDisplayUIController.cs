@@ -35,17 +35,22 @@ namespace TetrisTower.TowerLevels.UI
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			context.SetByType(out m_TowerLevel);
+			context.TrySetByType(out m_TowerLevel);
 			context.SetByType(out m_PlaythroughData);
 
-			m_TowerLevel.RunningActionsSequenceFinished += UpdateScore;
+			// WorldMap doesn't have this.
+			if (m_TowerLevel) {
+				m_TowerLevel.RunningActionsSequenceFinished += UpdateScore;
+			}
 
 			UpdateScore();
 		}
 
 		public void OnLevelUnloading()
 		{
-			m_TowerLevel.RunningActionsSequenceFinished -= UpdateScore;
+			if (m_TowerLevel) {
+				m_TowerLevel.RunningActionsSequenceFinished -= UpdateScore;
+			}
 		}
 
 		private void UpdateScore()
@@ -53,6 +58,10 @@ namespace TetrisTower.TowerLevels.UI
 			if (TotalScoreText) {
 				TotalScoreText.text = TotalScorePrefix + m_PlaythroughData.TotalScore;
 			}
+
+			// WorldMap doesn't have this.
+			if (m_TowerLevel == null)
+				return;
 
 			if (CurrentScoreText) {
 				CurrentScoreText.text = CurrentScorePrefix + m_LevelData.Score.Score;
