@@ -61,12 +61,12 @@ namespace TetrisTower.WorldMap.UI
 
 		public void PauseLevel()
 		{
-			Game.GameManager.Instance.SetLevelState(new WorldMapPausedState());
+			Game.GameManager.Instance.SetGlobalState(new WorldMapPausedState());
 		}
 
 		public void ResumeLevel()
 		{
-			Game.GameManager.Instance.SetLevelState(new WorldMapPlayState());
+			Game.GameManager.Instance.SetGlobalState(new WorldMapPlayState());
 		}
 
 		public void OpenOptions()

@@ -181,7 +181,7 @@ namespace DevLocker.GFrame
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void SetLevelState(IPlayerState state)
+		public async void SetGlobalState(IPlayerState state)
 		{
 			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(state);
 		}
@@ -190,7 +190,7 @@ namespace DevLocker.GFrame
 		/// Pop a single state from the state stack.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void PopLevelState()
+		public async void PopGlobalState()
 		{
 			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStateAsync();
 		}
@@ -199,7 +199,7 @@ namespace DevLocker.GFrame
 		/// Pops multiple states from the state stack.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void PopLevelStates(int count)
+		public async void PopGlobalStates(int count)
 		{
 			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStatesAsync(count);
 		}
@@ -208,7 +208,7 @@ namespace DevLocker.GFrame
 		/// Pop and push back the state at the top. Will trigger changing state events.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void ReenterCurrentLevelState()
+		public async void ReenterCurrentGlobalState()
 		{
 			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentStateAsync();
 		}
@@ -219,7 +219,7 @@ namespace DevLocker.GFrame
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void ChangeLevelState(IPlayerState state, StackAction stackAction)
+		public async void ChangeGlobalState(IPlayerState state, StackAction stackAction)
 		{
 			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeStateAsync(state, stackAction);
 		}
@@ -324,7 +324,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
 		/// </summary>
-		public void PushLevelState(IPlayerState state)
+		public void PushGlobalState(IPlayerState state)
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushStateCrt(state));
 		}
@@ -332,7 +332,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// </summary>
-		public void SetLevelState(IPlayerState state)
+		public void SetGlobalState(IPlayerState state)
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateCrt(state));
 		}
@@ -340,7 +340,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Pop a single state from the state stack.
 		/// </summary>
-		public void PopLevelState()
+		public void PopGlobalState()
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStateCrt());
 		}
@@ -348,7 +348,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Pops multiple states from the state stack.
 		/// </summary>
-		public void PopLevelStates(int count)
+		public void PopGlobalStates(int count)
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStatesCrt(count));
 		}
@@ -356,7 +356,7 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// Pop and push back the state at the top. Will trigger changing state events.
 		/// </summary>
-		public void ReenterCurrentLevelState()
+		public void ReenterCurrentGlobalState()
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentStateCrt());
 		}
@@ -366,7 +366,7 @@ namespace DevLocker.GFrame
 		/// Will notify the state itself.
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// </summary>
-		public void ChangeLevelState(IPlayerState state, StackAction stackAction)
+		public void ChangeGlobalState(IPlayerState state, StackAction stackAction)
 		{
 			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeStateCrt(state, stackAction));
 		}

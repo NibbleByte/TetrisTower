@@ -74,12 +74,12 @@ namespace TetrisTower.TowerLevels.UI
 
 		public void PauseLevel()
 		{
-			Game.GameManager.Instance.SetLevelState(new TowerPausedState());
+			Game.GameManager.Instance.SetGlobalState(new TowerPausedState());
 		}
 
 		public void ResumeLevel()
 		{
-			Game.GameManager.Instance.SetLevelState(new TowerPlayState());
+			Game.GameManager.Instance.SetGlobalState(new TowerPlayState());
 		}
 
 		public void OpenOptions()
