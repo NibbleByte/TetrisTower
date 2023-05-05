@@ -330,6 +330,15 @@ namespace TetrisTower.Game
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pointer-Click"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""3954e8ac-f530-46cc-988c-f1b39378d525"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -629,6 +638,39 @@ namespace TetrisTower.Game
                     ""action"": ""DiscworldZoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""57a658c0-3566-407c-a8c1-ea950dcc39ce"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Pointer-Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bbd73af6-2550-4721-945a-f5c30e6aa56a"",
+                    ""path"": ""<Pen>/tip"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Pointer-Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d59e2c18-309c-4dc0-9440-7432d88f405f"",
+                    ""path"": ""<Touchscreen>/touch*/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Touch"",
+                    ""action"": ""Pointer-Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1339,6 +1381,7 @@ namespace TetrisTower.Game
             m_WorldMapPlay_DiscworldMovement = m_WorldMapPlay.FindAction("DiscworldMovement", throwIfNotFound: true);
             m_WorldMapPlay_DiscworldZoom = m_WorldMapPlay.FindAction("DiscworldZoom", throwIfNotFound: true);
             m_WorldMapPlay_PointerPress = m_WorldMapPlay.FindAction("Pointer-Press", throwIfNotFound: true);
+            m_WorldMapPlay_PointerClick = m_WorldMapPlay.FindAction("Pointer-Click", throwIfNotFound: true);
             // WorldMapPaused
             m_WorldMapPaused = asset.FindActionMap("WorldMapPaused", throwIfNotFound: true);
             // LevelsShared
@@ -1530,6 +1573,7 @@ namespace TetrisTower.Game
         private readonly InputAction m_WorldMapPlay_DiscworldMovement;
         private readonly InputAction m_WorldMapPlay_DiscworldZoom;
         private readonly InputAction m_WorldMapPlay_PointerPress;
+        private readonly InputAction m_WorldMapPlay_PointerClick;
         public struct WorldMapPlayActions
         {
             private @PlayerControls m_Wrapper;
@@ -1537,6 +1581,7 @@ namespace TetrisTower.Game
             public InputAction @DiscworldMovement => m_Wrapper.m_WorldMapPlay_DiscworldMovement;
             public InputAction @DiscworldZoom => m_Wrapper.m_WorldMapPlay_DiscworldZoom;
             public InputAction @PointerPress => m_Wrapper.m_WorldMapPlay_PointerPress;
+            public InputAction @PointerClick => m_Wrapper.m_WorldMapPlay_PointerClick;
             public InputActionMap Get() { return m_Wrapper.m_WorldMapPlay; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1555,6 +1600,9 @@ namespace TetrisTower.Game
                     @PointerPress.started -= m_Wrapper.m_WorldMapPlayActionsCallbackInterface.OnPointerPress;
                     @PointerPress.performed -= m_Wrapper.m_WorldMapPlayActionsCallbackInterface.OnPointerPress;
                     @PointerPress.canceled -= m_Wrapper.m_WorldMapPlayActionsCallbackInterface.OnPointerPress;
+                    @PointerClick.started -= m_Wrapper.m_WorldMapPlayActionsCallbackInterface.OnPointerClick;
+                    @PointerClick.performed -= m_Wrapper.m_WorldMapPlayActionsCallbackInterface.OnPointerClick;
+                    @PointerClick.canceled -= m_Wrapper.m_WorldMapPlayActionsCallbackInterface.OnPointerClick;
                 }
                 m_Wrapper.m_WorldMapPlayActionsCallbackInterface = instance;
                 if (instance != null)
@@ -1568,6 +1616,9 @@ namespace TetrisTower.Game
                     @PointerPress.started += instance.OnPointerPress;
                     @PointerPress.performed += instance.OnPointerPress;
                     @PointerPress.canceled += instance.OnPointerPress;
+                    @PointerClick.started += instance.OnPointerClick;
+                    @PointerClick.performed += instance.OnPointerClick;
+                    @PointerClick.canceled += instance.OnPointerClick;
                 }
             }
         }
@@ -1837,6 +1888,7 @@ namespace TetrisTower.Game
             void OnDiscworldMovement(InputAction.CallbackContext context);
             void OnDiscworldZoom(InputAction.CallbackContext context);
             void OnPointerPress(InputAction.CallbackContext context);
+            void OnPointerClick(InputAction.CallbackContext context);
         }
         public interface IWorldMapPausedActions
         {

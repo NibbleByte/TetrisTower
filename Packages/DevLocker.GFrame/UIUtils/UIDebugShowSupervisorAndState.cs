@@ -51,12 +51,12 @@ namespace DevLocker.GFrame.UIUtils
 
 			if (SupervisorText && nextSupervisor != m_CurrentLevelSupervisor) {
 				m_CurrentLevelSupervisor = nextSupervisor;
-				SupervisorText.text = SupervisorPrefix + m_CurrentLevelSupervisor?.GetType().Name ?? string.Empty;
+				SupervisorText.text = SupervisorPrefix + (m_CurrentLevelSupervisor?.GetType().Name ?? string.Empty);
 			}
 
 			if (StateText && nextState != m_CurrentPlayerState) {
 				m_CurrentPlayerState = nextState;
-				StateText.text = StatePrefix + m_CurrentPlayerState?.GetType().Name ?? string.Empty;
+				StateText.text = StatePrefix + (m_CurrentPlayerState?.GetType().Name ?? string.Empty);
 			}
 		}
 	}

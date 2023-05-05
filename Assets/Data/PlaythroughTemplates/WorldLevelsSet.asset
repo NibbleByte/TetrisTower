@@ -123,12 +123,22 @@ MonoBehaviour:
   m_Name: WorldLevelsSet
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
+  StartLevel: {fileID: 1554497649489288964}
   Levels:
   - {fileID: -9033090740975800640}
   - {fileID: 1554497649489288964}
   - {fileID: 2539950144918906801}
   - {fileID: 3075740806775852930}
   - {fileID: -5133656246103420669}
+  LevelsLinks:
+  - LevelID1: BabylonID
+    LevelID2: ColosseumID
+  - LevelID1: ColosseumID
+    LevelID2: AtlantisID
+  - LevelID1: ColosseumID
+    LevelID2: StonehengeID
+  - LevelID1: StonehengeID
+    LevelID2: VikingsID
 --- !u!114 &1554497649489288964
 MonoBehaviour:
   m_ObjectHideFlags: 0

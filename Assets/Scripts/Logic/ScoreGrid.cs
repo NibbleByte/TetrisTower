@@ -33,6 +33,8 @@ namespace TetrisTower.Logic
 		[JsonProperty] public int TotalClearedBlocksCount { get; private set; }
 		[JsonProperty] public int ObjectiveProgress { get; private set; }
 
+		public float BonusRatio => TotalClearedBlocksCount != 0 ? (float)Score / TotalClearedBlocksCount : 1f;
+
 		private int m_CurrentClearedBlocksCount = 0;
 		private int m_CurrentCascadesCount = 0;
 

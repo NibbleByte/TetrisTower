@@ -39,10 +39,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 
 		public int ScoreOnLevelStart = 0;
-		public int TotalScore => ScoreOnLevelStart + m_TowerLevel?.Score.Score ?? 0;
+		public int TotalScore => ScoreOnLevelStart + (m_TowerLevel?.Score.Score ?? 0);
 
 		public float PlayTimeOnLevelStart = 0f;
-		public float TotalPlayTime => PlayTimeOnLevelStart + m_TowerLevel?.PlayTime ?? 0;
+		public float TotalPlayTime => PlayTimeOnLevelStart + (m_TowerLevel?.PlayTime ?? 0);
 
 		public abstract bool IsFinalLevel { get; }
 		public abstract bool HaveFinishedLevels { get; }

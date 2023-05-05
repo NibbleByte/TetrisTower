@@ -38,6 +38,22 @@ namespace TetrisTower.WorldMap
 				GameObject landMark = GameObject.Instantiate(level.WorldLandmarkPrefab, LocationsRoot);
 				landMark.name = "L-" + level.name;
 				landMark.transform.localPosition = level.WorldMapPosition;
+				landMark.AddComponent<WorldMapLandmark>().LevelParam = level;
+			}
+		}
+
+		public void TryWorldSelect(Vector2 screenPos)
+		{
+			Ray ray = Camera.GetComponentInChildren<Camera>().ScreenPointToRay(screenPos);
+
+			if (Physics.Raycast(ray, out RaycastHit hitInfo)) {
+				var landmark = hitInfo.collider.GetComponentInParent<WorldMapLandmark>();
+				if (landmark) {
+					m_PlaythroughData.SetCurrentLevel(landmark.LevelParam);
+
+					var supervisor = m_PlaythroughData.PrepareSupervisor();
+					Game.GameManager.Instance.SwitchLevelAsync(supervisor);
+				}
 			}
 		}
 

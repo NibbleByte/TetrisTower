@@ -22,8 +22,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public class WorldLevelAccomplishment
 		{
 			public string LevelID;
-			public int Score;
-			public int ClearedBlocks;
+			public int HighestScore = 0;
+			public float BestBonusRatio = 1f;
+			public int MostClearedBlocks = 0;
 			public bool Completed;	// Player needs to complete the level objective once to unlock the adjacent levels.
 		}
 
@@ -38,7 +39,17 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{
-			return TowerLevel == null ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
+			return TowerLevel == null && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
+		}
+
+		public void SetCurrentLevel(WorldMapLevelParamAsset levelAsset)
+		{
+			if (!string.IsNullOrEmpty(m_CurrentLevelID)) {
+				Debug.LogError($"Setting current levelID to {levelAsset.LevelID}, while another one is active - {m_CurrentLevelID}");
+			}
+
+			m_CurrentLevelID = levelAsset.LevelID;
+			Debug.Log($"Setting current level to {m_CurrentLevelID}");
 		}
 
 		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
@@ -60,8 +71,6 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override void FinishLevel()
 		{
-			base.FinishLevel();
-
 			WorldLevelAccomplishment accomplishment = Accomplishments.FirstOrDefault(a => a.LevelID == m_CurrentLevelID);
 			if (accomplishment == null) {
 				accomplishment = new WorldLevelAccomplishment() { LevelID = m_CurrentLevelID };
@@ -69,9 +78,15 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				Accomplishments.Add(accomplishment);
 			}
 
-			accomplishment.Score = m_TowerLevel.Score.Score;
-			accomplishment.ClearedBlocks = m_TowerLevel.Score.TotalClearedBlocksCount;
+			accomplishment.HighestScore = Mathf.Max(accomplishment.HighestScore, m_TowerLevel.Score.Score);
+			accomplishment.MostClearedBlocks = Mathf.Max(accomplishment.MostClearedBlocks, m_TowerLevel.Score.TotalClearedBlocksCount);
+			accomplishment.BestBonusRatio = Mathf.Max(accomplishment.BestBonusRatio, m_TowerLevel.Score.BonusRatio);
+
 			accomplishment.Completed = true; // TODO: this should be based on the objective.
+
+			base.FinishLevel();
+
+			ScoreOnLevelStart = Accomplishments.Sum(a => a.HighestScore);
 
 			m_CurrentLevelID = "";
 		}

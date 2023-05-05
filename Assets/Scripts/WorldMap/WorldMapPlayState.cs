@@ -58,6 +58,10 @@ namespace TetrisTower.WorldMap
 			return Task.CompletedTask;
 		}
 
+		public void OnPointerClick(InputAction.CallbackContext context)
+		{
+			m_LevelController.TryWorldSelect(Pointer.current?.position.ReadValue() ?? new Vector2(Screen.width / 2f, Screen.height / 2f));
+		}
 
 		public void OnDiscworldMovement(InputAction.CallbackContext context)
 		{
