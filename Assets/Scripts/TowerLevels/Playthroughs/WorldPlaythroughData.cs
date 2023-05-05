@@ -43,13 +43,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
-			if (string.IsNullOrWhiteSpace(m_CurrentLevelID) || !LevelsSet.GetLevel(m_CurrentLevelID).IsValid) {
+			if (string.IsNullOrWhiteSpace(m_CurrentLevelID) || LevelsSet.GetLevel(m_CurrentLevelID) == null) {
 				Debug.LogError($"Current level \"{m_CurrentLevelID}\" is invalid. Abort!");
 				m_TowerLevel = null;
 				return;
 			}
 
-			m_TowerLevel = GenerateTowerLevelData(gameConfig, LevelsSet.GetLevel(m_CurrentLevelID).LevelAsset.LevelParam);
+			m_TowerLevel = GenerateTowerLevelData(gameConfig, LevelsSet.GetLevel(m_CurrentLevelID).LevelParam);
 
 			if (overrideScene != null) {
 				TowerLevel.BackgroundScene = overrideScene;

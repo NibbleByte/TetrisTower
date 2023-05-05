@@ -29,7 +29,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override IEnumerable<LevelParamData> GetAllLevels()
 		{
-			return m_PlayerData.LevelsSet.Levels.Where(la => la.LevelAsset != null).Select(la => la.LevelAsset.LevelParam);
+			return m_PlayerData.LevelsSet.Levels.Where(lp => lp != null).Select(lp => lp.LevelParam);
 		}
 
 

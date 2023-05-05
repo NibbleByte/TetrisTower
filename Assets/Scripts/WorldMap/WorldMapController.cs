@@ -1,3 +1,4 @@
+using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 
 namespace TetrisTower.WorldMap
@@ -9,6 +10,8 @@ namespace TetrisTower.WorldMap
 		public Transform Camera;
 
 		public Transform Sun;
+
+		public Transform LocationsRoot;
 
 		public Vector2 MoveRange = new Vector2(-200f, 0f);
 		public Vector2 ZoomRange = new Vector2(50f, 150f);
@@ -24,6 +27,19 @@ namespace TetrisTower.WorldMap
 
 		public AnimationCurve ZoomToDrag = AnimationCurve.Linear(0f, 0.4f, 1f, 0f);
 		public float DragDamp = 0.2f;
+
+		private WorldPlaythroughData m_PlaythroughData;
+
+		public void Init(WorldPlaythroughData playthroughData)
+		{
+			m_PlaythroughData = playthroughData;
+
+			foreach(WorldMapLevelParamAsset level in playthroughData.LevelsSet.Levels) {
+				GameObject landMark = GameObject.Instantiate(level.WorldLandmarkPrefab, LocationsRoot);
+				landMark.name = "L-" + level.name;
+				landMark.transform.localPosition = level.WorldMapPosition;
+			}
+		}
 
 		public void RotateDiscworld(float rotate)
 		{

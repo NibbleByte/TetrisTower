@@ -28,7 +28,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		[SerializeField]
 		[Tooltip("List of level assets to use. Will be overridden by Levels if any.")]
-		private LevelParamAsset[] m_LevelAssets = new LevelParamAsset[0];
+		private WorldMapLevelParamAsset[] m_LevelAssets = new WorldMapLevelParamAsset[0];
 
 		public override bool IsFinalLevel => CurrentLevelIndex == Levels.Length - 1;
 		public override bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;

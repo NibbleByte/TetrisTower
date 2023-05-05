@@ -1,5 +1,115 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9033090740975800640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: AtlantisID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelID: AtlantisID
+  WorldLandmarkPrefab: {fileID: 8043460351148311224, guid: 2ede8e409af420846b601f546d8a2f06, type: 3}
+  WorldMapPosition: {x: 2.5, y: 0.4, z: -31}
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: aebb086cc80f793449da2f415203276c, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Atlantis.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    ObjectiveEndCount: 40
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      ObjectiveType: 1
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides:
+    - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &-5133656246103420669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: VikingsID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelID: VikingsID
+  WorldLandmarkPrefab: {fileID: 8043460351148311224, guid: 2ede8e409af420846b601f546d8a2f06, type: 3}
+  WorldMapPosition: {x: -6, y: 0.4, z: -14.4}
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 17f494c607e7b5a4b85f20d17c39e596, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Vikings.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 4
+    ObjectiveEndCount: 300
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      ObjectiveType: 7
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 5
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides:
+    - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14,8 +124,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
   Levels:
-  - LevelID: BabylonID
-    LevelAsset: {fileID: 1554497649489288964}
+  - {fileID: -9033090740975800640}
+  - {fileID: 1554497649489288964}
+  - {fileID: 2539950144918906801}
+  - {fileID: 3075740806775852930}
+  - {fileID: -5133656246103420669}
 --- !u!114 &1554497649489288964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29,32 +142,38 @@ MonoBehaviour:
   m_Name: BabylonID
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelID: BabylonID
+  WorldLandmarkPrefab: {fileID: 8043460351148311224, guid: 2ede8e409af420846b601f546d8a2f06, type: 3}
+  WorldMapPosition: {x: 13.5, y: 0.4, z: -29.5}
   LevelParam:
     BackgroundScene:
-      m_SceneAsset: {fileID: 0}
+      m_SceneAsset: {fileID: 102900000, guid: a35fc937ade46df42b1e56067073a56e, type: 3}
       m_IsDirty: 0
-      m_ScenePath: 
+      m_ScenePath: Assets/Scenes/SkyStory/S00_Babylon-Stormy.unity
     BackgroundSceneMobile:
-      m_SceneAsset: {fileID: 0}
+      m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
       m_IsDirty: 0
-      m_ScenePath: 
-    GreetMessage: 
-    InitialSpawnBlockTypesCount: 3
-    ObjectiveEndCount: 0
+      m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+    GreetMessage: 'Drop the first blocks to start!
+
+      Match {ObjectiveEndCount}
+      blocks to win!'
+    InitialSpawnBlockTypesCount: 4
+    ObjectiveEndCount: 100
     Rules:
       MatchHorizontalLines: 3
       MatchVerticalLines: 3
       MatchDiagonalsLines: 3
       ObjectiveType: 7
-      WildBlockChance: 0.05
-      BlockSmiteChance: 0.005
-      RowSmiteChance: 0.005
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
       FallSpeedNormalized: 2
       FallSpeedupPerAction: 0.02
       MatchesToModifySpawnedBlocksRange: 120
       ModifyBlocksRangeType: 0
-      WrapSidesOnMatch: 0
-      WrapSidesOnMove: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
     GridRows: 9
     GridColumns: 13
     ShapeTemplates: []
@@ -62,6 +181,120 @@ MonoBehaviour:
     StartGrid:
       rid: -2
     SkinOverrides: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &2539950144918906801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: ColosseumID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelID: ColosseumID
+  WorldLandmarkPrefab: {fileID: 8043460351148311224, guid: 2ede8e409af420846b601f546d8a2f06, type: 3}
+  WorldMapPosition: {x: -3.14, y: 0.4, z: -27.17}
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 11aa518b027c5dd4f8b78489ffa37c37, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Colosseum.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: '"Veni, vidi, vici"'
+    InitialSpawnBlockTypesCount: 3
+    ObjectiveEndCount: 300
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      ObjectiveType: 7
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &3075740806775852930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: StonehengeID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelID: StonehengeID
+  WorldLandmarkPrefab: {fileID: 8043460351148311224, guid: 2ede8e409af420846b601f546d8a2f06, type: 3}
+  WorldMapPosition: {x: -8.17, y: 0.4, z: -20.31}
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 6c5fc7ab53fadb641af161f1f1ef2570, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Stonehenge.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 'In ancient times...
+
+      Hundreds of years before the dawn of
+      history
+
+      Lived a strange race of people... the Druids'
+    InitialSpawnBlockTypesCount: 4
+    ObjectiveEndCount: 300
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      ObjectiveType: 7
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 1
+    StartGrid:
+      rid: -2
+    SkinOverrides:
+    - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
   references:
     version: 2
     RefIds:

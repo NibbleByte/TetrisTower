@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Core;
-using TetrisTower.Game;
 using UnityEngine;
 
 namespace TetrisTower.TowerLevels.Playthroughs
@@ -14,32 +13,27 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	[CreateAssetMenu(fileName = "Unknown_WorldLevelsSet", menuName = "Tetris Tower/World Levels Set")]
 	public class WorldLevelsSet : SerializableAsset
 	{
-		[Serializable]
-		public struct WorldLevelDescription
-		{
-			public string LevelID;
-			public Vector2 Position;
-			public LevelParamAsset LevelAsset;
+		public WorldMapLevelParamAsset[] Levels;
 
-			public bool IsValid => !string.IsNullOrEmpty(LevelID);
-		}
-
-		public WorldLevelDescription[] Levels;
-
-		public WorldLevelDescription GetLevel(string levelID)
+		public WorldMapLevelParamAsset GetLevel(string levelID)
 		{
 			foreach(var level in Levels) {
 				if (level.LevelID == levelID)
 					return level;
 			}
 
-			return default;
+			return null;
 		}
 
 		public void Validate(AssetsRepository repo)
 		{
-			foreach(WorldLevelDescription level in Levels) {
-				level.LevelAsset.Validate(repo);
+			foreach(WorldMapLevelParamAsset level in Levels) {
+				if (level == null) {
+					Debug.LogError($"{name} has missing level.", this);
+					continue;
+				}
+
+				level.Validate(repo);
 			}
 		}
 
@@ -47,16 +41,11 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[ContextMenu("Add level as sub asset")]
 		private void AddLevelSubAsset()
 		{
-			var levelAsset = ScriptableObject.CreateInstance<LevelParamAsset>();
+			var levelAsset = ScriptableObject.CreateInstance<WorldMapLevelParamAsset>();
 
-			levelAsset.name = $"Level-{Levels.Length:00}";
+			levelAsset.LevelID = levelAsset.name = $"Level-{Levels.Length:00}";
 
-			WorldLevelDescription worldLevel = new WorldLevelDescription() {
-				LevelID = levelAsset.name,
-				LevelAsset = levelAsset,
-			};
-
-			Levels = Levels.Concat(new WorldLevelDescription[] { worldLevel }).ToArray();
+			Levels = Levels.Concat(new [] { levelAsset }).ToArray();
 
 			UnityEditor.AssetDatabase.AddObjectToAsset(levelAsset, this);
 			UnityEditor.EditorUtility.SetDirty(this);
@@ -68,10 +57,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		{
 			string ownedPath = UnityEditor.AssetDatabase.GetAssetPath(this);
 
-			foreach(WorldLevelDescription level in Levels) {
-				if (level.LevelAsset && UnityEditor.AssetDatabase.GetAssetPath(level.LevelAsset) == ownedPath && level.LevelID != level.LevelAsset.name) {
-					level.LevelAsset.name = level.LevelID;
-					UnityEditor.EditorUtility.SetDirty(level.LevelAsset);
+			foreach(WorldMapLevelParamAsset level in Levels) {
+				if (level && UnityEditor.AssetDatabase.GetAssetPath(level) == ownedPath && level.LevelID != level.name) {
+					level.name = level.LevelID;
+					UnityEditor.EditorUtility.SetDirty(level);
 				}
 			}
 
