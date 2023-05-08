@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
+using static TetrisTower.TowerLevels.Playthroughs.WorldPlaythroughData;
 
 namespace TetrisTower.WorldMap
 {
@@ -46,6 +47,45 @@ namespace TetrisTower.WorldMap
 				location.LevelID = level.LevelID;
 
 				m_Locations.Add(location);
+			}
+
+			RefreshLocationStates();
+		}
+
+		private void RefreshLocationStates()
+		{
+			foreach(WorldMapLocation location in m_Locations) {
+
+				WorldLevelAccomplishment accomplishment = m_PlaythroughData.GetAccomplishment(location.LevelID);
+				if (accomplishment != null && accomplishment.Completed) {
+					location.SetState(WorldMapLocation.VisibleState.Completed);
+					continue;
+				}
+
+				if (location.LevelID == m_PlaythroughData.LevelsSet.StartLevel.LevelID) {
+					location.SetState(WorldMapLocation.VisibleState.Revealed);
+					continue;
+				}
+
+				// If got accomplishment in any way, consider level as revealed, even if not linked to a completed level.
+				if (accomplishment != null) {
+					location.SetState(WorldMapLocation.VisibleState.Revealed);
+					continue;
+				}
+
+				bool revealed = false;
+				foreach(string linkedLevelID in m_PlaythroughData.LevelsSet.GetLinkedLevelIDsFor(location.LevelID)) {
+					WorldLevelAccomplishment linkedAccomplishment = m_PlaythroughData.GetAccomplishment(linkedLevelID);
+					if (linkedAccomplishment != null && linkedAccomplishment.Completed) {
+						location.SetState(WorldMapLocation.VisibleState.Revealed);
+						revealed = true;
+						break;
+					}
+				}
+
+				if (!revealed) {
+					location.SetState(WorldMapLocation.VisibleState.Hidden);
+				}
 			}
 		}
 

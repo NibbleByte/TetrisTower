@@ -39,6 +39,17 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return null;
 		}
 
+		public IEnumerable<string> GetLinkedLevelIDsFor(string levelID)
+		{
+			foreach(LevelsLink link in LevelsLinks) {
+				if (link.LevelID1 == levelID)
+					yield return link.LevelID2;
+
+				if (link.LevelID2 == levelID)
+					yield return link.LevelID1;
+			}
+		}
+
 		public void Validate(AssetsRepository repo)
 		{
 			foreach(WorldMapLevelParamAsset level in Levels) {

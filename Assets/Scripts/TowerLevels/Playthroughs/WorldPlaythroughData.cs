@@ -37,6 +37,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public override bool IsFinalLevel => false;	// World doesn't have a final level... for now?!
 		public override bool HaveFinishedLevels => Accomplishments.Where(a => a.Completed).Count() >= LevelsSet.Levels.Length;
 
+		public WorldLevelAccomplishment GetAccomplishment(string levelID) => Accomplishments.FirstOrDefault(a => a.LevelID == levelID);
+
 		public override ILevelSupervisor PrepareSupervisor()
 		{
 			return TowerLevel == null && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
@@ -71,7 +73,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override void FinishLevel()
 		{
-			WorldLevelAccomplishment accomplishment = Accomplishments.FirstOrDefault(a => a.LevelID == m_CurrentLevelID);
+			WorldLevelAccomplishment accomplishment = GetAccomplishment(m_CurrentLevelID);
 			if (accomplishment == null) {
 				accomplishment = new WorldLevelAccomplishment() { LevelID = m_CurrentLevelID };
 
