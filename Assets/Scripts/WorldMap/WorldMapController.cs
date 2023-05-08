@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 
@@ -28,17 +29,23 @@ namespace TetrisTower.WorldMap
 		public AnimationCurve ZoomToDrag = AnimationCurve.Linear(0f, 0.4f, 1f, 0f);
 		public float DragDamp = 0.2f;
 
+		public WorldMapLocation WorldMapLocation;
+
 		private WorldPlaythroughData m_PlaythroughData;
+
+		private List<WorldMapLocation> m_Locations = new List<WorldMapLocation>();
 
 		public void Init(WorldPlaythroughData playthroughData)
 		{
 			m_PlaythroughData = playthroughData;
 
 			foreach(WorldMapLevelParamAsset level in playthroughData.LevelsSet.Levels) {
-				GameObject landMark = GameObject.Instantiate(level.WorldLandmarkPrefab, LocationsRoot);
-				landMark.name = "L-" + level.name;
-				landMark.transform.localPosition = level.WorldMapPosition;
-				landMark.AddComponent<WorldMapLandmark>().LevelParam = level;
+				WorldMapLocation location = GameObject.Instantiate(WorldMapLocation, LocationsRoot);
+				location.name = "L-" + level.LevelID;
+				location.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
+				location.LevelID = level.LevelID;
+
+				m_Locations.Add(location);
 			}
 		}
 
@@ -47,14 +54,25 @@ namespace TetrisTower.WorldMap
 			Ray ray = Camera.GetComponentInChildren<Camera>().ScreenPointToRay(screenPos);
 
 			if (Physics.Raycast(ray, out RaycastHit hitInfo)) {
-				var landmark = hitInfo.collider.GetComponentInParent<WorldMapLandmark>();
-				if (landmark) {
-					m_PlaythroughData.SetCurrentLevel(landmark.LevelParam);
+				var location = hitInfo.collider.GetComponentInParent<WorldMapLocation>();
+				if (location) {
+					m_PlaythroughData.SetCurrentLevel(location.LevelID);
 
 					var supervisor = m_PlaythroughData.PrepareSupervisor();
 					Game.GameManager.Instance.SwitchLevelAsync(supervisor);
 				}
 			}
+		}
+
+		public WorldMapLocation GetLevelParamForLocation(string levelID)
+		{
+			foreach(WorldMapLocation location in m_Locations) {
+				if (location.LevelID == levelID) {
+					return location;
+				}
+			}
+
+			return null;
 		}
 
 		public void RotateDiscworld(float rotate)

@@ -42,13 +42,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return TowerLevel == null && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
 		}
 
-		public void SetCurrentLevel(WorldMapLevelParamAsset levelAsset)
+		public void SetCurrentLevel(string levelID)
 		{
 			if (!string.IsNullOrEmpty(m_CurrentLevelID)) {
-				Debug.LogError($"Setting current levelID to {levelAsset.LevelID}, while another one is active - {m_CurrentLevelID}");
+				Debug.LogError($"Setting current levelID to {levelID}, while another one is active - {m_CurrentLevelID}");
 			}
 
-			m_CurrentLevelID = levelAsset.LevelID;
+			m_CurrentLevelID = levelID;
 			Debug.Log($"Setting current level to {m_CurrentLevelID}");
 		}
 

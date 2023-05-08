@@ -10,8 +10,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	public class WorldMapLevelParamAsset : SerializableAsset
 	{
 		public string LevelID;
-		public GameObject WorldLandmarkPrefab;
-		public Vector3 WorldMapPosition;
+		public Vector2 WorldMapPosition;
 
 		public LevelParamData LevelParam;
 
