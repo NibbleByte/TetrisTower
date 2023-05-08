@@ -12,6 +12,9 @@ namespace DevLocker.GFrame.UIUtils
 		public float Duration = 0.25f;
 		public bool TimeScaled = true;  // Should it be timeScale dependent or not.
 
+		[Tooltip("How many frames should loading screen wait before starting hide animation. First few frames performance may be unstable resulting in chopppy or skipped animation.")]
+		public int WaitFramesBeforeHide = 2;
+
 		public bool HasShowFinished => isActiveAndEnabled && m_CanvasGroup.alpha == 1f;
 		public bool HasHideFinished => !isActiveAndEnabled;
 
@@ -48,6 +51,15 @@ namespace DevLocker.GFrame.UIUtils
 		public IEnumerator Hide()
 #endif
 		{
+			int startFrame = Time.frameCount;
+			while(WaitFramesBeforeHide > 0 && Time.frameCount - startFrame < WaitFramesBeforeHide) {
+#if GFRAME_ASYNC
+				await Task.Yield();
+#else
+				yield return null;
+#endif
+			}
+
 			m_StartTime = Now;
 			m_StartAlpha = 1.0f;
 			m_EndAlpha = 0.0f;

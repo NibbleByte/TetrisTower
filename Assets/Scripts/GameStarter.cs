@@ -1,4 +1,5 @@
 using DevLocker.GFrame.Input.Contexts;
+using DevLocker.GFrame.UIUtils;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
@@ -42,6 +43,7 @@ namespace TetrisTower.GameStarter
 
 			var gameInputObject = Instantiate(GameConfig.GameInputPrefab, transform);
 			Instantiate(GameConfig.MessageBoxPrefab.gameObject, transform);
+			var loadingScreen = Instantiate(GameConfig.LoadingScreenPrefab, transform).GetComponentInChildren<UISimpleCanvasGroupFader>(true);
 
 			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
 			uiInputModule.actionsAsset = playerControls.asset;
@@ -53,6 +55,7 @@ namespace TetrisTower.GameStarter
 			GameContext = new GameContext(GameConfig, playerControls, inputContext);
 
 			var supervisorManager = gameObject.AddComponent<GameManager>();
+			supervisorManager.LevelLoadingScreen = loadingScreen;
 			supervisorManager.SetGameContext(GameContext);
 
 

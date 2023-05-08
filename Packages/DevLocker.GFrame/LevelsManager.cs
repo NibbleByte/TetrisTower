@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DevLocker.GFrame
 {
@@ -120,6 +121,10 @@ namespace DevLocker.GFrame
 
 			// Avoid first show of loading screen when the game starts.
 			if (hadPreviousSupervisor && LevelLoadingScreen != null) {
+
+				// Wait 1 frame for performance to stabilize (or transition animations will be skipped).
+				await Task.Yield();
+
 				await LevelLoadingScreen.HideAsync();
 			}
 
@@ -272,6 +277,10 @@ namespace DevLocker.GFrame
 
 			// Avoid first show of loading screen when the game starts.
 			if (hadPreviousSupervisor && LevelLoadingScreen != null) {
+
+				// Wait 1 frame for performance to stabilize (or transition animations will be skipped).
+				yield return null;
+
 				yield return LevelLoadingScreen.Hide();
 			}
 

@@ -15,6 +15,7 @@ namespace TetrisTower.Game
 
 		public GameObject GameInputPrefab;
 		public MessageBox MessageBoxPrefab;
+		public GameObject LoadingScreenPrefab;
 
 		public GridLevelController TowerLevelController;
 
