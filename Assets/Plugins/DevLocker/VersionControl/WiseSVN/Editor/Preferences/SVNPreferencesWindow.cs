@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using System.IO;
 
 namespace DevLocker.VersionControl.WiseSVN.Preferences
 {
@@ -74,6 +75,8 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 
 		private SerializedObject m_SerializedObject;
 
+		private static string m_Version = "";
+
 		private void OnEnable()
 		{
 			m_SerializedObject = new SerializedObject(this);
@@ -121,6 +124,8 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 						SVNStatusesDatabase.Instance.InvalidateDatabase();
 						SVNBranchesDatabase.Instance.InvalidateDatabase();
 						SVNLockPromptDatabaseStarter.TryStartIfNeeded();
+
+						SVNPreferencesManager.Instance.CheckSVNSupport();
 					}
 				}
 				GUI.backgroundColor = prevColor;
@@ -157,10 +162,23 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 
 		private void SanitizeBeforeSave()
 		{
+			m_PersonalPrefs.SvnCLIPath = SVNPreferencesManager.SanitizeUnityPath(m_PersonalPrefs.SvnCLIPath);
+			m_PersonalPrefs.Exclude = SanitizePathsList(m_PersonalPrefs.Exclude);
+
 			m_ProjectPrefs.SvnCLIPath = SVNPreferencesManager.SanitizeUnityPath(m_ProjectPrefs.SvnCLIPath);
 			m_ProjectPrefs.SvnCLIPathMacOS = SVNPreferencesManager.SanitizeUnityPath(m_ProjectPrefs.SvnCLIPathMacOS);
-			m_PersonalPrefs.Exclude = SanitizePathsList(m_PersonalPrefs.Exclude);
 			m_ProjectPrefs.Exclude = SanitizePathsList(m_ProjectPrefs.Exclude);
+
+
+			string userPath = m_PersonalPrefs.SvnCLIPath;
+
+			if (string.IsNullOrWhiteSpace(userPath)) {
+				userPath = m_ProjectPrefs.PlatformSvnCLIPath;
+			}
+
+			if (!string.IsNullOrWhiteSpace(userPath) && !File.Exists(userPath)) {
+				EditorUtility.DisplayDialog("SVN Binary Missing", $"Cannot find the \"svn\" executable specified in the svn preferences:\n\"{userPath}\"", "Ok");
+			}
 
 			if (m_ProjectPrefs.EnableLockPrompt) {
 
@@ -418,6 +436,7 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 
 		public static void DrawHelpAbout()
 		{
+			EditorGUILayout.LabelField("Version: " + GetVersion(), EditorStyles.boldLabel);
 			EditorGUILayout.LabelField("Help:", EditorStyles.boldLabel);
 
 			if (GUILayout.Button("Documentation", GUILayout.MaxWidth(EditorGUIUtility.labelWidth))) {
@@ -506,6 +525,29 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 					m_RandomVideoIndex = (m_RandomVideoIndex + 1) % m_RandomVideos.Count;
 				}
 			}
+		}
+
+		private static string GetVersion()
+		{
+			if (!string.IsNullOrEmpty(m_Version))
+				return m_Version;
+
+			string pathToCode = AssetDatabase.FindAssets(nameof(WiseSVNIntegration)).Select(AssetDatabase.GUIDToAssetPath).FirstOrDefault();
+			if (!string.IsNullOrEmpty(pathToCode)) {
+
+				string pathToPackage = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(pathToCode)), "package.json");
+				if (File.Exists(pathToPackage)) {
+
+					string versionLine = File.ReadAllLines(pathToPackage).Where(l => l.Contains("\"version\": ")).FirstOrDefault();
+					if (!string.IsNullOrEmpty(versionLine)) {
+						m_Version = "WiseSVN " + System.Text.RegularExpressions.Regex.Match(versionLine, @"\d\.\d\.\d").Value;
+						return m_Version;
+					}
+				}
+			}
+
+			m_Version = "Unknown";
+			return m_Version;
 		}
 
 		private static string GetSerializedPropertyTooltip<Type>(SerializedProperty serializedProperty, bool inherit)

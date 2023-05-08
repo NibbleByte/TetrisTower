@@ -336,12 +336,12 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 		{
 			return path
 				.Trim()
-				.Trim('\\', '/')
+				.TrimEnd('\\', '/')
 				.Replace('\\', '/')
 				;
 		}
 
-		private void CheckSVNSupport()
+		public void CheckSVNSupport()
 		{
 			string svnError;
 			try {
@@ -375,6 +375,27 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 						"/usr/bin/svn",
 						"/Applications/Xcode.app/Contents/Developer/usr/bin/svn",
 						"/opt/subversion/bin/svn",
+						"/opt/local/bin/svn",
+
+						//
+						// SnailSVN comes with bundled up svn binaries. Use those if needed, starting with the higher version. Premium and free.
+						//
+
+						// Arm64
+						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/arm64/1.14.x/svn",
+						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/arm64/1.14.x/svn",
+
+						// Intel x64
+						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.14.x/svn",
+						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.11.x/svn",
+						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.10.x/svn",
+						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.9.x/svn",
+
+
+						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.14.x/svn",
+						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.11.x/svn",
+						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.10.x/svn",
+						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.9.x/svn",
 					};
 
 					foreach(string osxPath in osxDefaultBinariesPaths) {
@@ -404,7 +425,7 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 
 				Debug.LogError($"SVN CLI (Command Line Interface) not found. You need to install it in order for the SVN integration to work properly. Disabling WiseSVN integration. Please fix the error and restart Unity.\n\n{svnError}");
 #if UNITY_EDITOR_OSX
-				Debug.LogError($"If you installed SVN via Brew or similar, you may need to add \"/usr/local/bin\" (or wherever svn binaries can be found) to your PATH environment variable and restart. Example:\nsudo launchctl config user path /usr/local/bin\nAlternatively, you may add relative SVN CLI path in your WiseSVN preferences at:\n{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}");
+				Debug.LogError($"If you installed SVN via Brew or similar, you may need to add \"/usr/local/bin\" (or wherever svn binaries can be found) to your PATH environment variable and restart. Example:\nsudo launchctl config user path /usr/local/bin\nAlternatively, you may add SVN CLI path in your WiseSVN preferences at:\n{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}");
 #endif
 				return;
 			}

@@ -17,7 +17,11 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 	// revert, switch, unlock, update (up)
 	internal class SnailSVNContextMenus : SVNContextMenusBase
 	{
-		private const string ClientCommand = "/Applications/SnailSVNLite.app/Contents/Resources/snailsvn.sh";
+		private const string ClientLightCommand =	"/Applications/SnailSVNLite.app/Contents/Resources/snailsvn.sh";
+		private const string ClientPremiumCommand = "/Applications/SnailSVN.app/Contents/Resources/snailsvn.sh";
+
+		private const string ClientLightProtocol = "snailsvnfree";
+		private const string ClientPremiumProtocol = "snailsvn";
 
 		protected override string FileArgumentsSeparator => " ";
 		protected override bool FileArgumentsSurroundQuotes => true;
@@ -30,13 +34,15 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 		private ShellUtils.ShellResult ExecuteCommand(string command, string fileArgument, string workingFolder, bool waitForOutput)
 		{
 			return ShellUtils.ExecuteCommand(new ShellUtils.ShellArgs() {
-				Command = ClientCommand,
+				Command = File.Exists(ClientPremiumCommand) ? ClientPremiumCommand : ClientLightCommand,
 				Args = string.IsNullOrEmpty(fileArgument) ? command : $"{command} {fileArgument}",
 				WorkingDirectory = workingFolder,
 				WaitForOutput = waitForOutput,
 				WaitTimeout = -1,
 			});
 		}
+
+		private string GetClientProtocol() => File.Exists(ClientPremiumCommand) ? ClientPremiumProtocol : ClientLightProtocol;
 
 		public override void CheckChanges(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
 		{
@@ -49,7 +55,7 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 
 			// The snailsvn.sh currently doesn't accept "check-for-modifications" argument, but with some reverse engineering, managed to make it work like this.
 			// open "snailsvnfree://check-for-modifications/SomeFolderHere/UnityProject/Assets"
-			Application.OpenURL($"snailsvnfree://check-for-modifications{WiseSVNIntegration.ProjectRootNative}/{path}");
+			Application.OpenURL($"{GetClientProtocol()}://check-for-modifications{WiseSVNIntegration.ProjectRootNative}/{path}");
 		}
 
 		public override void DiffChanges(string assetPath, bool wait = false)
@@ -171,7 +177,7 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 
 			// The snailsvn.sh currently doesn't accept "blame" argument, but with some reverse engineering, managed to make it work like this.
 			// open "snailsvnfree://svn-blame/SomeFolderHere/UnityProject/Assets/foo.txt"
-			Application.OpenURL($"snailsvnfree://svn-blame{WiseSVNIntegration.ProjectRootNative}/{assetPath}");
+			Application.OpenURL($"{GetClientProtocol()}://svn-blame{WiseSVNIntegration.ProjectRootNative}/{assetPath}");
 		}
 
 		public override void Cleanup(bool wait = false)
