@@ -11,6 +11,14 @@ using UnityEngine.Serialization;
 
 namespace TetrisTower.TowerLevels.Playthroughs
 {
+	public enum WorldLocationState
+	{
+		Hidden,
+		Unlocked,	// Unlocked but not yet revealed to the player. UI has to do this.
+		Revealed,	// Level is unlocked and shown to player.
+		Completed   // Player needs to complete the level objective once to unlock the adjacent levels.
+	}
+
 	/// <summary>
 	/// Sequential play through in which players play levels one after another until end is reached.
 	/// </summary>
@@ -19,29 +27,75 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	public class WorldPlaythroughData : PlaythroughDataBase
 	{
 		[Serializable]
-		public class WorldLevelAccomplishment
+		public struct WorldLevelAccomplishment
 		{
 			public string LevelID;
-			public int HighestScore = 0;
-			public float BestBonusRatio = 1f;
-			public int MostClearedBlocks = 0;
-			public bool Completed;	// Player needs to complete the level objective once to unlock the adjacent levels.
+			public int HighestScore;
+			public float BestBonusRatio;
+			public int MostClearedBlocks;
+			public WorldLocationState State;
+
+			public bool IsValid => !string.IsNullOrEmpty(LevelID);
 		}
 
-		public WorldLevelsSet LevelsSet;
+		// Keep it private - modding can add more levels, outside this set.
+		[SerializeField]
+		private WorldLevelsSet m_LevelsSet;
 
-		public List<WorldLevelAccomplishment> Accomplishments = new List<WorldLevelAccomplishment>();
+		public IReadOnlyCollection<WorldLevelAccomplishment> Accomplishments => m_Accomplishments;
+		private WorldLevelAccomplishment[] m_Accomplishments = new WorldLevelAccomplishment[0];
 
 		private string m_CurrentLevelID;
 
 		public override bool IsFinalLevel => false;	// World doesn't have a final level... for now?!
-		public override bool HaveFinishedLevels => Accomplishments.Where(a => a.Completed).Count() >= LevelsSet.Levels.Length;
+		public override bool HaveFinishedLevels => m_Accomplishments.Where(a => a.State == WorldLocationState.Completed).Count() >= m_LevelsSet.LevelsCount;
 
-		public WorldLevelAccomplishment GetAccomplishment(string levelID) => Accomplishments.FirstOrDefault(a => a.LevelID == levelID);
+		public WorldLevelAccomplishment GetAccomplishment(string levelID) => m_Accomplishments.FirstOrDefault(a => a.LevelID == levelID);
+
+		public WorldLocationState GetLocationState(string levelID) => GetAccomplishment(levelID).State;
+
+		public IEnumerable<LevelParamData> GetAllLevels() => m_LevelsSet.Levels;
+
+		public IEnumerable<WorldLevelsLink> GetAllLevelLinks() => m_LevelsSet.LevelsLinks;
+
+		public IEnumerable<string> GetLinkedLevelIDsFor(string levelID) => m_LevelsSet.GetLinkedLevelIDsFor(levelID);
+
+		private int GetAccomplishmentIndex(string levelID, bool createIfMissing) {
+			int index = Array.FindIndex(m_Accomplishments, a => a.LevelID == levelID);
+
+			if (index == -1 && createIfMissing) {
+				index = m_Accomplishments.Length;
+
+				Array.Resize(ref m_Accomplishments, m_Accomplishments.Length + 1);
+
+				m_Accomplishments[index] = new WorldLevelAccomplishment() { LevelID = levelID };
+			}
+
+			return index;
+		}
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{
 			return TowerLevel == null && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
+		}
+
+		/// <summary>
+		/// Call this to ensure location state is up to date (supporting save migration & modding).
+		/// Checks if all locations linked to completed ones are unlocked.
+		/// </summary>
+		public void DataIntegrityCheck()
+		{
+			int startIndex = GetAccomplishmentIndex(m_LevelsSet.StartLevel.LevelParam.LevelID, true);
+			ref WorldLevelAccomplishment startAccomplishment = ref m_Accomplishments[startIndex];
+			if (startAccomplishment.State == WorldLocationState.Hidden) {
+				startAccomplishment.State = WorldLocationState.Unlocked;
+			}
+
+			foreach (WorldMapLevelParamData level in GetAllLevels()) {
+				if (GetAccomplishment(level.LevelID).State == WorldLocationState.Completed) {
+					UnlockLinkedLevels(level.LevelID);
+				}
+			}
 		}
 
 		public void SetCurrentLevel(string levelID)
@@ -56,13 +110,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
-			if (string.IsNullOrWhiteSpace(m_CurrentLevelID) || LevelsSet.GetLevel(m_CurrentLevelID) == null) {
+			if (string.IsNullOrWhiteSpace(m_CurrentLevelID) || m_LevelsSet.GetLevelData(m_CurrentLevelID) == null) {
 				Debug.LogError($"Current level \"{m_CurrentLevelID}\" is invalid. Abort!");
 				m_TowerLevel = null;
 				return;
 			}
 
-			m_TowerLevel = GenerateTowerLevelData(gameConfig, LevelsSet.GetLevel(m_CurrentLevelID).LevelParam);
+			m_TowerLevel = GenerateTowerLevelData(gameConfig, m_LevelsSet.GetLevelData(m_CurrentLevelID));
 
 			if (overrideScene != null) {
 				TowerLevel.BackgroundScene = overrideScene;
@@ -73,31 +127,60 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override void FinishLevel()
 		{
-			WorldLevelAccomplishment accomplishment = GetAccomplishment(m_CurrentLevelID);
-			if (accomplishment == null) {
-				accomplishment = new WorldLevelAccomplishment() { LevelID = m_CurrentLevelID };
+			int index = GetAccomplishmentIndex(m_CurrentLevelID, createIfMissing: true);
 
-				Accomplishments.Add(accomplishment);
-			}
+			ref WorldLevelAccomplishment accomplishment = ref m_Accomplishments[index];
 
 			accomplishment.HighestScore = Mathf.Max(accomplishment.HighestScore, m_TowerLevel.Score.Score);
 			accomplishment.MostClearedBlocks = Mathf.Max(accomplishment.MostClearedBlocks, m_TowerLevel.Score.TotalClearedBlocksCount);
 			accomplishment.BestBonusRatio = Mathf.Max(accomplishment.BestBonusRatio, m_TowerLevel.Score.BonusRatio);
 
-			accomplishment.Completed = true; // TODO: this should be based on the objective.
+			accomplishment.State = WorldLocationState.Completed; // TODO: this should be based on the objective.
 
 			base.FinishLevel();
 
-			ScoreOnLevelStart = Accomplishments.Sum(a => a.HighestScore);
+			ScoreOnLevelStart = m_Accomplishments.Sum(a => a.HighestScore);
+
+			UnlockLinkedLevels(m_CurrentLevelID);
 
 			m_CurrentLevelID = "";
+		}
+
+		private void UnlockLinkedLevels(string levelID)
+		{
+			foreach (string linkedLevelID in GetLinkedLevelIDsFor(levelID)) {
+				int linkedIndex = GetAccomplishmentIndex(linkedLevelID, true);
+
+				ref WorldLevelAccomplishment linkedAccomplishment = ref m_Accomplishments[linkedIndex];
+
+				if (linkedAccomplishment.State == WorldLocationState.Hidden) {
+					linkedAccomplishment.State = WorldLocationState.Unlocked;
+				}
+			}
+		}
+
+		public void RevealUnlockedLevel(string levelID)
+		{
+			int index = GetAccomplishmentIndex(levelID, false);
+			if (index == -1) {
+				Debug.LogError($"{levelID} trying to reveal level that is not unlocked or missing.");
+				return;
+			}
+
+			ref WorldLevelAccomplishment accomplishment = ref m_Accomplishments[index];
+
+			if (accomplishment.State == WorldLocationState.Unlocked) {
+				accomplishment.State = WorldLocationState.Revealed;
+			} else {
+				Debug.LogError($"Trying to reveal level {levelID} that is not unlocked. Found state: {accomplishment.State}.");
+			}
 		}
 
 		public override void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
 			base.Validate(repo, context);
 
-			LevelsSet.Validate(repo);
+			m_LevelsSet.Validate(repo);
 		}
 	}
 

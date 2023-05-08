@@ -27,10 +27,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<WorldPlaythroughData>(serialized, Saves.SaveManager.GetConverters(config));
 		}
 
-		public override IEnumerable<LevelParamData> GetAllLevels()
-		{
-			return m_PlayerData.LevelsSet.Levels.Where(lp => lp != null).Select(lp => lp.LevelParam);
-		}
+		public override IEnumerable<LevelParamData> GetAllLevels() => m_PlayerData.GetAllLevels();
 
 
 #if UNITY_EDITOR

@@ -1,35 +1,33 @@
+using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 
 namespace TetrisTower.WorldMap
 {
 	public class WorldMapLocation : MonoBehaviour
 	{
-		public enum VisibleState
-		{
-			Hidden,
-			Revealed,
-			Completed
-		}
-
 		public string LevelID;
 
-		public VisibleState State { get; private set; }
+		public WorldLocationState State { get; private set; }
 
-		public void SetState(VisibleState state)
+		public void SetState(WorldLocationState state)
 		{
 			State = state;
 
 			switch(State) {
-				case VisibleState.Hidden:
+				case WorldLocationState.Hidden:
 					gameObject.SetActive(false);
 					break;
 
-				case VisibleState.Revealed:
+				case WorldLocationState.Unlocked:
+					gameObject.SetActive(false);
+					break;
+
+				case WorldLocationState.Revealed:
 					// TODO: Colorize differently
 					gameObject.SetActive(true);
 					break;
 
-				case VisibleState.Completed:
+				case WorldLocationState.Completed:
 					// TODO: Colorize differently
 					transform.localScale = Vector3.one / 2f;
 					gameObject.SetActive(true);

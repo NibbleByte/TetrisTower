@@ -1,3 +1,7 @@
+using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
+using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
@@ -5,7 +9,7 @@ using static TetrisTower.TowerLevels.Playthroughs.WorldPlaythroughData;
 
 namespace TetrisTower.WorldMap
 {
-	public class WorldMapController : MonoBehaviour
+	public class WorldMapController : MonoBehaviour, ILevelLoadedListener
 	{
 		public Transform Discworld;
 
@@ -40,7 +44,9 @@ namespace TetrisTower.WorldMap
 		{
 			m_PlaythroughData = playthroughData;
 
-			foreach(WorldMapLevelParamAsset level in playthroughData.LevelsSet.Levels) {
+			m_PlaythroughData.DataIntegrityCheck();
+
+			foreach (WorldMapLevelParamData level in m_PlaythroughData.GetAllLevels()) {
 				WorldMapLocation location = GameObject.Instantiate(WorldMapLocation, LocationsRoot);
 				location.name = "L-" + level.LevelID;
 				location.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
@@ -49,42 +55,30 @@ namespace TetrisTower.WorldMap
 				m_Locations.Add(location);
 			}
 
-			RefreshLocationStates();
+			foreach(WorldMapLocation location in m_Locations) {
+				location.SetState(m_PlaythroughData.GetLocationState(location.LevelID));
+			}
 		}
 
-		private void RefreshLocationStates()
+		public void OnLevelLoaded(PlayerStatesContext context)
+		{
+			StartCoroutine(RevealUnlockedLocations());
+		}
+
+		public void OnLevelUnloading()
+		{
+		}
+
+		private IEnumerator RevealUnlockedLocations()
 		{
 			foreach(WorldMapLocation location in m_Locations) {
+				WorldLocationState state = m_PlaythroughData.GetLocationState(location.LevelID);
 
-				WorldLevelAccomplishment accomplishment = m_PlaythroughData.GetAccomplishment(location.LevelID);
-				if (accomplishment != null && accomplishment.Completed) {
-					location.SetState(WorldMapLocation.VisibleState.Completed);
-					continue;
-				}
+				if (state == WorldLocationState.Unlocked) {
+					m_PlaythroughData.RevealUnlockedLevel(location.LevelID);
+					location.SetState(WorldLocationState.Revealed);
 
-				if (location.LevelID == m_PlaythroughData.LevelsSet.StartLevel.LevelID) {
-					location.SetState(WorldMapLocation.VisibleState.Revealed);
-					continue;
-				}
-
-				// If got accomplishment in any way, consider level as revealed, even if not linked to a completed level.
-				if (accomplishment != null) {
-					location.SetState(WorldMapLocation.VisibleState.Revealed);
-					continue;
-				}
-
-				bool revealed = false;
-				foreach(string linkedLevelID in m_PlaythroughData.LevelsSet.GetLinkedLevelIDsFor(location.LevelID)) {
-					WorldLevelAccomplishment linkedAccomplishment = m_PlaythroughData.GetAccomplishment(linkedLevelID);
-					if (linkedAccomplishment != null && linkedAccomplishment.Completed) {
-						location.SetState(WorldMapLocation.VisibleState.Revealed);
-						revealed = true;
-						break;
-					}
-				}
-
-				if (!revealed) {
-					location.SetState(WorldMapLocation.VisibleState.Hidden);
+					yield return location.transform.DOScale(0.2f, 0.5f).From();
 				}
 			}
 		}

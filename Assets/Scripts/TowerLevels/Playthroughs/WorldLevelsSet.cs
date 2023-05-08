@@ -17,23 +17,21 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	[CreateAssetMenu(fileName = "Unknown_WorldLevelsSet", menuName = "Tetris Tower/World Levels Set")]
 	public class WorldLevelsSet : SerializableAsset
 	{
-		[Serializable]
-		public struct LevelsLink
-		{
-			public string LevelID1;
-			public string LevelID2;
-		}
-
 		public WorldMapLevelParamAsset StartLevel;
-		public WorldMapLevelParamAsset[] Levels;
 
-		public LevelsLink[] LevelsLinks;
+		[SerializeField]
+		private WorldMapLevelParamAsset[] m_Levels;
 
-		public WorldMapLevelParamAsset GetLevel(string levelID)
+		public int LevelsCount => m_Levels.Length;
+		public IEnumerable<WorldMapLevelParamData> Levels => m_Levels.Where(asset => asset != null).Select(asset => asset.LevelParam);
+
+		public WorldLevelsLink[] LevelsLinks;
+
+		public WorldMapLevelParamData GetLevelData(string levelID)
 		{
-			foreach(var level in Levels) {
-				if (level.LevelID == levelID)
-					return level;
+			foreach(var level in m_Levels) {
+				if (level.LevelParam.LevelID == levelID)
+					return level.LevelParam;
 			}
 
 			return null;
@@ -41,7 +39,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public IEnumerable<string> GetLinkedLevelIDsFor(string levelID)
 		{
-			foreach(LevelsLink link in LevelsLinks) {
+			foreach(WorldLevelsLink link in LevelsLinks) {
 				if (link.LevelID1 == levelID)
 					yield return link.LevelID2;
 
@@ -52,7 +50,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public void Validate(AssetsRepository repo)
 		{
-			foreach(WorldMapLevelParamAsset level in Levels) {
+			foreach(WorldMapLevelParamAsset level in m_Levels) {
 				if (level == null) {
 					Debug.LogError($"{name} has missing level.", this);
 					continue;
@@ -60,12 +58,12 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 				level.Validate(repo);
 
-				if (LevelsLinks.All(ll => ll.LevelID1 != level.LevelID && ll.LevelID2 != level.LevelID)) {
-					Debug.LogError($"{name} level \"{level.LevelID}\" has no links to other levels.", this);
+				if (LevelsLinks.All(ll => ll.LevelID1 != level.LevelParam.LevelID && ll.LevelID2 != level.LevelParam.LevelID)) {
+					Debug.LogError($"{name} level \"{level.LevelParam.LevelID}\" has no links to other levels.", this);
 				}
 			}
 
-			foreach(LevelsLink link in LevelsLinks) {
+			foreach(WorldLevelsLink link in LevelsLinks) {
 				if (string.IsNullOrWhiteSpace(link.LevelID1) || string.IsNullOrWhiteSpace(link.LevelID2)) {
 					Debug.LogError($"{name} has empty.", this);
 					continue;
@@ -76,11 +74,11 @@ namespace TetrisTower.TowerLevels.Playthroughs
 					continue;
 				}
 
-				if (GetLevel(link.LevelID1) == null) {
+				if (GetLevelData(link.LevelID1) == null) {
 					Debug.LogError($"{name} has invalid link to \"{link.LevelID1}\".", this);
 				}
 
-				if (GetLevel(link.LevelID2) == null) {
+				if (GetLevelData(link.LevelID2) == null) {
 					Debug.LogError($"{name} has invalid link to \"{link.LevelID2}\".", this);
 				}
 			}
@@ -92,9 +90,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		{
 			var levelAsset = ScriptableObject.CreateInstance<WorldMapLevelParamAsset>();
 
-			levelAsset.LevelID = levelAsset.name = $"Level-{Levels.Length:00}";
+			levelAsset.LevelParam.LevelID = levelAsset.name = $"Level-{m_Levels.Length:00}";
 
-			Levels = Levels.Concat(new [] { levelAsset }).ToArray();
+			m_Levels = m_Levels.Concat(new [] { levelAsset }).ToArray();
 
 			AssetDatabase.AddObjectToAsset(levelAsset, this);
 			EditorUtility.SetDirty(this);
@@ -106,9 +104,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		{
 			string ownedPath = AssetDatabase.GetAssetPath(this);
 
-			foreach(WorldMapLevelParamAsset level in Levels) {
-				if (level && AssetDatabase.GetAssetPath(level) == ownedPath && level.LevelID != level.name) {
-					level.name = level.LevelID;
+			foreach(WorldMapLevelParamAsset level in m_Levels) {
+				if (level && AssetDatabase.GetAssetPath(level) == ownedPath && level.LevelParam.LevelID != level.name) {
+					level.name = level.LevelParam.LevelID;
 					EditorUtility.SetDirty(level);
 				}
 			}
@@ -122,52 +120,4 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	{
 		public WorldLevelsSetConverter(AssetsRepository repository) : base(repository) { }
 	}
-
-#if UNITY_EDITOR
-	[CustomPropertyDrawer(typeof(WorldLevelsSet.LevelsLink))]
-	internal class LevelsLinkPropertyDrawer : PropertyDrawer
-	{
-		List<SerializedProperty> links = new List<SerializedProperty>(2);
-
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			return EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(WorldLevelsSet.LevelsLink.LevelID1))) * 2 + 4f /* Padding */;
-		}
-
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			label = EditorGUI.BeginProperty(position, label, property);
-
-			//position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-
-			links.Clear();
-			links.Add(property.FindPropertyRelative(nameof(WorldLevelsSet.LevelsLink.LevelID1)));
-			links.Add(property.FindPropertyRelative(nameof(WorldLevelsSet.LevelsLink.LevelID2)));
-
-			float linkHeight = EditorGUI.GetPropertyHeight(links[0]);
-
-			for(int i = 0; i < links.Count; ++i) {
-				SerializedProperty linkProp = links[i];
-
-				Rect idPos = position;
-				idPos.width *= 0.75f;
-				idPos.height = linkHeight;
-				idPos.y = position.y + i * linkHeight;
-
-				Rect assetPos = idPos;
-				assetPos.x += idPos.width;
-				assetPos.width = position.width - idPos.width;
-
-				EditorGUI.PropertyField(idPos, linkProp);
-				var levelObject = EditorGUI.ObjectField(assetPos, null, typeof(WorldMapLevelParamAsset), false) as WorldMapLevelParamAsset;
-				if (levelObject) {
-					linkProp.stringValue = levelObject.LevelID;
-				}
-			}
-
-
-			EditorGUI.EndProperty();
-		}
-	}
-#endif
 }

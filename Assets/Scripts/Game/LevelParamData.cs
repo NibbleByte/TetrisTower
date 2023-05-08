@@ -54,7 +54,7 @@ namespace TetrisTower.Game
 			}
 		}
 
-		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
+		public virtual void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
 			if (Rules.ObjectiveType == 0) {
 				Debug.LogError($"{context} has no ObjectiveType set.", context);

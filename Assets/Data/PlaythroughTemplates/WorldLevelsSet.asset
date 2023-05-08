@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: AtlantisID
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
-  LevelID: AtlantisID
-  WorldMapPosition: {x: 2.5, y: -31}
   LevelParam:
     BackgroundScene:
       m_SceneAsset: {fileID: 102900000, guid: aebb086cc80f793449da2f415203276c, type: 3}
@@ -49,6 +47,8 @@ MonoBehaviour:
       rid: -2
     SkinOverrides:
     - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
+    LevelID: AtlantisID
+    WorldMapPosition: {x: 2.5, y: -31}
   references:
     version: 2
     RefIds:
@@ -67,8 +67,6 @@ MonoBehaviour:
   m_Name: VikingsID
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
-  LevelID: VikingsID
-  WorldMapPosition: {x: -6, y: -14.4}
   LevelParam:
     BackgroundScene:
       m_SceneAsset: {fileID: 102900000, guid: 17f494c607e7b5a4b85f20d17c39e596, type: 3}
@@ -103,6 +101,8 @@ MonoBehaviour:
       rid: -2
     SkinOverrides:
     - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
+    LevelID: VikingsID
+    WorldMapPosition: {x: -6, y: -14.4}
   references:
     version: 2
     RefIds:
@@ -122,7 +122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
   StartLevel: {fileID: 1554497649489288964}
-  Levels:
+  m_Levels:
   - {fileID: -9033090740975800640}
   - {fileID: 1554497649489288964}
   - {fileID: 2539950144918906801}
@@ -150,8 +150,6 @@ MonoBehaviour:
   m_Name: BabylonID
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
-  LevelID: BabylonID
-  WorldMapPosition: {x: 13.5, y: -29.5}
   LevelParam:
     BackgroundScene:
       m_SceneAsset: {fileID: 102900000, guid: a35fc937ade46df42b1e56067073a56e, type: 3}
@@ -188,6 +186,8 @@ MonoBehaviour:
     StartGrid:
       rid: -2
     SkinOverrides: []
+    LevelID: BabylonID
+    WorldMapPosition: {x: 13.5, y: -29.5}
   references:
     version: 2
     RefIds:
@@ -206,8 +206,6 @@ MonoBehaviour:
   m_Name: ColosseumID
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
-  LevelID: ColosseumID
-  WorldMapPosition: {x: -3.14, y: -27.17}
   LevelParam:
     BackgroundScene:
       m_SceneAsset: {fileID: 102900000, guid: 11aa518b027c5dd4f8b78489ffa37c37, type: 3}
@@ -241,6 +239,8 @@ MonoBehaviour:
     StartGrid:
       rid: -2
     SkinOverrides: []
+    LevelID: ColosseumID
+    WorldMapPosition: {x: -3.14, y: -27.17}
   references:
     version: 2
     RefIds:
@@ -259,8 +259,6 @@ MonoBehaviour:
   m_Name: StonehengeID
   m_EditorClassIdentifier: 
   SEID: 4627b4debeed84d4681b87d1edc51827
-  LevelID: StonehengeID
-  WorldMapPosition: {x: -8.17, y: -20.31}
   LevelParam:
     BackgroundScene:
       m_SceneAsset: {fileID: 102900000, guid: 6c5fc7ab53fadb641af161f1f1ef2570, type: 3}
@@ -300,6 +298,8 @@ MonoBehaviour:
       rid: -2
     SkinOverrides:
     - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
+    LevelID: StonehengeID
+    WorldMapPosition: {x: -8.17, y: -20.31}
   references:
     version: 2
     RefIds:
