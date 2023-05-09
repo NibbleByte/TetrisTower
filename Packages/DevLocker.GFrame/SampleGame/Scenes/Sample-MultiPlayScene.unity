@@ -188,10 +188,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1332669761}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1659193
 MonoBehaviour:
@@ -216,10 +216,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 663966980}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 936201677}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &7965726
 GameObject:
@@ -738,10 +738,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1730423539}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 1334510043}
 --- !u!1 &63821639
@@ -2764,10 +2764,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1628424256}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &318219085
 MonoBehaviour:
@@ -2792,10 +2792,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1306513265}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1365124316}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &334952919
 GameObject:
@@ -3495,10 +3495,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 2058897299}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &440074263
 MonoBehaviour:
@@ -3523,10 +3523,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 421348229}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 2127293146}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &457576665
 GameObject:
@@ -4011,10 +4011,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 234137311}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 2047907465}
 --- !u!1 &554001643
@@ -4278,6 +4278,8 @@ GameObject:
   - component: {fileID: 611622385}
   - component: {fileID: 611622384}
   - component: {fileID: 611622383}
+  - component: {fileID: 611622389}
+  - component: {fileID: 611622388}
   - component: {fileID: 611622382}
   - component: {fileID: 611622387}
   m_Layer: 5
@@ -4302,7 +4304,6 @@ MonoBehaviour:
   CurrentState: 0
   JumperModePanel: {fileID: 810714580}
   ChopperModePanel: {fileID: 937329581}
-  ModeLabel: {fileID: 0}
   ModeLabelTMP: {fileID: 1772677376}
   StatePanels:
   - State: 2
@@ -4407,6 +4408,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d241b1dd9deb164295fb3482a691f96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &611622388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611622381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 279eaf917c3e37741a7766d465aa660c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &611622389
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611622381}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &615867429
 GameObject:
   m_ObjectHideFlags: 0
@@ -4560,10 +4585,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1789272804}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &628045385
 MonoBehaviour:
@@ -4588,10 +4613,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 426172652}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 57742457}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &653163908
 GameObject:
@@ -5251,10 +5276,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 481010170}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 184035748}
 --- !u!1 &762717560
@@ -5539,6 +5564,8 @@ GameObject:
   - component: {fileID: 774594913}
   - component: {fileID: 774594912}
   - component: {fileID: 774594911}
+  - component: {fileID: 774594918}
+  - component: {fileID: 774594917}
   - component: {fileID: 774594915}
   - component: {fileID: 774594916}
   m_Layer: 5
@@ -5647,7 +5674,6 @@ MonoBehaviour:
   CurrentState: 0
   JumperModePanel: {fileID: 1385800759}
   ChopperModePanel: {fileID: 1927827257}
-  ModeLabel: {fileID: 0}
   ModeLabelTMP: {fileID: 1558155519}
   StatePanels:
   - State: 2
@@ -5668,6 +5694,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d241b1dd9deb164295fb3482a691f96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &774594917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774594910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 279eaf917c3e37741a7766d465aa660c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &774594918
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774594910}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &785481115
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6681,10 +6731,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1319498575}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 845160100}
 --- !u!1 &936201673
@@ -7036,10 +7086,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1993795021}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1004634958
 MonoBehaviour:
@@ -7064,10 +7114,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 490869877}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1893244789}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1048827920 stripped
 GameObject:
@@ -8485,10 +8535,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 104409986}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 1304923797}
 --- !u!1 &1244419454
@@ -8821,7 +8871,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -8890,10 +8939,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1652075115}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1296646268
 MonoBehaviour:
@@ -8918,10 +8967,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1991236843}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1141138393}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1304923797
 GameObject:
@@ -9199,10 +9248,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 334952923}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1318878026
 MonoBehaviour:
@@ -9227,10 +9276,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 573346998}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1061343406}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1319498573
 GameObject:
@@ -9373,10 +9422,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 7965728}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1327014495
 MonoBehaviour:
@@ -9401,10 +9450,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1409110351}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 268206196}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1332669757
 GameObject:
@@ -9841,7 +9890,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -9936,10 +9984,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 915274186}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1357118780
 MonoBehaviour:
@@ -9964,10 +10012,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 35314543}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1052062003}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1365124312
 GameObject:
@@ -10555,10 +10603,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 812291148}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1444108440
 MonoBehaviour:
@@ -10583,10 +10631,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 2054592249}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 2134122524}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1448866743
 GameObject:
@@ -10637,7 +10685,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1448866743}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
@@ -10801,10 +10849,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 355530009}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 1685220394}
 --- !u!1 &1513765941
@@ -11004,10 +11052,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 477935498}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 200207095}
 --- !u!1 &1558155515
@@ -11276,7 +11324,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1612941642}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
@@ -11360,10 +11408,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1926903281}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1613478103
 MonoBehaviour:
@@ -11388,10 +11436,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1900379399}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 680102560}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1628424252
 GameObject:
@@ -11951,6 +11999,7 @@ MonoBehaviour:
   StartSelection: {fileID: 1914759134}
   PersistentSelection: 0
   NoSelectionAction: 8
+  TrackOnlyChildren: 1
   FilterControlScheme: []
   RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!114 &1649358484
@@ -11970,7 +12019,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -12846,7 +12894,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -12865,6 +12912,7 @@ MonoBehaviour:
   StartSelection: {fileID: 1612941644}
   PersistentSelection: 0
   NoSelectionAction: 8
+  TrackOnlyChildren: 1
   FilterControlScheme: []
   RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &1730423537
@@ -13177,10 +13225,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1166644655}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1781725051
 MonoBehaviour:
@@ -13205,10 +13253,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 578046994}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1691544626}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1786860257
 GameObject:
@@ -13272,10 +13320,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1696241197}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 736601183}
 --- !u!1 &1789272802
@@ -14345,7 +14393,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1914759133}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
@@ -14753,10 +14801,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 340378309}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 653163908}
 --- !u!1 &1991236841
@@ -15032,10 +15080,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 463462985}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 1244419454}
 --- !u!1 &2047907465
@@ -15663,7 +15711,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2081448678}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 

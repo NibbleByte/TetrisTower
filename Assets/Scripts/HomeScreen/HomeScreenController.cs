@@ -42,6 +42,15 @@ namespace TetrisTower.HomeScreen
 			nextPanel.SetActive(true);
 		}
 
+		public void ClearState()
+		{
+			foreach (var bind in StatePanels) {
+				bind.Panel.SetActive(false);
+			}
+
+			CurrentState = null;
+		}
+
 		public void QuitGame()
 		{
 #if UNITY_EDITOR

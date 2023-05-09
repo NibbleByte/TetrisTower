@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace DevLocker.GFrame
 {
@@ -95,7 +94,7 @@ namespace DevLocker.GFrame
 
 				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
 
-					if (playerContext.StatesStack != null && !playerContext.StatesStack.IsEmpty) {
+					if (playerContext.StatesStack != null) {
 						await playerContext.DisposePlayerStackAsync();
 					}
 				}
@@ -251,8 +250,8 @@ namespace DevLocker.GFrame
 
 				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
 
-					if (playerContext.StatesStack != null && !playerContext.StatesStack.IsEmpty) {
-						yield return playerContext.ClearPlayerStackCrt();
+					if (playerContext.StatesStack != null) {
+						yield return playerContext.DisposePlayerStackCrt();
 					}
 				}
 

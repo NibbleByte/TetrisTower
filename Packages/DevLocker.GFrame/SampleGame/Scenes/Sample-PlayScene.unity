@@ -188,10 +188,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1332669761}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1659193
 MonoBehaviour:
@@ -216,10 +216,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 663966980}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 936201677}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &87470637
 GameObject:
@@ -629,10 +629,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 87470639}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 2044406482}
 --- !u!1 &160448500
@@ -970,10 +970,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1628424256}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &318219085
 MonoBehaviour:
@@ -998,10 +998,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1306513265}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1365124316}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &334952919
 GameObject:
@@ -1549,10 +1549,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 2058897299}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &440074263
 MonoBehaviour:
@@ -1577,10 +1577,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 421348229}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 2127293146}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &483588979
 GameObject:
@@ -1644,10 +1644,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 2141019228}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 1429835146}
 --- !u!1 &554001643
@@ -1885,10 +1885,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 336520272}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 874759586}
 --- !u!1 &663966978
@@ -2440,6 +2440,8 @@ GameObject:
   - component: {fileID: 774594913}
   - component: {fileID: 774594912}
   - component: {fileID: 774594911}
+  - component: {fileID: 774594917}
+  - component: {fileID: 774594916}
   - component: {fileID: 774594915}
   m_Layer: 5
   m_Name: Canvas
@@ -2547,7 +2549,6 @@ MonoBehaviour:
   CurrentState: 0
   JumperModePanel: {fileID: 1385800759}
   ChopperModePanel: {fileID: 1927827257}
-  ModeLabel: {fileID: 0}
   ModeLabelTMP: {fileID: 1558155519}
   StatePanels:
   - State: 2
@@ -2556,6 +2557,30 @@ MonoBehaviour:
     Panel: {fileID: 1698978884}
   - State: 8
     Panel: {fileID: 1647289257}
+--- !u!114 &774594916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774594910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 279eaf917c3e37741a7766d465aa660c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &774594917
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774594910}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &792933209
 GameObject:
   m_ObjectHideFlags: 0
@@ -4393,10 +4418,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 334952923}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1318878026
 MonoBehaviour:
@@ -4421,10 +4446,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 573346998}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1061343406}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1332669757
 GameObject:
@@ -5206,10 +5231,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 812291148}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1444108440
 MonoBehaviour:
@@ -5234,10 +5259,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 2054592249}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 2134122524}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1558155515
 GameObject:
@@ -5436,10 +5461,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 774216676}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 1621333570}
 --- !u!1 &1612941642
@@ -5657,10 +5682,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 0}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 1926903281}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!114 &1613478103
 MonoBehaviour:
@@ -5685,10 +5710,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 1900379399}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 680102560}
   UseShortText: 0
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate: []
 --- !u!1 &1621333570
 GameObject:
@@ -7983,10 +8008,10 @@ MonoBehaviour:
     ExcludedControlSchemes: []
   ShowPriority: 0
   Icon: {fileID: 7936144982152012332}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   UseShortText: 1
   FormatText: 
+  AdjustSize: 1
   AdditionalObjectsToActivate:
   - {fileID: 983820030}
 --- !u!1 &7936144981248220255

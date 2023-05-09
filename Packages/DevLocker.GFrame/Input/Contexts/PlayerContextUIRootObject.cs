@@ -109,6 +109,9 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// </summary>
 		public PlayerContextUIRootObject GetRootObject() => this;
 
+		public event System.Action StatesStackCreated;
+		public event System.Action StatesStackDestroyed;
+
 		/// <summary>
 		/// Create the <see cref="PlayerStateStack"/> for this player. The passed on references will be used as context.
 		/// </summary>
@@ -116,6 +119,8 @@ namespace DevLocker.GFrame.Input.Contexts
 		{
 			StatesStack = new PlayerStateStack(references);
 			StatesStack.Context.AddReference(this);
+
+			StatesStackCreated?.Invoke();
 		}
 
 #if GFRAME_ASYNC
@@ -125,7 +130,12 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// </summary>
 		public async System.Threading.Tasks.Task DisposePlayerStackAsync()
 		{
-			await StatesStack.ClearStackAndStateAsync();
+			if (!StatesStack.IsEmpty) {
+				await StatesStack.ClearStackAndStateAsync();
+			}
+
+			StatesStackDestroyed?.Invoke();
+
 			StatesStack = null;
 		}
 
@@ -134,9 +144,14 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// <summary>
 		/// Clear the StatesStack. Do this when switching levels, especially with the <see cref="GlobalPlayerContext"/>
 		/// </summary>
-		public IEnumerator ClearPlayerStackCrt()
+		public IEnumerator DisposePlayerStackCrt()
 		{
-			yield return StatesStack.ClearStackAndStateCrt();
+			if (!StatesStack.IsEmpty) {
+				yield return StatesStack.ClearStackAndStateCrt();
+			}
+
+			StatesStackDestroyed?.Invoke();
+
 			StatesStack = null;
 		}
 #endif

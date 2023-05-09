@@ -1626,6 +1626,8 @@ GameObject:
   - component: {fileID: 5836640996027809007}
   - component: {fileID: 5836640996027809006}
   - component: {fileID: 5836640996027808977}
+  - component: {fileID: 2119101421899997768}
+  - component: {fileID: 405667489380807041}
   - component: {fileID: 5836640996027809005}
   m_Layer: 5
   m_Name: TowerLevelMainCanvas-Mobile
@@ -1719,6 +1721,30 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &2119101421899997768
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640996027808976}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &405667489380807041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640996027808976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 279eaf917c3e37741a7766d465aa660c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5836640996027809005
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10636,6 +10636,8 @@ GameObject:
   - component: {fileID: 540250534}
   - component: {fileID: 540250533}
   - component: {fileID: 540250537}
+  - component: {fileID: 540250539}
+  - component: {fileID: 540250538}
   - component: {fileID: 540250532}
   m_Layer: 5
   m_Name: Canvas
@@ -10762,6 +10764,30 @@ MonoBehaviour:
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
+--- !u!114 &540250538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540250531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 279eaf917c3e37741a7766d465aa660c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &540250539
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540250531}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &548412068
 GameObject:
   m_ObjectHideFlags: 0

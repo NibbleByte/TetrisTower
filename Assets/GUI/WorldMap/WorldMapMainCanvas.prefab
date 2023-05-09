@@ -650,6 +650,8 @@ GameObject:
   - component: {fileID: 5836640996027809007}
   - component: {fileID: 5836640996027809006}
   - component: {fileID: 5836640996027808977}
+  - component: {fileID: 4269233454833077656}
+  - component: {fileID: 2833239957258126470}
   - component: {fileID: 7959415322507947321}
   m_Layer: 5
   m_Name: WorldMapMainCanvas
@@ -743,6 +745,30 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &4269233454833077656
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640996027808976}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &2833239957258126470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640996027808976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 279eaf917c3e37741a7766d465aa660c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7959415322507947321
 MonoBehaviour:
   m_ObjectHideFlags: 0

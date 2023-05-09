@@ -71,6 +71,9 @@ namespace DevLocker.GFrame.Input
 		public event Action EnteringState;
 		public event Action EnteredState;
 
+		public event Action StateChangesStarted;
+		public event Action StateChangesEnded;
+
 		private readonly Stack<IPlayerState> m_StackedStates = new Stack<IPlayerState>();
 
 		// Used when state is changed inside another state change event.
@@ -175,6 +178,7 @@ namespace DevLocker.GFrame.Input
 
 			} else {
 				ChangingStates = true;
+				StateChangesStarted?.Invoke();
 			}
 
 			if (CurrentState != null) {
@@ -198,6 +202,7 @@ namespace DevLocker.GFrame.Input
 			await EnteredStateAsync();
 
 			ChangingStates = false;
+			StateChangesEnded?.Invoke();
 
 			// Execute the pending states...
 			if (m_PendingStateChanges.Count > 0) {
@@ -342,6 +347,7 @@ namespace DevLocker.GFrame.Input
 
 			} else {
 				ChangingStates = true;
+				StateChangesStarted?.Invoke();
 			}
 
 			if (CurrentState != null) {
@@ -365,6 +371,7 @@ namespace DevLocker.GFrame.Input
 			yield return EnteredStateCrt();
 
 			ChangingStates = false;
+			StateChangesEnded?.Invoke();
 
 			// Execute the pending states...
 			if (m_PendingStateChanges.Count > 0) {
