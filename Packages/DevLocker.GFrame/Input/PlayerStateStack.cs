@@ -161,31 +161,43 @@ namespace DevLocker.GFrame.Input
 
 			if (ChangingStates) {
 				m_PendingStateChanges.Enqueue(new PendingStateArgs(state, stackAction));
+				return;
 
 			} else {
 				ChangingStates = true;
 				StateChangesStarted?.Invoke();
 			}
 
-			if (CurrentState != null) {
-				OnExitingState();
-				CurrentState.ExitState();
-				OnExitedState();
+			try {
+				if (CurrentState != null) {
+					OnExitingState();
+					CurrentState.ExitState();
+					OnExitedState();
+				}
+
+				if (stackAction == StackAction.ClearAndPush) {
+					m_StackedStates.Clear();
+				}
+
+				if (stackAction == StackAction.ReplaceTop && m_StackedStates.Count > 0) {
+					m_StackedStates.Pop();
+				}
+
+				m_StackedStates.Push(state);
+
+				OnEnteringState();
+				CurrentState.EnterState(Context);
+				OnEnteredState();
+
+			} catch(Exception) {
+				// Don't use catch+finally as the order of execution is questionable.
+				m_PendingStateChanges.Clear();
+				ChangingStates = false;
+				StateChangesEnded?.Invoke();
+
+				throw;
+
 			}
-
-			if (stackAction == StackAction.ClearAndPush) {
-				m_StackedStates.Clear();
-			}
-
-			if (stackAction == StackAction.ReplaceTop && m_StackedStates.Count > 0) {
-				m_StackedStates.Pop();
-			}
-
-			m_StackedStates.Push(state);
-
-			OnEnteringState();
-			CurrentState.EnterState(Context);
-			OnEnteredState();
 
 			ChangingStates = false;
 			StateChangesEnded?.Invoke();
