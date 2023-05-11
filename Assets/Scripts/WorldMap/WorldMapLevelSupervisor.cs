@@ -70,7 +70,7 @@ namespace TetrisTower.WorldMap
 				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(new WorldMapPlayState());
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new WorldMapPlayState());
 		}
 
 		public Task UnloadAsync()

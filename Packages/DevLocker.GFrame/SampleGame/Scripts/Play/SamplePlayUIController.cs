@@ -97,35 +97,19 @@ namespace DevLocker.GFrame.SampleGame.Play
 			throw new NotImplementedException();
 		}
 
-#if GFRAME_ASYNC
-		public async void PauseLevel()
-		{
-			// Will be popped by UI.
-			await m_PlayerContext.StatesStack.PushStateAsync(new SamplePlayPausedState());
-			//Game.SampleLevelsManager.Instance.PushGlobalState(new SamplePlayPausedState());
-		}
-
-		public async void OpenOptions()
-		{
-			// Will be popped by UI.
-			await m_PlayerContext.StatesStack.PushStateAsync(new SamplePlayOptionsState());
-			//Game.SampleLevelsManager.Instance.PushGlobalState(new SamplePlayOptionsState());
-		}
-#else
 		public void PauseLevel()
 		{
 			// Will be popped by UI.
-			StartCoroutine(m_PlayerContext.StatesStack.PushStateCrt(new SamplePlayPausedState()));
+			m_PlayerContext.StatesStack.PushState(new SamplePlayPausedState());
 			//Game.SampleLevelsManager.Instance.PushGlobalState(new SamplePlayPausedState());
 		}
 
 		public void OpenOptions()
 		{
 			// Will be popped by UI.
-			StartCoroutine(m_PlayerContext.StatesStack.PushStateCrt(new SamplePlayOptionsState()));
+			m_PlayerContext.StatesStack.PushState(new SamplePlayOptionsState());
 			//Game.SampleLevelsManager.Instance.PushGlobalState(new SamplePlayOptionsState());
 		}
-#endif
 
 		public void ExitToMainMenu()
 		{

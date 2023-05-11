@@ -202,7 +202,7 @@ namespace TetrisTower.TowerLevels
 				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(new TowerPlayState());
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new TowerPlayState());
 
 			if (m_PlaythroughData.TowerLevel.IsPlaying) {
 				GridLevelData levelData = m_PlaythroughData.TowerLevel;

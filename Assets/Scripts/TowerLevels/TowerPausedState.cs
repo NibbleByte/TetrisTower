@@ -16,7 +16,7 @@ namespace TetrisTower.TowerLevels
 
 		private InputEnabler m_InputEnabler;
 
-		public Task EnterStateAsync(PlayerStatesContext context)
+		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_PlayerControls);
@@ -30,18 +30,14 @@ namespace TetrisTower.TowerLevels
 			m_UIController.SwitchState(UI.TowerLevelUIState.Paused);
 
 			m_LevelController.PauseLevel();
-
-			return Task.CompletedTask;
 		}
 
-		public Task ExitStateAsync()
+		public void ExitState()
 		{
 			m_LevelController.ResumeLevel();
 
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(null);
 			m_InputEnabler.Dispose();
-
-			return Task.CompletedTask;
 		}
 	}
 }

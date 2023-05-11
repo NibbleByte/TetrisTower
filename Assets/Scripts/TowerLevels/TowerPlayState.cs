@@ -31,7 +31,7 @@ namespace TetrisTower.TowerLevels
 
 		private InputEnabler m_InputEnabler;
 
-		public Task EnterStateAsync(PlayerStatesContext context)
+		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_LevelController);
@@ -53,19 +53,15 @@ namespace TetrisTower.TowerLevels
 
 			MessageBox.Instance.MessageShown += m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed += m_LevelController.ResumeLevel;
-
-			return Task.CompletedTask;
 		}
 
-		public Task ExitStateAsync()
+		public void ExitState()
 		{
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
 			m_InputEnabler.Dispose();
 
 			MessageBox.Instance.MessageShown -= m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed -= m_LevelController.ResumeLevel;
-
-			return Task.CompletedTask;
 		}
 
 		public void OnMoveShapeLeft(InputAction.CallbackContext context)

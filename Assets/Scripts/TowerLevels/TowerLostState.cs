@@ -27,7 +27,7 @@ namespace TetrisTower.TowerLevels
 
 		private float m_StartTime;
 
-		public Task EnterStateAsync(PlayerStatesContext context)
+		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_UIController);
 			context.SetByType(out m_PlayerControls);
@@ -66,11 +66,9 @@ namespace TetrisTower.TowerLevels
 					break;
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
-		public Task ExitStateAsync()
+		public void ExitState()
 		{
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnPointerPressed;
 			m_PlayerControls.CommonHotkeys.SetCallbacks(null);
@@ -80,8 +78,6 @@ namespace TetrisTower.TowerLevels
 				m_Interrupted = true;
 				m_CurrentAnimation.Interrupt();
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private void RequestFinishUpState()

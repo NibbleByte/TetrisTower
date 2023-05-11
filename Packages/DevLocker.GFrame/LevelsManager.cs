@@ -95,7 +95,7 @@ namespace DevLocker.GFrame
 				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
 
 					if (playerContext.StatesStack != null) {
-						await playerContext.DisposePlayerStackAsync();
+						playerContext.DisposePlayerStack();
 					}
 				}
 
@@ -176,45 +176,45 @@ namespace DevLocker.GFrame
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void PushGlobalState(IPlayerState state)
+		public void PushGlobalState(IPlayerState state)
 		{
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushStateAsync(state);
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushState(state);
 		}
 
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void SetGlobalState(IPlayerState state)
+		public void SetGlobalState(IPlayerState state)
 		{
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(state);
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(state);
 		}
 
 		/// <summary>
 		/// Pop a single state from the state stack.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void PopGlobalState()
+		public void PopGlobalState()
 		{
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStateAsync();
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopState();
 		}
 
 		/// <summary>
 		/// Pops multiple states from the state stack.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void PopGlobalStates(int count)
+		public void PopGlobalStates(int count)
 		{
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStatesAsync(count);
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStates(count);
 		}
 
 		/// <summary>
 		/// Pop and push back the state at the top. Will trigger changing state events.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void ReenterCurrentGlobalState()
+		public void ReenterCurrentGlobalState()
 		{
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentStateAsync();
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentState();
 		}
 
 		/// <summary>
@@ -223,9 +223,9 @@ namespace DevLocker.GFrame
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
 		/// </summary>
-		public async void ChangeGlobalState(IPlayerState state, StackAction stackAction)
+		public void ChangeGlobalState(IPlayerState state, StackAction stackAction)
 		{
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeStateAsync(state, stackAction);
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeState(state, stackAction);
 		}
 
 #else

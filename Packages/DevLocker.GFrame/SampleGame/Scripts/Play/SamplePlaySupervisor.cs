@@ -77,11 +77,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
-#if GFRAME_ASYNC
-			await PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateAsync(new SamplePlayJumperState());
-#else
-			yield return PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateCrt(new SamplePlayJumperState());
-#endif
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new SamplePlayJumperState());
 		}
 
 

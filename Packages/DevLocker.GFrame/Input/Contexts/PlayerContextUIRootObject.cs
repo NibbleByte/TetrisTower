@@ -123,38 +123,19 @@ namespace DevLocker.GFrame.Input.Contexts
 			StatesStackCreated?.Invoke();
 		}
 
-#if GFRAME_ASYNC
-
 		/// <summary>
 		/// Dispose of the states stack. Do this when switching levels, especially with the <see cref="GlobalPlayerContext"/>
 		/// </summary>
-		public async System.Threading.Tasks.Task DisposePlayerStackAsync()
+		public void DisposePlayerStack()
 		{
 			if (!StatesStack.IsEmpty) {
-				await StatesStack.ClearStackAndStateAsync();
+				StatesStack.ClearStackAndState();
 			}
 
 			StatesStackDestroyed?.Invoke();
 
 			StatesStack = null;
 		}
-
-#else
-
-		/// <summary>
-		/// Clear the StatesStack. Do this when switching levels, especially with the <see cref="GlobalPlayerContext"/>
-		/// </summary>
-		public IEnumerator DisposePlayerStackCrt()
-		{
-			if (!StatesStack.IsEmpty) {
-				yield return StatesStack.ClearStackAndStateCrt();
-			}
-
-			StatesStackDestroyed?.Invoke();
-
-			StatesStack = null;
-		}
-#endif
 
 		/// <summary>
 		/// Called when assembly reload is disabled.

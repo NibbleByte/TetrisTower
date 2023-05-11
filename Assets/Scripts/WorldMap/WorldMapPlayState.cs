@@ -30,7 +30,7 @@ namespace TetrisTower.WorldMap
 
 		private InputEnabler m_InputEnabler;
 
-		public Task EnterStateAsync(PlayerStatesContext context)
+		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_LevelController);
@@ -46,16 +46,12 @@ namespace TetrisTower.WorldMap
 			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
 
 			m_UIController.SwitchState(UI.WorldMapUIState.Play);
-
-			return Task.CompletedTask;
 		}
 
-		public Task ExitStateAsync()
+		public void ExitState()
 		{
 			m_PlayerControls.WorldMapPlay.SetCallbacks(null);
 			m_InputEnabler.Dispose();
-
-			return Task.CompletedTask;
 		}
 
 		public void OnPointerClick(InputAction.CallbackContext context)

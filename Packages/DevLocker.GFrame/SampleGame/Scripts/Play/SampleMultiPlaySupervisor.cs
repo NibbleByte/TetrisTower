@@ -119,11 +119,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 				}
 
 
-#if GFRAME_ASYNC
-				await playerContext.StatesStack.SetStateAsync(new SamplePlayJumperState());
-#else
-				yield return playerContext.StatesStack.SetStateCrt(new SamplePlayJumperState());
-#endif
+				playerContext.StatesStack.SetState(new SamplePlayJumperState());
 			}
 		}
 

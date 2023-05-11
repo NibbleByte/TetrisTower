@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-#if GFRAME_ASYNC
-using System.Threading.Tasks;
-#endif
 
 namespace DevLocker.GFrame.Input
 {
@@ -14,13 +11,8 @@ namespace DevLocker.GFrame.Input
 	/// </summary>
 	public interface IPlayerState
 	{
-#if GFRAME_ASYNC
-		Task EnterStateAsync(PlayerStatesContext context);
-		Task ExitStateAsync();
-#else
-		IEnumerator EnterState(PlayerStatesContext context);
-		IEnumerator ExitState();
-#endif
+		void EnterState(PlayerStatesContext context);
+		void ExitState();
 	}
 
 	public enum StackAction
@@ -88,36 +80,35 @@ namespace DevLocker.GFrame.Input
 			Context = new PlayerStatesContext(context);
 		}
 
-#if GFRAME_ASYNC
 
 		/// <summary>
 		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
 		/// </summary>
-		public async Task PushStateAsync(IPlayerState state)
+		public void PushState(IPlayerState state)
 		{
-			await ChangeStateAsync(state, StackAction.Push);
+			ChangeState(state, StackAction.Push);
 		}
 
 		/// <summary>
 		/// Clears the state stack of any other states and pushes the provided one.
 		/// </summary>
-		public async Task SetStateAsync(IPlayerState state)
+		public void SetState(IPlayerState state)
 		{
-			await ChangeStateAsync(state, StackAction.ClearAndPush);
+			ChangeState(state, StackAction.ClearAndPush);
 		}
 
 		/// <summary>
 		/// Pop a single state from the state stack.
 		/// </summary>
-		public async Task PopStateAsync()
+		public void PopState()
 		{
-			await PopStatesAsync(1);
+			PopStates(1);
 		}
 
 		/// <summary>
 		/// Pops multiple states from the state stack.
 		/// </summary>
-		public async Task PopStatesAsync(int count)
+		public void PopStates(int count)
 		{
 			count = Math.Max(1, count);
 
@@ -126,34 +117,34 @@ namespace DevLocker.GFrame.Input
 				return;
 			}
 
-			await ExitingStateAsync();
-			await CurrentState.ExitStateAsync();
-			await ExitedStateAsync();
+			OnExitingState();
+			CurrentState.ExitState();
+			OnExitedState();
 
 			for (int i = 0; i < count; ++i) {
 				m_StackedStates.Pop();
 			}
 
-			await EnteringStateAsync();
-			await (CurrentState?.EnterStateAsync(Context) ?? Task.CompletedTask);
-			await EnteredStateAsync();
+			OnEnteringState();
+			CurrentState?.EnterState(Context);
+			OnEnteredState();
 		}
 
 		/// <summary>
 		/// Pop and push back the state at the top. Will trigger changing state events.
 		/// </summary>
-		public async Task ReenterCurrentStateAsync()
+		public void ReenterCurrentState()
 		{
 			// Re-insert the top state to trigger changing events.
-			await ChangeStateAsync(CurrentState, StackAction.ReplaceTop);
+			ChangeState(CurrentState, StackAction.ReplaceTop);
 		}
 
 		/// <summary>
 		/// Exits the state and leaves the stack empty.
 		/// </summary>
-		public async Task ClearStackAndStateAsync()
+		public void ClearStackAndState()
 		{
-			await PopStatesAsync(StackedStatesCount);
+			PopStates(StackedStatesCount);
 		}
 
 		/// <summary>
@@ -161,7 +152,7 @@ namespace DevLocker.GFrame.Input
 		/// Will notify the state itself.
 		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
 		/// </summary>
-		public async Task ChangeStateAsync(IPlayerState state, StackAction stackAction)
+		public void ChangeState(IPlayerState state, StackAction stackAction)
 		{
 			// Sanity check.
 			if (m_StackedStates.Count > 7 && stackAction == StackAction.Push) {
@@ -171,20 +162,15 @@ namespace DevLocker.GFrame.Input
 			if (ChangingStates) {
 				m_PendingStateChanges.Enqueue(new PendingStateArgs(state, stackAction));
 
-				// Wait till all the state switching has finished. That means that you may end up in a state that is not the one you requested.
-				while (m_PendingStateChanges.Count > 0) {
-					await Task.Yield();
-				}
-
 			} else {
 				ChangingStates = true;
 				StateChangesStarted?.Invoke();
 			}
 
 			if (CurrentState != null) {
-				await ExitingStateAsync();
-				await CurrentState.ExitStateAsync();
-				await ExitedStateAsync();
+				OnExitingState();
+				CurrentState.ExitState();
+				OnExitedState();
 			}
 
 			if (stackAction == StackAction.ClearAndPush) {
@@ -197,9 +183,9 @@ namespace DevLocker.GFrame.Input
 
 			m_StackedStates.Push(state);
 
-			await EnteringStateAsync();
-			await CurrentState.EnterStateAsync(Context);
-			await EnteredStateAsync();
+			OnEnteringState();
+			CurrentState.EnterState(Context);
+			OnEnteredState();
 
 			ChangingStates = false;
 			StateChangesEnded?.Invoke();
@@ -208,7 +194,7 @@ namespace DevLocker.GFrame.Input
 			if (m_PendingStateChanges.Count > 0) {
 				var stateArgs = m_PendingStateChanges.Dequeue();
 
-				await ChangeStateAsync(stateArgs.State, stateArgs.StackAction);
+				ChangeState(stateArgs.State, stateArgs.StackAction);
 			}
 		}
 
@@ -216,216 +202,37 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Override this according to your needs.
 		/// </summary>
-		protected virtual Task ExitingStateAsync()
+		protected virtual void OnExitingState()
 		{
 			ExitingState?.Invoke();
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Override this according to your needs.
 		/// </summary>
-		protected virtual Task ExitedStateAsync()
+		protected virtual void OnExitedState()
 		{
 			ExitedState?.Invoke();
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Override this according to your needs.
 		/// </summary>
-		protected virtual Task EnteringStateAsync()
+		protected virtual void OnEnteringState()
 		{
 			EnteringState?.Invoke();
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Override this according to your needs.
 		/// </summary>
-		protected virtual Task EnteredStateAsync()
+		protected virtual void OnEnteredState()
 		{
 			EnteredState?.Invoke();
 
 			// In case the scopes were already active when the state kicked in and it pushed
 			// a new state onto the InputActionsStack (resetting the previous actions).
 			Input.UIScope.UIScope.RefocusActiveScopes();
-
-			return Task.CompletedTask;
 		}
-
-#else
-
-		/// <summary>
-		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
-		/// </summary>
-		public IEnumerator PushStateCrt(IPlayerState state)
-		{
-			yield return ChangeStateCrt(state, StackAction.Push);
-		}
-
-		/// <summary>
-		/// Clears the state stack of any other states and pushes the provided one.
-		/// </summary>
-		public IEnumerator SetStateCrt(IPlayerState state)
-		{
-			yield return ChangeStateCrt(state, StackAction.ClearAndPush);
-		}
-
-		/// <summary>
-		/// Pop a single state from the state stack.
-		/// </summary>
-		public IEnumerator PopStateCrt()
-		{
-			yield return PopStatesCrt(1);
-		}
-
-		/// <summary>
-		/// Pops multiple states from the state stack.
-		/// </summary>
-		public IEnumerator PopStatesCrt(int count)
-		{
-			count = Math.Max(1, count);
-
-			if (StackedStatesCount < count) {
-				UnityEngine.Debug.LogError("Trying to pop states while there aren't any stacked ones.");
-				yield break;
-			}
-
-			yield return ExitingStateCrt();
-			yield return CurrentState.ExitState();
-			yield return ExitedStateCrt();
-
-			for (int i = 0; i < count; ++i) {
-				m_StackedStates.Pop();
-			}
-
-			yield return EnteringStateCrt();
-			yield return CurrentState?.EnterState(Context);
-			yield return EnteredStateCrt();
-		}
-
-		/// <summary>
-		/// Pop and push back the state at the top. Will trigger changing state events.
-		/// </summary>
-		public IEnumerator ReenterCurrentStateCrt()
-		{
-			// Re-insert the top state to trigger changing events.
-			yield return ChangeStateCrt(CurrentState, StackAction.ReplaceTop);
-		}
-
-		/// <summary>
-		/// Exits the state and leaves the stack empty.
-		/// </summary>
-		public IEnumerator ClearStackAndStateCrt()
-		{
-			yield return PopStatesCrt(StackedStatesCount);
-		}
-
-		/// <summary>
-		/// Change the current state and add it to the state stack.
-		/// Will notify the state itself.
-		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
-		/// </summary>
-		public IEnumerator ChangeStateCrt(IPlayerState state, StackAction stackAction)
-		{
-			// Sanity check.
-			if (m_StackedStates.Count > 7 && stackAction == StackAction.Push) {
-				UnityEngine.Debug.LogWarning($"You're stacking too many states down. Are you sure? Stacked state: {state}.");
-			}
-
-			if (ChangingStates) {
-				m_PendingStateChanges.Enqueue(new PendingStateArgs(state, stackAction));
-
-				// Wait till all the state switching has finished. That means that you may end up in a state that is not the one you requested.
-				while(m_PendingStateChanges.Count > 0) {
-					yield return null;
-				}
-
-			} else {
-				ChangingStates = true;
-				StateChangesStarted?.Invoke();
-			}
-
-			if (CurrentState != null) {
-				yield return ExitingStateCrt();
-				yield return CurrentState.ExitState();
-				yield return ExitedStateCrt();
-			}
-
-			if (stackAction == StackAction.ClearAndPush) {
-				m_StackedStates.Clear();
-			}
-
-			if (stackAction == StackAction.ReplaceTop && m_StackedStates.Count > 0) {
-				m_StackedStates.Pop();
-			}
-
-			m_StackedStates.Push(state);
-
-			yield return EnteringStateCrt();
-			yield return CurrentState.EnterState(Context);
-			yield return EnteredStateCrt();
-
-			ChangingStates = false;
-			StateChangesEnded?.Invoke();
-
-			// Execute the pending states...
-			if (m_PendingStateChanges.Count > 0) {
-				var stateArgs = m_PendingStateChanges.Dequeue();
-
-				yield return ChangeStateCrt(stateArgs.State, stateArgs.StackAction);
-			}
-		}
-
-
-		/// <summary>
-		/// Override this according to your needs.
-		/// </summary>
-		protected virtual IEnumerator ExitingStateCrt()
-		{
-			ExitingState?.Invoke();
-
-			yield break;
-		}
-
-		/// <summary>
-		/// Override this according to your needs.
-		/// </summary>
-		protected virtual IEnumerator ExitedStateCrt()
-		{
-			ExitedState?.Invoke();
-
-			yield break;
-		}
-
-		/// <summary>
-		/// Override this according to your needs.
-		/// </summary>
-		protected virtual IEnumerator EnteringStateCrt()
-		{
-			EnteringState?.Invoke();
-
-			yield break;
-		}
-
-		/// <summary>
-		/// Override this according to your needs.
-		/// </summary>
-		protected virtual IEnumerator EnteredStateCrt()
-		{
-			EnteredState?.Invoke();
-
-			// In case the scopes were already active when the state kicked in and it pushed
-			// a new state onto the InputActionsStack (resetting the previous actions).
-			Input.UIScope.UIScope.RefocusActiveScopes();
-
-			yield break;
-		}
-#endif
-
 	}
 }

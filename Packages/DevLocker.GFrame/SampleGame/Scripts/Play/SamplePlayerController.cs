@@ -57,25 +57,13 @@ namespace DevLocker.GFrame.SampleGame.Play
 			}
 		}
 
-#if GFRAME_ASYNC
-		public async void SwitchToChopper()
-		{
-			m_Rigidbody.isKinematic = true;
-			m_Velocity = Vector3.zero;
-
-			await m_PlayerContext.StatesStack.SetStateAsync(new SamplePlayChopperState());
-		}
-
-#else
-		
 		public void SwitchToChopper()
 		{
 			m_Rigidbody.isKinematic = true;
 			m_Velocity = Vector3.zero;
 
-			StartCoroutine(m_PlayerContext.StatesStack.SetStateCrt(new SamplePlayChopperState()));
+			m_PlayerContext.StatesStack.SetState(new SamplePlayChopperState());
 		}
-#endif
 
 		#endregion
 
@@ -87,24 +75,13 @@ namespace DevLocker.GFrame.SampleGame.Play
 			m_Velocity = movement;
 		}
 
-#if GFRAME_ASYNC
-		public async void SwitchToJumper()
-		{
-			m_Rigidbody.isKinematic = false;
-			m_Velocity = Vector3.zero;
-
-			await m_PlayerContext.StatesStack.SetStateAsync(new SamplePlayJumperState());
-		}
-#else
-		
 		public void SwitchToJumper()
 		{
 			m_Rigidbody.isKinematic = false;
 			m_Velocity = Vector3.zero;
 
-			StartCoroutine(m_PlayerContext.StatesStack.SetStateCrt(new SamplePlayJumperState()));
+			m_PlayerContext.StatesStack.SetState(new SamplePlayJumperState());
 		}
-#endif
 
 		#endregion
 
