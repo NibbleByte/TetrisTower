@@ -23,7 +23,15 @@ namespace DevLocker.GFrame
 		[Tooltip("Should level loading screen show before exiting the level states or after.")]
 		public bool ShowLoadingScreenBeforeLevelStates = false;
 
+		/// <summary>
+		/// Current level supervisor.
+		/// </summary>
 		public ILevelSupervisor LevelSupervisor { get; private set; }
+
+		/// <summary>
+		/// Is level currently changing. Can't start another change while this is true.
+		/// </summary>
+		public bool ChangingLevel { get; private set; }
 
 		// Listen for supervisor change.
 		// NOTE: avoid using events with more complex logic as it will blow up in your face.
@@ -135,58 +143,73 @@ namespace DevLocker.GFrame
 
 		#endregion
 
+
 #if GFRAME_ASYNC
 
 		public async void SwitchLevelAsync(ILevelSupervisor nextLevel)
 		{
-			bool hadPreviousSupervisor = false;
+			if (ChangingLevel) {
+				throw new InvalidOperationException($"Level is already changing. Can't switch to {nextLevel} while change is in progress.");
+			}
 
-			if (LevelSupervisor != null) {
+			ChangingLevel = true;
+			ILevelSupervisor prevLevel = LevelSupervisor;
 
-				hadPreviousSupervisor = true;
+			try {
+				if (LevelSupervisor != null) {
 
-				await UnloadingSupervisorAsync();
+					await UnloadingSupervisorAsync();
 
-				if (ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
-					await LevelLoadingScreen.ShowAsync();
-				}
-
-				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
-
-					if (playerContext.StatesStack != null) {
-						playerContext.DisposePlayerStack();
+					if (ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
+						await LevelLoadingScreen.ShowAsync();
 					}
+
+					foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+
+						if (playerContext.StatesStack != null) {
+							playerContext.DisposePlayerStack();
+						}
+					}
+
+
+					if (!ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
+						await LevelLoadingScreen.ShowAsync();
+					}
+
+					await LevelSupervisor.UnloadAsync();
+
+					await UnloadedSupervisorAsync();
+
+				} else if (LevelLoadingScreen != null) {
+					LevelLoadingScreen.HideInstantly();
 				}
 
+				LevelSupervisor = nextLevel;
 
-				if (!ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
-					await LevelLoadingScreen.ShowAsync();
+				await LoadingSupervisorAsync();
+
+				await nextLevel.LoadAsync();
+
+				// Avoid first show of loading screen when the game starts.
+				if (prevLevel != null && LevelLoadingScreen != null) {
+
+					// Wait 1 frame for performance to stabilize (or transition animations will be skipped).
+					await Task.Yield();
+
+					await LevelLoadingScreen.HideAsync();
 				}
 
-				await LevelSupervisor.UnloadAsync();
+				await LoadedSupervisorAsync();
 
-				await UnloadedSupervisorAsync();
-
-			} else if (LevelLoadingScreen != null) {
-				LevelLoadingScreen.HideInstantly();
+				ChangingLevel = false;
 			}
+			catch (Exception ex) {
+				ChangingLevel = false;
 
-			LevelSupervisor = nextLevel;
-
-			await LoadingSupervisorAsync();
-
-			await nextLevel.LoadAsync();
-
-			// Avoid first show of loading screen when the game starts.
-			if (hadPreviousSupervisor && LevelLoadingScreen != null) {
-
-				// Wait 1 frame for performance to stabilize (or transition animations will be skipped).
-				await Task.Yield();
-
-				await LevelLoadingScreen.HideAsync();
+				if (!OnException(prevLevel, nextLevel, ex)) {
+					throw;
+				}
 			}
-
-			await LoadedSupervisorAsync();
 		}
 
 		/// <summary>
@@ -231,7 +254,21 @@ namespace DevLocker.GFrame
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Chance to handle exceptions on level switching. Return true if handled.
+		/// Example: switch to another fall-back level.
+		/// </summary>
+		protected virtual bool OnException(ILevelSupervisor prevLevel, ILevelSupervisor nextLevel, Exception exception)
+		{
+			return false;
+		}
+
 #else
+		/// <summary>
+		/// If coroutines fail, use this to reset the changing level flag so you can switch again. For example switch to fall-back level.
+		/// </summary>
+		public void RestartChangingLevelFlag() => ChangingLevel = false;
+
 		public void SwitchLevel(ILevelSupervisor nextLevel)
 		{
 			StartCoroutine(SwitchLevelCrt(nextLevel));
@@ -239,6 +276,14 @@ namespace DevLocker.GFrame
 
 		public IEnumerator SwitchLevelCrt(ILevelSupervisor nextLevel)
 		{
+			if (ChangingLevel) {
+				throw new InvalidOperationException($"Level is already changing. Can't switch to {nextLevel} while change is in progress.");
+			}
+
+			// If exception happens in some of the coroutines, flag will remain set forever.
+			// Use the RestartChangingLevelFlag() to restore it and switch back to fall-back level.
+			ChangingLevel = true;
+
 			bool hadPreviousSupervisor = false;
 
 			if (LevelSupervisor != null) {
@@ -287,6 +332,8 @@ namespace DevLocker.GFrame
 			}
 
 			yield return LoadedSupervisorCrt();
+
+			ChangingLevel = false;
 		}
 
 		/// <summary>
