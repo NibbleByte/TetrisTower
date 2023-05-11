@@ -76,6 +76,65 @@ namespace DevLocker.GFrame
 
 		}
 
+		#region Global Player State
+		/// <summary>
+		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
+		/// </summary>
+		public void PushGlobalState(IPlayerState state)
+		{
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushState(state);
+		}
+
+		/// <summary>
+		/// Clears the state stack of any other states and pushes the provided one.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
+		/// </summary>
+		public void SetGlobalState(IPlayerState state)
+		{
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(state);
+		}
+
+		/// <summary>
+		/// Pop a single state from the state stack.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
+		/// </summary>
+		public void PopGlobalState()
+		{
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopState();
+		}
+
+		/// <summary>
+		/// Pops multiple states from the state stack.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
+		/// </summary>
+		public void PopGlobalStates(int count)
+		{
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStates(count);
+		}
+
+		/// <summary>
+		/// Pop and push back the state at the top. Will trigger changing state events.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
+		/// </summary>
+		public void ReenterCurrentGlobalState()
+		{
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentState();
+		}
+
+		/// <summary>
+		/// Change the current state and add it to the state stack.
+		/// Will notify the state itself.
+		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
+		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
+		/// </summary>
+		public void ChangeGlobalState(IPlayerState state, StackAction stackAction)
+		{
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeState(state, stackAction);
+		}
+
+		#endregion
+
 #if GFRAME_ASYNC
 
 		public async void SwitchLevelAsync(ILevelSupervisor nextLevel)
@@ -170,62 +229,6 @@ namespace DevLocker.GFrame
 			LoadedSupervisor?.Invoke();
 
 			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
-		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
-		/// </summary>
-		public void PushGlobalState(IPlayerState state)
-		{
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushState(state);
-		}
-
-		/// <summary>
-		/// Clears the state stack of any other states and pushes the provided one.
-		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
-		/// </summary>
-		public void SetGlobalState(IPlayerState state)
-		{
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(state);
-		}
-
-		/// <summary>
-		/// Pop a single state from the state stack.
-		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
-		/// </summary>
-		public void PopGlobalState()
-		{
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopState();
-		}
-
-		/// <summary>
-		/// Pops multiple states from the state stack.
-		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
-		/// </summary>
-		public void PopGlobalStates(int count)
-		{
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStates(count);
-		}
-
-		/// <summary>
-		/// Pop and push back the state at the top. Will trigger changing state events.
-		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
-		/// </summary>
-		public void ReenterCurrentGlobalState()
-		{
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentState();
-		}
-
-		/// <summary>
-		/// Change the current state and add it to the state stack.
-		/// Will notify the state itself.
-		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
-		/// Works with the <see cref="PlayerContextUIRootObject.GlobalPlayerContext"/>. Don't use in split-screen games.
-		/// </summary>
-		public void ChangeGlobalState(IPlayerState state, StackAction stackAction)
-		{
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeState(state, stackAction);
 		}
 
 #else
@@ -328,56 +331,6 @@ namespace DevLocker.GFrame
 			yield break;
 		}
 
-
-		/// <summary>
-		/// Push state to the top of the state stack. Can pop it out to the previous state later on.
-		/// </summary>
-		public void PushGlobalState(IPlayerState state)
-		{
-			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PushStateCrt(state));
-		}
-
-		/// <summary>
-		/// Clears the state stack of any other states and pushes the provided one.
-		/// </summary>
-		public void SetGlobalState(IPlayerState state)
-		{
-			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetStateCrt(state));
-		}
-
-		/// <summary>
-		/// Pop a single state from the state stack.
-		/// </summary>
-		public void PopGlobalState()
-		{
-			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStateCrt());
-		}
-
-		/// <summary>
-		/// Pops multiple states from the state stack.
-		/// </summary>
-		public void PopGlobalStates(int count)
-		{
-			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.PopStatesCrt(count));
-		}
-
-		/// <summary>
-		/// Pop and push back the state at the top. Will trigger changing state events.
-		/// </summary>
-		public void ReenterCurrentGlobalState()
-		{
-			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ReenterCurrentStateCrt());
-		}
-
-		/// <summary>
-		/// Change the current state and add it to the state stack.
-		/// Will notify the state itself.
-		/// Any additional state changes that happened in the meantime will be queued and executed after the current change finishes.
-		/// </summary>
-		public void ChangeGlobalState(IPlayerState state, StackAction stackAction)
-		{
-			StartCoroutine(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.ChangeStateCrt(state, stackAction));
-		}
 #endif
 
 	}
