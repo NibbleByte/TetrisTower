@@ -57,10 +57,18 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_TowerLevel = levelData;
 		}
 
-		public void RetryLevel()
+		public virtual void RetryLevel()
 		{
 			if (m_TowerLevel == null)
 				throw new InvalidOperationException($"Trying to retry a level when no level is in progress.");
+
+			m_TowerLevel = null;
+		}
+
+		public virtual void QuitLevel()
+		{
+			if (m_TowerLevel == null)
+				throw new InvalidOperationException($"Trying to quit a level when no level is in progress.");
 
 			m_TowerLevel = null;
 		}

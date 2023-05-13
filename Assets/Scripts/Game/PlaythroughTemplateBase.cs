@@ -26,6 +26,7 @@ namespace TetrisTower.Game
 		void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 
 		void RetryLevel();
+		void QuitLevel();
 		void FinishLevel();
 
 		void SetupRandomGenerator(int seed = 0, bool resetCurrentLevelRandom = false);

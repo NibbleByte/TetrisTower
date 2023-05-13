@@ -87,6 +87,15 @@ namespace TetrisTower.TowerLevels.UI
 			Game.GameManager.Instance.PushGlobalState(new TowerOptionsState());
 		}
 
+		public void QuitLevel()
+		{
+			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
+
+			playthroughData.QuitLevel();
+
+			Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
+		}
+
 		public void ExitToHomeScreen()
 		{
 			Game.GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());

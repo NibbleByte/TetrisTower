@@ -131,6 +131,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			Debug.Log($"Setup current level {m_CurrentLevelID} - \"{m_TowerLevel.BackgroundScene?.ScenePath}\".");
 		}
 
+		public override void QuitLevel()
+		{
+			base.QuitLevel();
+
+			m_CurrentLevelID = "";
+		}
+
 		public override void FinishLevel()
 		{
 			int index = GetAccomplishmentIndex(m_CurrentLevelID, createIfMissing: true);
