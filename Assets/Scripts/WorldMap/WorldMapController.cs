@@ -163,6 +163,12 @@ namespace TetrisTower.WorldMap
 		void Update()
 		{
 			Sun.Rotate(Vector3.up, SunSpeed * Time.deltaTime);
+
+			foreach (LocationBind locationBind in m_Locations) {
+				if (locationBind.UITracker.State.IsVisible()) {
+					locationBind.UITracker.SetZoomLevel(ZoomNormalized);
+				}
+			}
 		}
 	}
 }

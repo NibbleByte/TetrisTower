@@ -9,9 +9,13 @@ namespace TetrisTower.WorldMap.UI
 {
 	public class WorldMapLocationUITracker : MonoBehaviour
 	{
+		public CanvasGroup CanvasGroup;
+		public Image LocationImage;
+
+		public AnimationCurve ZoomFadeOutCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
 		private WorldMapLevelParamData m_LevelData;
 
-		public Image LocationImage;
 
 		public WorldLocationState State { get; private set; }
 
@@ -20,6 +24,13 @@ namespace TetrisTower.WorldMap.UI
 			m_LevelData = levelData;
 
 			LocationImage.sprite = m_LevelData.Thumbnail;
+		}
+
+		public void SetZoomLevel(float zoom)
+		{
+			if (CanvasGroup) {
+				CanvasGroup.alpha = ZoomFadeOutCurve.Evaluate(zoom);
+			}
 		}
 
 		public void SetState(WorldLocationState state)

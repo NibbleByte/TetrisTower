@@ -19,6 +19,11 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		Completed   // Player needs to complete the level objective once to unlock the adjacent levels.
 	}
 
+	public static class WorldLocationExtensions
+	{
+		public static bool IsVisible(this WorldLocationState state) => state == WorldLocationState.Revealed || state == WorldLocationState.Completed;
+	}
+
 	/// <summary>
 	/// Sequential play through in which players play levels one after another until end is reached.
 	/// </summary>

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3538843721729428088}
   - component: {fileID: 7799236866640364054}
   - component: {fileID: 5145599685263413368}
+  - component: {fileID: 3963858552142557038}
   - component: {fileID: 2862559360953991826}
   m_Layer: 5
   m_Name: WorldMapLocationTracker
@@ -87,6 +88,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &3963858552142557038
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3538843721729428095}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &2862559360953991826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,7 +112,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d349c72c20d84d3498ed51839ff5130d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CanvasGroup: {fileID: 3963858552142557038}
   LocationImage: {fileID: 4151192034834568238}
+  ZoomFadeOutCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.25
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.8
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.12727277
+      outWeight: 0.114197426
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8292482177426119683
 GameObject:
   m_ObjectHideFlags: 0

@@ -56,6 +56,9 @@ namespace TetrisTower.WorldMap
 
 		public void OnPointerClick(InputAction.CallbackContext context)
 		{
+			if (UnityEngine.EventSystems.EventSystem.current == null)
+				return;
+
 			if (UIUtils.RaycastUIElements(Pointer.current.position.ReadValue()).Count > 0)
 				return;
 

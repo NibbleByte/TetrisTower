@@ -11,9 +11,13 @@ namespace TetrisTower.Core.UI
 
 		public static IReadOnlyList<RaycastResult> RaycastUIElements(Vector3 position)
 		{
+			m_RayCastResultsCache.Clear();
+
+			if (EventSystem.current == null)
+				return m_RayCastResultsCache;
+
 			PointerEventData eventData = new PointerEventData(EventSystem.current);
 			eventData.position = position;
-			m_RayCastResultsCache.Clear();
 			EventSystem.current.RaycastAll(eventData, m_RayCastResultsCache);
 			return m_RayCastResultsCache;
 		}
