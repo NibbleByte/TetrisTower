@@ -56,6 +56,9 @@ namespace TetrisTower.WorldMap
 
 		public void OnPointerClick(InputAction.CallbackContext context)
 		{
+			if (context.phase != InputActionPhase.Performed)
+				return;
+
 			if (UnityEngine.EventSystems.EventSystem.current == null)
 				return;
 

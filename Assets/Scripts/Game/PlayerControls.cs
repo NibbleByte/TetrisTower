@@ -643,7 +643,7 @@ namespace TetrisTower.Game
                     ""name"": """",
                     ""id"": ""57a658c0-3566-407c-a8c1-ea950dcc39ce"",
                     ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Pointer-Click"",
