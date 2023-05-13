@@ -34,11 +34,26 @@ namespace TetrisTower.WorldMap
 		public AnimationCurve ZoomToDrag = AnimationCurve.Linear(0f, 0.4f, 1f, 0f);
 		public float DragDamp = 0.2f;
 
-		public WorldMapLocation WorldMapLocation;
+		public UI.UIObjectsTrackerController TrackerController;
+		public WorldMapLocation WorldMapLocationPrefab;
+		public UI.WorldMapLocationUITracker UILocationTrackerPrefab;
 
 		private WorldPlaythroughData m_PlaythroughData;
 
-		private List<WorldMapLocation> m_Locations = new List<WorldMapLocation>();
+		private List<LocationBind> m_Locations = new List<LocationBind>();
+
+		private struct LocationBind
+		{
+			public string LevelID;
+			public WorldMapLocation WorldLocation;
+			public UI.WorldMapLocationUITracker UITracker;
+
+			public void SetState(WorldLocationState state)
+			{
+				WorldLocation.SetState(state);
+				UITracker?.SetState(state);
+			}
+		}
 
 		public void Init(WorldPlaythroughData playthroughData)
 		{
@@ -47,16 +62,30 @@ namespace TetrisTower.WorldMap
 			m_PlaythroughData.DataIntegrityCheck();
 
 			foreach (WorldMapLevelParamData level in m_PlaythroughData.GetAllLevels()) {
-				WorldMapLocation location = GameObject.Instantiate(WorldMapLocation, LocationsRoot);
-				location.name = "L-" + level.LevelID;
-				location.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
-				location.LevelID = level.LevelID;
+				var locationBind = new LocationBind() {
+					LevelID = level.LevelID
+				};
 
-				m_Locations.Add(location);
+				locationBind.WorldLocation = GameObject.Instantiate(WorldMapLocationPrefab, LocationsRoot);
+				locationBind.WorldLocation.name = "L-" + level.LevelID;
+				locationBind.WorldLocation.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
+				locationBind.WorldLocation.Setup(level);
+
+
+				if (TrackerController && UILocationTrackerPrefab) {
+					locationBind.UITracker = GameObject.Instantiate(UILocationTrackerPrefab);
+					locationBind.UITracker.name = "UI-" + level.LevelID;
+					locationBind.UITracker.Setup(level);
+
+					TrackerController.StartTracking(locationBind.WorldLocation.transform, (RectTransform) locationBind.UITracker.transform);
+				}
+
+				m_Locations.Add(locationBind);
 			}
 
-			foreach(WorldMapLocation location in m_Locations) {
-				location.SetState(m_PlaythroughData.GetLocationState(location.LevelID));
+			foreach(LocationBind locationBind in m_Locations) {
+				WorldLocationState state = m_PlaythroughData.GetLocationState(locationBind.LevelID);
+				locationBind.SetState(state);
 			}
 		}
 
@@ -71,14 +100,19 @@ namespace TetrisTower.WorldMap
 
 		private IEnumerator RevealUnlockedLocations()
 		{
-			foreach(WorldMapLocation location in m_Locations) {
-				WorldLocationState state = m_PlaythroughData.GetLocationState(location.LevelID);
+			foreach(LocationBind locationBind in m_Locations) {
+				WorldLocationState state = m_PlaythroughData.GetLocationState(locationBind.LevelID);
 
 				if (state == WorldLocationState.Unlocked) {
-					m_PlaythroughData.RevealUnlockedLevel(location.LevelID);
-					location.SetState(WorldLocationState.Revealed);
+					m_PlaythroughData.RevealUnlockedLevel(locationBind.LevelID);
+					locationBind.SetState(WorldLocationState.Revealed);
 
-					yield return location.transform.DOScale(0.2f, 0.5f).From();
+					float duration = 0.5f;
+					Sequence seq = DOTween.Sequence();
+					seq.Append(locationBind.WorldLocation.transform.DOScale(0.2f, duration).From());
+					seq.Insert(0f, locationBind.UITracker.transform.DOScale(0.2f, duration).From());
+
+					yield return seq;
 				}
 			}
 		}
@@ -96,17 +130,6 @@ namespace TetrisTower.WorldMap
 					Game.GameManager.Instance.SwitchLevelAsync(supervisor);
 				}
 			}
-		}
-
-		public WorldMapLocation GetLevelParamForLocation(string levelID)
-		{
-			foreach(WorldMapLocation location in m_Locations) {
-				if (location.LevelID == levelID) {
-					return location;
-				}
-			}
-
-			return null;
 		}
 
 		public void RotateDiscworld(float rotate)

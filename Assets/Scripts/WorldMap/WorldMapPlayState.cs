@@ -56,6 +56,9 @@ namespace TetrisTower.WorldMap
 
 		public void OnPointerClick(InputAction.CallbackContext context)
 		{
+			if (UIUtils.RaycastUIElements(Pointer.current.position.ReadValue()).Count > 0)
+				return;
+
 			m_LevelController.TryWorldSelect(Pointer.current?.position.ReadValue() ?? new Vector2(Screen.width / 2f, Screen.height / 2f));
 		}
 
