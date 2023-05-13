@@ -74,6 +74,12 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return index;
 		}
 
+		// For debug!
+		internal void __ReplaceAccomplishments(IEnumerable<WorldLevelAccomplishment> accomplishments)
+		{
+			m_Accomplishments = accomplishments.ToArray();
+		}
+
 		public override ILevelSupervisor PrepareSupervisor()
 		{
 			return TowerLevel == null && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);

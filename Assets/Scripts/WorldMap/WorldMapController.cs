@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
-using static TetrisTower.TowerLevels.Playthroughs.WorldPlaythroughData;
 
 namespace TetrisTower.WorldMap
 {
@@ -98,7 +97,7 @@ namespace TetrisTower.WorldMap
 		{
 		}
 
-		private IEnumerator RevealUnlockedLocations()
+		public IEnumerator RevealUnlockedLocations()
 		{
 			foreach(LocationBind locationBind in m_Locations) {
 				WorldLocationState state = m_PlaythroughData.GetLocationState(locationBind.LevelID);
