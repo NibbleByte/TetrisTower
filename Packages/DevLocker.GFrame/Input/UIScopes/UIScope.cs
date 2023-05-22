@@ -205,7 +205,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			m_HasInitialized = true;
 
-			ScanForChildScopeElements();
+			ScanForOwnedScopeElements();
 
 			return true;
 		}
@@ -475,19 +475,100 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.
 		/// </summary>
-		[ContextMenu("Rescan for child scope elements")]
-		public void ScanForChildScopeElements()
+		[ContextMenu("Rescan for owned scope elements")]
+		public void ScanForOwnedScopeElements()
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"Couldn't scan child scope elements for {name} as it isn't initialized.", this);
+				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
 				return;
 			}
 
 			m_ScopeElements.Clear();
 			m_DirectChildScopes.Clear();
-			ScanForChildScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
+			ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 
+			ReapplyOwnedScopeElements();
+		}
 
+		/// <summary>
+		/// This will replace the controlled scopeElements, no questions asked. Make sure passed elements are not owned by another scope.
+		/// USE WITH CAUTION!
+		/// </summary>
+		public void ReplaceOwnedScopeElements(IEnumerable<IScopeElement> scopeElements)
+		{
+			if (!m_HasInitialized) {
+				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				return;
+			}
+
+			m_ScopeElements.Clear();
+			m_ScopeElements.AddRange(scopeElements);
+
+			ReapplyOwnedScopeElements();
+		}
+
+		/// <summary>
+		/// This will try to append scopeElements to the already controlled ones, if they are not already controlled, no questions asked. Make sure passed elements are not owned by another scope.
+		/// USE WITH CAUTION!
+		/// </summary>
+		public void TryAppendOwnedScopeElements(IEnumerable<IScopeElement> scopeElements)
+		{
+			if (!m_HasInitialized) {
+				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				return;
+			}
+
+			bool changed = false;
+			foreach(IScopeElement scopeElement in scopeElements) {
+				if (!m_ScopeElements.Contains(scopeElement)) {
+					changed = true;
+					m_ScopeElements.Add(scopeElement);
+				}
+			}
+
+			if (changed) {
+				ReapplyOwnedScopeElements();
+			}
+		}
+
+		/// <summary>
+		/// This will try to append scopeElement to the already controlled ones, if it is not already controlled, no questions asked. Make sure passed elements are not owned by another scope.
+		/// USE WITH CAUTION!
+		/// </summary>
+		public void TryAppendOwnedScopeElements(IScopeElement scopeElement)
+		{
+			if (!m_HasInitialized) {
+				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				return;
+			}
+
+			bool changed = false;
+			if (!m_ScopeElements.Contains(scopeElement)) {
+				changed = true;
+				m_ScopeElements.Add(scopeElement);
+			}
+
+			if (changed) {
+				ReapplyOwnedScopeElements();
+			}
+		}
+
+		/// <summary>
+		/// Remove destroyed (as in Unity destroyed) or non-child scope elements controlled by this scope.
+		/// </summary>
+		public void ClearNonOwnedChildScopeElements()
+		{
+			m_ScopeElements.RemoveAll(e => e is Component component && (component == null || !component.transform.IsChildOf(transform)));
+		}
+
+		public bool Owns(IScopeElement scopeElement)
+		{
+			return m_ScopeElements.Contains(scopeElement);
+		}
+
+		// Call this after list of scope elements has changed.
+		private void ReapplyOwnedScopeElements()
+		{
 			if (Array.IndexOf(m_PlayerSet.ActiveScopes, this) != -1) {
 				var lastActive = m_PlayerSet.ActiveScopes.Last();
 
@@ -515,12 +596,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
-		public bool Owns(IScopeElement scopeElement)
-		{
-			return m_ScopeElements.Contains(scopeElement);
-		}
-
-		internal static void ScanForChildScopeElements(UIScope parentScope, Transform transform, List<IScopeElement> scopeElements, List<UIScope> directChildScopes)
+		internal static void ScanForOwnedScopeElements(UIScope parentScope, Transform transform, List<IScopeElement> scopeElements, List<UIScope> directChildScopes)
 		{
 			var scope = transform.GetComponent<UIScope>();
 			// Another scope begins, it will handle its own child hotkey elements.
@@ -532,7 +608,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			scopeElements.AddRange(transform.GetComponents<IScopeElement>());
 
 			foreach(Transform child in transform) {
-				ScanForChildScopeElements(parentScope, child, scopeElements, directChildScopes);
+				ScanForOwnedScopeElements(parentScope, child, scopeElements, directChildScopes);
 			}
 		}
 
@@ -698,7 +774,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			var scopeElements = new List<IScopeElement>();
 			var directChildScopes = new List<UIScope>();
-			UIScope.ScanForChildScopeElements(uiScope, uiScope.transform, scopeElements, directChildScopes);
+			UIScope.ScanForOwnedScopeElements(uiScope, uiScope.transform, scopeElements, directChildScopes);
 
 
 			UnityEditor.EditorGUILayout.Space();
