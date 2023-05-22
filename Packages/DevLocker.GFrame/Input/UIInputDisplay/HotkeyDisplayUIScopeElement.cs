@@ -14,10 +14,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 	{
 		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)
 		{
-			if (InputAction == null)
+			if (m_InputAction == null)
 				yield break;
 
-			InputAction action = inputContext.FindActionFor(InputAction.name);
+			InputAction action = inputContext.FindActionFor(m_InputAction.name);
 			if (action != null) {
 				yield return action;
 			}

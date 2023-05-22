@@ -20,6 +20,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		[SerializeField]
 		protected InputActionReference m_InputAction;
+		public InputActionReference InputAction => m_InputAction;
 
 		protected bool m_ActionStarted { get; private set; } = false;
 		protected bool m_ActionPerformed { get; private set; } = false;
@@ -145,6 +146,23 @@ namespace DevLocker.GFrame.Input.UIScope
 			InputAction action = inputContext.FindActionFor(m_InputAction.name);
 			if (action != null) {
 				yield return action;
+			}
+		}
+
+		/// <summary>
+		/// Set input action. Will rebind it properly.
+		/// </summary>
+		public void SetInputAction(InputAction inputAction)
+		{
+			bool wasEnabled = enabled;
+			if (wasEnabled) {
+				OnDisable();
+			}
+
+			m_InputAction = InputActionReference.Create(inputAction);
+			
+			if (wasEnabled) {
+				OnEnable();
 			}
 		}
 

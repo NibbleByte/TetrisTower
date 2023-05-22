@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input.UIInputDisplay
@@ -51,7 +52,11 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			ShowBoth,
 		}
 
-		public InputActionReference InputAction;
+		public InputActionReference InputAction => m_InputAction;
+		
+		[SerializeField]
+		[FormerlySerializedAs("InputAction")]
+		protected InputActionReference m_InputAction;
 		// Maybe you'd like to have the option to specify the binding here too.
 		// You can do this easily with the InputActionBindingPair class.
 		// But that is probably a bad idea, since you'll be locking this display to the binding control scheme.
@@ -121,7 +126,27 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			}
 
 			m_LastDevice = null;
-			RefreshDisplay(m_PlayerContext.InputContext);
+			
+			if (m_InputAction) {
+				RefreshDisplay(m_PlayerContext.InputContext);
+			}
+		}
+		
+		/// <summary>
+		/// Set input action. Will rebind it properly.
+		/// </summary>
+		public void SetInputAction(InputAction inputAction)
+		{
+			bool wasEnabled = enabled;
+			if (wasEnabled) {
+				OnDisable();
+			}
+
+			m_InputAction = InputActionReference.Create(inputAction);
+			
+			if (wasEnabled) {
+				OnEnable();
+			}
 		}
 
 		private void RefreshDisplay(IInputContext context)
@@ -207,9 +232,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				deviceLayout = DisplayMode.DisplayedDeviceLayout;
 			}
 
-			InputAction action = context.FindActionFor(InputAction.name);
+			InputAction action = context.FindActionFor(m_InputAction.name);
 			if (action == null) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} couldn't find specified action {InputAction.name} for player {m_PlayerContext.PlayerName}", this);
+				Debug.LogError($"{nameof(HotkeyDisplayUI)} couldn't find specified action {m_InputAction.name} for player {m_PlayerContext.PlayerName}", this);
 				return;
 			}
 
@@ -324,7 +349,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			m_PlayerContext.InputContext.LastUsedDeviceChanged += OnLastUsedDeviceChanged;
 			m_LastDevice = null;
-			RefreshDisplay(m_PlayerContext.InputContext);
+
+			if (m_InputAction) {
+				RefreshDisplay(m_PlayerContext.InputContext);
+			}
 		}
 
 		protected virtual void OnDisable()
@@ -385,12 +413,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			// Keyboard/Mouse check is done in the RefreshDisplay() method. Don't do it here.
 
-			RefreshDisplay(m_PlayerContext.InputContext);
+			if (m_InputAction) {
+				RefreshDisplay(m_PlayerContext.InputContext);
+			}
 		}
 
 		protected virtual void OnValidate()
 		{
-			Utils.Validation.ValidateMissingObject(this, InputAction, nameof(InputAction));
+			Utils.Validation.ValidateMissingObject(this, m_InputAction, nameof(m_InputAction));
 			Utils.Validation.ValidateMissingObject(this, Icon, nameof(Icon));
 
 #if USE_UGUI_TEXT
