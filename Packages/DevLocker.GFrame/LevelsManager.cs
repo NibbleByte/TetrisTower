@@ -299,7 +299,7 @@ namespace DevLocker.GFrame
 				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
 
 					if (playerContext.StatesStack != null) {
-						yield return playerContext.DisposePlayerStackCrt();
+						playerContext.DisposePlayerStack();
 					}
 				}
 
