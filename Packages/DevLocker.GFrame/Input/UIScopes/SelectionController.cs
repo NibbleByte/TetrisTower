@@ -165,15 +165,17 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void DoNoSelectionAction()
 		{
+			GameObject startObject = StartSelection ? StartSelection.gameObject : null;
+			
 			switch (NoSelectionAction) {
 
 				case NoSelectionActionType.SelectLastSelectedObject:
-					m_PlayerContext.SetSelectedGameObject(m_PersistedSelection && m_PersistedSelection.activeInHierarchy ? m_PersistedSelection : StartSelection.gameObject);
+					m_PlayerContext.SetSelectedGameObject(m_PersistedSelection && m_PersistedSelection.activeInHierarchy ? m_PersistedSelection : startObject);
 					OnSelected();
 					break;
 
 				case NoSelectionActionType.SelectStartObject:
-					m_PlayerContext.SetSelectedGameObject(StartSelection.gameObject);
+					m_PlayerContext.SetSelectedGameObject(startObject);
 					OnSelected();
 					break;
 
@@ -241,6 +243,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnValidate()
 		{
+			/* Having no start selection is valid if selectables will be created dynamically.
 			if (StartSelection == null
 #if UNITY_EDITOR
 				&& (Application.isPlaying || UnityEditor.BuildPipeline.isBuildingPlayer)
@@ -250,7 +253,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				) {
 				Debug.LogError($"{name} {nameof(SelectionController)} has no start selection set. Disabling!", this);
 				enabled = false;
-			}
+			}*/
 		}
 	}
 }

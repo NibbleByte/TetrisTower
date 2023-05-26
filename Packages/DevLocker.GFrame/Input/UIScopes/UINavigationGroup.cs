@@ -161,6 +161,12 @@ namespace DevLocker.GFrame.Input.UIScope
 				// Destroyed - yes. Re-parented - no. :(
 				// Check active instead gameObject.activeInHierarchy hoping it will be faster.
 				if (selectable == null || !IsStillActive(selectable)) {
+					
+					if (selectable) {
+						var listener = selectable.gameObject.GetComponent<UINavigationListener>();
+						listener.Owner = null;
+					}
+
 					m_ManagedSelectables.RemoveAt(i);
 					--i;
 					needsRefresh = true;
@@ -177,6 +183,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				if (!Exclude.Contains(selectable)
 					&& !m_ManagedSelectables.Contains(selectable)
+				    && selectable.GetComponent<UINavigationGroupExclude>() == null
 					&& (Include.Contains(selectable) || selectable.transform.IsChildOf(transform))
 					) {
 					m_ManagedSelectables.Add(selectable);
@@ -234,15 +241,15 @@ namespace DevLocker.GFrame.Input.UIScope
 				//
 				// https://docs.unity3d.com/Packages/com.unity.ugui@1.0/api/UnityEngine.UI.Selectable.html#UnityEngine_UI_Selectable_FindSelectable_UnityEngine_Vector3_
 				// Don't use FindSelectableOn*() as it won't work if "Explicit" mode set.
-				nav.selectOnUp = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Vertical) ? selectable.FindSelectable(selectable.transform.rotation * Vector3.up) : null;
-				nav.selectOnDown = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Vertical) ? selectable.FindSelectable(selectable.transform.rotation * Vector3.down) : null;
-				nav.selectOnLeft = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Horizontal) ? selectable.FindSelectable(selectable.transform.rotation * Vector3.left) : null;
-				nav.selectOnRight = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Horizontal) ? selectable.FindSelectable(selectable.transform.rotation * Vector3.right) : null;
+				nav.selectOnUp = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Vertical) ? FindManagedSelectable(selectable, Vector3.up) : null;
+				nav.selectOnDown = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Vertical) ? FindManagedSelectable(selectable, Vector3.down) : null;
+				nav.selectOnLeft = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Horizontal) ? FindManagedSelectable(selectable, Vector3.left) : null;
+				nav.selectOnRight = (Navigation == NavigationMode.Grid || Navigation == NavigationMode.Horizontal) ? FindManagedSelectable(selectable, Vector3.right) : null;
 
-				bool outsideUp = nav.selectOnUp == null || !m_ManagedSelectables.Contains(nav.selectOnUp);
-				bool outsideDown = nav.selectOnDown == null || !m_ManagedSelectables.Contains(nav.selectOnDown);
-				bool outsideLeft = nav.selectOnLeft == null || !m_ManagedSelectables.Contains(nav.selectOnLeft);
-				bool outsideRight = nav.selectOnRight == null || !m_ManagedSelectables.Contains(nav.selectOnRight);
+				bool outsideUp = nav.selectOnUp == null;
+				bool outsideDown = nav.selectOnDown == null;
+				bool outsideLeft = nav.selectOnLeft == null;
+				bool outsideRight = nav.selectOnRight == null;
 
 				// NOTE: These might not be what you expect if arrangement is more irregular...
 				if (outsideUp && outsideLeft) {
@@ -259,11 +266,11 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (outsideLeft) RecordEdgeSelectable(selectable.gameObject, MoveDirection.Left);
 				if (outsideRight) RecordEdgeSelectable(selectable.gameObject, MoveDirection.Right);
 
-				// Not one of ours? Don't link then!
-				if (outsideUp && !WrapUp.IsAutoMode) nav.selectOnUp = null;
-				if (outsideDown && !WrapDown.IsAutoMode) nav.selectOnDown = null;
-				if (outsideLeft && !WrapLeft.IsAutoMode) nav.selectOnLeft = null;
-				if (outsideRight && !WrapRight.IsAutoMode) nav.selectOnRight = null;
+				// Outside means no managed selectable is found. Find any selectable then.
+				if (outsideUp && WrapUp.IsAutoMode) nav.selectOnUp = selectable.FindSelectable(selectable.transform.rotation * Vector3.up);
+				if (outsideDown && WrapDown.IsAutoMode) nav.selectOnDown = selectable.FindSelectable(selectable.transform.rotation * Vector3.down);
+				if (outsideLeft && WrapLeft.IsAutoMode) nav.selectOnLeft = selectable.FindSelectable(selectable.transform.rotation * Vector3.left);
+				if (outsideRight && WrapRight.IsAutoMode) nav.selectOnRight = selectable.FindSelectable(selectable.transform.rotation * Vector3.right);
 
 				if (nav.selectOnUp == null && WrapUp.IsExplicitMode) nav.selectOnUp = WrapUp.Selectable;
 				if (nav.selectOnDown == null && WrapDown.IsExplicitMode) nav.selectOnDown = WrapDown.Selectable;
@@ -390,7 +397,17 @@ namespace DevLocker.GFrame.Input.UIScope
 		}
 #endif
 
-		void RecordEdgeSelectable(GameObject go, MoveDirection direction)
+		private Selectable FindManagedSelectable(Selectable selectable, Vector3 dir)
+		{
+			while ((selectable = selectable.FindSelectable(selectable.transform.rotation * dir)) != null) {
+				if (m_ManagedSelectables.Contains(selectable))
+					return selectable;
+			}
+
+			return null;
+		}
+
+		private void RecordEdgeSelectable(GameObject go, MoveDirection direction)
 		{
 			int id = go.GetInstanceID();
 

@@ -336,11 +336,60 @@ namespace DevLocker.GFrame.Input.UIScope
 					return;
 				}
 
-				// Something else just activated, don't change the focus.
+
+				
+				// Something else just activated, use that if appropriate.
+				UIScope fallbackFrameScope = null;
 				foreach(UIScope scope in m_PlayerSet.RegisteredScopes) {
+					
 					if (scope.m_FrameEnabled == Time.frameCount) {
-						return;
+						// A bit of copy-paste from OnEnable(). Sad.
+						switch (scope.OnEnableBehaviour) {
+							case OnEnablePolicy.Focus:
+								// Skip activation if this frame another scope was activated with higher priority.
+								if (!m_PlayerSet.RegisteredScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
+									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
+									return;
+								}
+
+								fallbackFrameScope = fallbackFrameScope ?? scope;
+								break;
+
+							case OnEnablePolicy.FocusWithFramePriority:
+								SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
+								return;
+
+							case OnEnablePolicy.FocusIfCurrentIsLowerDepth:
+								if (m_ScopeDepth < scope.m_ScopeDepth) {
+									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
+									return;
+								}
+
+								fallbackFrameScope = fallbackFrameScope ?? scope;
+								break;
+
+							case OnEnablePolicy.FocusIfCurrentIsLowerOrEqualDepth:
+								if (m_ScopeDepth <= scope.m_ScopeDepth) {
+									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
+									return;
+								}
+
+								fallbackFrameScope = fallbackFrameScope ?? scope;
+								break;
+
+							case OnEnablePolicy.DontFocus:
+								// Enabled this frame, but didn't want to focus, so don't do it.
+								break;
+
+							default:
+								throw new NotSupportedException(scope.OnEnableBehaviour.ToString());
+						}
 					}
+				}
+
+				// Focus on enabled scope this frame, even if it doesn't match the OnEnable criteria. Makes sense?
+				if (fallbackFrameScope) {
+					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(fallbackFrameScope));
 				}
 
 				UIScope nextScope = null;
@@ -470,7 +519,12 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Is this scope active due to one of its children being focused, or being the focused one.
 		/// </summary>
-		public bool IsActive => m_PlayerSet.ActiveScopes.Contains(this);
+		public bool IsActive => m_PlayerSet != null && m_PlayerSet.ActiveScopes.Contains(this);
+		
+		/// <summary>
+		/// Is this scope focused.
+		/// </summary>
+		public bool IsFocused => m_PlayerSet != null && m_PlayerSet.ActiveScopes.LastOrDefault() == this;
 
 		/// <summary>
 		/// Call this if you changed your UI hierarchy and expect added or removed scope elements.
@@ -778,30 +832,55 @@ namespace DevLocker.GFrame.Input.UIScope
 
 
 			UnityEditor.EditorGUILayout.Space();
-			UnityEditor.EditorGUILayout.LabelField("Controlled Elements:", UnityEditor.EditorStyles.boldLabel);
 
-			foreach(var element in scopeElements) {
+			UnityEditor.EditorGUILayout.BeginVertical(UnityEditor.EditorStyles.helpBox);
+			{
+				string scopeState = "Inactive";
+				Color scopeStateColor = Color.red;
+				if (uiScope.IsFocused) {
+					scopeState = "Focused";
+					scopeStateColor = Color.green;
+				} else if (uiScope.IsActive) {
+					scopeState = "Active";
+					scopeStateColor = Color.yellow;
+				}
+
+
+				var prevColor = GUI.color;
+
 				UnityEditor.EditorGUILayout.BeginHorizontal();
-				UnityEditor.EditorGUILayout.ObjectField(element as UnityEngine.Object, typeof(IScopeElement), true);
+				UnityEditor.EditorGUILayout.LabelField("Scope State:", UnityEditor.EditorStyles.boldLabel, GUILayout.Width(UnityEditor.EditorGUIUtility.labelWidth));
+				GUI.color = scopeStateColor;
+				UnityEditor.EditorGUILayout.LabelField(scopeState, UnityEditor.EditorStyles.boldLabel);
+				GUI.color = prevColor;
+				UnityEditor.EditorGUILayout.EndHorizontal();
+
+				UnityEditor.EditorGUILayout.LabelField("Controlled Elements:", UnityEditor.EditorStyles.boldLabel);
+
+				foreach (var element in scopeElements) {
+					UnityEditor.EditorGUILayout.BeginHorizontal();
+					UnityEditor.EditorGUILayout.ObjectField(element as UnityEngine.Object, typeof(IScopeElement), true);
 
 #if USE_INPUT_SYSTEM
-				if (element is IHotkeysWithInputActions hotkeyElement) {
+					if (element is IHotkeysWithInputActions hotkeyElement) {
 
-					var prevColor = GUI.color;
 
-					bool actionsActive = uiScope.enabled
-						&& uiScope.gameObject.activeInHierarchy
-						&& uiScope.m_PlayerContext?.InputContext != null
-						&& hotkeyElement.GetUsedActions(uiScope.m_PlayerContext.InputContext).Any(a => a.enabled);
+						bool actionsActive = uiScope.enabled
+						                     && uiScope.gameObject.activeInHierarchy
+						                     && uiScope.m_PlayerContext?.InputContext != null
+						                     && hotkeyElement.GetUsedActions(uiScope.m_PlayerContext.InputContext).Any(a => a.enabled);
 
-					string activeStr = actionsActive ? "Active" : "Inactive";
-					GUI.color = actionsActive ? Color.green : Color.red;
+						string activeStr = actionsActive ? "Active" : "Inactive";
+						GUI.color = actionsActive ? Color.green : Color.red;
 
-					GUILayout.Label(new GUIContent(activeStr, "Are the hotkey input actions active or not?"), GUILayout.ExpandWidth(false));
-					GUI.color = prevColor;
-				}
+						GUILayout.Label(new GUIContent(activeStr, "Are the hotkey input actions active or not?"), GUILayout.ExpandWidth(false));
+						GUI.color = prevColor;
+					}
 #endif
-				UnityEditor.EditorGUILayout.EndHorizontal();
+					UnityEditor.EditorGUILayout.EndHorizontal();
+				}
+
+				UnityEditor.EditorGUILayout.EndVertical();
 			}
 		}
 	}
