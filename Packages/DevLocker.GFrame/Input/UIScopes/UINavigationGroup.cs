@@ -160,7 +160,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				// Destroyed - yes. Re-parented - no. :(
 				// Check active instead gameObject.activeInHierarchy hoping it will be faster.
-				if (selectable == null || !IsStillActive(selectable)) {
+				if (selectable == null || !selectable.IsInteractable() || !IsStillActive(selectable)) {
 					
 					if (selectable) {
 						var listener = selectable.gameObject.GetComponent<UINavigationListener>();
@@ -182,11 +182,17 @@ namespace DevLocker.GFrame.Input.UIScope
 					break;
 
 				if (!Exclude.Contains(selectable)
+				    && selectable.IsInteractable()
 					&& !m_ManagedSelectables.Contains(selectable)
 				    && selectable.GetComponent<UINavigationGroupExclude>() == null
 					&& (Include.Contains(selectable) || selectable.transform.IsChildOf(transform))
 					) {
 					m_ManagedSelectables.Add(selectable);
+					
+					// Make sure to set navigation mode different from None in advance or the Selectable.FindSelectable() below will skip it. 
+					Navigation nav = selectable.navigation;
+					nav.mode = UnityEngine.UI.Navigation.Mode.Explicit;
+					selectable.navigation = nav;
 
 					if (Application.isPlaying) {
 						// Never removed but who cares...
@@ -399,6 +405,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private Selectable FindManagedSelectable(Selectable selectable, Vector3 dir)
 		{
+			// Selectable.FindSelectable() searches only interactable ones.
 			while ((selectable = selectable.FindSelectable(selectable.transform.rotation * dir)) != null) {
 				if (m_ManagedSelectables.Contains(selectable))
 					return selectable;

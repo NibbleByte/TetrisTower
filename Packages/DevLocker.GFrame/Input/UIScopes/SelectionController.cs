@@ -38,6 +38,12 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool RemoveSelectionOnControlSchemeMismatch = true;
 
 		private GameObject m_PersistedSelection = null;
+		private Selectable m_PersistedSelectable;	// Not sure if having selected object without selectable component is possible.
+		private bool m_PersistedIsAvailable => m_PersistedSelectable 
+			? m_PersistedSelectable.IsInteractable() && m_PersistedSelectable.isActiveAndEnabled 
+			: m_PersistedSelection != null && m_PersistedSelection.activeInHierarchy
+		;
+		
 		private bool m_SelectRequested = false;
 		private string m_LastControlScheme = "";
 		private bool m_ControlSchemeMatched = true;
@@ -98,7 +104,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				m_SelectRequested = false;
 
-				GameObject targetSelection = (PersistentSelection && m_PersistedSelection && m_PersistedSelection.activeInHierarchy)
+				GameObject targetSelection = (PersistentSelection && m_PersistedIsAvailable)
 					? m_PersistedSelection
 					: (StartSelection ? StartSelection.gameObject : null)
 					;
@@ -117,21 +123,26 @@ namespace DevLocker.GFrame.Input.UIScope
 					m_PlayerContext.SetSelectedGameObject(targetSelection);
 
 					m_PersistedSelection = m_PlayerContext.SelectedGameObject;
+					m_PersistedSelectable = m_PersistedSelection ? m_PersistedSelection.GetComponent<Selectable>() : null;
 
 					OnSelected();
 
 				} else {
 
 					m_PersistedSelection = targetSelection;
+					m_PersistedSelectable = m_PersistedSelection ? m_PersistedSelection.GetComponent<Selectable>() : null;
 				}
 
 			} else {
 
 				if (m_ControlSchemeMatched) {
-					if (m_PlayerContext.SelectedGameObject && m_PlayerContext.SelectedGameObject.activeInHierarchy) {
+					GameObject selectedObject = m_PlayerContext.SelectedGameObject;
+					Selectable selectable = selectedObject ? selectedObject.GetComponent<Selectable>() : null;
+					if (selectedObject && selectedObject.activeInHierarchy && (selectable == null || selectable.IsInteractable())) {
 
 						if (!TrackOnlyChildren || m_PlayerContext.SelectedGameObject.transform.IsChildOf(transform)) {
 							m_PersistedSelection = m_PlayerContext.SelectedGameObject;
+							m_PersistedSelectable = m_PersistedSelection ? m_PersistedSelection.GetComponent<Selectable>() : null;
 						}
 
 					} else {
@@ -170,7 +181,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			switch (NoSelectionAction) {
 
 				case NoSelectionActionType.SelectLastSelectedObject:
-					m_PlayerContext.SetSelectedGameObject(m_PersistedSelection && m_PersistedSelection.activeInHierarchy ? m_PersistedSelection : startObject);
+					m_PlayerContext.SetSelectedGameObject(m_PersistedIsAvailable ? m_PersistedSelection : startObject);
 					OnSelected();
 					break;
 
