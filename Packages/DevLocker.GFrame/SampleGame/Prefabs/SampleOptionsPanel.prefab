@@ -456,7 +456,6 @@ MonoBehaviour:
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  EnableUsedInputActions: 1
   PushInputStack: 0
   IncludeUIActions: 1
   IsRoot: 0
@@ -488,9 +487,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartSelection: {fileID: 1268881109926130125}
+  StartSelections:
+  - {fileID: 1268881109926130125}
   PersistentSelection: 0
   NoSelectionAction: 8
+  TrackOnlyChildren: 1
   FilterControlScheme: []
   RemoveSelectionOnControlSchemeMismatch: 1
 --- !u!1 &1268881109884049377
@@ -665,12 +666,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268881109920819538}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0f06ea55a1aa7e4a8a6fcec53aa8944, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 0
   SkipHotkey: 1
   m_InputAction: {fileID: -6345765068046251359, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
 --- !u!1 &1268881109926130127
@@ -816,12 +816,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268881109926130127}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 0
   SkipHotkey: 2
   m_InputAction: {fileID: -545284412596635738, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
 --- !u!1 &1268881110335725833
@@ -1553,12 +1552,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268881110886724369}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 0
   SkipHotkey: 0
   m_InputAction: {fileID: -7452923264383808493, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
 --- !u!1 &1268881110950398496
@@ -2805,12 +2803,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268881111400655108}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0f06ea55a1aa7e4a8a6fcec53aa8944, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 0
   SkipHotkey: 1
   m_InputAction: {fileID: 2852409272423593020, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
 --- !u!1 &1268881111879395786

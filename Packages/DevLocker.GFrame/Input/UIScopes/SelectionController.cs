@@ -18,8 +18,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			SelectLastSelectedObject = 8,
 		};
 
-		[Tooltip("Select this object on enable.")]
-		public Selectable StartSelection;
+		[Tooltip("Select the first interactable object on enable.")]
+		public Selectable[] StartSelections;
 
 		[Tooltip("Initially select the starting object, but remember what the selection was on disable.\nOn re-enabling, resume from that selection.")]
 		public bool PersistentSelection = false;
@@ -39,11 +39,11 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private GameObject m_PersistedSelection = null;
 		private Selectable m_PersistedSelectable;	// Not sure if having selected object without selectable component is possible.
-		private bool m_PersistedIsAvailable => m_PersistedSelectable 
-			? m_PersistedSelectable.IsInteractable() && m_PersistedSelectable.isActiveAndEnabled 
+		private bool m_PersistedIsAvailable => m_PersistedSelectable
+			? m_PersistedSelectable.IsInteractable() && m_PersistedSelectable.isActiveAndEnabled
 			: m_PersistedSelection != null && m_PersistedSelection.activeInHierarchy
 		;
-		
+
 		private bool m_SelectRequested = false;
 		private string m_LastControlScheme = "";
 		private bool m_ControlSchemeMatched = true;
@@ -54,6 +54,22 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
+
+		/// <summary>
+		/// Find the first active and interactable selectable from <see cref="StartSelections"/>.
+		/// </summary>
+		public virtual Selectable GetStartSelection()
+		{
+			if (StartSelections == null)
+				return null;
+
+			foreach(Selectable selectable in StartSelections) {
+				if (selectable && selectable.isActiveAndEnabled && selectable.IsInteractable())
+					return selectable;
+			}
+
+			return null;
+		}
 
 		protected virtual void Awake()
 		{
@@ -106,7 +122,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				GameObject targetSelection = (PersistentSelection && m_PersistedIsAvailable)
 					? m_PersistedSelection
-					: (StartSelection ? StartSelection.gameObject : null)
+					: GetStartSelection()?.gameObject // Null-check is safe.
 					;
 
 				if (targetSelection && !targetSelection.activeInHierarchy) {
@@ -176,8 +192,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void DoNoSelectionAction()
 		{
-			GameObject startObject = StartSelection ? StartSelection.gameObject : null;
-			
+			GameObject startObject = GetStartSelection()?.gameObject; // Null-check is safe.
+
 			switch (NoSelectionAction) {
 
 				case NoSelectionActionType.SelectLastSelectedObject:
@@ -254,17 +270,14 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnValidate()
 		{
-			/* Having no start selection is valid if selectables will be created dynamically.
-			if (StartSelection == null
-#if UNITY_EDITOR
-				&& (Application.isPlaying || UnityEditor.BuildPipeline.isBuildingPlayer)
-#else
-				&& Application.isPlaying
-#endif
-				) {
-				Debug.LogError($"{name} {nameof(SelectionController)} has no start selection set. Disabling!", this);
-				enabled = false;
-			}*/
+			if (StartSelections != null) {
+				// Having no start selection is valid if selectables will be created dynamically.
+				foreach (Selectable selectable in StartSelections) {
+					if (selectable == null) {
+						Debug.LogError($"{name} {nameof(SelectionController)} has missing start selection.", this);
+					}
+				}
+			}
 		}
 	}
 }

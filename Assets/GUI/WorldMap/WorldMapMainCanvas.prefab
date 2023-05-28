@@ -1556,7 +1556,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartSelection: {fileID: 4757464412193887359}
+  StartSelections:
+  - {fileID: 4757464412193887359}
   PersistentSelection: 0
   NoSelectionAction: 8
   TrackOnlyChildren: 1
@@ -2330,6 +2331,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749554, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
       propertyPath: InputAction
+      value: 
+      objectReference: {fileID: 1797235489119140995, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
+    - target: {fileID: 5394036698972749554, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
+      propertyPath: m_InputAction
       value: 
       objectReference: {fileID: 1797235489119140995, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}
     - target: {fileID: 5394036698972749555, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
