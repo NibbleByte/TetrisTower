@@ -92,7 +92,12 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Tooltip("Exclude these selectables from navigation links.")]
 		public List<Selectable> Exclude;
 
-		private Selectable[] m_AllActiveSelectables = new Selectable[10];
+		private const int s_StartActiveSelectablesSize = 10; // Lengths must be equal!
+		private int m_AllActiveSelectablesCount = 0;
+		private Selectable[] m_AllActiveSelectables;	// Currently used.
+		private Selectable[] m_AllActiveSelectables1 = new Selectable[s_StartActiveSelectablesSize];
+		private Selectable[] m_AllActiveSelectables2 = new Selectable[s_StartActiveSelectablesSize];
+		private bool[] m_AllActiveSelectablesInteractablility = new bool[s_StartActiveSelectablesSize];
 
 		private List<Selectable> m_ManagedSelectables = new List<Selectable>();
 
@@ -139,20 +144,64 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public bool RescanSelectables()
 		{
-			if (Application.isPlaying) {
-				Selectable.AllSelectablesNoAlloc(m_AllActiveSelectables);
+			bool needsRefresh = false;
+			bool hasAutoWrap = WrapUp.IsAutoMode || WrapDown.IsAutoMode || WrapLeft.IsAutoMode || WrapRight.IsAutoMode;
 
-				// Keep expanding till array is big enough to fit all the active selectables.
-				while (m_AllActiveSelectables.Last() != null) {
-					m_AllActiveSelectables = new Selectable[m_AllActiveSelectables.Length * 2];
-					Selectable.AllSelectablesNoAlloc(m_AllActiveSelectables);
+			if (Application.isPlaying) {
+
+				// Gather active selectables from UGUI API. Note that this list incudes interactable and non-interactable ones.
+				// If auto wrap is used, check if selectables objects changed or their interactability.
+
+				if (m_AllActiveSelectables == null) {
+					m_AllActiveSelectables = m_AllActiveSelectables2;
+				}
+
+				if (m_AllActiveSelectables.Length < Selectable.allSelectableCount) {
+					// Must all have equal size.
+					m_AllActiveSelectables1 = new Selectable[Selectable.allSelectableCount * 2];
+					m_AllActiveSelectables2 = new Selectable[Selectable.allSelectableCount * 2];
+					m_AllActiveSelectablesInteractablility = new bool[Selectable.allSelectableCount * 2];
+
+					m_AllActiveSelectables = m_AllActiveSelectables2;
+				}
+
+				Selectable[] prevActiveSelectables = m_AllActiveSelectables;
+				int prevActiveSelectablesCount = m_AllActiveSelectablesCount;
+				m_AllActiveSelectables = m_AllActiveSelectables == m_AllActiveSelectables1 ? m_AllActiveSelectables2 : m_AllActiveSelectables1;
+
+				m_AllActiveSelectablesCount = Selectable.AllSelectablesNoAlloc(m_AllActiveSelectables);
+
+				if (hasAutoWrap) {
+					// Auto-wraps will link selectables outside this group that are not managed.
+					// If linked selectable becomes unavailable or a new one becomes available, auto should be refreshed.
+					// So check if list of selectables changed. Later will be checked for interactability too.
+
+					if (prevActiveSelectablesCount == m_AllActiveSelectablesCount) {
+						// Both arrays should have the same length! Always!
+						for (int i = 0; i < m_AllActiveSelectablesCount; ++i) {
+							if (prevActiveSelectables[i] != m_AllActiveSelectables[i]) {
+								needsRefresh = true;
+								// Don't break or continue! Need to write interactable flags.
+							}
+
+							// Check if button was active but not interactable and became interactable.
+							bool interactable = m_AllActiveSelectables[i].IsInteractable();
+							if (m_AllActiveSelectablesInteractablility[i] != interactable) {
+								needsRefresh = true;
+							}
+
+							m_AllActiveSelectablesInteractablility[i] = interactable;
+						}
+					} else {
+						needsRefresh = true;
+					}
 				}
 
 			} else {
 				m_AllActiveSelectables = GetComponentsInChildren<Selectable>().Concat(Include).Distinct().ToArray();
+				m_AllActiveSelectablesCount = m_AllActiveSelectables.Length;
+				m_AllActiveSelectablesInteractablility = m_AllActiveSelectables.Select(s => s.IsInteractable()).ToArray();
 			}
-
-			bool needsRefresh = false;
 
 			// Remove destroyed or inactive selectables.
 			for (int i = 0; i < m_ManagedSelectables.Count; ++i) {
@@ -161,7 +210,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				// Destroyed - yes. Re-parented - no. :(
 				// Check active instead gameObject.activeInHierarchy hoping it will be faster.
 				if (selectable == null || !selectable.IsInteractable() || !IsStillActive(selectable)) {
-					
+
 					if (selectable) {
 						var listener = selectable.gameObject.GetComponent<UINavigationListener>();
 						listener.Owner = null;
@@ -172,10 +221,16 @@ namespace DevLocker.GFrame.Input.UIScope
 					needsRefresh = true;
 					continue;
 				}
+
+				// Check for interactability. If object has become inactive it would be detected above.
+				if (!needsRefresh && selectable && IsAutoWrappedNotInteractable(selectable)) {
+					needsRefresh = true;
+				}
 			}
 
 			// Check for new selectables.
-			foreach (Selectable selectable in m_AllActiveSelectables) {
+			for(int i = 0; i < m_AllActiveSelectablesCount; ++i) {
+				Selectable selectable = m_AllActiveSelectables[i];
 
 				// End of array... or destroyed?
 				if (selectable == null)
@@ -188,8 +243,8 @@ namespace DevLocker.GFrame.Input.UIScope
 					&& (Include.Contains(selectable) || selectable.transform.IsChildOf(transform))
 					) {
 					m_ManagedSelectables.Add(selectable);
-					
-					// Make sure to set navigation mode different from None in advance or the Selectable.FindSelectable() below will skip it. 
+
+					// Make sure to set navigation mode different from None in advance or the Selectable.FindSelectable() below will skip it.
 					Navigation nav = selectable.navigation;
 					nav.mode = UnityEngine.UI.Navigation.Mode.Explicit;
 					selectable.navigation = nav;
@@ -382,14 +437,33 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void ClearCache()
 		{
 			m_ManagedSelectables.Clear();
+
+			m_AllActiveSelectablesCount = 0;
+			m_AllActiveSelectables = null;    // Currently used.
+			m_AllActiveSelectables1 = new Selectable[s_StartActiveSelectablesSize];
+			m_AllActiveSelectables2 = new Selectable[s_StartActiveSelectablesSize];
+			m_AllActiveSelectablesInteractablility = new bool[s_StartActiveSelectablesSize];
 		}
 
 		private bool IsStillActive(Selectable selectable)
 		{
-			foreach(Selectable activeSelectable in m_AllActiveSelectables) {
+			for(int i = 0; i < m_AllActiveSelectablesCount; ++i) {
+				Selectable activeSelectable = m_AllActiveSelectables[i];
+
 				if (activeSelectable == null) return false;	// Reached the end of the array.
 				if (activeSelectable == selectable) return true;
 			}
+
+			return false;
+		}
+
+		private bool IsAutoWrappedNotInteractable(Selectable selectable)
+		{
+			Navigation nav = selectable.navigation;
+			if (WrapUp.IsAutoMode && nav.selectOnUp && !nav.selectOnUp.IsInteractable()) return true;
+			if (WrapDown.IsAutoMode && nav.selectOnDown && !nav.selectOnDown.IsInteractable()) return true;
+			if (WrapLeft.IsAutoMode && nav.selectOnLeft && !nav.selectOnLeft.IsInteractable()) return true;
+			if (WrapRight.IsAutoMode && nav.selectOnRight && !nav.selectOnRight.IsInteractable()) return true;
 
 			return false;
 		}
