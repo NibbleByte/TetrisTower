@@ -37,6 +37,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Tooltip("Set selected object to none if the active control scheme doesn't match the filter. E.g. hide selection for mouse & keyboard, but show it for Gamepad.\nIgnored if no filter is specified.")]
 		public bool RemoveSelectionOnControlSchemeMismatch = true;
 
+		public bool ClearSelectionOnDisable = true;
+
 		private GameObject m_PersistedSelection = null;
 		private Selectable m_PersistedSelectable;	// Not sure if having selected object without selectable component is possible.
 		private bool m_PersistedIsAvailable => m_PersistedSelectable
@@ -81,6 +83,17 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_SelectRequested = true;
 
 			CollectParentCanvasGroups();
+		}
+
+		protected virtual void OnDisable()
+		{
+			if (GetActiveInstanceForThisPlayer() == this) {
+				m_ActiveInstances.Remove(m_PlayerContext.GetRootObject());
+			}
+
+			if (ClearSelectionOnDisable && m_PlayerContext.IsActive) {
+				m_PlayerContext.SetSelectedGameObject(null);
+			}
 		}
 
 		void Update()
@@ -215,13 +228,6 @@ namespace DevLocker.GFrame.Input.UIScope
 		}
 
 		protected virtual void OnSelected() { }
-
-		protected virtual void OnDisable()
-		{
-			if (GetActiveInstanceForThisPlayer() == this) {
-				m_ActiveInstances.Remove(m_PlayerContext.GetRootObject());
-			}
-		}
 
 		protected SelectionController GetActiveInstanceForThisPlayer()
 		{

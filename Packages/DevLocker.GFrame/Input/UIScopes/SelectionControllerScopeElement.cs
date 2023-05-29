@@ -8,15 +8,5 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// </summary>
 	public class SelectionControllerScopeElement : SelectionController, IScopeElement
 	{
-		public bool ClearSelectionOnDisable = true;
-
-		protected override void OnDisable()
-		{
-			base.OnDisable();
-
-			if (ClearSelectionOnDisable && m_PlayerContext.IsActive) {
-				m_PlayerContext.SetSelectedGameObject(null);
-			}
-		}
 	}
 }
