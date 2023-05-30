@@ -73,6 +73,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			public Queue<KeyValuePair<UIScope, bool>> PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
 		}
 
+		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of closest root will remain inactive).")]
+		public bool IsRoot = false;
+
 		[Tooltip("If on, you can choose OnEnable and OnDisable automatic focus behaviour.\n\nIf off, this scope will always be active when enabled and vice versa. You'll have to manually handle this and it will be excluded from any focus schemes (i.e. it can be active while another scope is focused + parents). You'll be responsible for managing conflicts.")]
 		public bool AutomaticFocus = true;
 
@@ -84,17 +87,14 @@ namespace DevLocker.GFrame.Input.UIScope
 		public List<UIScope> OnDisableScopes;
 
 #if USE_INPUT_SYSTEM
+		[Space]
 		[Tooltip("Reset all input actions.\nThis will interrupt their progress and any gesture, drag, sequence will be canceled.")]
 		public bool ResetAllActionsOnEnable = true;
 
-		[Space]
 		[Tooltip("Use this for modal windows to suppress background hotkeys.\n\nPushes a new input state in the stack.\nOn deactivating, will pop this state and restore the previous one.\nThe only enabled actions will be the used ones by (under) this scope.")]
 		public bool PushInputStack = false;
 		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
 		public bool IncludeUIActions = true;
-
-		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of lowest root will remain inactive).")]
-		public bool IsRoot = false;
 #endif
 
 		private UIScope m_LastFocusedScope;
@@ -337,11 +337,11 @@ namespace DevLocker.GFrame.Input.UIScope
 				}
 
 
-				
+
 				// Something else just activated, use that if appropriate.
 				UIScope fallbackFrameScope = null;
 				foreach(UIScope scope in m_PlayerSet.RegisteredScopes) {
-					
+
 					if (scope.m_FrameEnabled == Time.frameCount) {
 						// A bit of copy-paste from OnEnable(). Sad.
 						switch (scope.OnEnableBehaviour) {
@@ -520,7 +520,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// Is this scope active due to one of its children being focused, or being the focused one.
 		/// </summary>
 		public bool IsActive => m_PlayerSet != null && m_PlayerSet.ActiveScopes.Contains(this);
-		
+
 		/// <summary>
 		/// Is this scope focused.
 		/// </summary>
@@ -791,6 +791,8 @@ namespace DevLocker.GFrame.Input.UIScope
 	[UnityEditor.CanEditMultipleObjects]
 	internal class UIScopeEditor : UnityEditor.Editor
 	{
+		private static bool m_InfoFoldOut = false;
+
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
@@ -801,7 +803,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			var uiScope = (UIScope)target;
 
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IsRoot)));
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.AutomaticFocus)));
+
 			if (uiScope.AutomaticFocus) {
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnEnableBehaviour)));
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableBehaviour)));
@@ -812,8 +816,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 #if USE_INPUT_SYSTEM
-			UnityEditor.EditorGUILayout.Space();
-
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.ResetAllActionsOnEnable)));
 
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.PushInputStack)));
@@ -821,7 +823,6 @@ namespace DevLocker.GFrame.Input.UIScope
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IncludeUIActions)));
 			}
 #endif
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IsRoot)));
 
 			serializedObject.ApplyModifiedProperties();
 
@@ -833,8 +834,12 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UnityEditor.EditorGUILayout.Space();
 
-			UnityEditor.EditorGUILayout.BeginVertical(UnityEditor.EditorStyles.helpBox);
-			{
+			m_InfoFoldOut = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(m_InfoFoldOut, "Info");
+
+			if (m_InfoFoldOut) {
+
+				UnityEditor.EditorGUILayout.BeginVertical(UnityEditor.EditorStyles.helpBox);
+
 				string scopeState = "Inactive";
 				Color scopeStateColor = Color.red;
 				if (uiScope.IsFocused) {
@@ -866,9 +871,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 
 						bool actionsActive = uiScope.enabled
-						                     && uiScope.gameObject.activeInHierarchy
-						                     && uiScope.m_PlayerContext?.InputContext != null
-						                     && hotkeyElement.GetUsedActions(uiScope.m_PlayerContext.InputContext).Any(a => a.enabled);
+												&& uiScope.gameObject.activeInHierarchy
+												&& uiScope.m_PlayerContext?.InputContext != null
+												&& hotkeyElement.GetUsedActions(uiScope.m_PlayerContext.InputContext).Any(a => a.enabled);
 
 						string activeStr = actionsActive ? "Active" : "Inactive";
 						GUI.color = actionsActive ? Color.green : Color.red;
@@ -881,7 +886,11 @@ namespace DevLocker.GFrame.Input.UIScope
 				}
 
 				UnityEditor.EditorGUILayout.EndVertical();
+
 			}
+
+			UnityEditor.EditorGUILayout.EndFoldoutHeaderGroup();
+
 		}
 	}
 #endif
