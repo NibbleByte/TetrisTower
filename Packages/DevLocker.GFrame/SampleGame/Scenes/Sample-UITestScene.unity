@@ -4808,7 +4808,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   WrapDown:
-    Mode: 2
+    Mode: 10
     Selectable: {fileID: 0}
     NavigationGroup: {fileID: 0}
     Scope: {fileID: 0}
@@ -4837,9 +4837,9 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   WrapRight:
-    Mode: 2
+    Mode: 20
     Selectable: {fileID: 0}
-    NavigationGroup: {fileID: 0}
+    NavigationGroup: {fileID: 1331933435}
     Scope: {fileID: 0}
     Event:
       m_PersistentCalls:
@@ -13240,7 +13240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WrapUp:
-    Mode: 4
+    Mode: 24
     Selectable: {fileID: 0}
     NavigationGroup: {fileID: 249962574}
     Scope: {fileID: 0}
@@ -13264,7 +13264,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   WrapRight:
-    Mode: 4
+    Mode: 24
     Selectable: {fileID: 0}
     NavigationGroup: {fileID: 1331933435}
     Scope: {fileID: 1331933432}
@@ -13854,6 +13854,7 @@ MonoBehaviour:
   TrackOnlyChildren: 1
   FilterControlScheme: []
   RemoveSelectionOnControlSchemeMismatch: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &708464784
 GameObject:
   m_ObjectHideFlags: 0
@@ -27680,7 +27681,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   WrapDown:
-    Mode: 7
+    Mode: 50
     Selectable: {fileID: 0}
     NavigationGroup: {fileID: 0}
     Scope: {fileID: 0}
@@ -27701,7 +27702,7 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
   WrapLeft:
-    Mode: 1
+    Mode: 5
     Selectable: {fileID: 0}
     NavigationGroup: {fileID: 0}
     Scope: {fileID: 0}
@@ -27709,7 +27710,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   WrapRight:
-    Mode: 1
+    Mode: 5
     Selectable: {fileID: 0}
     NavigationGroup: {fileID: 0}
     Scope: {fileID: 0}
@@ -36609,6 +36610,7 @@ MonoBehaviour:
   TrackOnlyChildren: 1
   FilterControlScheme: []
   RemoveSelectionOnControlSchemeMismatch: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &1744189238
 GameObject:
   m_ObjectHideFlags: 0

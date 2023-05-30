@@ -20,14 +20,15 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		public enum WrapMode
 		{
-			None,
-			Wrap,
-			Auto,
-			Explicit,
-			FirstSelectableOfNavigationGroup,   // NOTE: These might not be what you expect if arrangement is more irregular...
-			LastSelectableOfNavigationGroup,    // NOTE: These might not be what you expect if arrangement is more irregular...
-			FocusScope,
-			TriggerEvent,
+			None = 0,
+			Wrap = 5,
+			Auto = 10,
+			Explicit = 15,
+			AutoSelectableOfNavigationGroup = 20,
+			FirstSelectableOfNavigationGroup = 24,   // NOTE: These might not be what you expect if arrangement is more irregular...
+			LastSelectableOfNavigationGroup = 28,    // NOTE: These might not be what you expect if arrangement is more irregular...
+			FocusScope = 40,
+			TriggerEvent = 50,
 		}
 
 		public enum NavigationMode
@@ -579,6 +580,16 @@ namespace DevLocker.GFrame.Input.UIScope
 					// Do nothing, they should be linked already.
 					return;
 
+				case WrapMode.AutoSelectableOfNavigationGroup:
+					var eventSelectable = eventData.selectedObject.GetComponent<Selectable>();
+					nextSelectable = wrapBehaviour.NavigationGroup ? wrapBehaviour.NavigationGroup.FindManagedSelectable(eventSelectable, eventData.moveVector) : null;
+
+					if (nextSelectable && nextSelectable.gameObject.activeInHierarchy) {
+						eventData.selectedObject = nextSelectable.gameObject;
+						eventData.Use();
+					}
+					break;
+
 				case WrapMode.FirstSelectableOfNavigationGroup:
 					nextSelectable = wrapBehaviour.NavigationGroup ? wrapBehaviour.NavigationGroup.FirstSelectable : null;
 
@@ -619,14 +630,17 @@ namespace DevLocker.GFrame.Input.UIScope
 	[CustomPropertyDrawer(typeof(UINavigationGroup.WrapBehaviour))]
 	internal class NavigationGroupWrapBehaviourPropertyDrawer : PropertyDrawer
 	{
+		private static UINavigationGroup.WrapMode[] s_WrapModeValues = (UINavigationGroup.WrapMode[]) Enum.GetValues(typeof(UINavigationGroup.WrapMode));
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			var mode = (UINavigationGroup.WrapMode) property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).enumValueIndex;
+			var mode = s_WrapModeValues[property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).enumValueIndex];
 			switch (mode) {
 				case UINavigationGroup.WrapMode.None:
 				case UINavigationGroup.WrapMode.Wrap:
 				case UINavigationGroup.WrapMode.Auto:
 				case UINavigationGroup.WrapMode.Explicit:
+				case UINavigationGroup.WrapMode.AutoSelectableOfNavigationGroup:
 				case UINavigationGroup.WrapMode.FirstSelectableOfNavigationGroup:
 				case UINavigationGroup.WrapMode.LastSelectableOfNavigationGroup:
 				case UINavigationGroup.WrapMode.FocusScope:
@@ -644,7 +658,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-			var mode = (UINavigationGroup.WrapMode)property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).enumValueIndex;
+			var mode = s_WrapModeValues[property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).enumValueIndex];
 
 			switch (mode) {
 				case UINavigationGroup.WrapMode.None:
@@ -660,6 +674,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					EditorGUI.PropertyField(position, property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Selectable)), new GUIContent());
 					break;
 
+				case UINavigationGroup.WrapMode.AutoSelectableOfNavigationGroup:
 				case UINavigationGroup.WrapMode.FirstSelectableOfNavigationGroup:
 				case UINavigationGroup.WrapMode.LastSelectableOfNavigationGroup:
 					position.width /= 2f;
