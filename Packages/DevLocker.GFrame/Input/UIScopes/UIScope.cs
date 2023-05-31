@@ -834,7 +834,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UnityEditor.EditorGUILayout.Space();
 
+
+			UnityEditor.EditorGUILayout.BeginHorizontal();
 			m_InfoFoldOut = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(m_InfoFoldOut, "Info");
+			if (GUILayout.Button("Open Scopes Debugger", UnityEditor.EditorStyles.miniButton, GUILayout.ExpandWidth(false))) {
+				UIScopesDebugger.Init();
+			}
+			UnityEditor.EditorGUILayout.EndHorizontal();
 
 			if (m_InfoFoldOut) {
 
