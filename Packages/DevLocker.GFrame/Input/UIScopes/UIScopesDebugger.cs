@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using System.Text;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 namespace DevLocker.GFrame.Input.UIScope
 {
@@ -36,6 +37,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GUIStyle ActiveStyle;
 		private GUIStyle FocusedStyle;
 
+		private GUIContent EventSystemButtonContent;
 		private GUIContent FocusButtonContent;
 
 		internal static void Init()
@@ -66,6 +68,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			FocusedStyle.normal.textColor = FocusedStyle.hover.textColor = Color.green;
 
 			FocusButtonContent = EditorGUIUtility.IconContent("Animation.FilterBySelection");
+			EventSystemButtonContent = EditorGUIUtility.IconContent("EventSystem Icon");
 		}
 
 		void OnEnable()
@@ -86,13 +89,27 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			EditorGUILayout.BeginHorizontal();
+			EditorGUI.BeginDisabledGroup(!Application.isPlaying);
+			{
+				EditorGUILayout.ObjectField("Selected Object", EventSystem.current?.currentSelectedGameObject, typeof(GameObject), true);
+				if (GUILayout.Button(EventSystemButtonContent, EditorStyles.label, GUILayout.Width(16), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
+					Selection.activeGameObject = EventSystem.current?.gameObject;
+				}
 
-			if (GUILayout.Button("Rescan") || m_RootElement == null) {
-				BuildScopesTree();
 			}
+			EditorGUI.EndDisabledGroup();
+			EditorGUILayout.EndHorizontal();
 
-			m_ShowHotkeys = EditorGUILayout.Toggle(m_ShowHotkeys, GUILayout.Width(16));
 
+
+			EditorGUILayout.BeginHorizontal();
+			{
+				if (GUILayout.Button("Rescan") || m_RootElement == null) {
+					BuildScopesTree();
+				}
+
+				m_ShowHotkeys = EditorGUILayout.Toggle(m_ShowHotkeys, GUILayout.Width(16));
+			}
 			EditorGUILayout.EndHorizontal();
 
 			m_ScrollView = GUILayout.BeginScrollView(m_ScrollView);
