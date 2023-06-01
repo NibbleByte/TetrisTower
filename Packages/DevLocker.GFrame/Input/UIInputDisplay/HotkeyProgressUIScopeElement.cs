@@ -19,8 +19,12 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Utils.EnumMask]
 		public SkipHotkeyOption SkipHotkey;
 
+		[Tooltip("(Optional) Input action to be used. Can be missing - indicator root will be deactivated.")]
 		[SerializeField]
 		public InputActionReference InputAction;
+
+		[Tooltip("The root object of the indicator. It will be deactivated if the action doesn't have continues integration (e.g. \"hold\" interaction) or no action is specified.")]
+		public GameObject IndicatorRoot;
 
 		[Tooltip("Image to be used as a progress bar of the action. It will fill it from 0 to 1.\nLeave empty to use the image of the current game object.")]
 		public Image FillImage;
@@ -54,6 +58,24 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected bool m_HasInitialized = false;
 
+		public virtual bool HasContinuesInteractions()
+		{
+			if (m_InputAction == null)
+				return false;
+
+			StringComparison comparison = StringComparison.OrdinalIgnoreCase;
+			
+			if (m_InputAction.interactions.Contains("hold", comparison) || m_InputAction.interactions.Contains("slowTap", comparison))
+				return true;
+
+			foreach (InputBinding binding in m_InputAction.bindings) {
+				if ((binding.interactions?.Contains("hold", comparison) ?? false) || (binding.interactions?.Contains("slowTap", comparison) ?? false))
+					return true;
+			}
+
+			return false;
+		}
+
 		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
@@ -73,6 +95,10 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 
 			m_InputAction = GetUsedActions(m_PlayerContext.InputContext).FirstOrDefault();
+
+			if (IndicatorRoot) {
+				IndicatorRoot.SetActive(HasContinuesInteractions());
+			}
 
 			if (m_InputAction == null)
 				return;
@@ -170,7 +196,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void Update()
 		{
-			if (m_InputAction == null)
+			if (m_InputAction == null || (IndicatorRoot && !IndicatorRoot.activeSelf))
 				return;
 
 			if (m_ActionStarted) {

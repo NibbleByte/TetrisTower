@@ -267,17 +267,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 772ce5dafed8a854b9f35be3a5e4d61b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 1
   SkipHotkey: 0
-  m_InputAction: {fileID: 0}
+  InputAction: {fileID: 0}
+  IndicatorRoot: {fileID: 4408878009356400716}
   FillImage: {fileID: 502590122280986646}
-  Text: {fileID: 0}
   TextMeshProText: {fileID: 0}
   FormatText: '{value}'
   Started:
     m_PersistentCalls:
       m_Calls: []
   Performed:
+    m_PersistentCalls:
+      m_Calls: []
+  Cancelled:
     m_PersistentCalls:
       m_Calls: []
 --- !u!224 &1529557861353451395 stripped
