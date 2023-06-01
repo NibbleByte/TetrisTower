@@ -13,7 +13,10 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Tooltip("Check to work with multiple objects (advanced interface)")]
 		public bool MultipleObjects = false;
 
-		[Tooltip("When this object is selected, activate the other.")]
+		[Tooltip("Activate when selectable(s) are NOT selected.")]
+		public bool Invert = false;
+
+		[Tooltip("When this selectable is selected, activate the target object.")]
 		public Selectable OnSelectedObject;
 		[Tooltip("Object to be activated.")]
 		public GameObject ActivatedObject;
@@ -24,6 +27,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		public GameObject[] ActivatedObjects;
 
 		private GameObject m_LastSelectedObject;
+
+		private bool m_HasInitialized = false;
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
@@ -37,12 +42,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
 
-		void Update()
+		public void Update()
 		{
 			if (!m_PlayerContext.IsActive)
 				return;
 
-			if (m_LastSelectedObject != m_PlayerContext.SelectedGameObject) {
+			if (m_LastSelectedObject != m_PlayerContext.SelectedGameObject || !m_HasInitialized) {
+				m_HasInitialized = true;
 				m_LastSelectedObject = m_PlayerContext.SelectedGameObject;
 
 				if (MultipleObjects) {
@@ -54,15 +60,15 @@ namespace DevLocker.GFrame.Input.UIScope
 					}
 
 					foreach(GameObject obj in ActivatedObjects) {
-						obj.SetActive(activate);
+						obj.SetActive(Invert ? !activate : activate);
 					}
 
 				} else {
 
 					if (m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(OnSelectedObject.transform)) {
-						ActivatedObject.SetActive(true);
+						ActivatedObject.SetActive(Invert ? false : true);
 					} else {
-						ActivatedObject.SetActive(false);
+						ActivatedObject.SetActive(Invert ? true : false);
 					}
 				}
 			}
@@ -113,6 +119,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			var multipleObjectsProp = serializedObject.FindProperty(nameof(ActivateOnSelected.MultipleObjects));
 			UnityEditor.EditorGUILayout.PropertyField(multipleObjectsProp);
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(ActivateOnSelected.Invert)));
 
 			if (multipleObjectsProp.boolValue) {
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(ActivateOnSelected.OnSelectedObjects)));
