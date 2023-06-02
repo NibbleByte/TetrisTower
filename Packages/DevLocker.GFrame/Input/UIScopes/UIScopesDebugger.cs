@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using DevLocker.GFrame.Input.Contexts;
+using DevLocker.GFrame.Input.UIInputDisplay;
 
 namespace DevLocker.GFrame.Input.UIScope
 {
@@ -39,6 +41,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private GUIContent EventSystemButtonContent;
 		private GUIContent FocusButtonContent;
+
+		private ForceInputDevice m_ForceInputDevice;
 
 		internal static void Init()
 		{
@@ -79,6 +83,10 @@ namespace DevLocker.GFrame.Input.UIScope
 		void OnDisable()
 		{
 			EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+
+			if (m_ForceInputDevice) {
+				m_ForceInputDevice.ForcedDevice = null;
+			}
 		}
 
 		void OnGUI()
@@ -96,6 +104,30 @@ namespace DevLocker.GFrame.Input.UIScope
 					Selection.activeGameObject = EventSystem.current?.gameObject;
 				}
 
+			}
+			EditorGUI.EndDisabledGroup();
+			EditorGUILayout.EndHorizontal();
+
+
+			EditorGUILayout.BeginHorizontal();
+			EditorGUI.BeginDisabledGroup(!Application.isPlaying);
+			{
+				InputBindingDisplayAsset displayAsset = m_ForceInputDevice ? m_ForceInputDevice.ForcedDevice : null;
+				displayAsset = (InputBindingDisplayAsset) EditorGUILayout.ObjectField("Force Input Device", displayAsset, typeof(InputBindingDisplayAsset), false);
+
+				if (displayAsset) {
+					if (m_ForceInputDevice == null) {
+						m_ForceInputDevice = GameObject.FindObjectOfType<ForceInputDevice>();
+
+						if (m_ForceInputDevice == null) {
+							m_ForceInputDevice = EventSystem.current.gameObject.AddComponent<ForceInputDevice>();
+						}
+					}
+
+					m_ForceInputDevice.ForcedDevice = displayAsset;
+				} else if (m_ForceInputDevice) {
+					m_ForceInputDevice.ForcedDevice = null;
+				}
 			}
 			EditorGUI.EndDisabledGroup();
 			EditorGUILayout.EndHorizontal();
@@ -171,6 +203,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void GatherScopes(UIScopeTreeElement element, Transform transform)
 		{
+			if (m_ForceInputDevice == null) {
+				m_ForceInputDevice = transform.GetComponent<ForceInputDevice>();
+			}
+
 			UIScope scope = transform.GetComponent<UIScope>();
 			if (scope) {
 				element.Children.Add(new UIScopeTreeElement() { Scope = scope, Depth = element.Depth + 1 });

@@ -164,6 +164,12 @@ namespace DevLocker.GFrame.Input
 		event Action LastUsedDeviceChanged;
 
 		/// <summary>
+		/// Set to force the context to use only this device and ignore the rest.
+		/// This will force only hotkey icons to display for it.
+		/// </summary>
+		InputDevice ForcedDevice { get; set; }
+
+		/// <summary>
 		/// Find InputAction by action name or id.
 		/// </summary>
 		InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false);

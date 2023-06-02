@@ -35,6 +35,23 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
 
+		private InputDevice m_ForcedDevice;
+		public InputDevice ForcedDevice {
+			get => m_ForcedDevice;
+			set {
+				if (m_ForcedDevice == value)
+					return;
+
+				m_ForcedDevice = value;
+				if (m_ForcedDevice != null) {
+					m_LastUsedDevice = m_ForcedDevice;
+					m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
+
+					TriggerLastUsedDeviceChanged();
+				}
+			}
+		}
+
 		public InputComponentContext(PlayerInput playerInput, InputActionsStack inputStack, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
 		{
 			PlayerInput = playerInput;
@@ -196,6 +213,10 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
 		{
+			// Faking it.
+			if (m_ForcedDevice != null)
+				return;
+
 			if (m_LastUsedDevice == device || PlayerInput == null || !PlayerInput.devices.Contains(device))
 				return;
 
