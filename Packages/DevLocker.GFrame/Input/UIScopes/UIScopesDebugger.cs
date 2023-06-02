@@ -79,11 +79,23 @@ namespace DevLocker.GFrame.Input.UIScope
 		void OnEnable()
 		{
 			EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+			SceneManager.sceneLoaded += OnSceneLoaded;
+			SceneManager.sceneUnloaded += OnSceneUnloaded;
+			EditorSceneManager.sceneOpened += OnSceneOpened;
+			EditorSceneManager.sceneClosed += OnSceneClosed;
+			PrefabStage.prefabStageOpened += OnPrefabStageChanged;
+			PrefabStage.prefabStageClosing += OnPrefabStageChanged;
 		}
 
 		void OnDisable()
 		{
 			EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+			SceneManager.sceneLoaded -= OnSceneLoaded;
+			SceneManager.sceneUnloaded -= OnSceneUnloaded;
+			EditorSceneManager.sceneOpened -= OnSceneOpened;
+			EditorSceneManager.sceneClosed -= OnSceneClosed;
+			PrefabStage.prefabStageOpened -= OnPrefabStageChanged;
+			PrefabStage.prefabStageClosing -= OnPrefabStageChanged;
 
 			if (m_ForceInputDevice) {
 				m_ForceInputDevice.ForcedDevice = null;
@@ -94,7 +106,10 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			if (UrlStyle == null) {
 				InitStyles();
+			}
 
+			if (m_RootElement == null) {
+				BuildScopesTree();
 			}
 
 			EditorGUILayout.BeginHorizontal();
@@ -136,7 +151,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			EditorGUILayout.BeginHorizontal();
 			{
-				if (GUILayout.Button("Rescan") || m_RootElement == null) {
+				if (GUILayout.Button("Rescan")) {
 					BuildScopesTree();
 				}
 
@@ -152,16 +167,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			if (Application.isPlaying) {
 				Repaint();
-			}
-		}
-
-		private void OnPlayModeStateChanged(PlayModeStateChange state)
-		{
-			switch(state) {
-				case PlayModeStateChange.EnteredEditMode:
-				case PlayModeStateChange.EnteredPlayMode:
-					BuildScopesTree();
-					break;
 			}
 		}
 
@@ -335,6 +340,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+
 		private void SetFoldoutRecursively(UIScopeTreeElement element, bool foldout)
 		{
 			element.Foldout = foldout;
@@ -343,6 +349,53 @@ namespace DevLocker.GFrame.Input.UIScope
 				SetFoldoutRecursively(child, foldout);
 			}
 		}
+
+
+		#region Event handlers for refresh
+
+		private void OnPlayModeStateChanged(PlayModeStateChange state)
+		{
+			switch (state) {
+				case PlayModeStateChange.EnteredEditMode:
+				case PlayModeStateChange.EnteredPlayMode:
+					m_RootElement = null;
+					Repaint();
+					break;
+			}
+		}
+
+		private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+		{
+			m_RootElement = null;
+			Repaint();
+		}
+
+		private void OnSceneUnloaded(Scene arg0)
+		{
+			m_RootElement = null;
+			Repaint();
+		}
+
+		private void OnSceneOpened(Scene scene, OpenSceneMode mode)
+		{
+			m_RootElement = null;
+			Repaint();
+		}
+
+		private void OnSceneClosed(Scene scene)
+		{
+			m_RootElement = null;
+			Repaint();
+		}
+
+		private void OnPrefabStageChanged(PrefabStage obj)
+		{
+			m_RootElement = null;
+			Repaint();
+		}
+
+		#endregion
+
 	}
 }
 
