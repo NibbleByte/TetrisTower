@@ -209,6 +209,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UIScope scope = transform.GetComponent<UIScope>();
 			if (scope) {
+				if (scope.IsRoot) {
+					element = m_RootElement;
+				}
+
 				element.Children.Add(new UIScopeTreeElement() { Scope = scope, Depth = element.Depth + 1 });
 				element = element.Children.Last();
 			}
