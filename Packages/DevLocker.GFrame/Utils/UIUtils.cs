@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +11,8 @@ namespace DevLocker.GFrame.Utils
 	/// </summary>
 	public static class UIUtils
 	{
+		private static List<ICanvasElement> m_LayoutRebuildList;
+		
 		/// <summary>
 		/// Force recalculate content size fitters and layout groups properly - from bottom to top.
 		/// https://forum.unity.com/threads/content-size-fitter-refresh-problem.498536/#post-6857996
@@ -62,6 +67,28 @@ namespace DevLocker.GFrame.Utils
 			}
 
 			return true;
+		}
+
+		public static bool IsLayoutRebuildPending()
+		{
+			if (m_LayoutRebuildList == null) {
+				// Use reflection to get the internal list used for marked objects for layout rebuild.
+				// List is stored by reference, so it should be up to date.
+				// Idea by https://forum.unity.com/threads/callback-for-when-a-canvas-rebuild-happens.525100/
+				
+				try {
+					FieldInfo buildQueueField = typeof(CanvasUpdateRegistry).GetField("m_LayoutRebuildQueue", BindingFlags.NonPublic | BindingFlags.Instance);
+					object buildQueue = buildQueueField.GetValue(CanvasUpdateRegistry.instance);
+					FieldInfo buildListField = buildQueue.GetType().GetField("m_List", BindingFlags.NonPublic | BindingFlags.Instance);
+					m_LayoutRebuildList = (List<ICanvasElement>)buildListField.GetValue(buildQueue);
+				}
+				catch (Exception) {
+					// I guess the API changed and this check is no longer valid.
+					m_LayoutRebuildList = new List<ICanvasElement>();
+				}
+			}
+
+			return m_LayoutRebuildList.Count > 0;
 		}
 	}
 }

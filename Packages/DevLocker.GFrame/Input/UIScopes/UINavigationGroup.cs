@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using System;
+using DevLocker.GFrame.Utils;
 using UnityEngine.EventSystems;
 
 #if UNITY_EDITOR
@@ -140,6 +141,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GameObject m_LastSelectedObject;
 		private EventSystem m_CurrentEventSystem;
 
+		private bool m_CanvasLayoutIsRebuilding = false;
+
 		/// <summary>
 		/// Call this if you have added or removed child selectables and have <see cref="AutoScanForSelectables"/> disabled (no updates, no polling).
 		/// </summary>
@@ -262,6 +265,15 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					needsRefresh = true;
 				}
+			}
+
+			// If canvas layout rebuild is pending, wait for it to finish, then do the calculations.
+			if (m_CanvasLayoutIsRebuilding && UIUtils.IsLayoutRebuildPending()) {
+				return true;
+				
+			} else if (m_CanvasLayoutIsRebuilding) {
+				m_CanvasLayoutIsRebuilding = false;
+				needsRefresh = true;
 			}
 
 			if (needsRefresh) {
@@ -508,12 +520,16 @@ namespace DevLocker.GFrame.Input.UIScope
 				: EventSystem.current?.currentSelectedGameObject
 				;
 		}
-
+		
 		void Update()
 		{
 			m_LastSelectedObject = GetCurrentlySelectedObject();
 
 			if (AutoScanForSelectables) {
+				if (UIUtils.IsLayoutRebuildPending()) {
+					m_CanvasLayoutIsRebuilding = true;
+				}
+
 				RescanSelectables();
 			}
 		}
