@@ -43,6 +43,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private GUIContent FocusButtonContent;
 
 		private ForceInputDevice m_ForceInputDevice;
+		private InputBindingDisplayAsset m_ForcedDisplayAsset;
 
 		internal static void Init()
 		{
@@ -110,26 +111,25 @@ namespace DevLocker.GFrame.Input.UIScope
 
 
 			EditorGUILayout.BeginHorizontal();
-			EditorGUI.BeginDisabledGroup(!Application.isPlaying);
 			{
-				InputBindingDisplayAsset displayAsset = m_ForceInputDevice ? m_ForceInputDevice.ForcedDevice : null;
-				displayAsset = (InputBindingDisplayAsset) EditorGUILayout.ObjectField("Force Input Device", displayAsset, typeof(InputBindingDisplayAsset), false);
+				m_ForcedDisplayAsset = (InputBindingDisplayAsset) EditorGUILayout.ObjectField("Force Input Device", Application.isPlaying && m_ForceInputDevice ? m_ForceInputDevice.ForcedDevice : m_ForcedDisplayAsset, typeof(InputBindingDisplayAsset), false);
 
-				if (displayAsset) {
-					if (m_ForceInputDevice == null) {
-						m_ForceInputDevice = GameObject.FindObjectOfType<ForceInputDevice>();
-
+				if (Application.isPlaying) {
+					if (m_ForcedDisplayAsset) {
 						if (m_ForceInputDevice == null) {
-							m_ForceInputDevice = EventSystem.current.gameObject.AddComponent<ForceInputDevice>();
-						}
-					}
+							m_ForceInputDevice = GameObject.FindObjectOfType<ForceInputDevice>();
 
-					m_ForceInputDevice.ForcedDevice = displayAsset;
-				} else if (m_ForceInputDevice) {
-					m_ForceInputDevice.ForcedDevice = null;
+							if (m_ForceInputDevice == null) {
+								m_ForceInputDevice = EventSystem.current.gameObject.AddComponent<ForceInputDevice>();
+							}
+						}
+
+						m_ForceInputDevice.ForcedDevice = m_ForcedDisplayAsset;
+					} else if (m_ForceInputDevice) {
+						m_ForceInputDevice.ForcedDevice = null;
+					}
 				}
 			}
-			EditorGUI.EndDisabledGroup();
 			EditorGUILayout.EndHorizontal();
 
 
