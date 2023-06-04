@@ -17,7 +17,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[Header("World Map Info")]
 		public string LevelID;
 		public Vector2 WorldMapPosition;
-		public Sprite Thumbnail; // TODO: This doesn't support modding easily. Make an option to load by image name from streaming assets.
+		public Sprite PreviewImage; // TODO: This doesn't support modding easily. Make an option to load by image name from streaming assets.
 
 		public override void Validate(AssetsRepository repo, UnityEngine.Object context)
 		{

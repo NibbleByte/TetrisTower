@@ -14,6 +14,8 @@ namespace TetrisTower.WorldMap.UI
 
 		public AnimationCurve ZoomFadeOutCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
+		public event Action<string> Clicked;
+
 		private WorldMapLevelParamData m_LevelData;
 
 
@@ -23,7 +25,7 @@ namespace TetrisTower.WorldMap.UI
 		{
 			m_LevelData = levelData;
 
-			LocationImage.sprite = m_LevelData.Thumbnail;
+			LocationImage.sprite = m_LevelData.PreviewImage;
 		}
 
 		public void SetZoomLevel(float zoom)
@@ -58,6 +60,11 @@ namespace TetrisTower.WorldMap.UI
 
 				default: throw new System.NotSupportedException(State.ToString());
 			}
+		}
+
+		public void OnClicked()
+		{
+			Clicked?.Invoke(m_LevelData.LevelID);
 		}
 	}
 }

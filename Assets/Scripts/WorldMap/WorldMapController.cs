@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.TowerLevels.Playthroughs;
@@ -68,6 +69,8 @@ namespace TetrisTower.WorldMap
 				locationBind.WorldLocation = GameObject.Instantiate(WorldMapLocationPrefab, LocationsRoot);
 				locationBind.WorldLocation.name = "L-" + level.LevelID;
 				locationBind.WorldLocation.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
+				locationBind.WorldLocation.transform.localRotation= Quaternion.identity;
+				locationBind.WorldLocation.transform.localScale = Vector3.one;
 				locationBind.WorldLocation.Setup(level);
 
 
@@ -75,6 +78,7 @@ namespace TetrisTower.WorldMap
 					locationBind.UITracker = GameObject.Instantiate(UILocationTrackerPrefab);
 					locationBind.UITracker.name = "UI-" + level.LevelID;
 					locationBind.UITracker.Setup(level);
+					locationBind.UITracker.Clicked += LoadLocation;
 
 					TrackerController.StartTracking(locationBind.WorldLocation.transform, (RectTransform) locationBind.UITracker.transform);
 				}
@@ -116,6 +120,7 @@ namespace TetrisTower.WorldMap
 			}
 		}
 
+		// TODO: Not used - locations are purely UI for now.
 		public void TryWorldSelect(Vector2 screenPos)
 		{
 			Ray ray = Camera.GetComponentInChildren<Camera>().ScreenPointToRay(screenPos);
@@ -123,12 +128,17 @@ namespace TetrisTower.WorldMap
 			if (Physics.Raycast(ray, out RaycastHit hitInfo)) {
 				var location = hitInfo.collider.GetComponentInParent<WorldMapLocation>();
 				if (location) {
-					m_PlaythroughData.SetCurrentLevel(location.LevelID);
-
-					var supervisor = m_PlaythroughData.PrepareSupervisor();
-					Game.GameManager.Instance.SwitchLevelAsync(supervisor);
+					LoadLocation(location.LevelID);
 				}
 			}
+		}
+
+		private void LoadLocation(string levelID)
+		{
+			m_PlaythroughData.SetCurrentLevel(levelID);
+
+			var supervisor = m_PlaythroughData.PrepareSupervisor();
+			Game.GameManager.Instance.SwitchLevelAsync(supervisor);
 		}
 
 		public void RotateDiscworld(float rotate)

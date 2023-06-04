@@ -56,16 +56,17 @@ namespace TetrisTower.WorldMap
 
 		public void OnPointerClick(InputAction.CallbackContext context)
 		{
-			if (context.phase != InputActionPhase.Performed)
-				return;
-
-			if (UnityEngine.EventSystems.EventSystem.current == null)
-				return;
-
-			if (UIUtils.RaycastUIElements(Pointer.current.position.ReadValue()).Count > 0)
-				return;
-
-			m_LevelController.TryWorldSelect(Pointer.current?.position.ReadValue() ?? new Vector2(Screen.width / 2f, Screen.height / 2f));
+			// TODO: Disable - locations are purely UI for now.
+			//if (context.phase != InputActionPhase.Performed)
+			//	return;
+			//
+			//if (UnityEngine.EventSystems.EventSystem.current == null)
+			//	return;
+			//
+			//if (UIUtils.RaycastUIElements(Pointer.current.position.ReadValue()).Count > 0)
+			//	return;
+			//
+			//m_LevelController.TryWorldSelect(Pointer.current?.position.ReadValue() ?? new Vector2(Screen.width / 2f, Screen.height / 2f));
 		}
 
 		public void OnDiscworldMovement(InputAction.CallbackContext context)
