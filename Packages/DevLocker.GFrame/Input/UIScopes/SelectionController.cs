@@ -50,7 +50,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private string m_LastControlScheme = "";
 		private bool m_ControlSchemeMatched = true;
 
-		private static Dictionary<PlayerContextUIRootObject, SelectionController> m_ActiveInstances = new Dictionary<PlayerContextUIRootObject, SelectionController>();
+		private static Dictionary<PlayerContextUIRootObject, SelectionController> s_ActiveInstances = new Dictionary<PlayerContextUIRootObject, SelectionController>();
 
 		private List<CanvasGroup> m_CanvasGroups = new List<CanvasGroup>();
 
@@ -73,6 +73,16 @@ namespace DevLocker.GFrame.Input.UIScope
 			return null;
 		}
 
+		/// <summary>
+		/// Get the active instance for the specified player context (i.e. singleton).
+		/// </summary>
+		public static SelectionController GetActiveInstanceFor(PlayerContextUIRootObject playerContext)
+		{
+			s_ActiveInstances.TryGetValue(playerContext, out SelectionController instance);
+
+			return instance;
+		}
+
 		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
@@ -88,7 +98,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected virtual void OnDisable()
 		{
 			if (GetActiveInstanceForThisPlayer() == this) {
-				m_ActiveInstances.Remove(m_PlayerContext.GetRootObject());
+				s_ActiveInstances.Remove(m_PlayerContext.GetRootObject());
 			}
 
 			if (ClearSelectionOnDisable && m_PlayerContext.IsActive) {
@@ -115,7 +125,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				// Call this on update, to avoid errors while switching active object (turn on one, turn off another).
 				if (activeInstance == null) {
-					m_ActiveInstances.Add(m_PlayerContext.GetRootObject(), this);
+					s_ActiveInstances.Add(m_PlayerContext.GetRootObject(), this);
 				} else {
 					Debug.LogError($"There are two or more {nameof(SelectionController)} instances active at the same time - this is not allowed. Currently active: \"{activeInstance.name}\". Additional instance: \"{name}\"", this);
 				}
@@ -236,7 +246,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return null;
 
 			SelectionController result;
-			m_ActiveInstances.TryGetValue(rootObject, out result);
+			s_ActiveInstances.TryGetValue(rootObject, out result);
 
 			return result;
 		}
