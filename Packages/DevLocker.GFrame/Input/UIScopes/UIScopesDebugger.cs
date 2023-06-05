@@ -11,6 +11,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.Input.UIInputDisplay;
+using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input.UIScope
 {
@@ -41,6 +42,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private GUIContent EventSystemButtonContent;
 		private GUIContent FocusButtonContent;
+		private GUIContent SelectionControllerButtonContent;
 
 		private ForceInputDevice m_ForceInputDevice;
 		private InputBindingDisplayAsset m_ForcedDisplayAsset;
@@ -74,6 +76,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			FocusButtonContent = EditorGUIUtility.IconContent("Animation.FilterBySelection");
 			EventSystemButtonContent = EditorGUIUtility.IconContent("EventSystem Icon");
+
+			SelectionControllerButtonContent = AssetDatabase.FindAssets($"t:Script {nameof(SelectionController)}")
+				.Select(AssetDatabase.GUIDToAssetPath)
+				.Select(AssetDatabase.GetCachedIcon)
+				.Select(t => new GUIContent(t))
+				.FirstOrDefault()
+				;
 		}
 
 		void OnEnable()
@@ -113,15 +122,38 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			EditorGUILayout.BeginHorizontal();
-			EditorGUI.BeginDisabledGroup(!Application.isPlaying);
 			{
-				EditorGUILayout.ObjectField("Selected Object", EventSystem.current?.currentSelectedGameObject, typeof(GameObject), true);
+				EditorGUI.BeginChangeCheck();
+
+				Selectable selected = (EventSystem.current?.currentSelectedGameObject != null) ? EventSystem.current?.currentSelectedGameObject.GetComponent<Selectable>() : null;
+
+				Color prevColor = GUI.backgroundColor;
+				GUI.backgroundColor = selected && (!selected.IsInteractable() || !selected.isActiveAndEnabled || !Utils.UIUtils.IsClickable(selected.gameObject))? Color.red : prevColor;
+
+				selected = (Selectable) EditorGUILayout.ObjectField("Selected Object", selected, typeof(Selectable), true);
+
+				GUI.backgroundColor = prevColor;
+
+				if (EventSystem.current && EditorGUI.EndChangeCheck()) {
+					EventSystem.current.SetSelectedGameObject(selected.gameObject);
+				}
+
 				if (GUILayout.Button(EventSystemButtonContent, EditorStyles.label, GUILayout.Width(16), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
-					Selection.activeGameObject = EventSystem.current?.gameObject;
+					if (Application.isPlaying) {
+						Selection.activeGameObject = EventSystem.current?.gameObject;
+					} else {
+						Selection.activeObject = GameObject.FindObjectOfType<EventSystem>(true)?.gameObject;
+					}
+				}
+				if (GUILayout.Button(SelectionControllerButtonContent, EditorStyles.label, GUILayout.Width(16), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
+					if (Application.isPlaying) {
+						Selection.activeObject = SelectionController.GetActiveInstanceFor(PlayerContextUIRootObject.GlobalPlayerContext);
+					} else {
+						Selection.activeObject = GameObject.FindObjectOfType<SelectionController>(true);
+					}
 				}
 
 			}
-			EditorGUI.EndDisabledGroup();
 			EditorGUILayout.EndHorizontal();
 
 
@@ -135,11 +167,13 @@ namespace DevLocker.GFrame.Input.UIScope
 							m_ForceInputDevice = GameObject.FindObjectOfType<ForceInputDevice>();
 
 							if (m_ForceInputDevice == null) {
-								m_ForceInputDevice = EventSystem.current.gameObject.AddComponent<ForceInputDevice>();
+								m_ForceInputDevice = EventSystem.current?.gameObject.AddComponent<ForceInputDevice>();
 							}
 						}
 
-						m_ForceInputDevice.ForcedDevice = m_ForcedDisplayAsset;
+						if (m_ForceInputDevice) {
+							m_ForceInputDevice.ForcedDevice = m_ForcedDisplayAsset;
+						}
 					} else if (m_ForceInputDevice) {
 						m_ForceInputDevice.ForcedDevice = null;
 					}
@@ -165,7 +199,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			GUILayout.EndScrollView();
 
-			if (Application.isPlaying) {
+			// Don't refresh every frame.
+			if (Application.isPlaying && !EditorApplication.isPaused) {
 				Repaint();
 			}
 		}
