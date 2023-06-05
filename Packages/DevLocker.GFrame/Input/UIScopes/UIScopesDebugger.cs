@@ -128,14 +128,14 @@ namespace DevLocker.GFrame.Input.UIScope
 				Selectable selected = (EventSystem.current?.currentSelectedGameObject != null) ? EventSystem.current?.currentSelectedGameObject.GetComponent<Selectable>() : null;
 
 				Color prevColor = GUI.backgroundColor;
-				GUI.backgroundColor = selected && (!selected.IsInteractable() || !selected.isActiveAndEnabled || !Utils.UIUtils.IsClickable(selected.gameObject))? Color.red : prevColor;
+				GUI.backgroundColor = selected && (!selected.IsInteractable() || !selected.isActiveAndEnabled)? Color.red : prevColor;
 
 				selected = (Selectable) EditorGUILayout.ObjectField("Selected Object", selected, typeof(Selectable), true);
 
 				GUI.backgroundColor = prevColor;
 
 				if (EventSystem.current && EditorGUI.EndChangeCheck()) {
-					EventSystem.current.SetSelectedGameObject(selected.gameObject);
+					EventSystem.current.SetSelectedGameObject(selected?.gameObject);
 				}
 
 				if (GUILayout.Button(EventSystemButtonContent, EditorStyles.label, GUILayout.Width(16), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {

@@ -116,8 +116,17 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			// Wait till clickable to work with selection.
-			if (!IsClickable())
+			if (!IsClickable()) {
+				if (!m_ControlSchemeMatched && RemoveSelectionOnControlSchemeMismatch && m_PlayerContext.SelectedGameObject) {
+					m_PlayerContext.SetSelectedGameObject(null);
+				}
+
+				if (ClearSelectionOnDisable && m_PlayerContext.SelectedGameObject) {
+					m_PlayerContext.SetSelectedGameObject(null);
+				}
+
 				return;
+			}
 
 			if (m_SelectRequested) {
 
@@ -179,7 +188,10 @@ namespace DevLocker.GFrame.Input.UIScope
 					Selectable selectable = selectedObject ? selectedObject.GetComponent<Selectable>() : null;
 					if (selectedObject && selectedObject.activeInHierarchy && (selectable == null || selectable.IsInteractable())) {
 
-						if (!TrackOnlyChildren || m_PlayerContext.SelectedGameObject.transform.IsChildOf(transform)) {
+						if (!TrackOnlyChildren
+							|| selectable && System.Array.IndexOf(StartSelections, selectable) != -1
+							|| m_PlayerContext.SelectedGameObject.transform.IsChildOf(transform)
+							) {
 							m_PersistedSelection = m_PlayerContext.SelectedGameObject;
 							m_PersistedSelectable = m_PersistedSelection ? m_PersistedSelection.GetComponent<Selectable>() : null;
 						}
