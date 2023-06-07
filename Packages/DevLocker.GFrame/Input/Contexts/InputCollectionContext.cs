@@ -24,6 +24,8 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public event Action LastUsedDeviceChanged;
 
+		public event Action LastUsedInputControlSchemeChanged;
+
 
 		private InputDevice[] m_PairedDevices = new InputDevice[0];
 		private InputDevice m_LastUsedDevice;
@@ -42,6 +44,7 @@ namespace DevLocker.GFrame.Input.Contexts
 					m_LastUsedDevice = m_ForcedDevice;
 					m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
 
+					TriggerLastUsedInputControlSchemeChanged();
 					TriggerLastUsedDeviceChanged();
 				}
 			}
@@ -133,6 +136,11 @@ namespace DevLocker.GFrame.Input.Contexts
 			LastUsedDeviceChanged?.Invoke();
 		}
 
+		public void TriggerLastUsedInputControlSchemeChanged()
+		{
+			LastUsedInputControlSchemeChanged?.Invoke();
+		}
+
 		public IEnumerable<InputControlScheme> GetAllInputControlSchemes()
 		{
 			return InputActionsCollection.controlSchemes;
@@ -181,7 +189,12 @@ namespace DevLocker.GFrame.Input.Contexts
 
 			m_LastUsedDevice = device;
 			if (m_LastUsedDevice != null) {
+				InputControlScheme prevScheme = m_LastUsedControlScheme;
 				m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
+
+				if (m_LastUsedControlScheme != prevScheme) {
+					TriggerLastUsedInputControlSchemeChanged();
+				}
 			}
 
 			TriggerLastUsedDeviceChanged();

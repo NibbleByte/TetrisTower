@@ -29,6 +29,7 @@ namespace DevLocker.GFrame.Input.Contexts
 		///				If you prefer using messages, you'll need to trigger the TriggerLastUsedDeviceChanged() manually when devices change.
 		/// </summary>
 		public event Action LastUsedDeviceChanged;
+		public event Action LastUsedInputControlSchemeChanged;
 
 		private InputDevice m_LastUsedDevice;
 		private InputControlScheme m_LastUsedControlScheme;
@@ -47,6 +48,7 @@ namespace DevLocker.GFrame.Input.Contexts
 					m_LastUsedDevice = m_ForcedDevice;
 					m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
 
+					TriggerLastUsedInputControlSchemeChanged();
 					TriggerLastUsedDeviceChanged();
 				}
 			}
@@ -169,6 +171,11 @@ namespace DevLocker.GFrame.Input.Contexts
 			LastUsedDeviceChanged?.Invoke();
 		}
 
+		public void TriggerLastUsedInputControlSchemeChanged()
+		{
+			LastUsedInputControlSchemeChanged?.Invoke();
+		}
+
 		public IEnumerable<InputControlScheme> GetAllInputControlSchemes()
 		{
 			if (PlayerInput == null)
@@ -193,9 +200,14 @@ namespace DevLocker.GFrame.Input.Contexts
 		// NOTE: Not used anymore, check the init method.
 		//private void OnControlsChanged(PlayerInput obj)
 		//{
+		//	InputControlScheme prevScheme = m_LastUsedControlScheme;
 		//	m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
 		//
-		//	TriggerLastUsedDeviceChanged(PlayerIndex.Player0);
+		//	if (m_LastUsedControlScheme != prevScheme) {
+		//		TriggerLastUsedInputControlSchemeChanged();
+		//	}
+		//
+		//	TriggerLastUsedDeviceChanged();
 		//}
 
 		private void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
@@ -233,7 +245,12 @@ namespace DevLocker.GFrame.Input.Contexts
 
 			m_LastUsedDevice = device;
 			if (m_LastUsedDevice != null) {
+				InputControlScheme prevScheme = m_LastUsedControlScheme;
 				m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
+
+				if (m_LastUsedControlScheme != prevScheme) {
+					TriggerLastUsedInputControlSchemeChanged();
+				}
 			}
 
 			TriggerLastUsedDeviceChanged();

@@ -164,6 +164,11 @@ namespace DevLocker.GFrame.Input
 		event Action LastUsedDeviceChanged;
 
 		/// <summary>
+		/// Last device used got changed.
+		/// </summary>
+		event Action LastUsedInputControlSchemeChanged;
+
+		/// <summary>
 		/// Set to force the context to use only this device and ignore the rest.
 		/// This will force only hotkey icons to display for it.
 		/// </summary>
@@ -226,6 +231,11 @@ namespace DevLocker.GFrame.Input
 		/// or if you're using PlayerInput component with SendMessage / Broadcast notification.
 		/// </summary>
 		void TriggerLastUsedDeviceChanged();
+
+		/// <summary>
+		/// Force invoke the LastUsedInputControlSchemeChanged, so UI and others can refresh.
+		/// </summary>
+		void TriggerLastUsedInputControlSchemeChanged();
 
 		/// <summary>
 		/// Get all used <see cref="InputControlScheme" />.
