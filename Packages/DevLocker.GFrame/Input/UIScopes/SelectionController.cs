@@ -18,6 +18,17 @@ namespace DevLocker.GFrame.Input.UIScope
 			SelectLastSelectedObject = 8,
 		};
 
+		public enum StartSelectionSourceTypes
+		{
+			Selectables = 0,
+			NavigationGroups = 4,
+		}
+
+		public StartSelectionSourceTypes StartSelectionSource = StartSelectionSourceTypes.Selectables;
+
+		[Tooltip("Select the first interactable object from the managed selectables of this navigation group.")]
+		public UINavigationGroup[] StartNavigationGroups;
+
 		[Tooltip("Select the first interactable object on enable.")]
 		public Selectable[] StartSelections;
 
@@ -58,19 +69,62 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected IPlayerContext m_PlayerContext;
 
 		/// <summary>
-		/// Find the first active and interactable selectable from <see cref="StartSelections"/>.
+		/// Find the first active and interactable selectable from <see cref="StartNavigationGroups"/> or <see cref="StartSelections"/>.
 		/// </summary>
 		public virtual Selectable GetStartSelection()
 		{
-			if (StartSelections == null)
-				return null;
+			switch(StartSelectionSource) {
+				case StartSelectionSourceTypes.Selectables:
+					if (StartSelections == null)
+						return null;
 
-			foreach(Selectable selectable in StartSelections) {
-				if (selectable && selectable.isActiveAndEnabled && selectable.IsInteractable())
-					return selectable;
+					foreach(Selectable selectable in StartSelections) {
+						if (selectable && selectable.isActiveAndEnabled && selectable.IsInteractable())
+							return selectable;
+					}
+					break;
+
+				case StartSelectionSourceTypes.NavigationGroups:
+					if (StartNavigationGroups == null)
+						return null;
+
+					foreach (UINavigationGroup navigationGroup in StartNavigationGroups) {
+
+						if (navigationGroup.FirstSelectable)
+							return navigationGroup.FirstSelectable;
+
+						foreach (Selectable selectable in navigationGroup.ManagedSelectables) {
+							if (selectable && selectable.isActiveAndEnabled && selectable.IsInteractable())
+								return selectable;
+						}
+					}
+					break;
 			}
 
+
 			return null;
+		}
+
+		public virtual bool IsInStartSelection(Selectable selectable)
+		{
+			switch(StartSelectionSource) {
+				case StartSelectionSourceTypes.Selectables:
+					return StartSelections != null && System.Array.IndexOf(StartSelections, selectable) != -1;
+
+				case StartSelectionSourceTypes.NavigationGroups:
+					if (StartNavigationGroups == null)
+						return false;
+
+					foreach (UINavigationGroup navigationGroup in StartNavigationGroups) {
+						foreach (Selectable startSelectable in navigationGroup.ManagedSelectables) {
+							if (startSelectable == selectable)
+								return true;
+						}
+					}
+					break;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -189,7 +243,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					if (selectedObject && selectedObject.activeInHierarchy && (selectable == null || selectable.IsInteractable())) {
 
 						if (!TrackOnlyChildren
-							|| selectable && System.Array.IndexOf(StartSelections, selectable) != -1
+							|| selectable && IsInStartSelection(selectable)
 							|| m_PlayerContext.SelectedGameObject.transform.IsChildOf(transform)
 							) {
 							m_PersistedSelection = m_PlayerContext.SelectedGameObject;
@@ -298,14 +352,80 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void OnValidate()
 		{
-			if (StartSelections != null) {
-				// Having no start selection is valid if selectables will be created dynamically.
-				foreach (Selectable selectable in StartSelections) {
-					if (selectable == null) {
-						Debug.LogError($"[Input] {name} {nameof(SelectionController)} has missing start selection.", this);
+			switch(StartSelectionSource) {
+				case StartSelectionSourceTypes.Selectables:
+					if (StartSelections != null) {
+						// Having no start selection is valid if selectables will be created dynamically.
+						foreach (Selectable selectable in StartSelections) {
+							if (selectable == null) {
+								Debug.LogError($"[Input] {name} {nameof(SelectionController)} has missing start selection.", this);
+							}
+						}
 					}
-				}
+					break;
+
+				case StartSelectionSourceTypes.NavigationGroups:
+					if (StartNavigationGroups != null) {
+						// Having no start selection is valid if selectables will be created dynamically.
+						foreach (UINavigationGroup navGroup in StartNavigationGroups) {
+							if (navGroup == null) {
+								Debug.LogError($"[Input] {name} {nameof(SelectionController)} has missing start selection.", this);
+							}
+						}
+					}
+					break;
 			}
+
 		}
 	}
+
+
+#if UNITY_EDITOR
+	[UnityEditor.CustomEditor(typeof(SelectionController), true)]
+	[UnityEditor.CanEditMultipleObjects]
+	internal class SelectionControllerEditor : UnityEditor.Editor
+	{
+		private static SelectionController.StartSelectionSourceTypes[] s_StartSelectionSourceTypeValues = (SelectionController.StartSelectionSourceTypes[]) System.Enum.GetValues(typeof(SelectionController.StartSelectionSourceTypes));
+
+		public override void OnInspectorGUI()
+		{
+			serializedObject.Update();
+
+			UnityEditor.EditorGUI.BeginDisabledGroup(true);
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
+			UnityEditor.EditorGUI.EndDisabledGroup();
+
+			var startSelectionSource = serializedObject.FindProperty(nameof(SelectionController.StartSelectionSource));
+			UnityEditor.EditorGUILayout.PropertyField(startSelectionSource);
+
+			var sourceType = s_StartSelectionSourceTypeValues[startSelectionSource.enumValueIndex];
+
+			switch(sourceType) {
+				case SelectionController.StartSelectionSourceTypes.Selectables:
+					UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.StartSelections)));
+					break;
+				case SelectionController.StartSelectionSourceTypes.NavigationGroups:
+					UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.StartNavigationGroups)));
+					break;
+				default:
+					Debug.LogError($"Unknown type {sourceType}", target);
+					break;
+			}
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.PersistentSelection)));
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.NoSelectionAction)));
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.TrackOnlyChildren)));
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.FilterControlScheme)));
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.RemoveSelectionOnControlSchemeMismatch)));
+
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.ClearSelectionOnDisable)));
+
+			serializedObject.ApplyModifiedProperties();
+		}
+	}
+#endif
 }
