@@ -286,12 +286,12 @@ namespace DevLocker.GFrame.Input
 			foreach (InputAction action in actions) {
 
 				if (m_Actions.Contains(action)) {
-					Debug.LogWarning($"Trying to enable InputAction \"{action.name}\" that is already owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
+					Debug.LogWarning($"[Input] Trying to enable InputAction \"{action.name}\" that is already owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
 					continue;
 				}
 
 				if (action.enabled) {
-					Debug.LogWarning($"Trying to enable InputAction \"{action.name}\" that is already enabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
+					Debug.LogWarning($"[Input] Trying to enable InputAction \"{action.name}\" that is already enabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
 
 				} else {
 					action.Enable();
@@ -319,7 +319,7 @@ namespace DevLocker.GFrame.Input
 			foreach (InputAction action in actions) {
 
 				if (!m_Actions.Contains(action)) {
-					Debug.LogWarning($"Trying to disable InputAction \"{action.name}\" that is not owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
+					Debug.LogWarning($"[Input] Trying to disable InputAction \"{action.name}\" that is not owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
 					continue;
 				}
 
@@ -327,7 +327,7 @@ namespace DevLocker.GFrame.Input
 					action.Disable();
 					m_Actions.Remove(action);
 				} else {
-					Debug.LogWarning($"Trying to disable InputAction \"{action.name}\" that is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
+					Debug.LogWarning($"[Input] Trying to disable InputAction \"{action.name}\" that is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
 				}
 			}
 		}
@@ -361,7 +361,7 @@ namespace DevLocker.GFrame.Input
 				if (action.enabled) {
 					action.Disable();
 				}else {
-					Debug.LogWarning($"Trying to disable InputAction \"{action.name}\" is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
+					Debug.LogWarning($"[Input] Trying to disable InputAction \"{action.name}\" is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
 				}
 			}
 

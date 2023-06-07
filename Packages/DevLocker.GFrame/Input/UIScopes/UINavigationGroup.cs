@@ -270,7 +270,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			// If canvas layout rebuild is pending, wait for it to finish, then do the calculations.
 			if (m_CanvasLayoutIsRebuilding && UIUtils.IsLayoutRebuildPending()) {
 				return true;
-				
+
 			} else if (m_CanvasLayoutIsRebuilding) {
 				m_CanvasLayoutIsRebuilding = false;
 				needsRefresh = true;
@@ -375,7 +375,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 							sanityCount++;
 							if (sanityCount > sanityCountLimit) {
-								Debug.LogError($"Navigation group couldn't wrap around {selectable}!", this);
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
 								break;
 							}
 						}
@@ -393,7 +393,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 							sanityCount++;
 							if (sanityCount > sanityCountLimit) {
-								Debug.LogError($"Navigation group couldn't wrap around {selectable}!", this);
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
 								break;
 							}
 						}
@@ -411,7 +411,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 							sanityCount++;
 							if (sanityCount > sanityCountLimit) {
-								Debug.LogError($"Navigation group couldn't wrap around {selectable}!", this);
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
 								break;
 							}
 						}
@@ -429,7 +429,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 							sanityCount++;
 							if (sanityCount > sanityCountLimit) {
-								Debug.LogError($"Navigation group couldn't wrap around {selectable}!", this);
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
 								break;
 							}
 						}
@@ -520,7 +520,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				: EventSystem.current?.currentSelectedGameObject
 				;
 		}
-		
+
 		void Update()
 		{
 			m_LastSelectedObject = GetCurrentlySelectedObject();

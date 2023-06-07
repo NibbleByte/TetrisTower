@@ -58,7 +58,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action)
 		{
 			if (string.IsNullOrWhiteSpace(MatchingControlScheme)) {
-				Debug.LogError($"Matching control scheme is missing for {name}!", this);
+				Debug.LogError($"[Input] Matching control scheme is missing for {name}!", this);
 				yield break;
 			}
 
@@ -78,7 +78,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 						continue;
 
 					if (i >= bindings.Count || !bindings[i].isPartOfComposite) {
-						Debug.LogError($"Action {action.name} has composite binding {binding.name} with no parts.", this);
+						Debug.LogError($"[Input] Action {action.name} has composite binding {binding.name} with no parts.", this);
 						continue;
 					}
 

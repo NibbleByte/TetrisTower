@@ -113,7 +113,7 @@ namespace DevLocker.GFrame.Input
 			count = Math.Max(1, count);
 
 			if (StackedStatesCount < count) {
-				UnityEngine.Debug.LogError("Trying to pop states while there aren't any stacked ones.");
+				UnityEngine.Debug.LogError("[Input] Trying to pop states while there aren't any stacked ones.");
 				return;
 			}
 
@@ -156,7 +156,7 @@ namespace DevLocker.GFrame.Input
 		{
 			// Sanity check.
 			if (m_StackedStates.Count > 7 && stackAction == StackAction.Push) {
-				UnityEngine.Debug.LogWarning($"You're stacking too many states down. Are you sure? Stacked state: {state}.");
+				UnityEngine.Debug.LogWarning($"[Input] You're stacking too many states down. Are you sure? Stacked state: {state}.");
 			}
 
 			if (ChangingStates) {

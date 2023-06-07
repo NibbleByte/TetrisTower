@@ -79,7 +79,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		void OnEnable()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -92,7 +92,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		void OnDisable()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -104,7 +104,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		{
 
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -115,7 +115,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		void OnValidate()
 		{
 			if (ControlSchemeObjects.SelectMany(bind => bind.Objects).Any(obj => obj && transform.IsChildOf(obj.transform))) {
-				Debug.LogError($"{nameof(InputControlSchemeActivatorUI)} deactivates game objects that are parents of it. This is not allowed.", this);
+				Debug.LogError($"[Input] {nameof(InputControlSchemeActivatorUI)} deactivates game objects that are parents of it. This is not allowed.", this);
 			}
 		}
 	}

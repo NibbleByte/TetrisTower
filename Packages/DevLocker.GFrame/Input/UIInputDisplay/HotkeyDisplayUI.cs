@@ -53,7 +53,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		}
 
 		public InputActionReference InputAction => m_InputAction;
-		
+
 		[SerializeField]
 		[FormerlySerializedAs("InputAction")]
 		protected InputActionReference m_InputAction;
@@ -120,18 +120,18 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				return;
 
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
 
 			m_LastDevice = null;
-			
+
 			if (m_InputAction) {
 				RefreshDisplay(m_PlayerContext.InputContext);
 			}
 		}
-		
+
 		/// <summary>
 		/// Set input action. Will rebind it properly.
 		/// </summary>
@@ -143,7 +143,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			}
 
 			m_InputAction = InputActionReference.Create(inputAction);
-			
+
 			if (wasEnabled) {
 				OnEnable();
 			}
@@ -234,7 +234,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			InputAction action = context.FindActionFor(m_InputAction.name);
 			if (action == null) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} couldn't find specified action {m_InputAction.name} for player {m_PlayerContext.PlayerName}", this);
+				Debug.LogError($"[Input] {nameof(HotkeyDisplayUI)} couldn't find specified action {m_InputAction.name} for player {m_PlayerContext.PlayerName}", this);
 				return;
 			}
 
@@ -342,7 +342,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				return;
 
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -362,7 +362,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			if (m_PlayerContext.InputContext == null) {
 				if (!m_GameQuitting) {
-					Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+					Debug.LogWarning($"[Input] {nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 					enabled = false;
 				}
 				return;
@@ -406,7 +406,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private void OnLastUsedDeviceChanged()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(HotkeyDisplayUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -439,7 +439,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				|| (TextMeshProText && TextMeshProText.gameObject == gameObject)
 #endif
 				) {
-				Debug.LogError($"{nameof(HotkeyDisplayUI)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
+				Debug.LogError($"[Input] {nameof(HotkeyDisplayUI)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
 			}
 		}
 

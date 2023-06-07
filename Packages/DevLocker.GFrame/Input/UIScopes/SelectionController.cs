@@ -136,7 +136,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (activeInstance == null) {
 					s_ActiveInstances.Add(m_PlayerContext.GetRootObject(), this);
 				} else {
-					Debug.LogError($"There are two or more {nameof(SelectionController)} instances active at the same time - this is not allowed. Currently active: \"{activeInstance.name}\". Additional instance: \"{name}\"", this);
+					Debug.LogError($"[Input] There are two or more {nameof(SelectionController)} instances active at the same time - this is not allowed. Currently active: \"{activeInstance.name}\". Additional instance: \"{name}\"", this);
 				}
 
 #if USE_INPUT_SYSTEM
@@ -158,7 +158,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					;
 
 				if (targetSelection && !targetSelection.activeInHierarchy) {
-					Debug.LogWarning($"{name} {nameof(SelectionController)} is trying to select inactive object!", this);
+					Debug.LogWarning($"[Input] {name} {nameof(SelectionController)} is trying to select inactive object!", this);
 				}
 
 				if (m_ControlSchemeMatched) {
@@ -302,7 +302,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				// Having no start selection is valid if selectables will be created dynamically.
 				foreach (Selectable selectable in StartSelections) {
 					if (selectable == null) {
-						Debug.LogError($"{name} {nameof(SelectionController)} has missing start selection.", this);
+						Debug.LogError($"[Input] {name} {nameof(SelectionController)} has missing start selection.", this);
 					}
 				}
 			}

@@ -74,7 +74,7 @@ namespace DevLocker.GFrame.Input
 		void OnValidate()
 		{
 			if (ActionsMap.HasBrokenReference) {
-				Debug.LogError($"\"{name}\" set has InputActionMap \"{ActionsMap}\" that doesn't exist in the {ActionsMap.Asset.name}", this);
+				Debug.LogError($"[Input] \"{name}\" set has InputActionMap \"{ActionsMap}\" that doesn't exist in the {ActionsMap.Asset.name}", this);
 
 			} else if (m_OnDemandActions) {
 

@@ -217,7 +217,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		protected virtual Task UnloadingSupervisorAsync()
 		{
-			Debug.Log($"Unloading level supervisor {LevelSupervisor}");
+			Debug.Log($"[GFrame] Unloading level supervisor {LevelSupervisor}");
 			UnloadingSupervisor?.Invoke();
 
 			return Task.CompletedTask;
@@ -238,7 +238,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		protected virtual Task LoadingSupervisorAsync()
 		{
-			Debug.Log($"Loading level supervisor {LevelSupervisor}");
+			Debug.Log($"[GFrame] Loading level supervisor {LevelSupervisor}");
 			LoadingSupervisor?.Invoke();
 
 			return Task.CompletedTask;
@@ -341,7 +341,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		protected virtual IEnumerator UnloadingSupervisorCrt()
 		{
-			Debug.Log($"Unloading level supervisor {LevelSupervisor}");
+			Debug.Log($"[GFrame] Unloading level supervisor {LevelSupervisor}");
 			UnloadingSupervisor?.Invoke();
 
 			yield break;
@@ -362,7 +362,7 @@ namespace DevLocker.GFrame
 		/// </summary>
 		protected virtual IEnumerator LoadingSupervisorCrt()
 		{
-			Debug.Log($"Loading level supervisor {LevelSupervisor}");
+			Debug.Log($"[GFrame] Loading level supervisor {LevelSupervisor}");
 			LoadingSupervisor?.Invoke();
 
 			yield break;

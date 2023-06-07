@@ -31,7 +31,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			// OnValidate() gets called even if object is not active.
 			var selectable = GetComponentInParent<Selectable>(true);
 			if (selectable == null) {
-				Debug.LogError($"No valid button was found for HotkeyButton {name}", this);
+				Debug.LogError($"[Input] No valid button was found for HotkeyButton {name}", this);
 				return;
 			}
 
@@ -40,18 +40,18 @@ namespace DevLocker.GFrame.Input.UIScope
 				int eventCount = button.onClick.GetPersistentEventCount();
 				if (eventCount == 0) {
 					// User may subscribe dynamically runtime.
-					//Debug.LogError($"Button {button.name} doesn't do anything on click, so it's hotkey will do nothing.", this);
+					//Debug.LogError($"[Input] Button {button.name} doesn't do anything on click, so it's hotkey will do nothing.", this);
 					return;
 				}
 
 				for (int i = 0; i < eventCount; ++i) {
 					if (button.onClick.GetPersistentTarget(i) == null) {
-						Debug.LogError($"Button {button.name} has invalid target for on click event.", this);
+						Debug.LogError($"[Input] Button {button.name} has invalid target for on click event.", this);
 						return;
 					}
 
 					if (string.IsNullOrEmpty(button.onClick.GetPersistentMethodName(i))) {
-						Debug.LogError($"Button {button.name} has invalid target method for on click event.", this);
+						Debug.LogError($"[Input] Button {button.name} has invalid target method for on click event.", this);
 						return;
 					}
 				}

@@ -64,7 +64,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return false;
 
 			StringComparison comparison = StringComparison.OrdinalIgnoreCase;
-			
+
 			if (m_InputAction.interactions.Contains("hold", comparison) || m_InputAction.interactions.Contains("slowTap", comparison))
 				return true;
 
@@ -106,7 +106,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (FillImage == null) {
 				FillImage = GetComponent<Image>();
 				if (FillImage == null) {
-					Debug.LogWarning($"{nameof(HotkeyProgressUIScopeElement)} \"{name}\" has no image specified to use.", this);
+					Debug.LogWarning($"[Input] {nameof(HotkeyProgressUIScopeElement)} \"{name}\" has no image specified to use.", this);
 					enabled = false;
 					return;
 				}

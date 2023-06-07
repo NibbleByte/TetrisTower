@@ -20,7 +20,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (FocusScope == null) {
-				Debug.LogWarning($"No scope to focus for {name}", this);
+				Debug.LogWarning($"[Input] No scope to focus for {name}", this);
 				return;
 			}
 

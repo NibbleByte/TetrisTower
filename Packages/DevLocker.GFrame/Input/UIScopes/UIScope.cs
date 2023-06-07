@@ -158,7 +158,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				bool result = Initialize();
 				if (!result) {
-					Debug.LogError($"UIScope {name} initialize failed, which should be impossible! Delayed setup: {delayedSetup}.");
+					Debug.LogError($"[Input] UIScope {name} initialize failed, which should be impossible! Delayed setup: {delayedSetup}.");
 					return;
 				}
 
@@ -181,7 +181,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (OnDisableScopes != null) {
 				for (int i = 0; i < OnDisableScopes.Count; ++i) {
 					if (OnDisableScopes[i] == null) {
-						Debug.LogError($"\"{name}\" has missing scope in {nameof(OnDisableScopes)} list at scene \"{gameObject.scene.name}\"", this);
+						Debug.LogError($"[Input] \"{name}\" has missing scope in {nameof(OnDisableScopes)} list at scene \"{gameObject.scene.name}\"", this);
 					}
 				}
 			}
@@ -492,7 +492,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void Focus()
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"Couldn't focus on {name} as it isn't initialized.", this);
+				Debug.LogWarning($"[Input] Couldn't focus on {name} as it isn't initialized.", this);
 				return;
 			}
 
@@ -507,7 +507,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			// That would be weird.
 			if (!gameObject.activeInHierarchy) {
-				Debug.LogWarning($"Trying to force activate UIScope {name}, but it is not active in the hierarchy. Abort!", this);
+				Debug.LogWarning($"[Input] Trying to force activate UIScope {name}, but it is not active in the hierarchy. Abort!", this);
 				return;
 			}
 
@@ -533,7 +533,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void ScanForOwnedScopeElements()
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
 				return;
 			}
 
@@ -551,7 +551,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void ReplaceOwnedScopeElements(IEnumerable<IScopeElement> scopeElements)
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
 				return;
 			}
 
@@ -568,7 +568,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void TryAppendOwnedScopeElements(IEnumerable<IScopeElement> scopeElements)
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
 				return;
 			}
 
@@ -592,7 +592,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void TryAppendOwnedScopeElements(IScopeElement scopeElement)
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
 				return;
 			}
 
@@ -748,7 +748,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			var context = m_PlayerContext.InputContext;
 
 			if (context == null) {
-				Debug.LogWarning($"{nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
 				return;
 			}
 

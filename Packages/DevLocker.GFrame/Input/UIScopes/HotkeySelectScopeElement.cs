@@ -30,7 +30,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			// OnValidate() gets called even if object is not active.
 			var selectable = GetComponentInParent<Selectable>(true);
 			if (selectable == null) {
-				Debug.LogError($"No valid selectable was found for HotkeySelect {name}", this);
+				Debug.LogError($"[Input] No valid selectable was found for HotkeySelect {name}", this);
 				return;
 			}
 		}
