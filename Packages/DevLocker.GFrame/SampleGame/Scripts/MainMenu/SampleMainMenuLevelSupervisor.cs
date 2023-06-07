@@ -60,7 +60,7 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 
 			// The whole level is UI, so enable it for the whole level.
 			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(gameContext.PlayerControls.UI);
+			m_InputEnabler.Enable(gameContext.PlayerControls.Sample_UI);
 		}
 
 #if GFRAME_ASYNC

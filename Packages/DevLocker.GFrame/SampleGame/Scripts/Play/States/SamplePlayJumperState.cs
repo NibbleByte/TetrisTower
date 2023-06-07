@@ -11,7 +11,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 	/// Player is in jumper state - can move left and right + jump and is affected by gravity.
 	/// This state also controls what is displayed on the UI via the UIController.
 	/// </summary>
-	public class SamplePlayJumperState : IPlayerState, SamplePlayerControls.IPlayJumperActions
+	public class SamplePlayJumperState : IPlayerState, SamplePlayerControls.ISample_PlayJumperActions
 	{
 		private SamplePlayerControls m_PlayerControls;
 		private SamplePlayerController m_PlayerController;
@@ -26,20 +26,20 @@ namespace DevLocker.GFrame.SampleGame.Play
 			context.SetByType(out m_UIController);
 
 			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.UI);
-			m_InputEnabler.Enable(m_PlayerControls.PlayJumper);
-			m_PlayerControls.PlayJumper.SetCallbacks(this);
+			m_InputEnabler.Enable(m_PlayerControls.Sample_UI);
+			m_InputEnabler.Enable(m_PlayerControls.Sample_PlayJumper);
+			m_PlayerControls.Sample_PlayJumper.SetCallbacks(this);
 
 			// You don't want "Return" key to trigger selected buttons.
-			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
-			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
+			m_InputEnabler.Disable(m_PlayerControls.Sample_UI.Submit);
+			m_InputEnabler.Disable(m_PlayerControls.Sample_UI.Navigate);
 
 			m_UIController.SwitchState(PlayUIState.Play, true);
 		}
 
 		public void ExitState()
 		{
-			m_PlayerControls.PlayJumper.SetCallbacks(null);
+			m_PlayerControls.Sample_PlayJumper.SetCallbacks(null);
 			m_InputEnabler.Dispose();
 		}
 

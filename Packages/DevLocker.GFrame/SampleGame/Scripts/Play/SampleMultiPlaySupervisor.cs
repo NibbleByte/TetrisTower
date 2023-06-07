@@ -148,7 +148,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			SampleLevelsManager.Instance.GameContext.PlayerInput.gameObject.SetActive(true);
 
 			// Enabling input components causes for UI InputActions to get enabled, which confuses the MainMenu supervisor, who also enables them.
-			SampleLevelsManager.Instance.GameContext.PlayerControls.UI.Disable();
+			SampleLevelsManager.Instance.GameContext.PlayerControls.Sample_UI.Disable();
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;

@@ -21,7 +21,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			context.SetByType(out m_UIController);
 
 			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.UI);
+			m_InputEnabler.Enable(m_PlayerControls.Sample_UI);
 
 			m_UIController.SwitchState(PlayUIState.Paused);
 		}

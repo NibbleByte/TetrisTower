@@ -11,7 +11,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 	/// Player is in chopper state - can move freely in all directions with gravity turned off.
 	/// This state also controls what is displayed on the UI via the UIController.
 	/// </summary>
-	public class SamplePlayChopperState : IPlayerState, SamplePlayerControls.IPlayChopperActions
+	public class SamplePlayChopperState : IPlayerState, SamplePlayerControls.ISample_PlayChopperActions
 	{
 		private SamplePlayerControls m_PlayerControls;
 		private SamplePlayerController m_PlayerController;
@@ -26,20 +26,20 @@ namespace DevLocker.GFrame.SampleGame.Play
 			context.SetByType(out m_UIController);
 
 			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.UI);
-			m_InputEnabler.Enable(m_PlayerControls.PlayChopper);
-			m_PlayerControls.PlayChopper.SetCallbacks(this);
+			m_InputEnabler.Enable(m_PlayerControls.Sample_UI);
+			m_InputEnabler.Enable(m_PlayerControls.Sample_PlayChopper);
+			m_PlayerControls.Sample_PlayChopper.SetCallbacks(this);
 
 			// You don't want "Return" key to trigger selected buttons.
-			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
-			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
+			m_InputEnabler.Disable(m_PlayerControls.Sample_UI.Submit);
+			m_InputEnabler.Disable(m_PlayerControls.Sample_UI.Navigate);
 
 			m_UIController.SwitchState(PlayUIState.Play, false);
 		}
 
 		public void ExitState()
 		{
-			m_PlayerControls.PlayChopper.SetCallbacks(null);
+			m_PlayerControls.Sample_PlayChopper.SetCallbacks(null);
 			m_InputEnabler.Dispose();
 		}
 
