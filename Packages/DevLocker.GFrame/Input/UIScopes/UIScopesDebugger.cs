@@ -47,6 +47,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private ForceInputDevice m_ForceInputDevice;
 		private InputBindingDisplayAsset m_ForcedDisplayAsset;
 
+		[MenuItem("Tools/GFrame/UIScopes Debugger")]
 		internal static void Init()
 		{
 			var window = GetWindow<UIScopesDebugger>(false, "UIScopes Debugger");
