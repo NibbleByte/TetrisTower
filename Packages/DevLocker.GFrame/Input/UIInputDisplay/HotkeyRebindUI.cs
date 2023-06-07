@@ -52,7 +52,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public void StartRebind()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -102,7 +102,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public void CancelRebind()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -116,7 +116,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public void ResetBind()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"{nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(HotkeyRebindUI)} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
