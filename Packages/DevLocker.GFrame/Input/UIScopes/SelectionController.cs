@@ -11,6 +11,13 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// </summary>
 	public class SelectionController : MonoBehaviour
 	{
+		public enum PersistSelectionActionType
+		{
+			DoNotPersist = 0,
+			AlwaysPersist = 1,
+			PersistOnlyIfObjectIsActiveInHierarchy = 4,
+		};
+
 		public enum NoSelectionActionType
 		{
 			DoNothing = 0,
@@ -32,8 +39,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Tooltip("Select the first interactable object on enable.")]
 		public Selectable[] StartSelections;
 
-		[Tooltip("Initially select the starting object, but remember what the selection was on disable.\nOn re-enabling, resume from that selection.")]
-		public bool PersistentSelection = false;
+		[Tooltip("Persist selection even if component or object is disabled.")]
+		public PersistSelectionActionType PersistentSelection = PersistSelectionActionType.PersistOnlyIfObjectIsActiveInHierarchy;
 
 		[Tooltip("What should happen if no object is selected (e.g. user mouse-clicks on empty space and selection is lost)? Useful with FilterControlScheme.")]
 		public NoSelectionActionType NoSelectionAction = NoSelectionActionType.SelectLastSelectedObject;
@@ -158,6 +165,11 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (ClearSelectionOnDisable && m_PlayerContext.IsActive) {
 				m_PlayerContext.SetSelectedGameObject(null);
 			}
+
+			if (PersistentSelection == PersistSelectionActionType.PersistOnlyIfObjectIsActiveInHierarchy && !gameObject.activeInHierarchy) {
+				m_PersistedSelection = null;
+				m_PersistedSelectable = null;
+			}
 		}
 
 		void Update()
@@ -206,7 +218,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				m_SelectRequested = false;
 
-				GameObject targetSelection = (PersistentSelection && m_PersistedIsAvailable)
+				GameObject targetSelection = (PersistentSelection > 0 && m_PersistedIsAvailable)
 					? m_PersistedSelection
 					: GetStartSelection()?.gameObject // Null-check is safe.
 					;
