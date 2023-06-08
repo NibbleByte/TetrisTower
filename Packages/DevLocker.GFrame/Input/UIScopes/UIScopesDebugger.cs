@@ -28,6 +28,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		}
 
 		private UIScopeTreeElement m_RootElement;
+		private bool m_ShowInactiveScopes = true;
 		private bool m_ShowHotkeys = true;
 		private bool m_FocusedScopeWasDrawn = false;
 
@@ -141,13 +142,6 @@ namespace DevLocker.GFrame.Input.UIScope
 					EventSystem.current.SetSelectedGameObject(selected?.gameObject);
 				}
 
-				if (GUILayout.Button(EventSystemButtonContent, EditorStyles.label, GUILayout.Width(16), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
-					if (Application.isPlaying) {
-						Selection.activeGameObject = EventSystem.current?.gameObject;
-					} else {
-						Selection.activeObject = GameObject.FindObjectOfType<EventSystem>(true)?.gameObject;
-					}
-				}
 				if (GUILayout.Button(SelectionControllerButtonContent, EditorStyles.label, GUILayout.Width(16), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
 					if (Application.isPlaying) {
 						Selection.activeObject = SelectionController.GetActiveInstanceFor(PlayerContextUIRootObject.GlobalPlayerContext);
@@ -155,7 +149,20 @@ namespace DevLocker.GFrame.Input.UIScope
 						Selection.activeObject = GameObject.FindObjectOfType<SelectionController>(true);
 					}
 				}
+			}
 
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.BeginHorizontal();
+			{
+				UIScope focusedScope = Application.isPlaying
+					? UIScope.FocusedScope(PlayerContextUIRootObject.GlobalPlayerContext)
+					: null
+					;
+
+				EditorGUILayout.ObjectField("Focused Scope:", focusedScope, typeof(UIScope), true);
+
+				m_ShowInactiveScopes = EditorGUILayout.Toggle(m_ShowInactiveScopes, GUILayout.Width(16));
 			}
 			EditorGUILayout.EndHorizontal();
 
@@ -179,6 +186,14 @@ namespace DevLocker.GFrame.Input.UIScope
 						}
 					} else if (m_ForceInputDevice) {
 						m_ForceInputDevice.ForcedDevice = null;
+					}
+				}
+
+				if (GUILayout.Button(EventSystemButtonContent, EditorStyles.label, GUILayout.Width(16), GUILayout.Height(EditorGUIUtility.singleLineHeight))) {
+					if (Application.isPlaying) {
+						Selection.activeGameObject = EventSystem.current?.gameObject;
+					} else {
+						Selection.activeObject = GameObject.FindObjectOfType<EventSystem>(true)?.gameObject;
 					}
 				}
 			}
@@ -280,10 +295,14 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					UIScope scope = child.Scope;
 					int depth = child.Depth;
+					bool scopeIsEnabled = scope && scope.isActiveAndEnabled;
 
 					if (Application.isPlaying && scope == UIScope.FocusedScope(PlayerContextUIRootObject.GlobalPlayerContext)) {
 						m_FocusedScopeWasDrawn = true;
 					}
+
+					if (!m_ShowInactiveScopes && !scopeIsEnabled)
+						continue;
 
 					EditorGUILayout.BeginHorizontal();
 
@@ -304,9 +323,9 @@ namespace DevLocker.GFrame.Input.UIScope
 					bool scopeInactiveOrDisabled;
 					GUIStyle scopeStyle;
 					if (!Application.isPlaying) {
-						scopeStyle = UrlStyle;
+						scopeStyle = scopeIsEnabled ? UrlStyle : DisabledStyle;
 						scopeInactiveOrDisabled = true;
-					} else if (scope == null || !scope.isActiveAndEnabled) {
+					} else if (scope == null || !scopeIsEnabled) {
 						scopeStyle = DisabledStyle;
 						scopeInactiveOrDisabled = true;
 					} else if (scope.IsFocused) {
