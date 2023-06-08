@@ -281,7 +281,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					UIScope scope = child.Scope;
 					int depth = child.Depth;
 
-					if (scope == UIScope.FocusedScope(PlayerContextUIRootObject.GlobalPlayerContext)) {
+					if (Application.isPlaying && scope == UIScope.FocusedScope(PlayerContextUIRootObject.GlobalPlayerContext)) {
 						m_FocusedScopeWasDrawn = true;
 					}
 

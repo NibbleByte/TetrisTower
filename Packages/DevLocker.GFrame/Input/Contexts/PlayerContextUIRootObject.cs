@@ -34,6 +34,11 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// </summary>
 		public static PlayerContextUIRootObject GlobalPlayerContext {
 			get {
+				if (!Application.isPlaying) {
+					Debug.LogError($"[Input] Trying to get {nameof(GlobalPlayerContext)} while game is not playing. This is not allowed.");
+					return null;
+				}
+
 				if (m_GlobalUIRootObject == null) {
 					m_GlobalUIRootObject = new GameObject(nameof(GlobalPlayerContext)).AddComponent<PlayerContextUIRootObject>();
 				}
