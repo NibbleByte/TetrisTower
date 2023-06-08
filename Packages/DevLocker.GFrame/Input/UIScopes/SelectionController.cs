@@ -275,7 +275,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					}
 				}
 
-				m_LastControlScheme = scheme.bindingGroup;
+				m_LastControlScheme = scheme.bindingGroup ?? "";
 			}
 		}
 

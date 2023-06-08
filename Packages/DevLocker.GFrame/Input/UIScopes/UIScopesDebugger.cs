@@ -1,5 +1,6 @@
 #if USE_INPUT_SYSTEM
 #if UNITY_EDITOR
+using System;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private UIScopeTreeElement m_RootElement;
 		private bool m_ShowHotkeys = true;
+		private bool m_FocusedScopeWasDrawn = false;
 
 		private Vector2 m_ScrollView = Vector2.zero;
 
@@ -196,9 +198,16 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			m_ScrollView = GUILayout.BeginScrollView(m_ScrollView);
 
+			m_FocusedScopeWasDrawn = false;
 			DrawScopes(m_RootElement);
 
 			GUILayout.EndScrollView();
+
+			// Do only on repaint or exceptions happen.
+			if (Application.isPlaying && Event.current != null && Event.current.type == EventType.Repaint && !m_FocusedScopeWasDrawn && UIScope.FocusedScope(PlayerContextUIRootObject.GlobalPlayerContext)) {
+				m_RootElement = null;
+				GUIUtility.ExitGUI();
+			}
 
 			// Don't refresh every frame.
 			if (Application.isPlaying && !EditorApplication.isPaused) {
@@ -220,6 +229,7 @@ namespace DevLocker.GFrame.Input.UIScope
 						allObjects.AddRange(SceneManager.GetSceneAt(i).GetRootGameObjects());
 					}
 
+					allObjects.AddRange(GetDontDestroyOnLoadObjects());
 
 					for (int i = 0; i < allObjects.Count; ++i) {
 
@@ -270,6 +280,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					UIScope scope = child.Scope;
 					int depth = child.Depth;
+
+					if (scope == UIScope.FocusedScope(PlayerContextUIRootObject.GlobalPlayerContext)) {
+						m_FocusedScopeWasDrawn = true;
+					}
 
 					EditorGUILayout.BeginHorizontal();
 
@@ -386,6 +400,31 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+
+		// Turns out DontDestroyOnLoad scene is not included in the SceneManager.
+		// https://forum.unity.com/threads/editor-script-how-to-access-objects-under-dontdestroyonload-while-in-play-mode.442014/#post-3570916
+		private GameObject[] GetDontDestroyOnLoadObjects()
+		{
+			if (!Application.isPlaying)
+				return Array.Empty<GameObject>();
+
+			GameObject temp = null;
+			try
+			{
+				temp = new GameObject();
+				DontDestroyOnLoad(temp);
+				Scene dontDestroyOnLoad = temp.scene;
+				Destroy(temp);
+				temp = null;
+
+				return dontDestroyOnLoad.GetRootGameObjects();
+			}
+			finally
+			{
+				if( temp != null )
+					Destroy( temp );
+			}
+		}
 
 		#region Event handlers for refresh
 

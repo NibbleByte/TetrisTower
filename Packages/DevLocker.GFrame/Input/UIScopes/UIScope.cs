@@ -740,6 +740,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				scopeElement.enabled = active;
 			}
+			
+			PostProcessInput(active);
 		}
 
 		protected void PreProcessInput(bool active)
@@ -776,8 +778,19 @@ namespace DevLocker.GFrame.Input.UIScope
 					}
 				}
 
-			} else {
+			}
+#endif
+		}
 
+		protected void PostProcessInput(bool active)
+		{
+#if USE_INPUT_SYSTEM
+			var context = m_PlayerContext.InputContext;
+
+			if (context == null)
+				return;
+			
+			if (!active) {
 				if (PushInputStack) {
 					context.PopActionsState(this);
 				}
