@@ -19,8 +19,10 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		[Tooltip("Skip the hotkey based on the selected condition.")]
 		[Utils.EnumMask]
+		[HideInInspector]	// Draw manually in the editor.
 		public SkipHotkeyOption SkipHotkey;
 
+		[HideInInspector]	// Draw manually in the editor.
 		[SerializeField]
 		protected InputActionReference m_InputAction;
 		public InputActionReference InputAction => m_InputAction;
@@ -215,9 +217,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
 			EditorGUI.EndDisabledGroup();
 
+			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(HotkeyBaseScopeElement.SkipHotkey)));
+
 			EditorGUI.BeginChangeCheck();
 
-			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(HotkeyBaseScopeElement.SkipHotkey)));
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_" + nameof(HotkeyBaseScopeElement.InputAction)));
 
 			if (EditorGUI.EndChangeCheck()) {
@@ -249,6 +252,17 @@ namespace DevLocker.GFrame.Input.UIScope
 				}
 
 				EditorGUILayout.EndHorizontal();
+			}
+
+			EditorGUILayout.Space();
+
+
+			EditorGUI.BeginChangeCheck();
+
+			DrawPropertiesExcluding(serializedObject, "m_Script");
+
+			if (EditorGUI.EndChangeCheck()) {
+				serializedObject.ApplyModifiedProperties();
 			}
 		}
 	}

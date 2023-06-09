@@ -26,7 +26,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			FocusFirstEnabledScopeFromList = 15,
 		}
 
+		[HideInInspector]
 		public FocusPolicyType FocusPolicy;
+
+		[HideInInspector]
 		public List<UIScope> FocusScopes = new List<UIScope>();
 
 		protected override void OnInvoke()
