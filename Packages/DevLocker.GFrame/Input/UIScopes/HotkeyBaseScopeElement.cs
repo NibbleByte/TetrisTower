@@ -169,6 +169,26 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+		/// <summary>
+		/// Call this after you changed the current InputAction and you want to apply it to all child indicators etc.
+		/// </summary>
+		public void ApplyInputActionToChildren()
+		{
+			var children = GetComponentsInChildren<IWritableHotkeyInputAction>();
+			foreach (IWritableHotkeyInputAction child in children) {
+				if (ReferenceEquals(child, this))
+					continue;
+
+				child.SetInputAction(InputAction);
+
+#if UNITY_EDITOR
+				if (!Application.isPlaying) {
+					EditorUtility.SetDirty((MonoBehaviour)child);
+				}
+#endif
+			}
+		}
+
 		protected virtual void OnValidate()
 		{
 			Utils.Validation.ValidateMissingObject(this, m_InputAction, nameof(m_InputAction));
@@ -209,14 +229,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					m_WasChanged = false;
 
 					foreach (var hotkeyElement in targets.OfType<HotkeyBaseScopeElement>()) {
-						var children = hotkeyElement.GetComponentsInChildren<IWritableHotkeyInputAction>();
-						foreach (IWritableHotkeyInputAction child in children) {
-							if (ReferenceEquals(child, hotkeyElement))
-								continue;
-
-							child.SetInputAction(hotkeyElement.InputAction);
-							EditorUtility.SetDirty((MonoBehaviour)child);
-						}
+						hotkeyElement.ApplyInputActionToChildren();
 					}
 				}
 
