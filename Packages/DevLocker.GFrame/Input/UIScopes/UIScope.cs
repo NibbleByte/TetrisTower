@@ -105,9 +105,13 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool IncludeUIActions = true;
 #endif
 
+		public UIScope LastFocusedScope => m_LastFocusedScope;
 		private UIScope m_LastFocusedScope;
-		private int m_FrameEnabled = -1;
+		
+		public int ScopeDepth => m_ScopeDepth;
 		private int m_ScopeDepth;
+		
+		private int m_FrameEnabled = -1;
 
 		/// <summary>
 		/// Focused scope which keeps it and all its parents active (and the rest will be inactive).
@@ -129,6 +133,17 @@ namespace DevLocker.GFrame.Input.UIScope
 			s_PlayerSets.TryGetValue(playerRoot, out PlayerScopeSet playerSet);
 
 			return playerSet?.ActiveScopes;
+		}
+		
+		/// <summary>
+		/// Get all registered scopes (including inactive ones).
+		/// <param name="playerRoot">Player root the scopes are part of (in case of split-screen)</param>
+		/// </summary>
+		public static IReadOnlyCollection<UIScope> GetRegisteredScopes(PlayerContextUIRootObject playerRoot)
+		{
+			s_PlayerSets.TryGetValue(playerRoot, out PlayerScopeSet playerSet);
+
+			return playerSet?.RegisteredScopes;
 		}
 
 		private static Dictionary<PlayerContextUIRootObject, PlayerScopeSet> s_PlayerSets = new Dictionary<PlayerContextUIRootObject, PlayerScopeSet>();

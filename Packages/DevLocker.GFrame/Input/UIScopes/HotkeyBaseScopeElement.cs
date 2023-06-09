@@ -209,11 +209,20 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public override void OnInspectorGUI()
 		{
+			serializedObject.Update();
+
+			EditorGUI.BeginDisabledGroup(true);
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
+			EditorGUI.EndDisabledGroup();
+
 			EditorGUI.BeginChangeCheck();
-			DrawDefaultInspector();
+
+			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(HotkeyBaseScopeElement.SkipHotkey)));
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_" + nameof(HotkeyBaseScopeElement.InputAction)));
 
 			if (EditorGUI.EndChangeCheck()) {
 				m_WasChanged = true;
+				serializedObject.ApplyModifiedProperties();
 			}
 
 			if (m_WasChanged) {
@@ -240,7 +249,6 @@ namespace DevLocker.GFrame.Input.UIScope
 				}
 
 				EditorGUILayout.EndHorizontal();
-
 			}
 		}
 	}
