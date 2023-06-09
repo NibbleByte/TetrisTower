@@ -62,7 +62,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"[Input] {nameof(HotkeySelectableScopeElement)} button {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {GetType().Name} button {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
