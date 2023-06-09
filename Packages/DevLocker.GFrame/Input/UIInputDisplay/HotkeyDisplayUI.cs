@@ -1,6 +1,7 @@
 #if USE_INPUT_SYSTEM
 using DevLocker.GFrame.Input;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 	/// Displays hotkey icon / text.
 	/// Refreshes if devices change.
 	/// </summary>
-	public class HotkeyDisplayUI : MonoBehaviour
+	public class HotkeyDisplayUI : MonoBehaviour, UIScope.IHotkeysWithInputActions, UIScope.IWritableHotkeyInputAction
 	{
 		public enum DisplayModes
 		{
@@ -129,6 +130,20 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			if (m_InputAction) {
 				RefreshDisplay(m_PlayerContext.InputContext);
+			}
+		}
+
+		/// <summary>
+		/// Get input actions used by this component.
+		/// </summary>
+		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)
+		{
+			if (m_InputAction == null)
+				yield break;
+
+			InputAction action = inputContext.FindActionFor(m_InputAction.name);
+			if (action != null) {
+				yield return action;
 			}
 		}
 

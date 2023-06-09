@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input.UIScope
@@ -13,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// <summary>
 	/// Will display progress of Hotkey interaction (e.g. hold / long press etc.)
 	/// </summary>
-	public class HotkeyProgressUIScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions
+	public class HotkeyProgressUIScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions, IWritableHotkeyInputAction
 	{
 		[Tooltip("Skip the hotkey on the selected condition.")]
 		[Utils.EnumMask]
@@ -21,7 +22,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		[Tooltip("(Optional) Input action to be used. Can be missing - indicator root will be deactivated.")]
 		[SerializeField]
-		public InputActionReference InputAction;
+		[FormerlySerializedAs("InputAction")]
+		protected InputActionReference m_InputAction;
+		public InputActionReference InputAction => m_InputAction;
 
 		[Tooltip("The root object of the indicator. It will be deactivated if the action doesn't have continues integration (e.g. \"hold\" interaction) or no action is specified.")]
 		public GameObject IndicatorRoot;
@@ -48,7 +51,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public UnityEvent Performed;
 		public UnityEvent Cancelled;
 
-		protected InputAction m_InputAction { get; private set; }
+		protected InputAction m_InputActionCached { get; private set; }
 
 		protected bool m_ActionStarted { get; private set; } = false;
 		protected bool m_ActionPerformed { get; private set; } = false;
@@ -60,20 +63,37 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public virtual bool HasContinuesInteractions()
 		{
-			if (m_InputAction == null)
+			if (m_InputActionCached == null)
 				return false;
 
 			StringComparison comparison = StringComparison.OrdinalIgnoreCase;
 
-			if (m_InputAction.interactions.Contains("hold", comparison) || m_InputAction.interactions.Contains("slowTap", comparison))
+			if (m_InputActionCached.interactions.Contains("hold", comparison) || m_InputActionCached.interactions.Contains("slowTap", comparison))
 				return true;
 
-			foreach (InputBinding binding in m_InputAction.bindings) {
+			foreach (InputBinding binding in m_InputActionCached.bindings) {
 				if ((binding.interactions?.Contains("hold", comparison) ?? false) || (binding.interactions?.Contains("slowTap", comparison) ?? false))
 					return true;
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Set input action. Will rebind it properly.
+		/// </summary>
+		public void SetInputAction(InputAction inputAction)
+		{
+			bool wasEnabled = enabled;
+			if (wasEnabled) {
+				OnDisable();
+			}
+
+			m_InputAction = InputActionReference.Create(inputAction);
+
+			if (wasEnabled) {
+				OnEnable();
+			}
 		}
 
 		protected virtual void Awake()
@@ -94,13 +114,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_HasInitialized)
 				return;
 
-			m_InputAction = GetUsedActions(m_PlayerContext.InputContext).FirstOrDefault();
+			m_InputActionCached = GetUsedActions(m_PlayerContext.InputContext).FirstOrDefault();
 
 			if (IndicatorRoot) {
 				IndicatorRoot.SetActive(HasContinuesInteractions());
 			}
 
-			if (m_InputAction == null)
+			if (m_InputActionCached == null)
 				return;
 
 			if (FillImage == null) {
@@ -114,9 +134,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			FillImage.fillAmount = 0f;
 
-			m_InputAction.started += OnInputStarted;
-			m_InputAction.performed += OnInputPerformed;
-			m_InputAction.canceled += OnInputCancel;
+			m_InputActionCached.started += OnInputStarted;
+			m_InputActionCached.performed += OnInputPerformed;
+			m_InputActionCached.canceled += OnInputCancel;
 		}
 
 		protected virtual void OnDisable()
@@ -127,12 +147,12 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_ActionStarted = false;
 			m_ActionPerformed = false;
 
-			if (m_InputAction == null)
+			if (m_InputActionCached == null)
 				return;
 
-			m_InputAction.started -= OnInputStarted;
-			m_InputAction.performed -= OnInputPerformed;
-			m_InputAction.canceled -= OnInputCancel;
+			m_InputActionCached.started -= OnInputStarted;
+			m_InputActionCached.performed -= OnInputPerformed;
+			m_InputActionCached.canceled -= OnInputCancel;
 		}
 
 		private void OnInputStarted(InputAction.CallbackContext obj)
@@ -196,11 +216,11 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void Update()
 		{
-			if (m_InputAction == null || (IndicatorRoot && !IndicatorRoot.activeSelf))
+			if (m_InputActionCached == null || (IndicatorRoot && !IndicatorRoot.activeSelf))
 				return;
 
 			if (m_ActionStarted) {
-				float progress = m_InputAction.GetTimeoutCompletionPercentage();
+				float progress = m_InputActionCached.GetTimeoutCompletionPercentage();
 				FillImage.fillAmount = progress;
 
 #if USE_UGUI_TEXT

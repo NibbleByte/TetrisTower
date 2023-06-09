@@ -23,6 +23,14 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		IEnumerable<UnityEngine.InputSystem.InputAction> GetUsedActions(IInputContext inputContext);
 	}
+
+	/// <summary>
+	/// Implement this if you want to be able to set current hotkey in a generic matter. Used for editor UI.
+	/// </summary>
+	public interface IWritableHotkeyInputAction
+	{
+		void SetInputAction(UnityEngine.InputSystem.InputAction inputAction);
+	}
 #endif
 
 	/// <summary>
@@ -740,7 +748,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				scopeElement.enabled = active;
 			}
-			
+
 			PostProcessInput(active);
 		}
 
@@ -789,7 +797,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			if (context == null)
 				return;
-			
+
 			if (!active) {
 				if (PushInputStack) {
 					context.PopActionsState(this);

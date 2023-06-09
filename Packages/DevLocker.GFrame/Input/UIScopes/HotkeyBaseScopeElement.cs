@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace DevLocker.GFrame.Input.UIScope
 {
@@ -12,7 +15,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// Base class for hotkey scope elements (that use Unity's Input System).
 	/// Note that this action has to be enabled in order to be invoked.
 	/// </summary>
-	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions
+	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions, IWritableHotkeyInputAction
 	{
 		[Tooltip("Skip the hotkey based on the selected condition.")]
 		[Utils.EnumMask]
@@ -176,6 +179,60 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 	}
+
+#if UNITY_EDITOR
+	[CustomEditor(typeof(HotkeyBaseScopeElement), true)]
+	[CanEditMultipleObjects]
+	internal class HotkeyBaseScopeElementEditor : Editor
+	{
+		private bool m_WasChanged = false;
+
+		public override void OnInspectorGUI()
+		{
+			EditorGUI.BeginChangeCheck();
+			DrawDefaultInspector();
+
+			if (EditorGUI.EndChangeCheck()) {
+				m_WasChanged = true;
+			}
+
+			if (m_WasChanged) {
+
+				EditorGUILayout.HelpBox("Change was detected. Do you want to apply the hotkey to all the child elements so they are the same?", MessageType.Warning);
+
+				EditorGUILayout.BeginHorizontal();
+
+				Color prevColor = GUI.backgroundColor;
+				GUI.backgroundColor = Color.yellow;
+
+				if (GUILayout.Button("Apply InputAction to Children")) {
+					m_WasChanged = false;
+
+					foreach (var hotkeyElement in targets.OfType<HotkeyBaseScopeElement>()) {
+						var children = hotkeyElement.GetComponentsInChildren<IWritableHotkeyInputAction>();
+						foreach (IWritableHotkeyInputAction child in children) {
+							if (ReferenceEquals(child, hotkeyElement))
+								continue;
+
+							child.SetInputAction(hotkeyElement.InputAction);
+							EditorUtility.SetDirty((MonoBehaviour)child);
+						}
+					}
+				}
+
+				GUI.backgroundColor = prevColor;
+
+				if (GUILayout.Button("X", GUILayout.Width(20))) {
+					m_WasChanged = false;
+				}
+
+				EditorGUILayout.EndHorizontal();
+
+			}
+		}
+	}
+#endif
+
 }
 
 #endif
