@@ -81,6 +81,11 @@ namespace DevLocker.GFrame.Input
 	public interface IInputBindingDisplayDataProvider
 	{
 		/// <summary>
+		/// Is UI navigation with selected element allowed when this type of device is used?
+		/// </summary>
+		bool SupportsUINavigationSelection { get; }
+
+		/// <summary>
 		/// What devices does this provider has representations for.
 		/// </summary>
 		bool MatchesDevice(string deviceLayout);
@@ -247,6 +252,11 @@ namespace DevLocker.GFrame.Input
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
 		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action);
+
+		/// <summary>
+		/// Get the currently used displayed data provider. Can be null.
+		/// </summary>
+		IInputBindingDisplayDataProvider GetCurrentDisplayData();
 	}
 
 	/// <summary>

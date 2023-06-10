@@ -1,7 +1,7 @@
 using DevLocker.GFrame.Input.Contexts;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input.UIScope
@@ -42,18 +42,15 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Tooltip("Persist selection even if component or object is disabled.")]
 		public PersistSelectionActionType PersistentSelection = PersistSelectionActionType.PersistOnlyIfObjectIsActiveInHierarchy;
 
-		[Tooltip("What should happen if no object is selected (e.g. user mouse-clicks on empty space and selection is lost)? Useful with FilterControlScheme.")]
+		[Tooltip("What should happen if no object is selected (e.g. user mouse-clicks on empty space and selection is lost)? Useful when device does not support UI navigation.")]
 		public NoSelectionActionType NoSelectionAction = NoSelectionActionType.SelectLastSelectedObject;
 
 		[Tooltip("Should it consider only selections that are child of this component for persistent or last selected object?")]
 		public bool TrackOnlyChildren = true;
 
-		[InputControlSchemePicker]
-		[Tooltip("Control schemes to update for. One control scheme can match multiple devices (e.g. XBox and PS gamepads). Use the picker to avoid typos.")]
-		public string[] FilterControlScheme;
-
-		[Tooltip("Set selected object to none if the active control scheme doesn't match the filter. E.g. hide selection for mouse & keyboard, but show it for Gamepad.\nIgnored if no filter is specified.")]
-		public bool RemoveSelectionOnControlSchemeMismatch = true;
+		[Tooltip("Set selected object to none if the current device doesn't support it. E.g. hide selection for mouse & keyboard, but show it for Gamepad.\nCheck the device InputBindingDisplayAsset.")]
+		[FormerlySerializedAs("RemoveSelectionOnControlSchemeMismatch")]
+		public bool RemoveSelectionIfDeviceDoesntSupportIt = true;
 
 		public bool ClearSelectionOnDisable = true;
 
@@ -65,7 +62,6 @@ namespace DevLocker.GFrame.Input.UIScope
 		;
 
 		private bool m_SelectRequested = false;
-		private string m_LastControlScheme = "";
 		private bool m_ControlSchemeMatched = true;
 
 		private static Dictionary<PlayerContextUIRootObject, SelectionController> s_ActiveInstances = new Dictionary<PlayerContextUIRootObject, SelectionController>();
@@ -177,13 +173,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_PlayerContext.IsActive)
 				return;
 
-			if (FilterControlScheme.Length != 0 && m_PlayerContext.InputContext != null) {
-				UpdateControlScheme();
+			if (m_PlayerContext.InputContext != null) {
+				m_ControlSchemeMatched = m_PlayerContext.InputContext.GetCurrentDisplayData()?.SupportsUINavigationSelection ?? false;
 			}
 
 			// Wait till clickable to work with selection.
 			if (!IsClickable()) {
-				if (!m_ControlSchemeMatched && RemoveSelectionOnControlSchemeMismatch && m_PlayerContext.SelectedGameObject) {
+				if (!m_ControlSchemeMatched && RemoveSelectionIfDeviceDoesntSupportIt && m_PlayerContext.SelectedGameObject) {
 					m_PlayerContext.SetSelectedGameObject(null);
 				}
 
@@ -266,28 +262,10 @@ namespace DevLocker.GFrame.Input.UIScope
 						DoNoSelectionAction();
 					}
 				} else {
-					if (RemoveSelectionOnControlSchemeMismatch && m_PlayerContext.SelectedGameObject) {
+					if (RemoveSelectionIfDeviceDoesntSupportIt && m_PlayerContext.SelectedGameObject) {
 						m_PlayerContext.SetSelectedGameObject(null);
 					}
 				}
-			}
-		}
-
-		private void UpdateControlScheme()
-		{
-			InputControlScheme scheme = m_PlayerContext.InputContext.GetLastUsedInputControlScheme();
-
-			if (!m_LastControlScheme.Equals(scheme.bindingGroup)) {
-
-				m_ControlSchemeMatched = false;
-				foreach (string filterScheme in FilterControlScheme) {
-					if (filterScheme.Equals(scheme.bindingGroup, System.StringComparison.OrdinalIgnoreCase)) {
-						m_ControlSchemeMatched = true;
-						break;
-					}
-				}
-
-				m_LastControlScheme = scheme.bindingGroup ?? "";
 			}
 		}
 
@@ -430,9 +408,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.TrackOnlyChildren)));
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.FilterControlScheme)));
-
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.RemoveSelectionOnControlSchemeMismatch)));
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.RemoveSelectionIfDeviceDoesntSupportIt)));
 
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SelectionController.ClearSelectionOnDisable)));
 

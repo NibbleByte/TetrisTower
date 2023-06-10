@@ -37,6 +37,11 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		[Tooltip("If one of the action's bindings doesn't have a defined display data in the list below, use the default display name provided by Unity.")]
 		public bool FallbackToDefaultDisplayTexts = true;
 
+		[Tooltip("Is UI navigation with selected element allowed when this type of device is used?")]
+		[SerializeField]
+		private bool m_SupportsUINavigationSelection = true;
+		public bool SupportsUINavigationSelection => m_SupportsUINavigationSelection;
+
 		[Space()]
 		[InputControlSchemePicker]
 		[Tooltip("The control scheme that matches the devices listed below.")]

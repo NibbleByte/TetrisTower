@@ -34,6 +34,7 @@ namespace DevLocker.GFrame.Input.Contexts
 		private InputDevice m_LastUsedDevice;
 		private InputControlScheme m_LastUsedControlScheme;
 
+		private IInputBindingDisplayDataProvider m_LastUsedDisplayData;
 		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
 
 		private InputDevice m_ForcedDevice;
@@ -46,6 +47,7 @@ namespace DevLocker.GFrame.Input.Contexts
 				m_ForcedDevice = value;
 				if (m_ForcedDevice != null) {
 					m_LastUsedDevice = m_ForcedDevice;
+					CacheDisplayData();
 					m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
 
 					TriggerLastUsedInputControlSchemeChanged();
@@ -80,12 +82,13 @@ namespace DevLocker.GFrame.Input.Contexts
 
 			UIActions = uiActions;
 
+			m_BindingsDisplayProviders = bindingDisplayProviders != null ? bindingDisplayProviders.ToArray() : new IInputBindingDisplayDataProvider[0];
+
 			if (PlayerInput.currentControlScheme != null) {
 				m_LastUsedControlScheme = PlayerInput.actions.FindControlScheme(PlayerInput.currentControlScheme) ?? new InputControlScheme();
 				m_LastUsedDevice = InputSystem.devices.FirstOrDefault(d => m_LastUsedControlScheme.SupportsDevice(d));
+				CacheDisplayData();
 			}
-
-			m_BindingsDisplayProviders = bindingDisplayProviders != null ? bindingDisplayProviders.ToArray() : new IInputBindingDisplayDataProvider[0];
 
 			// Make sure no input is enabled when starting level (including UI).
 			foreach (InputAction action in PlayerInput.actions) {
@@ -188,13 +191,35 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action)
 		{
-			foreach (var displaysProvider in m_BindingsDisplayProviders) {
-				if (displaysProvider.MatchesDevice(deviceLayout)) {
-					foreach (var bindingDisplay in displaysProvider.GetBindingDisplaysFor(action)) {
+			foreach (var displayData in m_BindingsDisplayProviders) {
+				if (displayData.MatchesDevice(deviceLayout)) {
+					foreach (var bindingDisplay in displayData.GetBindingDisplaysFor(action)) {
 						yield return bindingDisplay;
 					}
 				}
 			}
+		}
+
+		public IInputBindingDisplayDataProvider GetCurrentDisplayData()
+		{
+			return m_LastUsedDisplayData;
+		}
+
+		private void CacheDisplayData()
+		{
+			if (m_LastUsedDevice == null) {
+				m_LastUsedDisplayData = null;
+				return;
+			}
+
+			foreach (var displayData in m_BindingsDisplayProviders) {
+				if (displayData.MatchesDevice(m_LastUsedDevice.layout)) {
+					m_LastUsedDisplayData = displayData;
+					return;
+				}
+			}
+
+			m_LastUsedDisplayData = null;
 		}
 
 		// NOTE: Not used anymore, check the init method.
@@ -244,6 +269,8 @@ namespace DevLocker.GFrame.Input.Contexts
 			}
 
 			m_LastUsedDevice = device;
+			CacheDisplayData();
+
 			if (m_LastUsedDevice != null) {
 				InputControlScheme prevScheme = m_LastUsedControlScheme;
 				m_LastUsedControlScheme = this.GetInputControlSchemeFor(m_LastUsedDevice);
