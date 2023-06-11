@@ -217,9 +217,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
 			EditorGUI.EndDisabledGroup();
 
-			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(HotkeyBaseScopeElement.SkipHotkey)));
-
 			EditorGUI.BeginChangeCheck();
+
+			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(HotkeyBaseScopeElement.SkipHotkey)));
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_" + nameof(HotkeyBaseScopeElement.InputAction)));
 

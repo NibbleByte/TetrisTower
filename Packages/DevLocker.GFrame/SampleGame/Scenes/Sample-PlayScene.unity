@@ -3853,6 +3853,10 @@ PrefabInstance:
       propertyPath: InputAction
       value: 
       objectReference: {fileID: 1797235489119140995, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
+    - target: {fileID: 5394036698972749554, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
+      propertyPath: m_InputAction
+      value: 
+      objectReference: {fileID: 1797235489119140995, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3880,14 +3884,6 @@ PrefabInstance:
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_AnchorMin.y
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3923,7 +3919,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -34
+      value: -45
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -4269,6 +4265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsRoot: 0
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -4276,7 +4273,6 @@ MonoBehaviour:
   ResetAllActionsOnEnable: 1
   PushInputStack: 0
   IncludeUIActions: 1
-  IsRoot: 0
 --- !u!1 &1306513263
 GameObject:
   m_ObjectHideFlags: 0
@@ -6408,6 +6404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsRoot: 0
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -6415,7 +6412,6 @@ MonoBehaviour:
   ResetAllActionsOnEnable: 1
   PushInputStack: 0
   IncludeUIActions: 1
-  IsRoot: 0
 --- !u!114 &1698978889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6428,13 +6424,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartSelectionSource: 0
+  StartNavigationGroups: []
   StartSelections:
   - {fileID: 1612941644}
   PersistentSelection: 0
   NoSelectionAction: 8
   TrackOnlyChildren: 1
-  FilterControlScheme: []
-  RemoveSelectionOnControlSchemeMismatch: 1
+  RemoveSelectionIfDeviceDoesntSupportIt: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &1796854669
 GameObject:
   m_ObjectHideFlags: 0
