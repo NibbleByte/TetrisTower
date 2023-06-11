@@ -16,7 +16,7 @@ namespace DevLocker.GFrame.Input.Contexts
 	///
 	/// IMPORTANT: never use <see cref="PlayerInput.SwitchCurrentActionMap"/> to set currently active actions directly. Use the <see cref="InputActionsStack" /> instead.
 	/// </summary>
-	public sealed class InputComponentContext : IInputContext
+	public class InputComponentContext : IInputContext
 	{
 		public PlayerInput PlayerInput { get; }
 
@@ -30,6 +30,8 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// </summary>
 		public event Action LastUsedDeviceChanged;
 		public event Action LastUsedInputControlSchemeChanged;
+
+		public virtual bool DeviceSupportsUINavigationSelection => m_LastUsedDisplayData?.SupportsUINavigationSelection ?? false;
 
 		private InputDevice m_LastUsedDevice;
 		private InputControlScheme m_LastUsedControlScheme;
@@ -112,7 +114,7 @@ namespace DevLocker.GFrame.Input.Contexts
 			InputSystem.onDeviceChange += OnInputSystemDeviceChange;
 		}
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			//PlayerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
 			//PlayerInput.onControlsChanged -= OnControlsChanged;
@@ -169,12 +171,12 @@ namespace DevLocker.GFrame.Input.Contexts
 			return m_LastUsedControlScheme;
 		}
 
-		public void TriggerLastUsedDeviceChanged()
+		public virtual void TriggerLastUsedDeviceChanged()
 		{
 			LastUsedDeviceChanged?.Invoke();
 		}
 
-		public void TriggerLastUsedInputControlSchemeChanged()
+		public virtual void TriggerLastUsedInputControlSchemeChanged()
 		{
 			LastUsedInputControlSchemeChanged?.Invoke();
 		}
@@ -235,7 +237,7 @@ namespace DevLocker.GFrame.Input.Contexts
 		//	TriggerLastUsedDeviceChanged();
 		//}
 
-		private void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
+		protected virtual void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
 		{
 			if (PlayerInput == null)
 				return;
@@ -248,7 +250,7 @@ namespace DevLocker.GFrame.Input.Contexts
 			}
 		}
 
-		private void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
+		protected virtual void OnInputSystemEvent(InputEventPtr eventPtr, InputDevice device)
 		{
 			// Faking it.
 			if (m_ForcedDevice != null)

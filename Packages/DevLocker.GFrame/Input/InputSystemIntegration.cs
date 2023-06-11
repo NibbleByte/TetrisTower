@@ -257,6 +257,11 @@ namespace DevLocker.GFrame.Input
 		/// Get the currently used displayed data provider. Can be null.
 		/// </summary>
 		IInputBindingDisplayDataProvider GetCurrentDisplayData();
+
+		/// <summary>
+		/// Does the current device support UI navigation.
+		/// </summary>
+		bool DeviceSupportsUINavigationSelection { get; }
 	}
 
 	/// <summary>

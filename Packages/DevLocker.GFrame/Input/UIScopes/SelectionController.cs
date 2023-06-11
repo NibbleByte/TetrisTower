@@ -174,7 +174,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 
 			if (m_PlayerContext.InputContext != null) {
-				m_ControlSchemeMatched = m_PlayerContext.InputContext.GetCurrentDisplayData()?.SupportsUINavigationSelection ?? false;
+				m_ControlSchemeMatched = m_PlayerContext.InputContext.DeviceSupportsUINavigationSelection;
 			}
 
 			// Wait till clickable to work with selection.
