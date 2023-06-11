@@ -25,7 +25,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
-		private void Awake()
+		void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
@@ -70,22 +70,9 @@ namespace DevLocker.GFrame.SampleGame.UITester
 			if (m_PlayerContext.InputContext.GetLastUsedInputDevice() is Mouse)
 				return;
 
-			// Copied from https://stackoverflow.com/a/50191835
-			Vector2 contentPos = GetSnapToPositionToBringChildIntoView(TabsScrollRect, tabButton.GetComponent<RectTransform>());
-			contentPos.x = 0; // HACK: Calculations are a bit off. Dunno why.
-			TabsScrollRect.content.localPosition = contentPos;
-		}
 
-		public static Vector2 GetSnapToPositionToBringChildIntoView(ScrollRect instance, RectTransform child)
-		{
-			Canvas.ForceUpdateCanvases();
-			Vector2 viewportLocalPosition = instance.viewport.localPosition;
-			Vector2 childLocalPosition = child.localPosition;
-			Vector2 result = new Vector2(
-				0 - (viewportLocalPosition.x + childLocalPosition.x),
-				0 - (viewportLocalPosition.y + childLocalPosition.y)
-			);
-			return result;
+			Vector2 contentPos = ScrollWithSelected.GetScrollSnapToPosition(TabsScrollRect, tabButton.GetComponent<RectTransform>());
+			TabsScrollRect.content.localPosition = contentPos;
 		}
 	}
 
