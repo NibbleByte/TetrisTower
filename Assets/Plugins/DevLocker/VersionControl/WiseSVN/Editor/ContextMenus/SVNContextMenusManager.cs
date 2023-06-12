@@ -14,6 +14,8 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus
 		None,
 		TortoiseSVN,	// Good for Windows
 		SnailSVN,		// Good for MacOS
+		RabbitVCS,		// Good for Linux
+		CLI = 100,		// Good for anything
 	}
 
 	/// <summary>
@@ -59,34 +61,76 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus
 					return new TortoiseSVNContextMenus();
 
 				case ContextMenusClient.SnailSVN:
-					errorMsg = "SnailSVN is not supported on windows.";
+					errorMsg = "SnailSVN is not supported on Windows.";
 					return null;
+
+				case ContextMenusClient.RabbitVCS:
+					errorMsg = "RabbitVCS is not supported on Windows.";
+					return null;
+
+				case ContextMenusClient.CLI:
+					errorMsg = string.Empty;
+					return new CLIContextMenus();
 
 				default:
 					throw new NotImplementedException(client + " not implemented yet for this platform.");
 			}
-#else
+
+#elif UNITY_EDITOR_OSX
+
 			switch (client)
 			{
 
 				case ContextMenusClient.TortoiseSVN:
-					errorMsg = "TortoiseSVN is not supported on MacOS";
+					errorMsg = "TortoiseSVN is not supported on OSX";
 					return null;
 
 				case ContextMenusClient.SnailSVN:
 					errorMsg = string.Empty;
 					return new SnailSVNContextMenus();
 
+				case ContextMenusClient.RabbitVCS:
+					errorMsg = "RabbitVCS is not supported on OSX.";
+					return null;
+
+				case ContextMenusClient.CLI:
+					errorMsg = string.Empty;
+					return new CLIContextMenus();
+
 				default:
 					throw new NotImplementedException(client + " not implemented yet for this platform.");
 			}
+
+#else
+
+            switch (client) {
+
+				case ContextMenusClient.TortoiseSVN:
+					errorMsg = "TortoiseSVN is not supported on Linux";
+					return null;
+
+				case ContextMenusClient.SnailSVN:
+					errorMsg = "SnailSVN is not supported on Linux.";
+					return null;
+
+				case ContextMenusClient.RabbitVCS:
+					errorMsg = string.Empty;
+					return new RabbitSVNContextMenu();
+
+				case ContextMenusClient.CLI:
+					errorMsg = string.Empty;
+					return new CLIContextMenus();
+
+				default:
+					throw new NotImplementedException(client + " not implemented yet for this platform.");
+			}
+
 #endif
 		}
 
 		public static string IsCurrentlySupported(ContextMenusClient client)
 		{
-			string errorMsg = null;
-
+			string errorMsg;
 			TryCreateContextMenusIntegration(client, out errorMsg);
 
 			return errorMsg;
@@ -293,8 +337,10 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus
 					if (Directory.Exists(paths[0])) {
 						m_Integration?.Revert(paths, false);
 					} else {
-						WiseSVNIntegration.Revert(paths, false, true, false);
-						AssetDatabase.Refresh();
+						if (EditorUtility.DisplayDialog("Revert File?", $"Are you sure you want to revert this file and it's meta?\n\"{paths[0]}\"", "Yes", "No", DialogOptOutDecisionType.ForThisSession, "WiseSVN.RevertConfirm")) {
+							WiseSVNIntegration.Revert(paths, false, true, false);
+							AssetDatabase.Refresh();
+						}
 					}
 					return;
 				}
@@ -444,6 +490,89 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus
 		public static void Blame(string assetPath, bool wait = false)
 		{
 			m_Integration?.Blame(assetPath, wait);
+		}
+
+		// Feature is working, but menu is commented out so it doesn't clutter the interface.
+		// Uncomment next line if you really want to do svn ignores in Unity.
+		//[MenuItem("Assets/SVN/Ignore Toggle", false, MenuItemPriorityStart + 105)]
+		public static void IgnoreToggleSelected()
+		{
+			IgnoreToggle(GetSelectedAssetPaths().FirstOrDefault());
+		}
+
+		/// <summary>
+		/// Toggles "svn:ignore" for provided asset.
+		/// NOTE: This doesn't account for "svn:global-ignores".
+		/// </summary>
+		public static void IgnoreToggle(string assetPath)
+		{
+			if (string.IsNullOrEmpty(assetPath))
+				return;
+
+			string parentDirectory = Path.GetDirectoryName(assetPath);
+			string fileName = Path.GetFileName(assetPath);
+
+			List<PropgetEntry> propgetEntries = new List<PropgetEntry>();
+
+			using (var reporter = WiseSVNIntegration.CreateReporter()) {
+				PropOperationResult result = WiseSVNIntegration.Propget(parentDirectory, "svn:ignore", false, propgetEntries, WiseSVNIntegration.COMMAND_TIMEOUT, reporter);
+				if (result != PropOperationResult.Success)
+					return;
+
+				// If prop doesn't exist, error is reported, but success is returned. Ignore the error flag if successful.
+				reporter.ResetErrorFlag();
+
+				List<string> lines = (propgetEntries.FirstOrDefault().Value ?? "")
+					.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+					.Select(l => l.Trim()).ToList();
+
+				if (lines.Contains(fileName) || lines.Contains(fileName + ".meta")) {
+					lines.Remove(fileName);
+					lines.Remove(fileName + ".meta");
+
+				} else {
+
+					var statusData = WiseSVNIntegration.GetStatus(assetPath);
+					var statusDataMeta = WiseSVNIntegration.GetStatus(assetPath + ".meta");
+
+					bool isVersioned = statusData.Status != VCFileStatus.Unversioned && statusData.Status != VCFileStatus.Deleted;
+					isVersioned |= statusDataMeta.Status != VCFileStatus.Unversioned && statusDataMeta.Status != VCFileStatus.Deleted;
+
+					if (isVersioned) {
+						int choice = EditorUtility.DisplayDialogComplex("Ignore Versioned File",
+							$"Only unversioned files can be ignored, but selected file is versioned (committed). You can:\n" +
+							$"1. Add it to \"ignore-on-commit\" changelist. TortoiseSVN will ignore it by default on commit.\n" +
+							$"2. Mark the file as deleted in svn (without removing it from disk) and ignore it for everybody. You need to commit resulting changes.\n" +
+							$"\n\"{assetPath}\"",
+							"Add to \"ignore-on-commit\"", "Cancel", "Mark file for deletion && ignore"
+							);
+
+						switch(choice) {
+							case 0:
+								WiseSVNIntegration.ChangelistAdd(assetPath, "ignore-on-commit", recursive: false, reporter);
+								return;
+							case 1:
+								return;
+							case 2:
+								if (!WiseSVNIntegration.Delete(assetPath, statusDataMeta.Status != VCFileStatus.Unversioned, keepLocal: true, reporter))
+									return;
+								break;
+						}
+					}
+
+					lines.Add(fileName);
+					lines.Add(fileName + ".meta");
+				}
+
+				string propValue = string.Join('\n', lines);
+
+				result = WiseSVNIntegration.Propset(parentDirectory, "svn:ignore", propValue, false, WiseSVNIntegration.COMMAND_TIMEOUT, reporter);
+
+				if (result != PropOperationResult.Success)
+					return;
+
+				SVNStatusesDatabase.Instance.InvalidateDatabase();
+			}
 		}
 
 

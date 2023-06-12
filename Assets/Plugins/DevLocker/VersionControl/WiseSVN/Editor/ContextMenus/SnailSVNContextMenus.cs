@@ -55,7 +55,8 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 
 			// The snailsvn.sh currently doesn't accept "check-for-modifications" argument, but with some reverse engineering, managed to make it work like this.
 			// open "snailsvnfree://check-for-modifications/SomeFolderHere/UnityProject/Assets"
-			Application.OpenURL($"{GetClientProtocol()}://check-for-modifications{WiseSVNIntegration.ProjectRootNative}/{path}");
+			string url = $"{GetClientProtocol()}://check-for-modifications{System.Uri.EscapeUriString(Path.Combine(WiseSVNIntegration.ProjectRootNative, path))}";
+			Application.OpenURL(url);
 		}
 
 		public override void DiffChanges(string assetPath, bool wait = false)
@@ -78,6 +79,13 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 		{
 			if (!assetPaths.Any())
 				return;
+
+			// If trying to commit directory that was just added, show the parent, so the directory meta is visible. Exclude root "Assets" and "Packages" folder.
+			var fixedPaths = assetPaths.Select(path =>
+					(path.Contains('/') && Directory.Exists(path) && WiseSVNIntegration.GetStatus(path).Status == VCFileStatus.Added)
+					? Path.GetDirectoryName(path)
+					: path
+					);
 
 			var result = ExecuteCommand("commit", GetWorkingPath(assetPaths), wait);
 			if (!string.IsNullOrEmpty(result.Error)) {
@@ -113,6 +121,13 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 		{
 			if (!assetPaths.Any())
 				return;
+
+			// If trying to revert directory that was just added, show the parent, so the directory meta is visible. Exclude root "Assets" and "Packages" folder.
+			var fixedPaths = assetPaths.Select(path =>
+					(path.Contains('/') && Directory.Exists(path) && WiseSVNIntegration.GetStatus(path).Status == VCFileStatus.Added)
+					? Path.GetDirectoryName(path)
+					: path
+					);
 
 			var result = ExecuteCommand("revert", GetWorkingPath(assetPaths), wait);
 			if (!string.IsNullOrEmpty(result.Error)) {
@@ -175,9 +190,10 @@ namespace DevLocker.VersionControl.WiseSVN.ContextMenus.Implementation
 
 			// Support only one file.
 
-			// The snailsvn.sh currently doesn't accept "blame" argument, but with some reverse engineering, managed to make it work like this.
-			// open "snailsvnfree://svn-blame/SomeFolderHere/UnityProject/Assets/foo.txt"
-			Application.OpenURL($"{GetClientProtocol()}://svn-blame{WiseSVNIntegration.ProjectRootNative}/{assetPath}");
+			var result = ExecuteCommand("blame", assetPath, WiseSVNIntegration.ProjectRootNative, wait);
+			if (!string.IsNullOrEmpty(result.Error)) {
+				Debug.LogError($"SVN Error: {result.Error}");
+			}
 		}
 
 		public override void Cleanup(bool wait = false)
