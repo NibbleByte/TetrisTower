@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace DevLocker.GFrame.Input.UIScope
 {
@@ -13,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		public UnityEvent OnAction;
 
-		protected override void OnInvoke()
+		protected override void OnInvoke(InputAction.CallbackContext context)
 		{
 			OnAction.Invoke();
 		}

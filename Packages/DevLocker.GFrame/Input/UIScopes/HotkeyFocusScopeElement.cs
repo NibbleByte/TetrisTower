@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -32,7 +33,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		[HideInInspector]
 		public List<UIScope> FocusScopes = new List<UIScope>();
 
-		protected override void OnInvoke()
+		protected override void OnInvoke(InputAction.CallbackContext context)
 		{
 			UIScope nextScope = null;
 

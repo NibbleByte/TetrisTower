@@ -629,31 +629,9 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""up"",
-                    ""id"": ""9144cbe6-05e1-4687-a6d7-24f99d23dd81"",
-                    ""path"": ""<Gamepad>/rightStick/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": ""down"",
                     ""id"": ""2db08d65-c5fb-421b-983f-c71163608d67"",
                     ""path"": ""<Gamepad>/leftStick/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""58748904-2ea9-4a80-8579-b500e6a76df8"",
-                    ""path"": ""<Gamepad>/rightStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
@@ -673,31 +651,9 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""left"",
-                    ""id"": ""712e721c-bdfb-4b23-a86c-a0d9fcfea921"",
-                    ""path"": ""<Gamepad>/rightStick/left"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": ""right"",
                     ""id"": ""fcd248ae-a788-4676-a12e-f4d81205600b"",
                     ""path"": ""<Gamepad>/leftStick/right"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""1f04d9bc-c50b-41a1-bfcc-afb75475ec20"",
-                    ""path"": ""<Gamepad>/rightStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
@@ -1204,7 +1160,7 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""Left Stick"",
+                    ""name"": ""Right Stick"",
                     ""id"": ""39c755b8-811d-4a6f-abac-6d575b0fe70b"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -1217,7 +1173,7 @@ namespace DevLocker.GFrame.SampleGame.Game
                 {
                     ""name"": ""negative"",
                     ""id"": ""fbfa6ec7-2ce6-4e53-a55b-d2b40d397f84"",
-                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""path"": ""<Gamepad>/rightStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -1228,7 +1184,7 @@ namespace DevLocker.GFrame.SampleGame.Game
                 {
                     ""name"": ""positive"",
                     ""id"": ""e9149de1-8776-41ea-b3db-d3c341186369"",
-                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""path"": ""<Gamepad>/rightStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -1237,7 +1193,7 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Left Stick"",
+                    ""name"": ""Right Stick"",
                     ""id"": ""74208213-82ac-485f-bc2b-9e59b93a4e99"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -1250,7 +1206,7 @@ namespace DevLocker.GFrame.SampleGame.Game
                 {
                     ""name"": ""negative"",
                     ""id"": ""73504116-21bd-432d-90ff-ae3d0edabe14"",
-                    ""path"": ""<Gamepad>/leftStick/down"",
+                    ""path"": ""<Gamepad>/rightStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -1261,7 +1217,7 @@ namespace DevLocker.GFrame.SampleGame.Game
                 {
                     ""name"": ""positive"",
                     ""id"": ""7e6839cd-a7d1-43c0-b3a8-9d7375569a2b"",
-                    ""path"": ""<Gamepad>/leftStick/up"",
+                    ""path"": ""<Gamepad>/rightStick/up"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",

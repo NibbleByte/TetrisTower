@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input.UIScope
@@ -14,7 +15,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		private Selectable m_Selectable;
 
-		protected override void OnInvoke()
+		protected override void OnInvoke(InputAction.CallbackContext context)
 		{
 			if (m_Selectable == null) {
 				m_Selectable = GetComponentInParent<Selectable>();

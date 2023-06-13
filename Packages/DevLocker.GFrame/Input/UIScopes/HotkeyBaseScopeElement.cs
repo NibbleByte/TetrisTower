@@ -98,7 +98,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
-		private void OnInputStarted(InputAction.CallbackContext obj)
+		private void OnInputStarted(InputAction.CallbackContext context)
 		{
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
@@ -108,10 +108,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			m_ActionStarted = true;
 
-			OnStarted();
+			OnStarted(context);
 		}
 
-		private void OnInputPerformed(InputAction.CallbackContext obj)
+		private void OnInputPerformed(InputAction.CallbackContext context)
 		{
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
@@ -122,10 +122,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_ActionStarted = false;
 			m_ActionPerformed = true;
 
-			OnInvoke();
+			OnInvoke(context);
 		}
 
-		private void OnInputCancel(InputAction.CallbackContext obj)
+		private void OnInputCancel(InputAction.CallbackContext context)
 		{
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
@@ -136,12 +136,12 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_ActionStarted = false;
 			m_ActionPerformed = false;
 
-			OnCancel();
+			OnCancel(context);
 		}
 
-		protected virtual void OnStarted() { }
-		protected abstract void OnInvoke();
-		protected virtual void OnCancel() { }
+		protected virtual void OnStarted(InputAction.CallbackContext context) { }
+		protected abstract void OnInvoke(InputAction.CallbackContext context);
+		protected virtual void OnCancel(InputAction.CallbackContext context) { }
 
 		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)
 		{
