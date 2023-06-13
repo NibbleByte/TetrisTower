@@ -100,6 +100,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (nextScope) {
+				if (nextScope.IsFocused || !nextScope.isActiveAndEnabled)
+					return;
+
 				nextScope.Focus();
 			} else {
 				Debug.LogWarning($"[Input] No scope to focus for {name}", this);
