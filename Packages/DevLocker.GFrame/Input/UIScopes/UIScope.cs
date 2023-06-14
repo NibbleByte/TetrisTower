@@ -107,10 +107,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public UIScope LastFocusedScope => m_LastFocusedScope;
 		private UIScope m_LastFocusedScope;
-		
+
 		public int ScopeDepth => m_ScopeDepth;
 		private int m_ScopeDepth;
-		
+
 		private int m_FrameEnabled = -1;
 
 		/// <summary>
@@ -134,7 +134,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			return playerSet?.ActiveScopes;
 		}
-		
+
 		/// <summary>
 		/// Get all registered scopes (including inactive ones).
 		/// <param name="playerRoot">Player root the scopes are part of (in case of split-screen)</param>
@@ -434,6 +434,9 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					case OnDisablePolicy.FocusPreviousScope:
 						nextScope = m_LastFocusedScope;
+						if (nextScope == null)
+							break;
+
 						var visitedScopes = new HashSet<UIScope>() { nextScope };
 
 						while(nextScope != null && !nextScope.isActiveAndEnabled) {

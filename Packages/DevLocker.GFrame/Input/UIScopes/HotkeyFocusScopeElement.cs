@@ -67,7 +67,10 @@ namespace DevLocker.GFrame.Input.UIScope
 					break;
 
 				case FocusPolicyType.FocusPreviousScope:
-					nextScope = UIScope.FocusedScope(m_PlayerContext.GetRootObject());
+					nextScope = UIScope.FocusedScope(m_PlayerContext.GetRootObject())?.LastFocusedScope;
+
+					if (nextScope == null)
+						break;
 
 					var visitedScopes = new HashSet<UIScope>() { nextScope };
 
