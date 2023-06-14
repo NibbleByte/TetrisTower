@@ -15,6 +15,9 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		public ScrollRect ScrollRect;
 
+		[Tooltip("Margin when snapping")]
+		public Vector2 Margin;
+
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
@@ -38,8 +41,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				m_LastSelectedObject = m_PlayerContext.SelectedGameObject;
 
 				if (m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(ScrollRect.transform)) {
-
-					Vector2 contentPos = GetScrollSnapToPosition(ScrollRect, m_LastSelectedObject.GetComponent<RectTransform>());
+					Vector2 contentPos = GetScrollSnapToPosition(ScrollRect, m_LastSelectedObject.GetComponent<RectTransform>(), Margin);
 					ScrollRect.content.localPosition = contentPos;
 				}
 			}
@@ -47,25 +49,28 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		/// <summary>
 		/// Calculate scroll position so child is displayed.
-		/// Copied from https://stackoverflow.com/a/50191835 with some fixes.
+		/// Copied from https://stackoverflow.com/a/30769550/4612666 with some fixes.
 		/// </summary>
-		public static Vector2 GetScrollSnapToPosition(ScrollRect scrollRect, RectTransform child)
+		public static Vector2 GetScrollSnapToPosition(ScrollRect scrollRect, RectTransform child, Vector2 margin)
 		{
 			Canvas.ForceUpdateCanvases();
 
-			Vector2 viewportLocalPosition = scrollRect.viewport.localPosition;
-			Vector2 childLocalPosition = child.localPosition;
+			Vector2 contentPos = scrollRect.transform.InverseTransformPoint(scrollRect.content.position);
+			Vector2 childPosLocal = new Vector2(child.rect.xMin - margin.x, child.rect.yMax + margin.y);
+			Vector2 childPos = scrollRect.transform.InverseTransformPoint(child.TransformPoint(childPosLocal));
+
+			Vector2 endPos = contentPos - childPos;
 
 			float horizontalMax = scrollRect.content.rect.width - scrollRect.viewport.rect.width;
 			float verticalMax = scrollRect.content.rect.height - scrollRect.viewport.rect.height;
 
 			Vector2 result = Vector2.zero;
 
-			if (scrollRect.horizontal) {
-				result.x = Mathf.Clamp(0 - (viewportLocalPosition.x + childLocalPosition.x), -horizontalMax, 0f);
+			if (scrollRect.horizontal && horizontalMax > 0f) {
+				result.x = Mathf.Clamp(endPos.x, -horizontalMax, 0f);
 			}
-			if (scrollRect.vertical) {
-				result.y = Mathf.Clamp(0 - (viewportLocalPosition.y + childLocalPosition.y), 0f, verticalMax);
+			if (scrollRect.vertical && verticalMax > 0f) {
+				result.y = Mathf.Clamp(endPos.y, 0f, verticalMax);
 			}
 
 			return result;
