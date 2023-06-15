@@ -14,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 	/// Displays hotkey icon / text.
 	/// Refreshes if devices change.
 	/// </summary>
-	public class HotkeyDisplayUI : MonoBehaviour, UIScope.IHotkeysWithInputActions, UIScope.IWritableHotkeyInputAction
+	public class HotkeyDisplayUI : MonoBehaviour, UIScope.IHotkeysWithInputActions, UIScope.IWritableHotkeyInputActionReference
 	{
 		public enum DisplayModes
 		{
@@ -150,14 +150,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		/// <summary>
 		/// Set input action. Will rebind it properly.
 		/// </summary>
-		public void SetInputAction(InputAction inputAction)
+		public void SetInputAction(InputActionReference inputActionReference)
 		{
-			bool wasEnabled = enabled;
+			bool wasEnabled = Application.isPlaying && enabled;
 			if (wasEnabled) {
 				OnDisable();
 			}
 
-			m_InputAction = InputActionReference.Create(inputAction);
+			m_InputAction = inputActionReference;
 
 			if (wasEnabled) {
 				OnEnable();

@@ -14,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// <summary>
 	/// Will display progress of Hotkey interaction (e.g. hold / long press etc.)
 	/// </summary>
-	public class HotkeyProgressUIScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions, IWritableHotkeyInputAction
+	public class HotkeyProgressUIScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions, IWritableHotkeyInputActionReference
 	{
 		[Tooltip("Skip the hotkey on the selected condition.")]
 		[Utils.EnumMask]
@@ -82,14 +82,14 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Set input action. Will rebind it properly.
 		/// </summary>
-		public void SetInputAction(InputAction inputAction)
+		public void SetInputAction(InputActionReference inputActionReference)
 		{
-			bool wasEnabled = enabled;
+			bool wasEnabled = Application.isPlaying && enabled;
 			if (wasEnabled) {
 				OnDisable();
 			}
 
-			m_InputAction = InputActionReference.Create(inputAction);
+			m_InputAction = inputActionReference;
 
 			if (wasEnabled) {
 				OnEnable();

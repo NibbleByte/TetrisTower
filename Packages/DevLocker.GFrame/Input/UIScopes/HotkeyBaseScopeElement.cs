@@ -15,7 +15,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// Base class for hotkey scope elements (that use Unity's Input System).
 	/// Note that this action has to be enabled in order to be invoked.
 	/// </summary>
-	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions, IWritableHotkeyInputAction
+	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions, IWritableHotkeyInputActionReference
 	{
 		[Tooltip("Skip the hotkey based on the selected condition.")]
 		[Utils.EnumMask]
@@ -157,14 +157,14 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Set input action. Will rebind it properly.
 		/// </summary>
-		public void SetInputAction(InputAction inputAction)
+		public void SetInputAction(InputActionReference inputActionReference)
 		{
-			bool wasEnabled = enabled;
+			bool wasEnabled = Application.isPlaying && enabled;
 			if (wasEnabled) {
 				OnDisable();
 			}
 
-			m_InputAction = InputActionReference.Create(inputAction);
+			m_InputAction = inputActionReference;
 
 			if (wasEnabled) {
 				OnEnable();
@@ -176,8 +176,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public void ApplyInputActionToChildren()
 		{
-			var children = GetComponentsInChildren<IWritableHotkeyInputAction>();
-			foreach (IWritableHotkeyInputAction child in children) {
+			var children = GetComponentsInChildren<IWritableHotkeyInputActionReference>();
+			foreach (IWritableHotkeyInputActionReference child in children) {
 				if (ReferenceEquals(child, this))
 					continue;
 

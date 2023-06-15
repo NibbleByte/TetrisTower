@@ -27,9 +27,9 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// <summary>
 	/// Implement this if you want to be able to set current hotkey in a generic matter. Used for editor UI.
 	/// </summary>
-	public interface IWritableHotkeyInputAction
+	public interface IWritableHotkeyInputActionReference
 	{
-		void SetInputAction(UnityEngine.InputSystem.InputAction inputAction);
+		void SetInputAction(UnityEngine.InputSystem.InputActionReference inputActionReference);
 	}
 #endif
 
