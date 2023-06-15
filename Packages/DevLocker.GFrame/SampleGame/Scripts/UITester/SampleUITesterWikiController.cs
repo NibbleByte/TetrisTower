@@ -71,8 +71,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 				return;
 
 
-			Vector2 contentPos = ScrollWithSelected.GetScrollSnapToPosition(TabsScrollRect, tabButton.GetComponent<RectTransform>(), Vector2.zero);
-			TabsScrollRect.content.localPosition = contentPos;
+			ScrollWithSelected.KeepChildInScrollViewport(TabsScrollRect, tabButton.GetComponent<RectTransform>(), Vector2.zero);
 		}
 	}
 
