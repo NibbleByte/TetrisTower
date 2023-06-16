@@ -21175,7 +21175,6 @@ GameObject:
   - component: {fileID: 1094198005}
   - component: {fileID: 1094198007}
   - component: {fileID: 1094198006}
-  - component: {fileID: 1094198008}
   m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
@@ -21242,24 +21241,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1094198004}
   m_CullTransparentMesh: 1
---- !u!114 &1094198008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1094198004}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8e85821f54bff34fb51a34b96634e98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SkipHotkey: 0
-  m_InputAction: {fileID: -1861849840156152537, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
-  ScrollRect: {fileID: 0}
-  Direction: 0
-  ScrollSpeed: 100
-  Invert: 0
 --- !u!114 &1110550598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23595,7 +23576,6 @@ GameObject:
   - component: {fileID: 1250783694}
   - component: {fileID: 1250783696}
   - component: {fileID: 1250783695}
-  - component: {fileID: 1250783697}
   m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
@@ -23662,24 +23642,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1250783693}
   m_CullTransparentMesh: 1
---- !u!114 &1250783697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1250783693}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8e85821f54bff34fb51a34b96634e98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SkipHotkey: 0
-  m_InputAction: {fileID: 3516802644060230671, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
-  ScrollRect: {fileID: 0}
-  Direction: 1
-  ScrollSpeed: 100
-  Invert: 0
 --- !u!1 &1251880386
 GameObject:
   m_ObjectHideFlags: 0
@@ -40425,6 +40387,8 @@ GameObject:
   - component: {fileID: 2145263965}
   - component: {fileID: 2145263964}
   - component: {fileID: 2145263967}
+  - component: {fileID: 2145263969}
+  - component: {fileID: 2145263968}
   m_Layer: 5
   m_Name: ButtonsScroll
   m_TagString: Untagged
@@ -40536,7 +40500,47 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScrollRect: {fileID: 2145263964}
-  Margin: {x: 20, y: 20}
+  Margin:
+    m_Left: 20
+    m_Right: 20
+    m_Top: 20
+    m_Bottom: 20
+--- !u!114 &2145263968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2145263962}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8e85821f54bff34fb51a34b96634e98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SkipHotkey: 0
+  m_InputAction: {fileID: 3516802644060230671, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
+  ScrollRect: {fileID: 0}
+  Direction: 1
+  ScrollSpeed: 100
+  Invert: 0
+--- !u!114 &2145263969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2145263962}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8e85821f54bff34fb51a34b96634e98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SkipHotkey: 0
+  m_InputAction: {fileID: -1861849840156152537, guid: cfe6350f5d9d98c4d95bffc578542f16, type: 3}
+  ScrollRect: {fileID: 0}
+  Direction: 0
+  ScrollSpeed: 100
+  Invert: 0
 --- !u!1001 &393567691553934759
 PrefabInstance:
   m_ObjectHideFlags: 0

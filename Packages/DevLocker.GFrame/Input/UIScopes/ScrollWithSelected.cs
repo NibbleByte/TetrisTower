@@ -16,7 +16,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public ScrollRect ScrollRect;
 
 		[Tooltip("Margin when snapping")]
-		public Vector2 Margin;
+		public RectOffset Margin;
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
@@ -49,7 +49,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Move scroll so child is in view, if it isn't already.
 		/// </summary>
-		public static void KeepChildInScrollViewport(ScrollRect scrollRect, RectTransform child, Vector2 margin)
+		public static void KeepChildInScrollViewport(ScrollRect scrollRect, RectTransform child, RectOffset margin = null)
 		{
 			Canvas.ForceUpdateCanvases();
 
@@ -61,8 +61,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			Vector2 childPosMin = scrollRect.viewport.InverseTransformPoint(child.TransformPoint(child.rect.min));
 			Vector2 childPosMax = scrollRect.viewport.InverseTransformPoint(child.TransformPoint(child.rect.max));
 
-			childPosMin -= margin;
-			childPosMax += margin;
+			if (margin != null) {
+				childPosMin -= new Vector2(margin.left, margin.bottom);
+				childPosMax += new Vector2(margin.right, margin.top);
+			}
 
 			Vector2 move = Vector2.zero;
 

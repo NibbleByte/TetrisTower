@@ -71,7 +71,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 				return;
 
 
-			ScrollWithSelected.KeepChildInScrollViewport(TabsScrollRect, tabButton.GetComponent<RectTransform>(), Vector2.zero);
+			ScrollWithSelected.KeepChildInScrollViewport(TabsScrollRect, tabButton.GetComponent<RectTransform>());
 		}
 	}
 
