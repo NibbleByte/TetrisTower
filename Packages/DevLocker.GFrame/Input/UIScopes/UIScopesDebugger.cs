@@ -37,6 +37,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		private StringBuilder m_HotkeyNamesBuilder = new StringBuilder();
 
 		private GUIStyle UrlStyle;
+		private GUIStyle WarningStyle;
 
 		private GUIStyle DisabledStyle;
 		private GUIStyle InactiveStyle;
@@ -66,6 +67,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			UrlStyle.normal.textColor = EditorGUIUtility.isProSkin ? new Color(1.00f, 0.65f, 0.00f) : Color.blue;
 			UrlStyle.hover.textColor = UrlStyle.normal.textColor;
 			UrlStyle.active.textColor = Color.red;
+
+			WarningStyle = new GUIStyle(UrlStyle);
+			WarningStyle.fontStyle = FontStyle.Bold;
+			WarningStyle.alignment = TextAnchor.MiddleCenter;
 
 			DisabledStyle = new GUIStyle(UrlStyle);
 			DisabledStyle.normal.textColor = DisabledStyle.hover.textColor = Color.gray;
@@ -119,6 +124,19 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			if (UrlStyle == null) {
 				InitStyles();
+			}
+
+			
+			if (m_RootElement == null) {
+				// Root element is set to null if scene just loaded. Wait for any other scenes loading...
+				for (int i = 0; i < SceneManager.sceneCount; ++i) {
+					if (!SceneManager.GetSceneAt(i).isLoaded) {
+						EditorGUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
+						EditorGUILayout.LabelField("... waiting for scenes to load ...", WarningStyle, GUILayout.ExpandWidth(true));
+						Repaint();
+						return;
+					}
+				}
 			}
 
 			if (m_RootElement == null) {

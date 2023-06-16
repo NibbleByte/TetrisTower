@@ -370,7 +370,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					if (nav.selectOnUp == null && WrapUp.IsWrapMode) {
 						Selectable it = selectable;
-						while(it.navigation.selectOnDown != null && it.navigation.selectOnDown != selectable) {
+						while(it.navigation.selectOnDown != null && it.navigation.selectOnDown.navigation.selectOnUp == it && it.navigation.selectOnDown != selectable) {
 							it = it.navigation.selectOnDown;
 
 							sanityCount++;
@@ -388,7 +388,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					if (nav.selectOnDown == null && WrapDown.IsWrapMode) {
 						Selectable it = selectable;
-						while(it.navigation.selectOnUp != null && it.navigation.selectOnUp != selectable) {
+						while(it.navigation.selectOnUp != null && it.navigation.selectOnUp.navigation.selectOnDown == it && it.navigation.selectOnUp != selectable) {
 							it = it.navigation.selectOnUp;
 
 							sanityCount++;
@@ -406,7 +406,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					if (nav.selectOnLeft == null && WrapLeft.IsWrapMode) {
 						Selectable it = selectable;
-						while(it.navigation.selectOnRight != null && it.navigation.selectOnRight != selectable) {
+						while(it.navigation.selectOnRight != null && it.navigation.selectOnRight.navigation.selectOnLeft == it && it.navigation.selectOnRight != selectable) {
 							it = it.navigation.selectOnRight;
 
 							sanityCount++;
@@ -424,7 +424,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					if (nav.selectOnRight == null && WrapRight.IsWrapMode) {
 						Selectable it = selectable;
-						while(it.navigation.selectOnLeft != null && it.navigation.selectOnLeft != selectable) {
+						while(it.navigation.selectOnLeft != null && it.navigation.selectOnLeft.navigation.selectOnRight == it && it.navigation.selectOnLeft != selectable) {
 							it = it.navigation.selectOnLeft;
 
 							sanityCount++;

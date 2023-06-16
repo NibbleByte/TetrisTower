@@ -109,6 +109,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			if (!m_HasInitialized)
 				return;
 
+			// Changing levels or stopping the game - don't trigger events as this may cause headaches.
+			if (!gameObject.scene.isLoaded)
+				return;
+
 			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"[Input] {nameof(InputControlSchemeEventsUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
