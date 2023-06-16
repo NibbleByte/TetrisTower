@@ -244,7 +244,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				    && selectable.IsInteractable()
 					&& !m_ManagedSelectables.Contains(selectable)
 				    && selectable.GetComponent<UINavigationGroupExclude>() == null
-					&& (Include.Contains(selectable) || selectable.transform.IsChildOf(transform))
+					&& (Include.Contains(selectable) || selectable.GetComponentInParent<UINavigationGroup>() == this)
 					) {
 					m_ManagedSelectables.Add(selectable);
 
