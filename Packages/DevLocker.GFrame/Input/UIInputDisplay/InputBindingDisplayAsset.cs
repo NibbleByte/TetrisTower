@@ -42,6 +42,13 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private bool m_SupportsUINavigationSelection = true;
 		public bool SupportsUINavigationSelection => m_SupportsUINavigationSelection;
 
+#if USE_TEXT_MESH_PRO
+		[Tooltip("Sprite asset to be used for this device with TextMeshPro. Will be added dynamically to the default sprite assets list. Can be null.")]
+		[SerializeField]
+		private TMPro.TMP_SpriteAsset m_SpriteAsset;
+		public TMPro.TMP_SpriteAsset SpriteAsset => m_SpriteAsset;
+#endif
+
 		[Space()]
 		[InputControlSchemePicker]
 		[Tooltip("The control scheme that matches the devices listed below.")]

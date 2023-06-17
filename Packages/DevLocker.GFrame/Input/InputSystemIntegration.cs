@@ -95,6 +95,14 @@ namespace DevLocker.GFrame.Input
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
 		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action);
+
+#if USE_TEXT_MESH_PRO
+		/// <summary>
+		/// Sprite asset to be used for this device. Will be added dynamically to the default sprite assets list. Can be null.
+		/// </summary>
+		TMPro.TMP_SpriteAsset SpriteAsset { get; }
+#endif
+
 	}
 
 	/// <summary>
@@ -161,7 +169,7 @@ namespace DevLocker.GFrame.Input
 	/// <summary>
 	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
 	/// </summary>
-	public interface IInputContext : IDisposable
+	public interface IInputContext
 	{
 		/// <summary>
 		/// Last device used got changed.
@@ -262,6 +270,11 @@ namespace DevLocker.GFrame.Input
 		/// Does the current device support UI navigation.
 		/// </summary>
 		bool DeviceSupportsUINavigationSelection { get; }
+
+		/// <summary>
+		/// Dispose the context when you finished working with it.
+		/// </summary>
+		void Dispose();
 	}
 
 	/// <summary>

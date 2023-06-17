@@ -36,6 +36,10 @@ namespace DevLocker.GFrame.Input.Contexts
 		private IInputBindingDisplayDataProvider m_LastUsedDisplayData;
 		private readonly IInputBindingDisplayDataProvider[] m_BindingsDisplayProviders;
 
+#if USE_TEXT_MESH_PRO
+		private TMPro.TMP_SpriteAsset[] m_InitialSpriteAssets;
+#endif
+
 		private InputDevice m_ForcedDevice;
 		public InputDevice ForcedDevice {
 			get => m_ForcedDevice;
@@ -64,6 +68,18 @@ namespace DevLocker.GFrame.Input.Contexts
 
 			m_BindingsDisplayProviders = bindingDisplayProviders != null ? bindingDisplayProviders.ToArray() : new IInputBindingDisplayDataProvider[0];
 
+#if USE_TEXT_MESH_PRO
+			var defaultSpriteAsset = TMPro.TMP_Settings.GetSpriteAsset();
+			if (defaultSpriteAsset) {
+				m_InitialSpriteAssets = defaultSpriteAsset.fallbackSpriteAssets.ToArray();
+				foreach (var displayProvider in m_BindingsDisplayProviders) {
+					if (displayProvider.SpriteAsset != null) {
+						defaultSpriteAsset.fallbackSpriteAssets.Remove(displayProvider.SpriteAsset);
+					}
+				}
+			}
+#endif
+
 			m_LastUsedDevice = InputSystem.devices.FirstOrDefault();
 			CacheDisplayData();
 
@@ -86,6 +102,12 @@ namespace DevLocker.GFrame.Input.Contexts
 		{
 			InputSystem.onEvent -= OnInputSystemEvent;
 			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
+
+#if USE_TEXT_MESH_PRO
+			if (m_InitialSpriteAssets != null) {
+				TMPro.TMP_Settings.GetSpriteAsset().fallbackSpriteAssets = m_InitialSpriteAssets.ToList();
+			}
+#endif
 		}
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false)
@@ -171,20 +193,79 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		private void CacheDisplayData()
 		{
+#if USE_TEXT_MESH_PRO
+			var defaultSpriteAsset = TMPro.TMP_Settings.GetSpriteAsset();
+#endif
+
 			if (m_LastUsedDevice == null) {
+
+#if USE_TEXT_MESH_PRO
+				if (m_LastUsedDisplayData != null && m_LastUsedDisplayData.SpriteAsset != null) {
+					if (defaultSpriteAsset.fallbackSpriteAssets.Remove(m_LastUsedDisplayData.SpriteAsset)) {
+						RebuildTextMeshProGraphics();
+					}
+				}
+#endif
+
 				m_LastUsedDisplayData = null;
 				return;
 			}
 
 			foreach (var displayData in m_BindingsDisplayProviders) {
 				if (displayData.MatchesDevice(m_LastUsedDevice.layout)) {
+
+#if USE_TEXT_MESH_PRO
+					bool changedSprites = false;
+					if (m_LastUsedDisplayData != null && m_LastUsedDisplayData.SpriteAsset != null) {
+						if (defaultSpriteAsset.fallbackSpriteAssets.Remove(m_LastUsedDisplayData.SpriteAsset)) {
+							changedSprites = true;
+						}
+					}
+#endif
+
 					m_LastUsedDisplayData = displayData;
+
+#if USE_TEXT_MESH_PRO
+					if (m_LastUsedDisplayData != null && m_LastUsedDisplayData.SpriteAsset != null) {
+						defaultSpriteAsset.fallbackSpriteAssets.Add(m_LastUsedDisplayData.SpriteAsset);
+						changedSprites = true;
+					}
+
+					if (changedSprites) {
+						RebuildTextMeshProGraphics();
+					}
+#endif
+
 					return;
 				}
 			}
 
+
+#if USE_TEXT_MESH_PRO
+			if (m_LastUsedDisplayData != null && m_LastUsedDisplayData.SpriteAsset != null) {
+				if (defaultSpriteAsset.fallbackSpriteAssets.Remove(m_LastUsedDisplayData.SpriteAsset)) {
+					RebuildTextMeshProGraphics();
+				}
+			}
+#endif
 			m_LastUsedDisplayData = null;
 		}
+
+#if USE_TEXT_MESH_PRO
+		private void RebuildTextMeshProGraphics()
+		{
+			foreach (var canvas in Utils.UIUtils.GetAllCanvases()) {
+				var graphics = UnityEngine.UI.GraphicRegistry.GetGraphicsForCanvas(canvas);
+
+				// The returned IList<> doesn't support GetEnumerator, so iterate by index only.
+				for(int i = 0; i < graphics.Count; ++i) {
+					if (graphics[i] is TMPro.TextMeshProUGUI graphic) {
+						graphic.ForceMeshUpdate();
+					}
+				}
+			}
+		}
+#endif
 
 		protected virtual void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
 		{
