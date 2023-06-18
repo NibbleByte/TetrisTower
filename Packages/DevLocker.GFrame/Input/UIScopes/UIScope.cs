@@ -105,6 +105,20 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool IncludeUIActions = true;
 #endif
 
+		public event Action Activated;
+		public event Action Focused;
+
+		public event Action Deactivating;
+		public event Action Defocusing;
+
+		public delegate void ScopeEvent(UIScope scope);
+
+		public static event ScopeEvent ScopeActivated;
+		public static event ScopeEvent ScopeFocused;
+
+		public static event ScopeEvent ScopeDeactivating;
+		public static event ScopeEvent ScopeDefocusing;
+
 		public UIScope LastFocusedScope => m_LastFocusedScope;
 		private UIScope m_LastFocusedScope;
 
@@ -716,6 +730,19 @@ namespace DevLocker.GFrame.Input.UIScope
 			playerSet.ChangingActiveScopes = true;
 
 			try {
+				foreach (UIScope scope in prevScopes) {
+					if (!nextScopes.Contains(scope)) {
+						scope.Deactivating?.Invoke();
+						ScopeDeactivating?.Invoke(scope);
+					}
+				}
+
+				UIScope prevFocusedScope = prevScopes.LastOrDefault();
+				if (prevFocusedScope) {
+					prevFocusedScope.Defocusing?.Invoke();
+					ScopeDefocusing?.Invoke(prevFocusedScope);
+				}
+
 				// Reversed order, just in case.
 				foreach (UIScope scope in prevScopes.Reverse()) {
 					if (!nextScopes.Contains(scope)) {
@@ -726,7 +753,15 @@ namespace DevLocker.GFrame.Input.UIScope
 				foreach (UIScope scope in nextScopes) {
 					if (!prevScopes.Contains(scope)) {
 						scope.SetScopeState(true);
+						scope.Activated?.Invoke();
+						ScopeActivated?.Invoke(scope);
 					}
+				}
+
+				UIScope nextFocusedScope = nextScopes.LastOrDefault();
+				if (nextFocusedScope) {
+					nextFocusedScope.Focused?.Invoke();
+					ScopeFocused?.Invoke(nextFocusedScope);
 				}
 			}
 
