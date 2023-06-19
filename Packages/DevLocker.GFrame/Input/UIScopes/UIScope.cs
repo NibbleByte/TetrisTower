@@ -109,7 +109,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public event Action Focused;
 
 		public event Action Deactivating;
-		public event Action Defocusing;
+		public event Action Unfocusing;
 
 		public delegate void ScopeEvent(UIScope scope);
 
@@ -117,7 +117,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public static event ScopeEvent ScopeFocused;
 
 		public static event ScopeEvent ScopeDeactivating;
-		public static event ScopeEvent ScopeDefocusing;
+		public static event ScopeEvent ScopeUnfocusing;
 
 		public UIScope LastFocusedScope => m_LastFocusedScope;
 		private UIScope m_LastFocusedScope;
@@ -739,8 +739,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				UIScope prevFocusedScope = prevScopes.LastOrDefault();
 				if (prevFocusedScope) {
-					prevFocusedScope.Defocusing?.Invoke();
-					ScopeDefocusing?.Invoke(prevFocusedScope);
+					prevFocusedScope.Unfocusing?.Invoke();
+					ScopeUnfocusing?.Invoke(prevFocusedScope);
 				}
 
 				// Reversed order, just in case.

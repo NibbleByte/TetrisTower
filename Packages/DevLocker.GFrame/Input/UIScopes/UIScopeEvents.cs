@@ -12,7 +12,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		[Header("Focus Events")]
 		public UnityEvent Focused;
-		public UnityEvent Defocusing;
+		public UnityEvent Unfocusing;
 
 		[Header("Activate Events")]
 		public UnityEvent Activated;
@@ -32,7 +32,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			Scope.Activated += OnActivated;
 			Scope.Focused += OnFocused;
 			Scope.Deactivating += OnDeactivating;
-			Scope.Defocusing += OnDefocusing;
+			Scope.Unfocusing += OnUnfocusing;
 		}
 
 		void OnDisable()
@@ -43,7 +43,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			Scope.Activated -= OnActivated;
 			Scope.Focused -= OnFocused;
 			Scope.Deactivating -= OnDeactivating;
-			Scope.Defocusing -= OnDefocusing;
+			Scope.Unfocusing -= OnUnfocusing;
 		}
 
 		private void OnActivated()
@@ -61,9 +61,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			Deactivating.Invoke();
 		}
 
-		private void OnDefocusing()
+		private void OnUnfocusing()
 		{
-			Defocusing.Invoke();
+			Unfocusing.Invoke();
 		}
 
 	}
