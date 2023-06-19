@@ -166,8 +166,28 @@ namespace DevLocker.GFrame.Input.UIScope
 		private PlayerScopeSet m_PlayerSet;
 		internal PlayerContextUIRootObject m_PlayerContext;
 
-		public IReadOnlyList<IScopeElement> OwnedElements => m_ScopeElements;
-		public IReadOnlyList<UIScope> DirectChildScopes => m_DirectChildScopes;
+		public IReadOnlyList<IScopeElement> OwnedElements
+		{
+			get
+			{
+				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
+					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
+				}
+
+				return m_ScopeElements;
+			}
+		}
+
+		public IReadOnlyList<UIScope> DirectChildScopes
+		{
+			get {
+				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
+					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
+				}
+				
+				return m_DirectChildScopes;
+			}
+		}
 
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
@@ -573,7 +593,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void ScanForOwnedScopeElements()
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
 
@@ -591,7 +611,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void ReplaceOwnedScopeElements(IEnumerable<IScopeElement> scopeElements)
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
 
@@ -608,7 +628,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void TryAppendOwnedScopeElements(IEnumerable<IScopeElement> scopeElements)
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
 
@@ -632,7 +652,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public void TryAppendOwnedScopeElements(IScopeElement scopeElement)
 		{
 			if (!m_HasInitialized) {
-				Debug.LogWarning($"[Input] Couldn't scan owned scope elements for {name} as it isn't initialized.", this);
+				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
 
@@ -657,6 +677,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public bool Owns(IScopeElement scopeElement)
 		{
+			if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
+				ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
+			}
+			
 			return m_ScopeElements.Contains(scopeElement);
 		}
 
