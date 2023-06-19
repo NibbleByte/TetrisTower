@@ -36,6 +36,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private StringBuilder m_HotkeyNamesBuilder = new StringBuilder();
 
+		[NonSerialized]
 		private GUIStyle UrlStyle;
 		private GUIStyle WarningStyle;
 
