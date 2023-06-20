@@ -47,7 +47,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	[SelectionBase]
 	public class UIScope : MonoBehaviour
 	{
-		public enum OnEnablePolicy
+		public enum FocusPolicy
 		{
 			Focus = 0,
 			FocusWithFramePriority = 2,	// If multiple activations
@@ -56,7 +56,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			DontFocus = 20,
 		}
 
-		public enum OnDisablePolicy
+		public enum UnfocusPolicy
 		{
 			FocusScopeWithHighestDepth = 0,
 			FocusPreviousScope = 5,
@@ -88,9 +88,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		public bool AutomaticFocus = true;
 
 		[Tooltip("What should happen when this scope gets enabled.\n\nFocusWithFramePriority - use when multiple scopes get enabled in the same frame to prioritize this one.")]
-		public OnEnablePolicy OnEnableBehaviour;
+		public FocusPolicy OnEnableBehaviour;
 		[Tooltip("What should happen when this scope gets disabled ONLY if this is the FOCUSED (deepest) one.")]
-		public OnDisablePolicy OnDisableBehaviour;
+		public UnfocusPolicy OnDisableBehaviour;
 
 		public List<UIScope> OnDisableScopes;
 
@@ -184,7 +184,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 				}
-				
+
 				return m_DirectChildScopes;
 			}
 		}
@@ -321,30 +321,30 @@ namespace DevLocker.GFrame.Input.UIScope
 				UIScope lastActive = m_PlayerSet.ActiveScopes.LastOrDefault();
 
 				switch (OnEnableBehaviour) {
-					case OnEnablePolicy.Focus:
+					case FocusPolicy.Focus:
 						// Skip activation if this frame another scope was activated with higher priority.
-						if (!m_PlayerSet.ActiveScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
+						if (!m_PlayerSet.ActiveScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == FocusPolicy.FocusWithFramePriority)) {
 							SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						}
 						break;
 
-					case OnEnablePolicy.FocusWithFramePriority:
+					case FocusPolicy.FocusWithFramePriority:
 						SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						break;
 
-					case OnEnablePolicy.FocusIfCurrentIsLowerDepth:
+					case FocusPolicy.FocusIfCurrentIsLowerDepth:
 						if (lastActive == null || lastActive.m_ScopeDepth < m_ScopeDepth) {
 							SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						}
 						break;
 
-					case OnEnablePolicy.FocusIfCurrentIsLowerOrEqualDepth:
+					case FocusPolicy.FocusIfCurrentIsLowerOrEqualDepth:
 						if (lastActive == null || lastActive.m_ScopeDepth <= m_ScopeDepth) {
 							SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 						}
 						break;
 
-					case OnEnablePolicy.DontFocus:
+					case FocusPolicy.DontFocus:
 						break;
 
 					default:
@@ -402,9 +402,9 @@ namespace DevLocker.GFrame.Input.UIScope
 					if (scope.m_FrameEnabled == Time.frameCount) {
 						// A bit of copy-paste from OnEnable(). Sad.
 						switch (scope.OnEnableBehaviour) {
-							case OnEnablePolicy.Focus:
+							case FocusPolicy.Focus:
 								// Skip activation if this frame another scope was activated with higher priority.
-								if (!m_PlayerSet.RegisteredScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == OnEnablePolicy.FocusWithFramePriority)) {
+								if (!m_PlayerSet.RegisteredScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == FocusPolicy.FocusWithFramePriority)) {
 									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
 									return;
 								}
@@ -412,11 +412,11 @@ namespace DevLocker.GFrame.Input.UIScope
 								fallbackFrameScope = fallbackFrameScope ?? scope;
 								break;
 
-							case OnEnablePolicy.FocusWithFramePriority:
+							case FocusPolicy.FocusWithFramePriority:
 								SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
 								return;
 
-							case OnEnablePolicy.FocusIfCurrentIsLowerDepth:
+							case FocusPolicy.FocusIfCurrentIsLowerDepth:
 								if (m_ScopeDepth < scope.m_ScopeDepth) {
 									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
 									return;
@@ -425,7 +425,7 @@ namespace DevLocker.GFrame.Input.UIScope
 								fallbackFrameScope = fallbackFrameScope ?? scope;
 								break;
 
-							case OnEnablePolicy.FocusIfCurrentIsLowerOrEqualDepth:
+							case FocusPolicy.FocusIfCurrentIsLowerOrEqualDepth:
 								if (m_ScopeDepth <= scope.m_ScopeDepth) {
 									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
 									return;
@@ -434,7 +434,7 @@ namespace DevLocker.GFrame.Input.UIScope
 								fallbackFrameScope = fallbackFrameScope ?? scope;
 								break;
 
-							case OnEnablePolicy.DontFocus:
+							case FocusPolicy.DontFocus:
 								// Enabled this frame, but didn't want to focus, so don't do it.
 								break;
 
@@ -449,58 +449,8 @@ namespace DevLocker.GFrame.Input.UIScope
 					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(fallbackFrameScope));
 				}
 
-				UIScope nextScope = null;
+				UIScope nextScope = GetScopeOnUnfocus(OnDisableBehaviour);
 				UIScope[] nextScopes;
-
-				switch (OnDisableBehaviour) {
-					case OnDisablePolicy.FocusParentScope:
-						Transform scopeTransform = transform.parent;
-						while(scopeTransform) {
-							UIScope scope = scopeTransform.GetComponent<UIScope>();
-							if (scope && scope.isActiveAndEnabled && scope.AutomaticFocus) {
-								nextScope = scope;
-								break;
-							}
-
-							scopeTransform = scopeTransform.parent;
-						}
-						break;
-
-					case OnDisablePolicy.FocusPreviousScope:
-						nextScope = m_LastFocusedScope;
-						if (nextScope == null)
-							break;
-
-						var visitedScopes = new HashSet<UIScope>() { nextScope };
-
-						while(nextScope != null && !nextScope.isActiveAndEnabled) {
-							nextScope = visitedScopes.Contains(nextScope.m_LastFocusedScope)
-								? null
-								: nextScope.m_LastFocusedScope
-								;
-						}
-						break;
-
-					case OnDisablePolicy.FocusScopeWithHighestDepth:
-						nextScope = m_PlayerSet.RegisteredScopes.FirstOrDefault();
-						foreach(UIScope scope in m_PlayerSet.RegisteredScopes) {
-							if (nextScope.m_ScopeDepth < scope.m_ScopeDepth && scope.isActiveAndEnabled) {
-								nextScope = scope;
-							}
-						}
-						break;
-
-					case OnDisablePolicy.FocusFirstEnabledScopeFromList:
-						nextScope = OnDisableScopes.FirstOrDefault(s => s.isActiveAndEnabled);
-						break;
-
-					case OnDisablePolicy.EmptyFocus:
-						nextScope = null;
-						break;
-
-					default:
-						throw new NotSupportedException(OnDisableBehaviour.ToString());
-				}
 
 				nextScopes = nextScope
 					? CollectScopes(nextScope)
@@ -574,6 +524,102 @@ namespace DevLocker.GFrame.Input.UIScope
 			UIScope[] nextScopes = CollectScopes(this);
 
 			SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
+		}
+
+		/// <summary>
+		/// Unfocus this scope as if it was disabled (will use <see cref="OnDisableBehaviour"/>.
+		/// </summary>
+		[ContextMenu("Unfocus As If Disabled")]
+		public void UnfocusAsIfDisabled()
+		{
+			UIScope nextScope = GetScopeOnUnfocus(OnDisableBehaviour);
+			if (nextScope) {
+				nextScope.Focus();
+			}
+		}
+
+		/// <summary>
+		/// Focus parent scope. Exposed for UnityEvents.
+		/// </summary>
+		[ContextMenu("Focus Parent Scope")]
+		public void FocusParentScope()
+		{
+			UIScope nextScope = GetScopeOnUnfocus(UnfocusPolicy.FocusParentScope);
+			if (nextScope) {
+				nextScope.Focus();
+			}
+		}
+
+		/// <summary>
+		/// Focus previous scope. Exposed for UnityEvents.
+		/// </summary>
+		[ContextMenu("Focus Previous Scope")]
+		public void FocusPreviousScope()
+		{
+			UIScope nextScope = GetScopeOnUnfocus(UnfocusPolicy.FocusPreviousScope);
+			if (nextScope) {
+				nextScope.Focus();
+			}
+		}
+
+		/// <summary>
+		/// Get the scope that would be focused when onfocusing this one with the provided policy.
+		/// </summary>
+		public UIScope GetScopeOnUnfocus(UnfocusPolicy unfocusPolicy)
+		{
+			UIScope nextScope = null;
+
+			switch (unfocusPolicy) {
+				case UnfocusPolicy.FocusParentScope:
+					Transform scopeTransform = transform.parent;
+					while (scopeTransform) {
+						UIScope scope = scopeTransform.GetComponent<UIScope>();
+						if (scope && scope.isActiveAndEnabled && scope.AutomaticFocus) {
+							nextScope = scope;
+							break;
+						}
+
+						scopeTransform = scopeTransform.parent;
+					}
+					break;
+
+				case UnfocusPolicy.FocusPreviousScope:
+					nextScope = m_LastFocusedScope;
+					if (nextScope == null)
+						break;
+
+					var visitedScopes = new HashSet<UIScope>() { nextScope };
+
+					while (nextScope != null && !nextScope.isActiveAndEnabled) {
+						nextScope = visitedScopes.Contains(nextScope.m_LastFocusedScope)
+							? null
+							: nextScope.m_LastFocusedScope
+							;
+					}
+					break;
+
+				case UnfocusPolicy.FocusScopeWithHighestDepth:
+					nextScope = m_PlayerSet.RegisteredScopes.FirstOrDefault();
+					foreach (UIScope scope in m_PlayerSet.RegisteredScopes) {
+						if (nextScope.m_ScopeDepth < scope.m_ScopeDepth && scope.isActiveAndEnabled) {
+							nextScope = scope;
+						}
+					}
+					break;
+
+				case UnfocusPolicy.FocusFirstEnabledScopeFromList:
+					nextScope = OnDisableScopes.FirstOrDefault(s => s.isActiveAndEnabled);
+					break;
+
+				case UnfocusPolicy.EmptyFocus:
+					nextScope = null;
+					break;
+
+				default:
+					throw new NotSupportedException(unfocusPolicy.ToString());
+			}
+
+			return nextScope;
 		}
 
 		/// <summary>
@@ -680,7 +726,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 				ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 			}
-			
+
 			return m_ScopeElements.Contains(scopeElement);
 		}
 
@@ -908,7 +954,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnEnableBehaviour)));
 				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableBehaviour)));
 
-				if (uiScope.OnDisableBehaviour == UIScope.OnDisablePolicy.FocusFirstEnabledScopeFromList) {
+				if (uiScope.OnDisableBehaviour == UIScope.UnfocusPolicy.FocusFirstEnabledScopeFromList) {
 					UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableScopes)));
 				}
 			}
