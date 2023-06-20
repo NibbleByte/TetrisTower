@@ -308,6 +308,29 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Enable specified actions and remember them for later.
 		/// </summary>
+		public IEnumerable<InputAction> Enable(IInputContext context, params InputActionReference[] actionReferences)
+		{
+			if (actionReferences.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			Enable(actions);
+			return actions;
+		}
+
+		/// <summary>
+		/// Enable specified actions and remember them for later.
+		/// </summary>
+		public IEnumerable<InputAction> Enable(IInputContext context, IEnumerable<InputActionReference> actionReferences)
+		{
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			Enable(actions);
+			return actions;
+		}
+
+		/// <summary>
+		/// Enable specified actions and remember them for later.
+		/// </summary>
 		public void Enable(params InputAction[] actions)
 		{
 			if (actions.Length == 0)
@@ -336,6 +359,30 @@ namespace DevLocker.GFrame.Input
 					m_Actions.Add(action);
 				}
 			}
+		}
+
+
+		/// <summary>
+		/// Disable and forget specified actions.
+		/// </summary>
+		public IEnumerable<InputAction> Disable(IInputContext context, params InputActionReference[] actionReferences)
+		{
+			if (actionReferences.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			Disable(actions);
+			return actions;
+		}
+
+		/// <summary>
+		/// Disable and forget specified actions.
+		/// </summary>
+		public IEnumerable<InputAction> Disable(IInputContext context, IEnumerable<InputActionReference> actionReferences)
+		{
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			Disable(actions);
+			return actions;
 		}
 
 		/// <summary>
@@ -483,9 +530,52 @@ namespace DevLocker.GFrame.Input
 			return context.GetBindingDisplaysFor(lastUsedDevice.layout, action);
 		}
 
+		/// <summary>
+		/// Get <see cref="InputControlScheme" /> of specific device.
+		/// </summary>
 		public static InputControlScheme GetInputControlSchemeFor(this IInputContext context, InputDevice device)
 		{
 			return context.GetAllInputControlSchemes().FirstOrDefault(c => c.SupportsDevice(device));
+		}
+
+		/// <summary>
+		/// Find InputAction by action reference.
+		/// </summary>
+		public static InputAction FindActionFor(this IInputContext context, InputActionReference inputActionReference, bool throwIfNotFound = false)
+		{
+			return context.FindActionFor(inputActionReference.name, throwIfNotFound);
+		}
+
+		/// <summary>
+		/// Enable <see cref="inputAction"/> using the <see cref="inputEnabler"/>
+		/// </summary>
+		public static void Enable(this InputAction inputAction, InputEnabler inputEnabler)
+		{
+			inputEnabler.Enable(inputAction);
+		}
+
+		/// <summary>
+		/// Disable <see cref="inputAction"/> using the <see cref="inputEnabler"/>
+		/// </summary>
+		public static void Disable(this InputAction inputAction, InputEnabler inputEnabler)
+		{
+			inputEnabler.Disable(inputAction);
+		}
+
+		/// <summary>
+		/// Enable <see cref="inputReference"/> using the <see cref="inputEnabler"/> for <see cref="context"/>
+		/// </summary>
+		public static InputAction Enable(this InputActionReference inputReference, IInputContext context, InputEnabler inputEnabler)
+		{
+			return inputEnabler.Enable(context, inputReference).First();
+		}
+
+		/// <summary>
+		/// Disable <see cref="inputReference"/> using the <see cref="inputEnabler"/> for <see cref="context"/>
+		/// </summary>
+		public static InputAction Disable(this InputActionReference inputReference, IInputContext context, InputEnabler inputEnabler)
+		{
+			return inputEnabler.Disable(context, inputReference).First();
 		}
 	}
 }
