@@ -12,11 +12,26 @@ namespace DevLocker.GFrame.Input.UIScope
 	/// </summary>
 	public class HotkeyEventScopeElement : HotkeyBaseScopeElement
 	{
-		public UnityEvent OnAction;
+		[UnityEngine.Serialization.FormerlySerializedAs("OnAction")]
+		public UnityEvent OnPerformed;
+
+		public UnityEvent OnStarted;
+
+		public UnityEvent OnCancelled;
 
 		protected override void OnInvoke(InputAction.CallbackContext context)
 		{
-			OnAction.Invoke();
+			OnPerformed.Invoke();
+		}
+
+		protected override void OnStart(InputAction.CallbackContext context)
+		{
+			OnStarted.Invoke();
+		}
+
+		protected override void OnCancel(InputAction.CallbackContext context)
+		{
+			OnCancelled.Invoke();
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -29,6 +30,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected bool m_ActionStarted { get; private set; } = false;
 		protected bool m_ActionPerformed { get; private set; } = false;
+
+		private Coroutine m_CancelCheckAfterPeformCrt;
 
 		protected InputEnabler m_InputEnabler;
 
@@ -108,7 +111,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			m_ActionStarted = true;
 
-			OnStarted(context);
+			OnStart(context);
 		}
 
 		private void OnInputPerformed(InputAction.CallbackContext context)
@@ -122,11 +125,21 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_ActionStarted = false;
 			m_ActionPerformed = true;
 
+			if (m_CancelCheckAfterPeformCrt != null) {
+				StopCoroutine(m_CancelCheckAfterPeformCrt);
+			}
+			m_CancelCheckAfterPeformCrt = StartCoroutine(CancelCheckAfterPeform(context));
+
 			OnInvoke(context);
 		}
 
 		private void OnInputCancel(InputAction.CallbackContext context)
 		{
+			if (m_CancelCheckAfterPeformCrt != null) {
+				StopCoroutine(m_CancelCheckAfterPeformCrt);
+				m_CancelCheckAfterPeformCrt = null;
+			}
+
 			if (PlayerContextUtils.ShouldSkipHotkey(m_PlayerContext, SkipHotkey))
 				return;
 
@@ -139,7 +152,27 @@ namespace DevLocker.GFrame.Input.UIScope
 			OnCancel(context);
 		}
 
-		protected virtual void OnStarted(InputAction.CallbackContext context) { }
+		/// <summary>
+		/// Checks if cancel happened right after perform. In some cases, cancel event is skipped.
+		/// If cancel event is triggered, the coroutine will be cleared.
+		/// Example: Have two actions with the same bindings, one with a tap and the other with hold interactions.
+		///			 If you press and release quickly for a tap, you'll get tap-perform, hold-cancel, but no tap-cancel.
+		/// </summary>
+		private IEnumerator CancelCheckAfterPeform(InputAction.CallbackContext context)
+		{
+			yield return new WaitForEndOfFrame();
+
+			if (!m_PlayerContext.IsActive)
+				yield break;
+
+			InputAction action = m_PlayerContext.InputContext.FindActionFor(m_InputAction.name);
+			if (action.phase != InputActionPhase.Performed) {
+				// Context is the same in all the events - it keeps reference to the state. I think.
+				OnInputCancel(context);
+			}
+		}
+
+		protected virtual void OnStart(InputAction.CallbackContext context) { }
 		protected abstract void OnInvoke(InputAction.CallbackContext context);
 		protected virtual void OnCancel(InputAction.CallbackContext context) { }
 

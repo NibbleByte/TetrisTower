@@ -74,8 +74,8 @@ namespace DevLocker.GFrame.Input.UIScope
 				Reinitialize(StartTab);
 			}
 
-			NextHotkey?.OnAction.AddListener(OnNextAction);
-			PreviousHotkey?.OnAction.AddListener(OnPreviousAction);
+			NextHotkey?.OnPerformed.AddListener(OnNextAction);
+			PreviousHotkey?.OnPerformed.AddListener(OnPreviousAction);
 
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 		}
