@@ -28,7 +28,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		}
 
 		private UIScopeTreeElement m_RootElement;
-		private bool m_ShowInactiveScopes = true;
+		private bool m_ShowInactiveScopes = false;
 		private bool m_ShowHotkeys = true;
 		private bool m_FocusedScopeWasDrawn = false;
 
@@ -127,7 +127,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				InitStyles();
 			}
 
-			
+
 			if (m_RootElement == null) {
 				// Root element is set to null if scene just loaded. Wait for any other scenes loading...
 				for (int i = 0; i < SceneManager.sceneCount; ++i) {
