@@ -640,7 +640,53 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				case WrapMode.AutoSelectableOfNavigationGroup:
 					var eventSelectable = eventData.selectedObject.GetComponent<Selectable>();
-					nextSelectable = wrapBehaviour.NavigationGroup ? wrapBehaviour.NavigationGroup.FindManagedSelectable(eventSelectable, eventData.moveVector) : null;
+					nextSelectable = null;
+					if (wrapBehaviour.NavigationGroup) {
+						nextSelectable = wrapBehaviour.NavigationGroup.FindManagedSelectable(eventSelectable, eventData.moveVector);
+
+						// If navgroup is on the opposite side, search that way, then find the furthest edge selectable.
+						if (nextSelectable == null) {
+							nextSelectable = wrapBehaviour.NavigationGroup.FindManagedSelectable(eventSelectable, -eventData.moveVector);
+
+							// Failed to find any appropriate selectable from that group.
+							if (nextSelectable == null) {
+								eventData.selectedObject = eventSelectable.gameObject;
+								eventData.Use();
+								return;
+							}
+
+							int sanityCount = 0;
+							const int sanityCountLimit = 10000;
+
+							Selectable it = nextSelectable;
+							while (it) {
+
+								Selectable itNext = eventData.moveDir switch {
+									// Move in the opposite direction!!!
+									MoveDirection.Up => it.navigation.selectOnDown,
+									MoveDirection.Down => it.navigation.selectOnUp,
+									MoveDirection.Left => it.navigation.selectOnRight,
+									MoveDirection.Right => it.navigation.selectOnLeft,
+								};
+
+								// Edge or looped links.
+								if (itNext == null || itNext == nextSelectable)
+									break;
+
+								it = itNext;
+
+								sanityCount++;
+								if (sanityCount > sanityCountLimit) {
+									Debug.LogError($"[Input] Navigation group couldn't wrap around {eventSelectable} for group {wrapBehaviour.NavigationGroup}!", this);
+									eventData.selectedObject = eventSelectable.gameObject;
+									eventData.Use();
+									return;
+								}
+							}
+
+							nextSelectable = it;
+						}
+					}
 
 					if (nextSelectable && nextSelectable.gameObject.activeInHierarchy) {
 						eventData.selectedObject = nextSelectable.gameObject;
