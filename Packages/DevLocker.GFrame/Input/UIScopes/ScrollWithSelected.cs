@@ -23,6 +23,12 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private GameObject m_LastSelectedObject;
 
+
+		void Reset()
+		{
+			ScrollRect = GetComponent<ScrollRect>();
+		}
+
 		void Awake()
 		{
 			if (ScrollRect == null) {

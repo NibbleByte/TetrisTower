@@ -140,6 +140,16 @@ namespace DevLocker.GFrame.Input.UIScope
 			return instance;
 		}
 
+		protected virtual void Reset()
+		{
+			var navigation = GetComponent<UINavigationGroup>();
+			if (navigation) {
+				StartSelectionSource = StartSelectionSourceTypes.NavigationGroups;
+				StartNavigationGroups = new List<UINavigationGroup>();
+				StartNavigationGroups.Add(navigation);
+			}
+		}
+
 		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);

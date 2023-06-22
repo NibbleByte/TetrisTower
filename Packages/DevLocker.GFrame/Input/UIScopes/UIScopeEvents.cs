@@ -18,6 +18,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		public UnityEvent Activated;
 		public UnityEvent Deactivating;
 
+		void Reset()
+		{
+			Scope = GetComponent<UIScope>();
+		}
+
 		void OnEnable()
 		{
 			if (Scope == null) {

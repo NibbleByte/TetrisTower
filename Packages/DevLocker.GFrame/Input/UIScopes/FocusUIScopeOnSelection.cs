@@ -15,6 +15,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
+		void Reset()
+		{
+			Scope = GetComponent<UIScope>();
+		}
+
 		void Awake()
 		{
 			if (Scope == null) {

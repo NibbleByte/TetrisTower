@@ -101,9 +101,17 @@ namespace DevLocker.GFrame.Input.UIScope
 		private Selectable[] m_AllActiveSelectables2 = new Selectable[s_StartActiveSelectablesSize];
 		private bool[] m_AllActiveSelectablesInteractablility = new bool[s_StartActiveSelectablesSize];
 
-		private List<Selectable> m_ManagedSelectables = new List<Selectable>();
+		private List<Selectable> m_ManagedSelectables = null;
 
-		public IReadOnlyList<Selectable> ManagedSelectables => m_ManagedSelectables;
+		public IReadOnlyList<Selectable> ManagedSelectables {
+			get {
+				if (m_ManagedSelectables == null) {
+					RefreshNavigationSelectables();
+				}
+
+				return m_ManagedSelectables;
+			}
+		}
 
 		/// <summary>
 		/// Most top-left selectable.
@@ -111,7 +119,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public Selectable FirstSelectable {
 			get {
 				if (m_FirstSelectable == null) {
-					RescanSelectables();
+					RefreshNavigationSelectables();
 				}
 
 				return m_FirstSelectable;
@@ -124,7 +132,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public Selectable LastSelectable {
 			get {
 				if (m_LastSelectable == null) {
-					RescanSelectables();
+					RefreshNavigationSelectables();
 				}
 
 				return m_LastSelectable;
@@ -143,13 +151,55 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private bool m_CanvasLayoutIsRebuilding = false;
 
+		protected virtual void Reset()
+		{
+			var selectionController = GetComponent<SelectionController>();
+			if (selectionController && (selectionController.StartSelections?.Count ?? 0) == 0 && (selectionController.StartNavigationGroups?.Count ?? 0) == 0) {
+				selectionController.StartSelectionSource = SelectionController.StartSelectionSourceTypes.NavigationGroups;
+				selectionController.StartNavigationGroups = new List<UINavigationGroup>();
+				selectionController.StartNavigationGroups.Add(this);
+
+#if UNITY_EDITOR
+				EditorUtility.SetDirty(selectionController);
+#endif
+			}
+		}
+
+		/// <summary>
+		/// Call this in dire situations (re-parenting selectables).
+		/// Will clear caches and rescan for selectables on the next frame if auto-scan enabled, or immediately if not.
+		/// </summary>
+		public void RefreshNavigationClearCaches()
+		{
+			m_ManagedSelectables?.Clear();
+			m_ManagedSelectables = null;
+
+			m_AllActiveSelectablesCount = 0;
+			m_AllActiveSelectables = null;    // Currently used.
+			m_AllActiveSelectables1 = new Selectable[s_StartActiveSelectablesSize];
+			m_AllActiveSelectables2 = new Selectable[s_StartActiveSelectablesSize];
+			m_AllActiveSelectablesInteractablility = new bool[s_StartActiveSelectablesSize];
+
+			m_FirstSelectable = null;
+			m_LastSelectable = null;
+
+			if (!AutoScanForSelectables) {
+				RefreshNavigationSelectables();
+			}
+		}
+
 		/// <summary>
 		/// Call this if you have added or removed child selectables and have <see cref="AutoScanForSelectables"/> disabled (no updates, no polling).
+		/// NOTE: This won't work if positions changed or selectables changed parents.
 		/// </summary>
-		public bool RescanSelectables()
+		public bool RefreshNavigationSelectables()
 		{
 			bool needsRefresh = false;
 			bool hasAutoWrap = WrapUp.IsAutoMode || WrapDown.IsAutoMode || WrapLeft.IsAutoMode || WrapRight.IsAutoMode;
+
+			if (m_ManagedSelectables == null) {
+				m_ManagedSelectables = new List<Selectable>();
+			}
 
 			if (Application.isPlaying) {
 
@@ -277,7 +327,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (needsRefresh) {
-				RefreshNavigationLinks();
+				RefreshNavigationLinkPositions();
 			}
 
 			return needsRefresh;
@@ -287,8 +337,14 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// Will re-evaluate all managed navigation links.
 		/// Call this if you have moved the selectables around (this won't be detected automatically)
 		/// </summary>
-		public void RefreshNavigationLinks()
+		public void RefreshNavigationLinkPositions()
 		{
+			if (m_ManagedSelectables == null) {
+				// Will eventually call this method, but will setup cache properly.
+				RefreshNavigationSelectables();
+				return;
+			}
+
 			m_FirstSelectable = m_LastSelectable = m_ManagedSelectables.FirstOrDefault();
 
 #if UNITY_EDITOR
@@ -444,20 +500,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
-		/// <summary>
-		/// Call this in dire situations (re-parenting selectables).
-		/// </summary>
-		public void ClearCache()
-		{
-			m_ManagedSelectables.Clear();
-
-			m_AllActiveSelectablesCount = 0;
-			m_AllActiveSelectables = null;    // Currently used.
-			m_AllActiveSelectables1 = new Selectable[s_StartActiveSelectablesSize];
-			m_AllActiveSelectables2 = new Selectable[s_StartActiveSelectablesSize];
-			m_AllActiveSelectablesInteractablility = new bool[s_StartActiveSelectablesSize];
-		}
-
 		private bool IsStillActive(Selectable selectable)
 		{
 			for(int i = 0; i < m_AllActiveSelectablesCount; ++i) {
@@ -485,8 +527,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		[ContextMenu("Apply Group Navigation")]
 		internal void ApplyGroupNavigation()
 		{
-			ClearCache();
-			RescanSelectables();
+			RefreshNavigationClearCaches();
+			RefreshNavigationSelectables();
 		}
 #endif
 
@@ -530,7 +572,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					m_CanvasLayoutIsRebuilding = true;
 				}
 
-				RescanSelectables();
+				RefreshNavigationSelectables();
 			}
 		}
 
@@ -559,7 +601,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			Selectable selectable = GetCurrentlySelectedObject()?.GetComponent<Selectable>();
 
-			if (eventData.used || !m_ManagedSelectables.Contains(selectable))
+			if (eventData.used || m_ManagedSelectables == null || !m_ManagedSelectables.Contains(selectable))
 				return;
 
 			switch (eventData.moveDir) {
