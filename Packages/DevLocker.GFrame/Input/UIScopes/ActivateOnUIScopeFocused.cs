@@ -26,9 +26,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		public GameObject ActivatedObject;
 
 		[Tooltip("When any of these scopes are focused, activate the target objects.")]
-		public UIScope[] OnScopesFocused;
+		public List<UIScope> OnScopesFocused;
 		[Tooltip("Objects to be activated.")]
-		public GameObject[] ActivatedObjects;
+		public List<GameObject> ActivatedObjects;
 
 		private bool IsScopeFocused() => MultipleObjects
 			? OnScopesFocused.Any(s => s && s.IsFocused)
@@ -87,9 +87,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		void OnValidate()
 		{
 			if (MultipleObjects) {
-				if (OnScopesFocused != null && (OnScopesFocused.Length == 0 || OnScopesFocused.Any(o => o == null))) {
+				if (OnScopesFocused != null && (OnScopesFocused.Count == 0 || OnScopesFocused.Any(o => o == null))) {
 					Debug.LogError($"\"{name}\" has missing {nameof(OnScopesFocused)}...", this);
-				} else if (ActivatedObjects != null && (ActivatedObjects.Length == 0 || ActivatedObjects.Any(o => o == null))) {
+				} else if (ActivatedObjects != null && (ActivatedObjects.Count == 0 || ActivatedObjects.Any(o => o == null))) {
 					Debug.LogError($"\"{name}\" has missing {nameof(ActivatedObjects)}...", this);
 				}
 

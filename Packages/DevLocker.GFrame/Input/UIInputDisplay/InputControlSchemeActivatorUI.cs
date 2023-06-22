@@ -1,6 +1,7 @@
 #if USE_INPUT_SYSTEM
 using DevLocker.GFrame.Input;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,10 +22,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			public string ControlScheme;
 
 			[NonReorderable]
-			public GameObject[] Objects;
+			public List<GameObject> Objects;
 		}
 
-		public ControlSchemeActiveObjects[] ControlSchemeObjects;
+		public List<ControlSchemeActiveObjects> ControlSchemeObjects;
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;

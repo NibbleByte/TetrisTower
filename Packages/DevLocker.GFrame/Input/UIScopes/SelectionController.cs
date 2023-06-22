@@ -34,10 +34,10 @@ namespace DevLocker.GFrame.Input.UIScope
 		public StartSelectionSourceTypes StartSelectionSource = StartSelectionSourceTypes.Selectables;
 
 		[Tooltip("Select the first interactable object from the managed selectables of this navigation group.")]
-		public UINavigationGroup[] StartNavigationGroups;
+		public List<UINavigationGroup> StartNavigationGroups;
 
 		[Tooltip("Select the first interactable object on enable.")]
-		public Selectable[] StartSelections;
+		public List<Selectable> StartSelections;
 
 		[Tooltip("Persist selection even if component or object is disabled.")]
 		public PersistSelectionActionType PersistentSelection = PersistSelectionActionType.PersistOnlyIfObjectIsActiveInHierarchy;
@@ -112,7 +112,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			switch(StartSelectionSource) {
 				case StartSelectionSourceTypes.Selectables:
-					return StartSelections != null && System.Array.IndexOf(StartSelections, selectable) != -1;
+					return StartSelections != null && StartSelections.IndexOf(selectable) != -1;
 
 				case StartSelectionSourceTypes.NavigationGroups:
 					if (StartNavigationGroups == null)

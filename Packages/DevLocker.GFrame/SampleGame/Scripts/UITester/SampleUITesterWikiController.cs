@@ -55,8 +55,8 @@ namespace DevLocker.GFrame.SampleGame.UITester
 				contents.Add(contentGO);
 			}
 
-			TabsGroup.Tabs = tabs.ToArray();
-			TabsGroup.Contents = contents.ToArray();
+			TabsGroup.Tabs = tabs;
+			TabsGroup.Contents = contents;
 			TabsGroup.Reinitialize(tabs[0]);
 
 			GameObject.DestroyImmediate(WikiEntryTab.gameObject);

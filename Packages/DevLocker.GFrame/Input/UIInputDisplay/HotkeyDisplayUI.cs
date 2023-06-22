@@ -97,7 +97,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public bool AdjustSize = true;
 
 		[Tooltip("Optional - list of objects to be activated when hotkeys are displayed. Useful for labels indicating the result of the action.")]
-		public GameObject[] AdditionalObjectsToActivate;
+		public List<GameObject> AdditionalObjectsToActivate;
 
 		public InputBindingDisplayData CurrentlyDisplayedData { get; private set; }
 

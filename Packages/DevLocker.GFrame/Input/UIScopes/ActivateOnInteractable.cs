@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace DevLocker.GFrame.Input.UIScope
 {
@@ -22,9 +23,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		public GameObject ActivatedObject;
 
 		[Tooltip("When any of these selectables are interactable, activate the target objects.")]
-		public Selectable[] OnInteractableObjects;
+		public List<Selectable> OnInteractableObjects;
 		[Tooltip("Objects to be activated.")]
-		public GameObject[] ActivatedObjects;
+		public List<GameObject> ActivatedObjects;
 
 		private bool m_LastInteractableState;
 
@@ -61,9 +62,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		void OnValidate()
 		{
 			if (MultipleObjects) {
-				if (OnInteractableObjects != null && (OnInteractableObjects.Length == 0 || OnInteractableObjects.Any(o => o == null))) {
+				if (OnInteractableObjects != null && (OnInteractableObjects.Count == 0 || OnInteractableObjects.Any(o => o == null))) {
 					Debug.LogError($"\"{name}\" has missing {nameof(OnInteractableObjects)}...", this);
-				} else if (ActivatedObjects != null && (ActivatedObjects.Length == 0 || ActivatedObjects.Any(o => o == null))) {
+				} else if (ActivatedObjects != null && (ActivatedObjects.Count == 0 || ActivatedObjects.Any(o => o == null))) {
 					Debug.LogError($"\"{name}\" has missing {nameof(ActivatedObjects)}...", this);
 				}
 

@@ -1,5 +1,6 @@
 #if USE_INPUT_SYSTEM
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -23,11 +24,11 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		[InputControl]
 		[NonReorderable]
-		public string[] IncludeRebindsTo;
+		public List<string> IncludeRebindsTo;
 
 		[InputControl]
 		[NonReorderable]
-		public string[] ExcludeRebindsTo;
+		public List<string> ExcludeRebindsTo;
 
 		public UnityEvent RebindStarted;
 		public UnityEvent RebindFinished;

@@ -33,10 +33,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			"Hidden inactive tab gameobjects are allowed. You can re-activate them at any time.\n" +
 			"Opened tab is displayed as \"disabled\" (non-interactive) so it has distinguish look.\n" +
 			"If you need to have actually disabled tabs, you'll need another implementation.")]
-		public Button[] Tabs;
+		public List<Button> Tabs;
 
 		[Tooltip("Contents to be displayed when corresponding tab is active.")]
-		public GameObject[] Contents;
+		public List<GameObject> Contents;
 
 		[Tooltip("Which tab should be initially active?")]
 		public Button StartTab;
@@ -53,7 +53,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public Button ActiveTab => m_CurrentIndex >= 0 ? Tabs[m_CurrentIndex] : null;
 		public GameObject ActiveContent => m_CurrentIndex >= 0 ? Contents[m_CurrentIndex] : null;
 
-		public GameObject GetContentByTab(Button tabButton) => Contents[Array.IndexOf(Tabs, tabButton)];
+		public GameObject GetContentByTab(Button tabButton) => Contents[Tabs.IndexOf(tabButton)];
 
 		private int m_CurrentIndex = -1;
 
@@ -91,7 +91,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			// Some buttons may be destroyed by the user, new ones added later.
 			m_SubscribedTabButtons.RemoveAll(b => b == null);
 
-			for (int i = 0; i < Tabs.Length; ++i) {
+			for (int i = 0; i < Tabs.Count; ++i) {
 				Button tabButton = Tabs[i];
 
 				if (!m_SubscribedTabButtons.Contains(tabButton)) {
@@ -132,8 +132,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (Tabs == null || Contents == null)
 				return;
 
-			if (Tabs.Length != Contents.Length) {
-				Debug.LogError($"\"{name}\" Tabs buttons {Tabs.Length} count is different from the Contents objects {Contents.Length}. Every tab button needs corresponding content object.", this);
+			if (Tabs.Count != Contents.Count) {
+				Debug.LogError($"\"{name}\" Tabs buttons {Tabs.Count} count is different from the Contents objects {Contents.Count}. Every tab button needs corresponding content object.", this);
 				return;
 			}
 
@@ -148,7 +148,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public void SwitchToTab(Button tabButton)
 		{
-			SwitchToTab(Array.IndexOf(Tabs, tabButton));
+			SwitchToTab(Tabs.IndexOf(tabButton));
 		}
 
 		/// <summary>

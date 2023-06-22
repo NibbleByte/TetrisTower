@@ -18,7 +18,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public bool RecalculateLayoutOnChange = true;
 
 		[Tooltip("Will be active only if the InputAction itself is enabled.")]
-		public HotkeyDisplayUI[] HotkeyObjects;
+		public List<HotkeyDisplayUI> HotkeyObjects;
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
