@@ -128,7 +128,11 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (m_CancelCheckAfterPeformCrt != null) {
 				StopCoroutine(m_CancelCheckAfterPeformCrt);
 			}
-			m_CancelCheckAfterPeformCrt = StartCoroutine(CancelCheckAfterPeform(context));
+
+			// Buttons only, values get canceled right away after each value change.
+			if (context.action.type == InputActionType.Button) {
+				m_CancelCheckAfterPeformCrt = StartCoroutine(CancelCheckAfterPeform(context));
+			}
 
 			OnInvoke(context);
 		}
@@ -155,6 +159,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Checks if cancel happened right after perform. In some cases, cancel event is skipped.
 		/// If cancel event is triggered, the coroutine will be cleared.
+		/// (Buttons only, Values types get canceled right away after each value change.)
 		/// Example: Have two actions with the same bindings, one with a tap and the other with hold interactions.
 		///			 If you press and release quickly for a tap, you'll get tap-perform, hold-cancel, but no tap-cancel.
 		/// </summary>
