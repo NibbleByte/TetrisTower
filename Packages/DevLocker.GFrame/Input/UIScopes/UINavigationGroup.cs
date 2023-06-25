@@ -109,6 +109,15 @@ namespace DevLocker.GFrame.Input.UIScope
 					RefreshNavigationSelectables();
 				}
 
+				// If waiting for canvas layout, try to get what we have up till now. Or rebuild just finished this frame but we didn't know yet.
+				if (m_CanvasLayoutIsRebuilding) {
+					RefreshNavigationSelectables();
+
+					if (UIUtils.IsLayoutRebuildPending()) {
+						RefreshNavigationLinkPositions();
+					}
+				}
+
 				return m_ManagedSelectables;
 			}
 		}
@@ -122,6 +131,15 @@ namespace DevLocker.GFrame.Input.UIScope
 					RefreshNavigationSelectables();
 				}
 
+				// If waiting for canvas layout, try to get what we have up till now. Or rebuild just finished this frame but we didn't know yet.
+				if (m_CanvasLayoutIsRebuilding) {
+					RefreshNavigationSelectables();
+
+					if (UIUtils.IsLayoutRebuildPending()) {
+						RefreshNavigationLinkPositions();
+					}
+				}
+
 				return m_FirstSelectable;
 			}
 		}
@@ -133,6 +151,15 @@ namespace DevLocker.GFrame.Input.UIScope
 			get {
 				if (m_LastSelectable == null) {
 					RefreshNavigationSelectables();
+				}
+
+				// If waiting for canvas layout, try to get what we have up till now. Or rebuild just finished this frame but we didn't know yet.
+				if (m_CanvasLayoutIsRebuilding) {
+					RefreshNavigationSelectables();
+
+					if (UIUtils.IsLayoutRebuildPending()) {
+						RefreshNavigationLinkPositions();
+					}
 				}
 
 				return m_LastSelectable;

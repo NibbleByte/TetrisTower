@@ -1,4 +1,5 @@
 using DevLocker.GFrame.Input.Contexts;
+using DevLocker.GFrame.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -201,6 +202,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (m_SelectRequested) {
+
+				if (UIUtils.IsLayoutRebuildPending())
+					return;
 
 				SelectionController activeInstance = GetActiveInstanceForThisPlayer();
 
