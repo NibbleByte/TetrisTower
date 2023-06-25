@@ -633,6 +633,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsRoot: 0
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -640,7 +641,6 @@ MonoBehaviour:
   ResetAllActionsOnEnable: 1
   PushInputStack: 0
   IncludeUIActions: 1
-  IsRoot: 0
 --- !u!114 &533048047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -653,14 +653,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartSelectionSource: 0
+  StartNavigationGroups: []
   StartSelections:
-  - {fileID: 1963389932}
+  - {fileID: 762850209}
   PersistentSelection: 1
   NoSelectionAction: 8
   TrackOnlyChildren: 1
-  FilterControlScheme:
-  - Gamepad
-  RemoveSelectionOnControlSchemeMismatch: 1
+  RemoveSelectionIfDeviceDoesntSupportIt: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &540250531
 GameObject:
   m_ObjectHideFlags: 0
@@ -1032,6 +1033,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 753235475}
   m_CullTransparentMesh: 1
+--- !u!114 &762850209 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
+  m_PrefabInstance: {fileID: 386096761}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &829465719
 GameObject:
   m_ObjectHideFlags: 0
@@ -2227,6 +2239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsRoot: 0
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -2234,7 +2247,6 @@ MonoBehaviour:
   ResetAllActionsOnEnable: 1
   PushInputStack: 0
   IncludeUIActions: 1
-  IsRoot: 0
 --- !u!114 &1221063002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2247,14 +2259,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartSelectionSource: 0
+  StartNavigationGroups: []
   StartSelections:
   - {fileID: 2032308269}
   PersistentSelection: 0
   NoSelectionAction: 8
   TrackOnlyChildren: 1
-  FilterControlScheme:
-  - Gamepad
-  RemoveSelectionOnControlSchemeMismatch: 1
+  RemoveSelectionIfDeviceDoesntSupportIt: 1
+  ClearSelectionOnDisable: 1
 --- !u!1 &1264562878
 GameObject:
   m_ObjectHideFlags: 0
@@ -2731,6 +2744,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsRoot: 0
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -2738,7 +2752,6 @@ MonoBehaviour:
   ResetAllActionsOnEnable: 1
   PushInputStack: 0
   IncludeUIActions: 1
-  IsRoot: 0
 --- !u!114 &1624517869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2751,14 +2764,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartSelectionSource: 0
+  StartNavigationGroups: []
   StartSelections:
   - {fileID: 1141675059}
   PersistentSelection: 0
   NoSelectionAction: 8
   TrackOnlyChildren: 1
-  FilterControlScheme:
-  - Gamepad
-  RemoveSelectionOnControlSchemeMismatch: 1
+  RemoveSelectionIfDeviceDoesntSupportIt: 1
+  ClearSelectionOnDisable: 1
 --- !u!1001 &1748910607
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3325,17 +3339,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
---- !u!114 &1963389932 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1367408335253832820, guid: 43ddb45f1791d9c46ade1aaa70af9940, type: 3}
-  m_PrefabInstance: {fileID: 1963389931}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1996908308
 GameObject:
   m_ObjectHideFlags: 0
