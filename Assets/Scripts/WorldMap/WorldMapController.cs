@@ -113,7 +113,7 @@ namespace TetrisTower.WorldMap
 					float duration = 0.5f;
 					Sequence seq = DOTween.Sequence();
 					seq.Append(locationBind.WorldLocation.transform.DOScale(0.2f, duration).From());
-					seq.Insert(0f, locationBind.UITracker.transform.DOScale(0.2f, duration).From());
+					seq.Insert(0f, locationBind.UITracker.PlayRevealAnimation(duration));
 
 					yield return seq;
 				}

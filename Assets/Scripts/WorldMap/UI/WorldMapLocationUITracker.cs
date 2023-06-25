@@ -1,18 +1,26 @@
+using DG.Tweening;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace TetrisTower.WorldMap.UI
 {
-	public class WorldMapLocationUITracker : MonoBehaviour
+	public class WorldMapLocationUITracker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
 		public CanvasGroup CanvasGroup;
+		public RectTransform AnimationRoot;
 		public Image LocationImage;
+		public GameObject CompletedImage;
 
+		public AnimationCurve ZoomScaleCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 		public AnimationCurve ZoomFadeOutCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+		public float HoverScaleUp = 1.1f;
+		private const float HoverScaleDuration = 0.2f;
 
 		public event Action<string> Clicked;
 
@@ -30,9 +38,9 @@ namespace TetrisTower.WorldMap.UI
 
 		public void SetZoomLevel(float zoom)
 		{
-			if (CanvasGroup) {
-				CanvasGroup.alpha = ZoomFadeOutCurve.Evaluate(zoom);
-			}
+			transform.localScale = Vector3.one * ZoomScaleCurve.Evaluate(zoom);
+
+			CanvasGroup.alpha = ZoomFadeOutCurve.Evaluate(zoom);
 		}
 
 		public void SetState(WorldLocationState state)
@@ -60,11 +68,36 @@ namespace TetrisTower.WorldMap.UI
 
 				default: throw new System.NotSupportedException(State.ToString());
 			}
+
+			if (CompletedImage) {
+				CompletedImage.SetActive(State == WorldLocationState.Completed);
+			}
+		}
+
+		public Tween PlayRevealAnimation(float duration)
+		{
+			CanvasGroup.blocksRaycasts = false; // Avoids conflicts with hover animations.
+
+			return AnimationRoot
+				.DOScale(0.2f, duration)
+				.From()
+				.OnComplete(() => CanvasGroup.blocksRaycasts = true)
+				;
 		}
 
 		public void OnClicked()
 		{
 			Clicked?.Invoke(m_LevelData.LevelID);
+		}
+
+		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+		{
+			AnimationRoot.DOScale(HoverScaleUp, HoverScaleDuration);
+		}
+
+		public void OnPointerExit(PointerEventData eventData)
+		{
+			AnimationRoot.DOScale(1f, HoverScaleDuration);
 		}
 	}
 }
