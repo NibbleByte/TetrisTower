@@ -127,7 +127,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public Selectable FirstSelectable {
 			get {
-				if (m_FirstSelectable == null) {
+				if (m_FirstSelectable == null || !m_FirstSelectable.isActiveAndEnabled) {
 					RefreshNavigationSelectables();
 				}
 
@@ -149,7 +149,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public Selectable LastSelectable {
 			get {
-				if (m_LastSelectable == null) {
+				if (m_LastSelectable == null || !m_LastSelectable.isActiveAndEnabled) {
 					RefreshNavigationSelectables();
 				}
 
@@ -668,7 +668,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				case WrapMode.AutoSelectableOfNavigationGroup:
 					var eventSelectable = eventData.selectedObject.GetComponent<Selectable>();
 					nextSelectable = null;
-					if (wrapBehaviour.NavigationGroup) {
+					if (wrapBehaviour.NavigationGroup && wrapBehaviour.NavigationGroup.isActiveAndEnabled) {
 						nextSelectable = wrapBehaviour.NavigationGroup.FindManagedSelectable(eventSelectable, eventData.moveVector);
 
 						// If navgroup is on the opposite side, search that way, then find the furthest edge selectable.
