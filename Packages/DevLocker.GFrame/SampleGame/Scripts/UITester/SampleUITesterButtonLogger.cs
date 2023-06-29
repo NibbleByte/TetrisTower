@@ -23,10 +23,10 @@ namespace DevLocker.GFrame.SampleGame.UITester
 
 		public void OnButtonClicked()
 		{
-			string buttonText = GetComponentInChildren<Text>()?.text;
+			string buttonText = GetComponentInChildren<Text>(true)?.text;
 #if USE_TEXT_MESH_PRO
 			if (buttonText == null) {
-				buttonText = GetComponentInChildren<TMPro.TextMeshProUGUI>()?.text;
+				buttonText = GetComponentInChildren<TMPro.TextMeshProUGUI>(true)?.text;
 			}
 #endif
 			Debug.Log($"{buttonText} was pressed! {AdditionalMessage}", this);

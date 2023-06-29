@@ -32,17 +32,35 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		protected bool m_HasInitialized = false;
 
+		private string m_LastControlScheme;
+
 		private void RefreshObjects(IInputContext context)
 		{
-			string scheme = context.GetLastUsedInputControlScheme().bindingGroup ?? string.Empty;
+			InputControlScheme scheme = context.GetLastUsedInputControlScheme();
 
+			if (scheme.bindingGroup == m_LastControlScheme)
+				return;
+
+			// First deactivate, then activate, so enable events happen in correct order.
+			if (!string.IsNullOrEmpty(m_LastControlScheme)) {
+				SetObjectsActive(m_LastControlScheme, false);
+			}
+
+			m_LastControlScheme = scheme.bindingGroup;
+
+			if (!string.IsNullOrEmpty(m_LastControlScheme)) {
+				SetObjectsActive(m_LastControlScheme, true);
+			}
+		}
+
+		private void SetObjectsActive(string controlScheme, bool active)
+		{
 			foreach (ControlSchemeActiveObjects bind in ControlSchemeObjects) {
-				bool active = bind.ControlScheme.Equals(scheme, StringComparison.OrdinalIgnoreCase);
-
-				foreach (GameObject obj in bind.Objects) {
-					if (obj) {
+				if (bind.ControlScheme.Equals(controlScheme, StringComparison.OrdinalIgnoreCase)) {
+					foreach(GameObject obj in bind.Objects) {
 						obj.SetActive(active);
 					}
+					return;
 				}
 			}
 		}
@@ -73,6 +91,13 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			m_PlayerContext.InputContext.LastUsedInputControlSchemeChanged += OnLastUsedInputControlSchemeChanged;
 
+			if (string.IsNullOrEmpty(m_LastControlScheme)) {
+				foreach (ControlSchemeActiveObjects bind in ControlSchemeObjects) {
+					SetObjectsActive(bind.ControlScheme, false);
+				}
+			}
+
+			m_LastControlScheme = null;
 			RefreshObjects(m_PlayerContext.InputContext);
 		}
 
@@ -88,6 +113,12 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			}
 
 			m_PlayerContext.InputContext.LastUsedInputControlSchemeChanged -= OnLastUsedInputControlSchemeChanged;
+
+			if (!string.IsNullOrEmpty(m_LastControlScheme)) {
+				foreach (ControlSchemeActiveObjects bind in ControlSchemeObjects) {
+					SetObjectsActive(bind.ControlScheme, false);
+				}
+			}
 		}
 
 		private void OnLastUsedInputControlSchemeChanged()

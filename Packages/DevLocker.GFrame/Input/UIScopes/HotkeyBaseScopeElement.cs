@@ -14,7 +14,7 @@ namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Base class for hotkey scope elements (that use Unity's Input System).
-	/// Note that this action has to be enabled in order to be invoked.
+	/// Note that this component will enable the input action and it needs to stay enabled to be invoked.
 	/// </summary>
 	public abstract class HotkeyBaseScopeElement : MonoBehaviour, IScopeElement, IHotkeysWithInputActions, IWritableHotkeyInputActionReference
 	{
@@ -55,10 +55,22 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {
 				m_HasInitialized = true;
 
+				OnContextReady();
+
 				if (delayedSetup && isActiveAndEnabled) {
 					OnEnable();
 				}
 			});
+		}
+
+		protected virtual void OnContextReady()
+		{
+
+		}
+
+		protected virtual void OnDestroy()
+		{
+
 		}
 
 		protected virtual void OnEnable()
@@ -214,7 +226,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public void ApplyInputActionToChildren()
 		{
-			var children = GetComponentsInChildren<IWritableHotkeyInputActionReference>();
+			var children = GetComponentsInChildren<IWritableHotkeyInputActionReference>(true);
 			foreach (IWritableHotkeyInputActionReference child in children) {
 				if (ReferenceEquals(child, this))
 					continue;

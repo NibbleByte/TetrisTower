@@ -8,7 +8,7 @@ namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Calls UnityEvent on specified InputAction.
-	/// Note that this action has to be enabled in order to be invoked.
+	/// Note that this component will enable the input action and it needs to stay enabled to be invoked.
 	/// </summary>
 	public class HotkeyEventScopeElement : HotkeyBaseScopeElement
 	{

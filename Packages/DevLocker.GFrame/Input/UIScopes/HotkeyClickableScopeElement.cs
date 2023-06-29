@@ -9,7 +9,7 @@ namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Put next to or under a <see cref="Button"/> or <see cref="Toggle"/> or any <see cref="Selectable"/> component to get invoked on specified InputAction.
-	/// Note that this action has to be enabled in order to be invoked.
+	/// Note that this component will enable the input action and it needs to stay enabled to be invoked.
 	/// </summary>
 	public class HotkeyClickableScopeElement : HotkeyBaseScopeElement
 	{

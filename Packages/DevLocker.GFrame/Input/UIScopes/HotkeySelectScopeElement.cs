@@ -9,7 +9,7 @@ namespace DevLocker.GFrame.Input.UIScope
 {
 	/// <summary>
 	/// Put next to or under a UI.Selectable to be selected on performing the specified input action.
-	/// Note that this action has to be enabled in order to be invoked.
+	/// Note that this component will enable the input action and it needs to stay enabled to be invoked.
 	/// </summary>
 	public class HotkeySelectScopeElement : HotkeyBaseScopeElement
 	{

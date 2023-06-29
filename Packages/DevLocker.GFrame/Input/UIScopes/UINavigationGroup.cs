@@ -694,6 +694,7 @@ namespace DevLocker.GFrame.Input.UIScope
 									MoveDirection.Down => it.navigation.selectOnUp,
 									MoveDirection.Left => it.navigation.selectOnRight,
 									MoveDirection.Right => it.navigation.selectOnLeft,
+									_ => throw new NotSupportedException(eventData.moveDir.ToString())
 								};
 
 								// Edge or looped links.
