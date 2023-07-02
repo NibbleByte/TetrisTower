@@ -124,7 +124,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 						continue;
 					}
 
-					string currentDisplayText = currentProvider.GetTextMeshProDisplayTextFor(action);
+					string currentDisplayText = GetDisplayTextFor(action, currentProvider);
 
 					// If new provider doesn't have visuals for this binding, restore the initial text.
 					if (string.IsNullOrEmpty(currentDisplayText)) {
@@ -175,7 +175,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				string actionName = match.Value.Substring(1, match.Value.Length - 2);
 				InputAction action = m_PlayerContext.InputContext.FindActionFor(actionName);
 
-				string displayText = currentProvider.GetTextMeshProDisplayTextFor(action);
+				string displayText = GetDisplayTextFor(action, currentProvider);
 				if (!string.IsNullOrEmpty(displayText)) {
 
 					if (!m_ManagedActions.ContainsKey(action)) {
@@ -201,6 +201,21 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			m_ChangingText = true;
 			m_Text.text = replaced.ToString();
 			m_ChangingText = false;
+		}
+
+		private static string GetDisplayTextFor(InputAction action, IInputBindingDisplayDataProvider displayDataProvider)
+		{
+			// Consider only the first binding match.
+			InputBindingDisplayData displayData = displayDataProvider.GetBindingDisplaysFor(action).FirstOrDefault();
+			if (!displayData.IsValid)
+				return string.Empty;
+
+			if (displayData.Text.Contains("<sprite")) {
+				return displayData.Text;
+			} else {
+				// Add <b> tag to store the input action in an attribute so we can recognize it later and update it if needed.
+				return $"<b inputAction=\"{action.name}\">{displayData.Text}</b>";
+			}
 		}
 
 		private void TextLayoutChanged()

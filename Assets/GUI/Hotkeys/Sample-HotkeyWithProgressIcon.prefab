@@ -107,13 +107,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 913529240457648640}
-  m_Father: {fileID: 3321301070310594391}
+  m_Father: {fileID: 3321301069264005412}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 4}
-  m_SizeDelta: {x: 8, y: 8}
+  m_AnchoredPosition: {x: 0, y: 9}
+  m_SizeDelta: {x: -12, y: 18}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5667914288085755761
 CanvasRenderer:
@@ -250,6 +250,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
+--- !u!224 &3321301069264005412 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5394036698972749555, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
+  m_PrefabInstance: {fileID: 7263416098017236951}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3321301069264005413 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5394036698972749554, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
+  m_PrefabInstance: {fileID: 7263416098017236951}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3321301069264005415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fe81467647486549b4e360de6a75ba5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3321301069264005415 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5394036698972749552, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
@@ -267,21 +283,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 772ce5dafed8a854b9f35be3a5e4d61b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: 1
   SkipHotkey: 0
   m_InputAction: {fileID: 0}
+  HotkeyDisplayUI: {fileID: 3321301069264005413}
+  IndicatorRoot: {fileID: 0}
   FillImage: {fileID: 259714803111952981}
-  Text: {fileID: 0}
-  TextMeshProText: {fileID: 0}
-  FormatText: '{value}'
+  ProgressText: {fileID: 0}
+  ProgressTextFormat: '{value}'
   Started:
     m_PersistentCalls:
       m_Calls: []
   Performed:
     m_PersistentCalls:
       m_Calls: []
---- !u!224 &3321301070310594391 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5394036700216754304, guid: 6b4b45d9df9216941a6acaf1358d91f6, type: 3}
-  m_PrefabInstance: {fileID: 7263416098017236951}
-  m_PrefabAsset: {fileID: 0}
+  Cancelled:
+    m_PersistentCalls:
+      m_Calls: []

@@ -52,7 +52,6 @@ namespace DevLocker.GFrame.Input
 		public IReadOnlyList<InputBindingDisplayData> CompositeBindingParts;
 
 
-		public Sprite Icon;
 		public string Text;
 		public string ShortText;
 
@@ -69,7 +68,6 @@ namespace DevLocker.GFrame.Input
 
 		public bool IsPartOfComposite => Binding.isPartOfComposite;
 
-		public bool HasIcon => Icon != null;
 		public bool HasText => !string.IsNullOrWhiteSpace(Text) || !string.IsNullOrWhiteSpace(ShortText);
 
 		public override string ToString() => $"{Binding.name} - {ShortText}";
@@ -100,15 +98,6 @@ namespace DevLocker.GFrame.Input
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
 		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action);
-
-#if USE_TEXT_MESH_PRO
-		/// <summary>
-		/// Gets text to be in-lined in your text mesh pro component to display the provided input action.
-		/// Only the first matching binding will be returned.
-		/// It can return <sprite> tag referring to sprite asset or text representation.
-		/// </summary>
-		string GetTextMeshProDisplayTextFor(InputAction inputAction);
-#endif
 
 	}
 

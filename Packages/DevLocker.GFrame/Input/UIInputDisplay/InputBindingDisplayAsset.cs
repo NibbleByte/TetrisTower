@@ -20,8 +20,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			[InputControl]
 			public string BindingPath;
 
-			public Sprite Icon;
-
 			[Tooltip("Use the InputBinding displayName provided by Unity instead.\nIf true, next text fields will be ignored.")]
 			public bool UseDefaultTexts;
 
@@ -64,22 +62,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		{
 			return MatchingDeviceLayouts.Contains(deviceLayout, StringComparer.OrdinalIgnoreCase);
 		}
-
-#if USE_TEXT_MESH_PRO
-		public string GetTextMeshProDisplayTextFor(InputAction inputAction)
-		{
-			InputBindingDisplayData displayData = GetBindingDisplaysFor(inputAction).FirstOrDefault();
-			if (!displayData.IsValid)
-				return string.Empty;
-
-			if (displayData.Icon) {
-				// TODO: This doesn't work for composite actions :(
-				return $"<sprite name={displayData.Icon.name}>";
-			} else {
-				return $"<b inputAction=\"{inputAction.name}\">{displayData.Text}</b>";
-			}
-		}
-#endif
 
 		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action)
 		{
@@ -159,7 +141,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 						Binding = binding,
 						BindingIndex = bindingIndex,
 						ControlScheme = MatchingControlScheme,
-						Icon = pair.Value.Icon,
 					};
 
 					if (pair.Value.UseDefaultTexts) {
@@ -207,7 +188,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					Binding = binding,
 					BindingIndex = bindingIndex,
 					ControlScheme = MatchingControlScheme,
-					Icon = null,
 					Text = text,
 					ShortText = shortText,
 				};

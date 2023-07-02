@@ -46,13 +46,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			public string[] ExcludedControlSchemes;
 		}
 
-		public enum ShowPrioritySelection
-		{
-			IconIsPriority,
-			TextIsPriority,
-			ShowBoth,
-		}
-
 		public InputActionReference InputAction => m_InputAction;
 
 		[SerializeField]
@@ -64,6 +57,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		// Most likely you'd want to update the display dynamically with the current control scheme.
 		// (i.e. binding displays keyboard key, but player switches to a controller).
 
+#if USE_TEXT_MESH_PRO
+		[FormerlySerializedAs("TextMeshProText")]
+		public TMPro.TextMeshProUGUI Text;
+#endif
 		[Range(0, 5)]
 		[Tooltip("If multiple bindings are present in the action matching this device, display the n-th one.\n(i.e. \"alternative binding\")")]
 		public int BindingNumberToUse = 0;
@@ -74,36 +71,19 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		public DisplayModeData DisplayMode;
 
-		[Space()]
-		[Tooltip("Should it show icon or text if available. If not it will display whatever it can.")]
-		public ShowPrioritySelection ShowPriority = ShowPrioritySelection.IconIsPriority;
-
-		public Image Icon;
-
-#if USE_UGUI_TEXT
-		public Text Text;
-#endif
-
-#if USE_TEXT_MESH_PRO
-		public TMPro.TextMeshProUGUI TextMeshProText;
-#endif
 
 		public bool UseShortText = true;
 
 		[Tooltip("Optional - enter how the hotkey text should be displayed. Use \"{Hotkey}\" to be replaced with the matched text.\nLeave empty to skip.")]
 		public string FormatText;
 
-		[Tooltip("When updating the icon, should it resize the image rect to fit the new sprite relative to the initial rect/sprite size ratio.")]
-		public bool AdjustSize = true;
-
 		[Tooltip("Optional - list of objects to be activated when hotkeys are displayed. Useful for labels indicating the result of the action.")]
 		public List<GameObject> AdditionalObjectsToActivate;
 
 		public InputBindingDisplayData CurrentlyDisplayedData { get; private set; }
+		public bool DisplaysIcon { get; private set; }
 
 		private InputDevice m_LastDevice;
-
-		private Vector2 m_RectSpriteRatio = new Vector2(1f, 1f);
 
 		protected bool m_GameQuitting = false;
 
@@ -187,14 +167,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					if (!DisplayMode.DisplayedControlScheme.Equals(lastControlScheme, StringComparison.OrdinalIgnoreCase)) {
 
 						if (!DisplayMode.KeepDisplayingLastDevice) {
-							if (Icon) Icon.gameObject.SetActive(false);
-
-#if USE_UGUI_TEXT
-							if (Text) Text.gameObject.SetActive(false);
-#endif
-
 #if USE_TEXT_MESH_PRO
-							if (TextMeshProText) TextMeshProText.gameObject.SetActive(false);
+							Text.enabled = false;
 #endif
 
 							SetAdditionalObjects(false);
@@ -215,14 +189,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					if (DisplayMode.ExcludedControlSchemes.Contains(lastControlScheme)) {
 
 						if (!DisplayMode.KeepDisplayingLastDevice) {
-							if (Icon) Icon.gameObject.SetActive(false);
-
-#if USE_UGUI_TEXT
-							if (Text) Text.gameObject.SetActive(false);
-#endif
-
 #if USE_TEXT_MESH_PRO
-							if (TextMeshProText) TextMeshProText.gameObject.SetActive(false);
+							Text.enabled = false;
 #endif
 
 							SetAdditionalObjects(false);
@@ -272,78 +240,40 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			displayedData.DeviceLayout = deviceLayout;
 			CurrentlyDisplayedData = displayedData;
+			DisplaysIcon = false;
 
-			if (Icon) {
-				bool iconIsPriority = ShowPriority == ShowPrioritySelection.IconIsPriority || ShowPriority == ShowPrioritySelection.ShowBoth || !CurrentlyDisplayedData.HasText;
-
-				Icon.gameObject.SetActive(CurrentlyDisplayedData.HasIcon && iconIsPriority);
-				Icon.sprite = CurrentlyDisplayedData.Icon;
-
-				if (AdjustSize && Icon.sprite) {
-					Vector2 rectSize = Icon.sprite.rect.size * m_RectSpriteRatio;
-					// Vector2 == means approximately equality.
-					if (rectSize != Icon.rectTransform.sizeDelta) {
-						Icon.rectTransform.sizeDelta = rectSize;
-					}
-				}
-			}
-
-#if USE_UGUI_TEXT && USE_TEXT_MESH_PRO
-			if (Text || TextMeshProText) {
-#elif USE_UGUI_TEXT
+#if USE_TEXT_MESH_PRO
 			if (Text) {
-#else
-			if (TextMeshProText) {
 #endif
-			bool textIsPriority = ShowPriority == ShowPrioritySelection.TextIsPriority || ShowPriority == ShowPrioritySelection.ShowBoth || !CurrentlyDisplayedData.HasIcon;
-
-				string usedText = UseShortText ? CurrentlyDisplayedData.ShortText : CurrentlyDisplayedData.Text;
-				bool show = CurrentlyDisplayedData.HasText && textIsPriority;
+				string usedText = UseShortText && !string.IsNullOrWhiteSpace(CurrentlyDisplayedData.ShortText)
+					? CurrentlyDisplayedData.ShortText
+					: CurrentlyDisplayedData.Text
+					;
 
 				if (!string.IsNullOrWhiteSpace(FormatText)) {
 					usedText = FormatText.Replace("{Hotkey}", usedText);
 				}
 
-#if USE_UGUI_TEXT
-				if (Text) {
-					Text.gameObject.SetActive(show);
-					Text.text = usedText;
-				}
-#endif
-
 #if USE_TEXT_MESH_PRO
-				if (TextMeshProText) {
-					TextMeshProText.gameObject.SetActive(show);
-					TextMeshProText.text = usedText;
-				}
+				Text.enabled = CurrentlyDisplayedData.HasText;
+				Text.text = usedText;
 #endif
-
+				DisplaysIcon = usedText != null ? usedText.Contains("<sprite") : false;
 			}
 
-			bool shown = (Icon && Icon.gameObject.activeSelf)
-#if USE_UGUI_TEXT
-				|| (Text && Text.gameObject.activeSelf)
-#endif
-#if USE_TEXT_MESH_PRO
-				|| (TextMeshProText && TextMeshProText.gameObject.activeSelf)
-#endif
-			;
-
-			SetAdditionalObjects(shown);
+			SetAdditionalObjects(Text.enabled);
 		}
 
 		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 
+			if (Text == null) {
+				Text = GetComponent<TMPro.TextMeshProUGUI>();
+			}
+
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {
 				m_HasInitialized = true;
-
-				if (Icon && Icon.sprite) {
-					m_RectSpriteRatio = Icon.rectTransform.sizeDelta / Icon.sprite.rect.size;
-				} else {
-					m_RectSpriteRatio = new Vector2(1f, 1f);
-				}
 
 				if (delayedSetup && isActiveAndEnabled) {
 					OnEnable();
@@ -383,26 +313,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				return;
 			}
 
+			Text.enabled = false;
 			SetAdditionalObjects(false);
 
 			m_PlayerContext.InputContext.LastUsedDeviceChanged -= OnLastUsedDeviceChanged;
-
-			if (Icon) {
-				Icon.gameObject.SetActive(false);
-				Icon.sprite = null;
-			}
-
-#if USE_UGUI_TEXT
-			if (Text) {
-				Text.gameObject.SetActive(false);
-			}
-#endif
-
-#if USE_TEXT_MESH_PRO
-			if (TextMeshProText) {
-				TextMeshProText.gameObject.SetActive(false);
-			}
-#endif
 		}
 
 		private void SetAdditionalObjects(bool active)
@@ -436,26 +350,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		protected virtual void OnValidate()
 		{
 			Utils.Validation.ValidateMissingObject(this, m_InputAction, nameof(m_InputAction));
-			Utils.Validation.ValidateMissingObject(this, Icon, nameof(Icon));
-
-#if USE_UGUI_TEXT
-			Utils.Validation.ValidateMissingObject(this, Text, nameof(Text));
-#endif
 
 #if USE_TEXT_MESH_PRO
-			Utils.Validation.ValidateMissingObject(this, TextMeshProText, nameof(TMPro.TextMeshProUGUI));
+			Utils.Validation.ValidateMissingObject(this, Text, nameof(TMPro.TextMeshProUGUI));
 #endif
-
-			if ((Icon && Icon.gameObject == gameObject)
-#if USE_UGUI_TEXT
-				|| (Text && Text.gameObject == gameObject)
-#endif
-#if USE_TEXT_MESH_PRO
-				|| (TextMeshProText && TextMeshProText.gameObject == gameObject)
-#endif
-				) {
-				Debug.LogError($"[Input] {nameof(HotkeyDisplayUI)} {name} has to be attached to a game object that is different from the icon / text game object. Reason: target game object will be deactivated if no binding found. Recommended: attach to the parent or panel game object.", this);
-			}
 		}
 
 		void OnApplicationQuit()

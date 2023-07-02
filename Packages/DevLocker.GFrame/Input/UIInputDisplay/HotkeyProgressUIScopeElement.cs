@@ -1,5 +1,6 @@
 #if USE_INPUT_SYSTEM
 
+using DevLocker.GFrame.Input.UIScope;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace DevLocker.GFrame.Input.UIScope
+namespace DevLocker.GFrame.Input.UIInputDisplay
 {
 	/// <summary>
 	/// Will display progress of Hotkey interaction (e.g. hold / long press etc.)
@@ -26,24 +27,24 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected InputActionReference m_InputAction;
 		public InputActionReference InputAction => m_InputAction;
 
+		[Tooltip("The driving hotkey display UI. If it doesn't display icon, indicator will be hidden. Keep empty to bypass this behaviour.")]
+		public HotkeyDisplayUI HotkeyDisplayUI;
+
 		[Tooltip("The root object of the indicator. It will be deactivated if the action doesn't have continues integration (e.g. \"hold\" interaction) or no action is specified.")]
 		public GameObject IndicatorRoot;
 
 		[Tooltip("Image to be used as a progress bar of the action. It will fill it from 0 to 1.\nLeave empty to use the image of the current game object.")]
 		public Image FillImage;
 
-#if USE_UGUI_TEXT
-		[Tooltip("Optional - Text to set the progress.")]
-		public Text Text;
-#endif
-
 #if USE_TEXT_MESH_PRO
 		[Tooltip("Optional - Text to set the progress.")]
-		public TMPro.TextMeshProUGUI TextMeshProText;
+		[FormerlySerializedAs("TextMeshProText")]
+		public TMPro.TextMeshProUGUI ProgressText;
 #endif
 
 		[Tooltip("Optional - enter how the progress text should be displayed. Use \"{value}\" to be replaced with the matched text.")]
-		public string FormatText = "{value}";
+		[FormerlySerializedAs("FormatText")]
+		public string ProgressTextFormat = "{value}";
 
 		[Space]
 		[Space]
@@ -52,6 +53,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		public UnityEvent Cancelled;
 
 		protected InputAction m_InputActionCached { get; private set; }
+
+		protected bool m_HasContinuesInteractionsCached { get; private set; } = false;
+		private bool m_ShouldShowIndicator => m_HasContinuesInteractionsCached && (HotkeyDisplayUI?.DisplaysIcon ?? true);
 
 		protected bool m_ActionStarted { get; private set; } = false;
 		protected bool m_ActionPerformed { get; private set; } = false;
@@ -116,8 +120,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			m_InputActionCached = GetUsedActions(m_PlayerContext.InputContext).FirstOrDefault();
 
+			m_HasContinuesInteractionsCached = HasContinuesInteractions();
+
 			if (IndicatorRoot) {
-				IndicatorRoot.SetActive(HasContinuesInteractions());
+				IndicatorRoot.SetActive(m_ShouldShowIndicator);
 			}
 
 			if (m_InputActionCached == null)
@@ -216,37 +222,34 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void Update()
 		{
-			if (m_InputActionCached == null || (IndicatorRoot && !IndicatorRoot.activeSelf))
+			if (IndicatorRoot) {
+				if (IndicatorRoot.activeSelf != m_ShouldShowIndicator) {
+					IndicatorRoot.SetActive(m_ShouldShowIndicator);
+				}
+				if (!IndicatorRoot.activeSelf)
+					return;
+			}
+
+			if (m_InputActionCached == null)
 				return;
+
 
 			if (m_ActionStarted) {
 				float progress = m_InputActionCached.GetTimeoutCompletionPercentage();
 				FillImage.fillAmount = progress;
 
-#if USE_UGUI_TEXT
-				if (Text) {
-					Text.text = FormatText.Replace("{value}", Mathf.RoundToInt(progress * 100).ToString());
-				}
-#endif
-
 #if USE_TEXT_MESH_PRO
-				if (TextMeshProText) {
-					TextMeshProText.text = FormatText.Replace("{value}", Mathf.RoundToInt(progress * 100).ToString());
+				if (ProgressText) {
+					ProgressText.text = ProgressTextFormat.Replace("{value}", Mathf.RoundToInt(progress * 100).ToString());
 				}
 #endif
 
 			} else if (FillImage.fillAmount != 0f) {
 				FillImage.fillAmount = 0f;
 
-#if USE_UGUI_TEXT
-				if (Text) {
-					Text.text = "";
-				}
-#endif
-
 #if USE_TEXT_MESH_PRO
-				if (TextMeshProText) {
-					TextMeshProText.text = "";
+				if (ProgressText) {
+					ProgressText.text = "";
 				}
 #endif
 			}
@@ -255,6 +258,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected virtual void OnValidate()
 		{
 			Utils.Validation.ValidateMissingObject(this, InputAction, nameof(InputAction));
+			Utils.Validation.ValidateMissingObject(this, HotkeyDisplayUI, nameof(HotkeyDisplayUI));
 		}
 	}
 }
