@@ -162,17 +162,6 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 			foreach (var pair in m_ShownData.ButtonsOverrideLabels) {
 				var button = GetButtons(pair.Key).First();
 
-#if USE_UGUI_TEXT
-				var label = button.GetComponentInChildren<Text>();
-				if (label) {
-					m_ButtonsOriginalLabels.Add(pair.Key, label.text);
-					// Cache those every time in case the texts changed due to switched localization.
-					label.text = pair.Value;
-					continue;
-				}
-#endif
-
-#if USE_TEXT_MESH_PRO
 				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshProUGUI>();
 				if (textMeshProlabel) {
 					m_ButtonsOriginalLabels.Add(pair.Key, textMeshProlabel.text);
@@ -180,7 +169,6 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 					textMeshProlabel.text = pair.Value;
 					continue;
 				}
-#endif
 			}
 		}
 		protected virtual void RestoreButtonTexts()
@@ -188,21 +176,11 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 			foreach (var pair in m_ShownData.ButtonsOverrideLabels) {
 				var button = GetButtons(pair.Key).First();
 
-#if USE_UGUI_TEXT
-				var label = button.GetComponentInChildren<Text>();
-				if (label) {
-					label.text = m_ButtonsOriginalLabels[pair.Key];
-					continue;
-				}
-#endif
-
-#if USE_TEXT_MESH_PRO
 				var textMeshProlabel = button.GetComponentInChildren<TMPro.TextMeshProUGUI>();
 				if (textMeshProlabel) {
 					textMeshProlabel.text = m_ButtonsOriginalLabels[pair.Key];
 					continue;
 				}
-#endif
 			}
 		}
 

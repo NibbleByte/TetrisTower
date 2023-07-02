@@ -36,11 +36,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		[Tooltip("Image to be used as a progress bar of the action. It will fill it from 0 to 1.\nLeave empty to use the image of the current game object.")]
 		public Image FillImage;
 
-#if USE_TEXT_MESH_PRO
 		[Tooltip("Optional - Text to set the progress.")]
 		[FormerlySerializedAs("TextMeshProText")]
 		public TMPro.TextMeshProUGUI ProgressText;
-#endif
 
 		[Tooltip("Optional - enter how the progress text should be displayed. Use \"{value}\" to be replaced with the matched text.")]
 		[FormerlySerializedAs("FormatText")]
@@ -238,20 +236,16 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				float progress = m_InputActionCached.GetTimeoutCompletionPercentage();
 				FillImage.fillAmount = progress;
 
-#if USE_TEXT_MESH_PRO
 				if (ProgressText) {
 					ProgressText.text = ProgressTextFormat.Replace("{value}", Mathf.RoundToInt(progress * 100).ToString());
 				}
-#endif
 
 			} else if (FillImage.fillAmount != 0f) {
 				FillImage.fillAmount = 0f;
 
-#if USE_TEXT_MESH_PRO
 				if (ProgressText) {
 					ProgressText.text = "";
 				}
-#endif
 			}
 		}
 

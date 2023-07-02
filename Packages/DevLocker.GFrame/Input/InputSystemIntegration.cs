@@ -481,28 +481,15 @@ namespace DevLocker.GFrame.Input
 
 			if ((option & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected
-#if USE_UGUI_TEXT
-				&& !selected.GetComponent<UnityEngine.UI.InputField>()
-#endif
-#if USE_TEXT_MESH_PRO
 				&& !selected.GetComponent<TMPro.TMP_InputField>()
-#endif
 				)
 				return true;
 
 			if ((option & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
 
-#if USE_UGUI_TEXT
-				var inputField = selected.GetComponent<UnityEngine.UI.InputField>();
-				if (inputField && inputField.isFocused)
-					return true;
-#endif
-
-#if USE_TEXT_MESH_PRO
 				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
 				if (inputFieldTMP && inputFieldTMP.isFocused)
 					return true;
-#endif
 			}
 
 			return false;

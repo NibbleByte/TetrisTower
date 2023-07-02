@@ -57,10 +57,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		// Most likely you'd want to update the display dynamically with the current control scheme.
 		// (i.e. binding displays keyboard key, but player switches to a controller).
 
-#if USE_TEXT_MESH_PRO
 		[FormerlySerializedAs("TextMeshProText")]
 		public TMPro.TextMeshProUGUI Text;
-#endif
+
 		[Range(0, 5)]
 		[Tooltip("If multiple bindings are present in the action matching this device, display the n-th one.\n(i.e. \"alternative binding\")")]
 		public int BindingNumberToUse = 0;
@@ -167,12 +166,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					if (!DisplayMode.DisplayedControlScheme.Equals(lastControlScheme, StringComparison.OrdinalIgnoreCase)) {
 
 						if (!DisplayMode.KeepDisplayingLastDevice) {
-#if USE_TEXT_MESH_PRO
 							Text.enabled = false;
-#endif
-
 							SetAdditionalObjects(false);
-
 							return;
 						}
 
@@ -189,12 +184,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					if (DisplayMode.ExcludedControlSchemes.Contains(lastControlScheme)) {
 
 						if (!DisplayMode.KeepDisplayingLastDevice) {
-#if USE_TEXT_MESH_PRO
 							Text.enabled = false;
-#endif
-
 							SetAdditionalObjects(false);
-
 							return;
 						}
 
@@ -242,9 +233,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			CurrentlyDisplayedData = displayedData;
 			DisplaysIcon = false;
 
-#if USE_TEXT_MESH_PRO
 			if (Text) {
-#endif
 				string usedText = UseShortText && !string.IsNullOrWhiteSpace(CurrentlyDisplayedData.ShortText)
 					? CurrentlyDisplayedData.ShortText
 					: CurrentlyDisplayedData.Text
@@ -254,10 +243,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					usedText = FormatText.Replace("{Hotkey}", usedText);
 				}
 
-#if USE_TEXT_MESH_PRO
 				Text.enabled = CurrentlyDisplayedData.HasText;
 				Text.text = usedText;
-#endif
 				DisplaysIcon = usedText != null ? usedText.Contains("<sprite") : false;
 			}
 
@@ -350,10 +337,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		protected virtual void OnValidate()
 		{
 			Utils.Validation.ValidateMissingObject(this, m_InputAction, nameof(m_InputAction));
-
-#if USE_TEXT_MESH_PRO
 			Utils.Validation.ValidateMissingObject(this, Text, nameof(TMPro.TextMeshProUGUI));
-#endif
 		}
 
 		void OnApplicationQuit()

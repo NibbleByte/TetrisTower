@@ -34,44 +34,21 @@ namespace DevLocker.GFrame.MessageBox.UIControllers
 	[Serializable]
 	public struct MessageBoxUIText
 	{
-#if USE_UGUI_TEXT
-		public Text UGUIText;
-#endif
-
-#if USE_TEXT_MESH_PRO
 		public TMPro.TextMeshProUGUI TextMeshProText;
-#endif
 
 		public string Text {
 			get {
-
-#if USE_UGUI_TEXT
-				if (UGUIText) {
-					return UGUIText.text;
-				}
-#endif
-
-#if USE_TEXT_MESH_PRO
 				if (TextMeshProText) {
 					return TextMeshProText.text;
 				}
-#endif
+
 				return string.Empty;
 			}
 
 			set {
-
-#if USE_UGUI_TEXT
-				if (UGUIText) {
-					UGUIText.text = value;
-				}
-#endif
-
-#if USE_TEXT_MESH_PRO
 				if (TextMeshProText) {
 					TextMeshProText.text = value;
 				}
-#endif
 			}
 		}
 	}

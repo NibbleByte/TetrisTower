@@ -1,5 +1,4 @@
-﻿#if USE_TEXT_MESH_PRO
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,4 +39,3 @@ namespace DevLocker.GFrame.SampleGame.UITester
 		}
 	}
 }
-#endif

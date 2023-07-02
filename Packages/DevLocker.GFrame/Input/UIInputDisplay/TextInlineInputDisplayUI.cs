@@ -1,4 +1,4 @@
-#if USE_INPUT_SYSTEM && USE_TEXT_MESH_PRO
+#if USE_INPUT_SYSTEM
 using System;
 using System.Collections.Generic;
 using System.Linq;

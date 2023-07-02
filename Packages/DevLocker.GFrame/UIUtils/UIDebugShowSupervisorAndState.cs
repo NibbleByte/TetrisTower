@@ -1,4 +1,3 @@
-#if USE_TEXT_MESH_PRO
 using DevLocker.GFrame.Input;
 using TMPro;
 using UnityEngine;
@@ -61,4 +60,3 @@ namespace DevLocker.GFrame.UIUtils
 		}
 	}
 }
-#endif
