@@ -197,5 +197,65 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		}
 	}
 
+#if UNITY_EDITOR
+	[UnityEditor.CustomPropertyDrawer(typeof(InputBindingDisplayAsset.BindingDisplayAssetsData))]
+	internal class InputBindingDisplayAssetBindingDisplayAssetsDataPropertyDrawer : UnityEditor.PropertyDrawer
+	{
+		private static float s_LineHeight => UnityEditor.EditorGUIUtility.singleLineHeight + UnityEditor.EditorGUIUtility.standardVerticalSpacing;
+
+		public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
+		{
+			if (!property.isExpanded)
+				return UnityEditor.EditorGUIUtility.singleLineHeight;
+
+			var useDefaultTextsProperty = property.FindPropertyRelative(nameof(InputBindingDisplayAsset.BindingDisplayAssetsData.UseDefaultTexts));
+
+			float height = s_LineHeight * 2 + UnityEditor.EditorGUIUtility.singleLineHeight;
+			if (!useDefaultTextsProperty.boolValue) {
+				height += s_LineHeight * 2;
+			}
+
+			return height;
+		}
+
+		public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
+		{
+			label = UnityEditor.EditorGUI.BeginProperty(position, label, property);
+
+			Rect lineRect = position;
+			lineRect.height = s_LineHeight;
+
+			property.isExpanded = UnityEditor.EditorGUI.Foldout(lineRect, property.isExpanded, label, true);
+			lineRect.y += s_LineHeight;
+
+			if (property.isExpanded) {
+				UnityEditor.EditorGUI.indentLevel++;
+
+				UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(InputBindingDisplayAsset.BindingDisplayAssetsData.BindingPath)));
+
+				lineRect.y += s_LineHeight;
+
+				var useDefaultTextsProperty = property.FindPropertyRelative(nameof(InputBindingDisplayAsset.BindingDisplayAssetsData.UseDefaultTexts));
+				UnityEditor.EditorGUI.PropertyField(lineRect, useDefaultTextsProperty);
+
+				lineRect.y += s_LineHeight;
+
+				if (!useDefaultTextsProperty.boolValue) {
+					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(InputBindingDisplayAsset.BindingDisplayAssetsData.DisplayText)));
+
+					lineRect.y += s_LineHeight;
+
+					UnityEditor.EditorGUI.PropertyField(lineRect, property.FindPropertyRelative(nameof(InputBindingDisplayAsset.BindingDisplayAssetsData.DisplayShortText)));
+
+					lineRect.y += s_LineHeight;
+				}
+
+				UnityEditor.EditorGUI.indentLevel--;
+			}
+
+			UnityEditor.EditorGUI.EndProperty();
+		}
+	}
+#endif
 }
 #endif
