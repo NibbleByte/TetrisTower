@@ -17,7 +17,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 	/// Text changes by other code are automatically detected and refreshed.
 	/// </summary>
 	[RequireComponent(typeof(TextMeshProUGUI))]
-	public class TextMeshProInputDisplayUI : MonoBehaviour
+	public class TextInlineInputDisplayUI : MonoBehaviour
 	{
 		private class OwnedAction
 		{
@@ -71,7 +71,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			}
 
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"[Input] {nameof(TextMeshProInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(TextInlineInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -91,7 +91,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			}
 
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"[Input] {nameof(TextMeshProInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(TextInlineInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -102,7 +102,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public void RefreshTextInputSprites()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"[Input] {nameof(TextMeshProInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(TextInlineInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
@@ -230,7 +230,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private void OnLastUsedDeviceChanged()
 		{
 			if (m_PlayerContext.InputContext == null) {
-				Debug.LogWarning($"[Input] {nameof(TextMeshProInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
+				Debug.LogWarning($"[Input] {nameof(TextInlineInputDisplayUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
