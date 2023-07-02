@@ -13,8 +13,8 @@ namespace DevLocker.GFrame.Utils
 	/// </summary>
 	public static class UIUtils
 	{
-		private static IDictionary m_CanvasesRegister;
-		private static List<ICanvasElement> m_LayoutRebuildList;
+		private static IDictionary s_CanvasesRegister;
+		private static List<ICanvasElement> s_LayoutRebuildList;
 
 		/// <summary>
 		/// Force recalculate content size fitters and layout groups properly - from bottom to top.
@@ -77,7 +77,15 @@ namespace DevLocker.GFrame.Utils
 		/// </summary>
 		public static bool IsLayoutRebuildPending()
 		{
-			if (m_LayoutRebuildList == null) {
+			return GetPendingLayoutRebuildElements().Count > 0;
+		}
+
+		/// <summary>
+		/// Gets the dirty elements that have pending rebuild at the end of the frame.
+		/// </summary>
+		public static IReadOnlyList<ICanvasElement> GetPendingLayoutRebuildElements()
+		{
+			if (s_LayoutRebuildList == null) {
 				// Use reflection to get the internal list used for marked objects for layout rebuild.
 				// List is stored by reference, so it should be up to date.
 				// Idea by https://forum.unity.com/threads/callback-for-when-a-canvas-rebuild-happens.525100/
@@ -86,15 +94,15 @@ namespace DevLocker.GFrame.Utils
 					FieldInfo buildQueueField = typeof(CanvasUpdateRegistry).GetField("m_LayoutRebuildQueue", BindingFlags.NonPublic | BindingFlags.Instance);
 					object buildQueue = buildQueueField.GetValue(CanvasUpdateRegistry.instance);
 					FieldInfo buildListField = buildQueue.GetType().GetField("m_List", BindingFlags.NonPublic | BindingFlags.Instance);
-					m_LayoutRebuildList = (List<ICanvasElement>)buildListField.GetValue(buildQueue);
+					s_LayoutRebuildList = (List<ICanvasElement>)buildListField.GetValue(buildQueue);
 				}
 				catch (Exception) {
 					// I guess the API changed and this check is no longer valid.
-					m_LayoutRebuildList = new List<ICanvasElement>();
+					s_LayoutRebuildList = new List<ICanvasElement>();
 				}
 			}
 
-			return m_LayoutRebuildList.Count > 0;
+			return s_LayoutRebuildList;
 		}
 
 		/// <summary>
@@ -102,21 +110,21 @@ namespace DevLocker.GFrame.Utils
 		/// </summary>
 		public static IEnumerable<Canvas> GetAllCanvases()
 		{
-			if (m_CanvasesRegister == null) {
+			if (s_CanvasesRegister == null) {
 				// Use reflection to get the internal dictionary from the registry.
 				// This will give us quick access to all the canvases.
 
 				try {
 					FieldInfo graphicsField = typeof(GraphicRegistry).GetField("m_Graphics", BindingFlags.NonPublic | BindingFlags.Instance);
-					m_CanvasesRegister = (IDictionary) graphicsField.GetValue(GraphicRegistry.instance);
+					s_CanvasesRegister = (IDictionary) graphicsField.GetValue(GraphicRegistry.instance);
 				}
 				catch (Exception) {
 					// I guess the API changed and this call is no longer valid.
-					m_CanvasesRegister = new Dictionary<Canvas, object>();
+					s_CanvasesRegister = new Dictionary<Canvas, object>();
 				}
 			}
 
-			return m_CanvasesRegister.Keys.OfType<Canvas>();
+			return s_CanvasesRegister.Keys.OfType<Canvas>();
 		}
 	}
 }

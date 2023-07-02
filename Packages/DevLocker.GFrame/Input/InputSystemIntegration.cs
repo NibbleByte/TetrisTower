@@ -86,6 +86,11 @@ namespace DevLocker.GFrame.Input
 		bool SupportsUINavigationSelection { get; }
 
 		/// <summary>
+		/// Does this provider has representations for this binding's control scheme.
+		/// </summary>
+		bool MatchesBinding(InputBinding binding);
+
+		/// <summary>
 		/// What devices does this provider has representations for.
 		/// </summary>
 		bool MatchesDevice(string deviceLayout);
@@ -98,9 +103,11 @@ namespace DevLocker.GFrame.Input
 
 #if USE_TEXT_MESH_PRO
 		/// <summary>
-		/// Sprite asset to be used for this device. Will be added dynamically to the default sprite assets list. Can be null.
+		/// Gets text to be in-lined in your text mesh pro component to display the provided input action.
+		/// Only the first matching binding will be returned.
+		/// It can return <sprite> tag referring to sprite asset or text representation.
 		/// </summary>
-		TMPro.TMP_SpriteAsset SpriteAsset { get; }
+		string GetTextMeshProDisplayTextFor(InputAction inputAction);
 #endif
 
 	}
@@ -256,15 +263,14 @@ namespace DevLocker.GFrame.Input
 		IEnumerable<InputControlScheme> GetAllInputControlSchemes();
 
 		/// <summary>
-		/// Get the display representations of the matched device for the passed action.
-		/// An action can have multiple bindings for the same device.
+		/// Get all display data providers.
 		/// </summary>
-		IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(string deviceLayout, InputAction action);
+		IReadOnlyList<IInputBindingDisplayDataProvider> GetAllDisplayDataProviders();
 
 		/// <summary>
 		/// Get the currently used displayed data provider. Can be null.
 		/// </summary>
-		IInputBindingDisplayDataProvider GetCurrentDisplayData();
+		IInputBindingDisplayDataProvider GetCurrentDisplayDataProvider();
 
 		/// <summary>
 		/// Does the current device support UI navigation.
@@ -528,6 +534,21 @@ namespace DevLocker.GFrame.Input
 			}
 
 			return context.GetBindingDisplaysFor(lastUsedDevice.layout, action);
+		}
+
+		/// <summary>
+		/// Get the display representations of the matched device for the passed action.
+		/// An action can have multiple bindings for the same device.
+		/// </summary>
+		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, string deviceLayout, InputAction action)
+		{
+			foreach (var displayData in context.GetAllDisplayDataProviders()) {
+				if (displayData.MatchesDevice(deviceLayout)) {
+					foreach (var bindingDisplay in displayData.GetBindingDisplaysFor(action)) {
+						yield return bindingDisplay;
+					}
+				}
+			}
 		}
 
 		/// <summary>

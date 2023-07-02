@@ -42,13 +42,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private bool m_SupportsUINavigationSelection = true;
 		public bool SupportsUINavigationSelection => m_SupportsUINavigationSelection;
 
-#if USE_TEXT_MESH_PRO
-		[Tooltip("Sprite asset to be used for this device with TextMeshPro. Will be added dynamically to the default sprite assets list. Can be null.")]
-		[SerializeField]
-		private TMPro.TMP_SpriteAsset m_SpriteAsset;
-		public TMPro.TMP_SpriteAsset SpriteAsset => m_SpriteAsset;
-#endif
-
 		[Space()]
 		[InputControlSchemePicker]
 		[Tooltip("The control scheme that matches the devices listed below.")]
@@ -62,10 +55,31 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private KeyValuePair<InputBinding, BindingDisplayAssetsData>[] m_BindingDisplaysAssetsCache;
 
 
+		public bool MatchesBinding(InputBinding binding)
+		{
+			return string.IsNullOrWhiteSpace(binding.groups) ? false : binding.groups.Contains(MatchingControlScheme);
+		}
+
 		public bool MatchesDevice(string deviceLayout)
 		{
 			return MatchingDeviceLayouts.Contains(deviceLayout, StringComparer.OrdinalIgnoreCase);
 		}
+
+#if USE_TEXT_MESH_PRO
+		public string GetTextMeshProDisplayTextFor(InputAction inputAction)
+		{
+			InputBindingDisplayData displayData = GetBindingDisplaysFor(inputAction).FirstOrDefault();
+			if (!displayData.IsValid)
+				return string.Empty;
+
+			if (displayData.Icon) {
+				// TODO: This doesn't work for composite actions :(
+				return $"<sprite name={displayData.Icon.name}>";
+			} else {
+				return $"<b inputAction=\"{inputAction.name}\">{displayData.Text}</b>";
+			}
+		}
+#endif
 
 		public IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(InputAction action)
 		{

@@ -1260,6 +1260,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "TestHotkeyKeyboardOnly",
+                    "type": "Button",
+                    "id": "54761322-cab6-4ee7-962e-39b21d633f1c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1394,6 +1403,39 @@
                     "action": "TestHotkeyHoldX",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Shift+T",
+                    "id": "de7bfca0-4e22-4b3b-bcef-1ecc2c2f7490",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TestHotkeyKeyboardOnly",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "85000801-45aa-4bfb-be40-127b23d6230c",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "TestHotkeyKeyboardOnly",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "a8faa140-cb59-406a-b7c2-ec98a24223eb",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "TestHotkeyKeyboardOnly",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
