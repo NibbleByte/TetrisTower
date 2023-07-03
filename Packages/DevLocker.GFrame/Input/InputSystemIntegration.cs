@@ -84,6 +84,11 @@ namespace DevLocker.GFrame.Input
 		bool SupportsUINavigationSelection { get; }
 
 		/// <summary>
+		/// Pass in the selected binding display text to get additionally formatted.
+		/// </summary>
+		public string FormatBindingDisplayText(string displayText);
+
+		/// <summary>
 		/// Does this provider has representations for this binding's control scheme.
 		/// </summary>
 		bool MatchesBinding(InputBinding binding);
@@ -502,29 +507,14 @@ namespace DevLocker.GFrame.Input
 		/// Get the display representations of the matched device for the passed action.
 		/// An action can have multiple bindings for the same device.
 		/// </summary>
-		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, InputAction action)
-		{
-			InputDevice lastUsedDevice = context.GetLastUsedInputDevice();
-			if (lastUsedDevice == null) {
-				return Enumerable.Empty<InputBindingDisplayData>();
-			}
-
-			return context.GetBindingDisplaysFor(lastUsedDevice.layout, action);
-		}
-
-		/// <summary>
-		/// Get the display representations of the matched device for the passed action.
-		/// An action can have multiple bindings for the same device.
-		/// </summary>
-		public static IEnumerable<InputBindingDisplayData> GetBindingDisplaysFor(this IInputContext context, string deviceLayout, InputAction action)
+		public static IInputBindingDisplayDataProvider GetFirstMatchingDisplayDataProvider(this IInputContext context, string deviceLayout)
 		{
 			foreach (var displayData in context.GetAllDisplayDataProviders()) {
-				if (displayData.MatchesDevice(deviceLayout)) {
-					foreach (var bindingDisplay in displayData.GetBindingDisplaysFor(action)) {
-						yield return bindingDisplay;
-					}
-				}
+				if (displayData.MatchesDevice(deviceLayout))
+					return displayData;
 			}
+
+			return null;
 		}
 
 		/// <summary>

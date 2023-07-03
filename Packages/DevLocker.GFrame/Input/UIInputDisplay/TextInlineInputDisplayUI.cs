@@ -28,6 +28,12 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		[Tooltip("Disable the text mesh pro component if input action for the current device is unavailable.\nIf layout element is present on this object, it will set it to ignore the layout as well.")]
 		public bool HideTextIfBindingUnavailable = true;
 
+		[Space]
+		[Tooltip("(Optional) Format selected binding display text if it doesn't use sprites.\n\"{binding}\" will be replaced with the binding display text.")]
+		public string FormatBindingTexts = "";
+		[Tooltip("(Optional) Format selected binding display text if it contains sprites.\n\"{binding}\" will be replaced with the binding display text.")]
+		public string FormatBindingSprites = "";
+
 		private static Regex s_ActionPattern = new Regex(@"{[\w]+}");
 
 		private TextMeshProUGUI m_Text;
@@ -203,7 +209,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			m_ChangingText = false;
 		}
 
-		private static string GetDisplayTextFor(InputAction action, IInputBindingDisplayDataProvider displayDataProvider)
+		private string GetDisplayTextFor(InputAction action, IInputBindingDisplayDataProvider displayDataProvider)
 		{
 			// Consider only the first binding match.
 			InputBindingDisplayData displayData = displayDataProvider.GetBindingDisplaysFor(action).FirstOrDefault();
@@ -211,10 +217,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				return string.Empty;
 
 			if (displayData.Text.Contains("<sprite")) {
-				return displayData.Text;
+				string locallyFormatted = string.IsNullOrWhiteSpace(FormatBindingSprites) ? displayData.Text : FormatBindingSprites.Replace("{binding}", displayData.Text, StringComparison.OrdinalIgnoreCase);
+				return displayDataProvider.FormatBindingDisplayText(locallyFormatted);
 			} else {
 				// Add <b> tag to store the input action in an attribute so we can recognize it later and update it if needed.
-				return $"<b inputAction=\"{action.name}\">{displayData.Text}</b>";
+				string displayText = $"<b inputAction=\"{action.name}\">{displayData.Text}</b>";
+				string locallyFormatted = string.IsNullOrWhiteSpace(FormatBindingTexts) ? displayText : FormatBindingTexts.Replace("{binding}", displayText, StringComparison.OrdinalIgnoreCase);
+
+				return displayDataProvider.FormatBindingDisplayText(locallyFormatted);
 			}
 		}
 

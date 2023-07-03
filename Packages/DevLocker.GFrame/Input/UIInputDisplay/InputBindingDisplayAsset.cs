@@ -40,7 +40,13 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private bool m_SupportsUINavigationSelection = true;
 		public bool SupportsUINavigationSelection => m_SupportsUINavigationSelection;
 
-		[Space()]
+		[Space]
+		[Tooltip("(Optional) Format selected binding display text if it doesn't use sprites.\n\"{binding}\" will be replaced with the binding display text.")]
+		public string FormatBindingTexts = "";
+		[Tooltip("(Optional) Format selected binding display text if it contains sprites.\n\"{binding}\" will be replaced with the binding display text.")]
+		public string FormatBindingSprites = "";
+
+		[Space]
 		[InputControlSchemePicker]
 		[Tooltip("The control scheme that matches the devices listed below.")]
 		public string MatchingControlScheme;
@@ -52,6 +58,17 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		private InputBinding m_ControlSchemeMatchBinding = new InputBinding();
 		private KeyValuePair<InputBinding, BindingDisplayAssetsData>[] m_BindingDisplaysAssetsCache;
 
+
+		public string FormatBindingDisplayText(string displayText)
+		{
+			if (string.IsNullOrWhiteSpace(displayText))
+				return displayText;
+
+			return displayText.Contains("<sprite")
+				? (string.IsNullOrWhiteSpace(FormatBindingSprites) ? displayText : FormatBindingSprites.Replace("{binding}", displayText, StringComparison.OrdinalIgnoreCase))
+				: (string.IsNullOrWhiteSpace(FormatBindingTexts) ? displayText :FormatBindingTexts.Replace("{binding}", displayText, StringComparison.OrdinalIgnoreCase))
+				;
+		}
 
 		public bool MatchesBinding(InputBinding binding)
 		{

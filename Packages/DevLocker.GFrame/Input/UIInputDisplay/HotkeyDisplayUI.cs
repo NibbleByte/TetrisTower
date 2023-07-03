@@ -215,7 +215,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			int count = 0;
 			var displayedData = new InputBindingDisplayData();
 
-			foreach (var bindingDisplay in context.GetBindingDisplaysFor(deviceLayout, action)) {
+			IInputBindingDisplayDataProvider displayDataProvider = context.GetFirstMatchingDisplayDataProvider(deviceLayout);
+
+			foreach (var bindingDisplay in displayDataProvider.GetBindingDisplaysFor(action)) {
 				if (count == BindingNumberToUse) {
 
 					if (CompositePartNumberToUse == 0) {
@@ -244,7 +246,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				}
 
 				Text.enabled = CurrentlyDisplayedData.HasText;
-				Text.text = usedText;
+				Text.text = displayDataProvider.FormatBindingDisplayText(usedText);
 				DisplaysIcon = usedText != null ? usedText.Contains("<sprite") : false;
 			}
 
