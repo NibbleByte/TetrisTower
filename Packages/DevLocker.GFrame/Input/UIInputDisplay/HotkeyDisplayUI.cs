@@ -84,6 +84,8 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 		private InputDevice m_LastDevice;
 
+		private LayoutElement m_LayoutElement;
+
 		protected bool m_GameQuitting = false;
 
 		// Used for multiple event systems (e.g. split screen).
@@ -167,6 +169,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 						if (!DisplayMode.KeepDisplayingLastDevice) {
 							Text.enabled = false;
+
+							if (m_LayoutElement) {
+								m_LayoutElement.ignoreLayout = !Text.enabled;
+							}
 							SetAdditionalObjects(false);
 							return;
 						}
@@ -185,6 +191,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 						if (!DisplayMode.KeepDisplayingLastDevice) {
 							Text.enabled = false;
+
+							if (m_LayoutElement) {
+								m_LayoutElement.ignoreLayout = !Text.enabled;
+							}
 							SetAdditionalObjects(false);
 							return;
 						}
@@ -250,6 +260,9 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				DisplaysIcon = usedText != null ? usedText.Contains("<sprite") : false;
 			}
 
+			if (m_LayoutElement) {
+				m_LayoutElement.ignoreLayout = !Text.enabled;
+			}
 			SetAdditionalObjects(Text.enabled);
 		}
 
@@ -257,6 +270,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 
+			m_LayoutElement = GetComponent<LayoutElement>();
 			if (Text == null) {
 				Text = GetComponent<TMPro.TextMeshProUGUI>();
 			}
@@ -286,6 +300,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			if (m_InputAction) {
 				RefreshDisplay(m_PlayerContext.InputContext);
+
 			}
 		}
 
