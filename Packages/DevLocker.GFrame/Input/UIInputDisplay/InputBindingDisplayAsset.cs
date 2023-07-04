@@ -89,11 +89,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			m_ControlSchemeMatchBinding.groups = MatchingControlScheme;
 
+			bool compositePartsHasSprites = false;
+			var compositeBindingParts = new List<InputBindingDisplayData>();
 			var bindings = action.bindings;
 			for(int i = 0; i < bindings.Count; ++i) {
 				int bindingIndex = i;
 				InputBinding binding = bindings[bindingIndex];
-				var compositeBindingParts = new List<InputBindingDisplayData>();
+				compositeBindingParts.Clear();
+				compositePartsHasSprites = false;
 
 				if (binding.isComposite) {
 					++i;
@@ -110,6 +113,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					for(; i < bindings.Count && bindings[i].isPartOfComposite; ++i) {
 						InputBindingDisplayData bindingPartDisplay = PrepareDisplayDataFor(action, bindings[i], i);
 						compositeBindingParts.Add(bindingPartDisplay);
+						compositePartsHasSprites = compositePartsHasSprites || bindingPartDisplay.Text.Contains("<sprite") || bindingPartDisplay.ShortText.Contains("<sprite");
 					}
 
 					--i;	// Compensate for the initial for-loop iteration.
@@ -119,8 +123,23 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 					continue;
 				}
 
+				// If composite binding has sprites defined, prefer showing the sprites, instead of the default text representation.
+				if (binding.isComposite && compositeBindingParts.Count > 0 && compositePartsHasSprites) {
+					yield return new InputBindingDisplayData {
+						Binding = binding,
+						BindingIndex = bindingIndex,
+						ControlScheme = MatchingControlScheme,
+						CompositeBindingParts = compositeBindingParts.ToList(),
+
+						Text = string.Join(" + ", compositeBindingParts.Select(bp => bp.Text).Where(t => !string.IsNullOrWhiteSpace(t))),
+						ShortText = string.Join(" + ", compositeBindingParts.Select(bp => bp.ShortText).Where(t => !string.IsNullOrWhiteSpace(t))),
+					};
+
+					continue;
+				}
+
 				InputBindingDisplayData bindingDisplay = PrepareDisplayDataFor(action, binding, bindingIndex);
-				bindingDisplay.CompositeBindingParts = compositeBindingParts;
+				bindingDisplay.CompositeBindingParts = compositeBindingParts.ToList();
 
 				if (binding.isComposite) {
 					// Composite bindings should always be valid.

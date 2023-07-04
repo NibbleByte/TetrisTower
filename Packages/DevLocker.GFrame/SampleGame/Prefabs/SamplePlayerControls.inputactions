@@ -1269,6 +1269,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "TestHotkeyControllersOnly",
+                    "type": "Button",
+                    "id": "4334f95b-86ad-4e96-ba00-b98db234329c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1434,6 +1443,39 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "TestHotkeyKeyboardOnly",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Triggers",
+                    "id": "10053319-e7db-4479-9522-a55b7f1d813d",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TestHotkeyControllersOnly",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "30826ff5-351a-4c95-ae78-0a9876dcd3f1",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "TestHotkeyControllersOnly",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "9017bd0f-ebbd-48df-977d-cdfc934fd78c",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "TestHotkeyControllersOnly",
                     "isComposite": false,
                     "isPartOfComposite": true
                 }
