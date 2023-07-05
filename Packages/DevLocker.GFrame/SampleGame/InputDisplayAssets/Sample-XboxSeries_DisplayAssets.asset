@@ -18,6 +18,8 @@ MonoBehaviour:
   DeviceColor: {r: 0.5137255, g: 0.90588236, b: 0.3137255, a: 1}
   FallbackToDefaultDisplayTexts: 1
   m_SupportsUINavigationSelection: 1
+  FormatBindingTexts: 
+  FormatBindingSprites: 
   MatchingControlScheme: Gamepad
   MatchingDeviceLayouts:
   - XInputControllerWindows
@@ -37,6 +39,10 @@ MonoBehaviour:
   - BindingPath: <Gamepad>/buttonNorth
     UseDefaultTexts: 0
     DisplayText: <sprite="GFrame_Xbox_Series_SpriteAsset" name="GFrame_XboxSeriesX_Y">
+    DisplayShortText: 
+  - BindingPath: <Gamepad>/dpad
+    UseDefaultTexts: 0
+    DisplayText: <sprite="GFrame_Xbox_Series_SpriteAsset" name="GFrame_XboxSeriesX_Dpad">
     DisplayShortText: 
   - BindingPath: <Gamepad>/dpad/up
     UseDefaultTexts: 0

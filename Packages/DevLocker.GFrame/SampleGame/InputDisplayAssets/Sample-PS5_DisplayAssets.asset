@@ -18,6 +18,8 @@ MonoBehaviour:
   DeviceColor: {r: 0, g: 0.44705883, b: 1, a: 1}
   FallbackToDefaultDisplayTexts: 1
   m_SupportsUINavigationSelection: 1
+  FormatBindingTexts: 
+  FormatBindingSprites: 
   MatchingControlScheme: Gamepad
   MatchingDeviceLayouts:
   - DualSenseGamepadHID
@@ -38,6 +40,10 @@ MonoBehaviour:
   - BindingPath: <Gamepad>/buttonNorth
     UseDefaultTexts: 0
     DisplayText: <sprite="GFrame_PS5_SpriteAsset" name="GFrame_PS5_Triangle">
+    DisplayShortText: 
+  - BindingPath: <Gamepad>/dpad
+    UseDefaultTexts: 0
+    DisplayText: <sprite="GFrame_PS5_SpriteAsset" name="GFrame_PS5_Dpad">
     DisplayShortText: 
   - BindingPath: <Gamepad>/dpad/up
     UseDefaultTexts: 0
