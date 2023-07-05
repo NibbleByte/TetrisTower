@@ -534,6 +534,27 @@ namespace DevLocker.GFrame.Input
 		}
 
 		/// <summary>
+		/// Get the display text for provided <see cref="InputAction"/> (the first binding) for the current <see cref="IInputBindingDisplayDataProvider"/>.
+		/// </summary>
+		public static string GetDisplayTextFor(this IInputContext context, InputAction action, bool useShortText = false)
+		{
+			IInputBindingDisplayDataProvider currentDisplayDataProvider = context.GetCurrentDisplayDataProvider();
+			if (currentDisplayDataProvider == null)
+				return null;
+
+			InputBindingDisplayData displayData = currentDisplayDataProvider.GetBindingDisplaysFor(action).FirstOrDefault();
+			if (!displayData.IsValid)
+				return null;
+
+			string usedText = useShortText && !string.IsNullOrWhiteSpace(displayData.ShortText)
+					? displayData.ShortText
+					: displayData.Text
+					;
+
+			return currentDisplayDataProvider.FormatBindingDisplayText(usedText);
+		}
+
+		/// <summary>
 		/// Enable <see cref="inputAction"/> using the <see cref="inputEnabler"/>
 		/// </summary>
 		public static void Enable(this InputAction inputAction, InputEnabler inputEnabler)
