@@ -373,7 +373,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 						int enabledElementsCount = !scopeInactiveOrDisabled ? scopeElements.Count(e => {
 							var behaviour = e as MonoBehaviour;
-							return e.enabled && (behaviour == null || behaviour.isActiveAndEnabled);
+							return behaviour == null || (e.enabled && behaviour.isActiveAndEnabled);
 						}) : 0;
 
 						string elementsStatus = (enabledElementsCount == scopeElements.Count || scopeInactiveOrDisabled || !Application.isPlaying)
@@ -384,11 +384,11 @@ namespace DevLocker.GFrame.Input.UIScope
 						scopeLabel = $"\"{scope.name}\" {elementsStatus}";
 
 
-						if (scope.m_PlayerContext?.InputContext != null) {
+						if (scope.PlayerContext?.InputContext != null) {
 							List<InputAction> hotkeys = new List<InputAction>();
 
 							foreach (var hotkeyElement in scopeElements.OfType<IHotkeysWithInputActions>()) {
-								foreach(InputAction inputAction in hotkeyElement.GetUsedActions(scope.m_PlayerContext.InputContext)) {
+								foreach(InputAction inputAction in hotkeyElement.GetUsedActions(scope.PlayerContext.InputContext)) {
 									if (!hotkeys.Contains(inputAction)) {
 										hotkeys.Add(inputAction);
 									}

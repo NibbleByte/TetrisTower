@@ -413,6 +413,7 @@ namespace DevLocker.GFrame.Input
 					m_Actions.Remove(action);
 				} else {
 					Debug.LogError($"[Input] Trying to disable InputAction \"{action.name}\" that is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
+					m_Actions.Remove(action);
 				}
 			}
 		}

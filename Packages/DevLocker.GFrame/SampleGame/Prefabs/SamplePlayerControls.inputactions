@@ -1278,6 +1278,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "TestTriggerLeft",
+                    "type": "Button",
+                    "id": "fa250fbb-3630-467a-997c-145fb090bfd4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1478,6 +1487,28 @@
                     "action": "TestHotkeyControllersOnly",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "d52e0d19-1025-46ea-b473-abacad9924c2",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "TestTriggerLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "04556920-8c23-4ac5-87b1-40e879e50bf8",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "TestTriggerLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

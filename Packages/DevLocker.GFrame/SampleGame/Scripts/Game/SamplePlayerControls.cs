@@ -1302,6 +1302,15 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TestTriggerLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""fa250fbb-3630-467a-997c-145fb090bfd4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1502,6 +1511,28 @@ namespace DevLocker.GFrame.SampleGame.Game
                     ""action"": ""TestHotkeyControllersOnly"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d52e0d19-1025-46ea-b473-abacad9924c2"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""TestTriggerLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""04556920-8c23-4ac5-87b1-40e879e50bf8"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""TestTriggerLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1591,6 +1622,7 @@ namespace DevLocker.GFrame.SampleGame.Game
             m_Sample_UITester_TestHotkeyY = m_Sample_UITester.FindAction("TestHotkeyY", throwIfNotFound: true);
             m_Sample_UITester_TestHotkeyKeyboardOnly = m_Sample_UITester.FindAction("TestHotkeyKeyboardOnly", throwIfNotFound: true);
             m_Sample_UITester_TestHotkeyControllersOnly = m_Sample_UITester.FindAction("TestHotkeyControllersOnly", throwIfNotFound: true);
+            m_Sample_UITester_TestTriggerLeft = m_Sample_UITester.FindAction("TestTriggerLeft", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -1975,6 +2007,7 @@ namespace DevLocker.GFrame.SampleGame.Game
         private readonly InputAction m_Sample_UITester_TestHotkeyY;
         private readonly InputAction m_Sample_UITester_TestHotkeyKeyboardOnly;
         private readonly InputAction m_Sample_UITester_TestHotkeyControllersOnly;
+        private readonly InputAction m_Sample_UITester_TestTriggerLeft;
         public struct Sample_UITesterActions
         {
             private @SamplePlayerControls m_Wrapper;
@@ -1987,6 +2020,7 @@ namespace DevLocker.GFrame.SampleGame.Game
             public InputAction @TestHotkeyY => m_Wrapper.m_Sample_UITester_TestHotkeyY;
             public InputAction @TestHotkeyKeyboardOnly => m_Wrapper.m_Sample_UITester_TestHotkeyKeyboardOnly;
             public InputAction @TestHotkeyControllersOnly => m_Wrapper.m_Sample_UITester_TestHotkeyControllersOnly;
+            public InputAction @TestTriggerLeft => m_Wrapper.m_Sample_UITester_TestTriggerLeft;
             public InputActionMap Get() { return m_Wrapper.m_Sample_UITester; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -2020,6 +2054,9 @@ namespace DevLocker.GFrame.SampleGame.Game
                     @TestHotkeyControllersOnly.started -= m_Wrapper.m_Sample_UITesterActionsCallbackInterface.OnTestHotkeyControllersOnly;
                     @TestHotkeyControllersOnly.performed -= m_Wrapper.m_Sample_UITesterActionsCallbackInterface.OnTestHotkeyControllersOnly;
                     @TestHotkeyControllersOnly.canceled -= m_Wrapper.m_Sample_UITesterActionsCallbackInterface.OnTestHotkeyControllersOnly;
+                    @TestTriggerLeft.started -= m_Wrapper.m_Sample_UITesterActionsCallbackInterface.OnTestTriggerLeft;
+                    @TestTriggerLeft.performed -= m_Wrapper.m_Sample_UITesterActionsCallbackInterface.OnTestTriggerLeft;
+                    @TestTriggerLeft.canceled -= m_Wrapper.m_Sample_UITesterActionsCallbackInterface.OnTestTriggerLeft;
                 }
                 m_Wrapper.m_Sample_UITesterActionsCallbackInterface = instance;
                 if (instance != null)
@@ -2048,6 +2085,9 @@ namespace DevLocker.GFrame.SampleGame.Game
                     @TestHotkeyControllersOnly.started += instance.OnTestHotkeyControllersOnly;
                     @TestHotkeyControllersOnly.performed += instance.OnTestHotkeyControllersOnly;
                     @TestHotkeyControllersOnly.canceled += instance.OnTestHotkeyControllersOnly;
+                    @TestTriggerLeft.started += instance.OnTestTriggerLeft;
+                    @TestTriggerLeft.performed += instance.OnTestTriggerLeft;
+                    @TestTriggerLeft.canceled += instance.OnTestTriggerLeft;
                 }
             }
         }
@@ -2128,6 +2168,7 @@ namespace DevLocker.GFrame.SampleGame.Game
             void OnTestHotkeyY(InputAction.CallbackContext context);
             void OnTestHotkeyKeyboardOnly(InputAction.CallbackContext context);
             void OnTestHotkeyControllersOnly(InputAction.CallbackContext context);
+            void OnTestTriggerLeft(InputAction.CallbackContext context);
         }
     }
 }

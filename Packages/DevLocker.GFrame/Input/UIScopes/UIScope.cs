@@ -160,11 +160,21 @@ namespace DevLocker.GFrame.Input.UIScope
 			return playerSet?.RegisteredScopes;
 		}
 
+		/// <summary>
+		/// Is currently changing of active and focused scopes happening right now.
+		/// </summary>
+		public static bool IsCurrentlySwitchingActiveScopes(PlayerContextUIRootObject playerRoot)
+		{
+			s_PlayerSets.TryGetValue(playerRoot, out PlayerScopeSet playerSet);
+
+			return playerSet?.ChangingActiveScopes ?? false;
+		}
+
 		private static Dictionary<PlayerContextUIRootObject, PlayerScopeSet> s_PlayerSets = new Dictionary<PlayerContextUIRootObject, PlayerScopeSet>();
 
 		// Player set used by this UIScope.
 		private PlayerScopeSet m_PlayerSet;
-		internal PlayerContextUIRootObject m_PlayerContext;
+		public PlayerContextUIRootObject PlayerContext { get; private set; }
 
 		public IReadOnlyList<IScopeElement> OwnedElements
 		{
@@ -253,7 +263,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return false;
 			}
 
-			m_PlayerContext = playerContext;
+			PlayerContext = playerContext;
 
 			if (!s_PlayerSets.TryGetValue(playerContext, out m_PlayerSet)) {
 				m_PlayerSet = new PlayerScopeSet();
@@ -878,7 +888,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected void PreProcessInput(bool active)
 		{
 #if USE_INPUT_SYSTEM
-			var context = m_PlayerContext.InputContext;
+			var context = PlayerContext.InputContext;
 
 			if (context == null) {
 				Debug.LogWarning($"[Input] {nameof(UIScope)} {name} can't be used if Unity Input System is not provided.", this);
@@ -916,7 +926,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected void PostProcessInput(bool active)
 		{
 #if USE_INPUT_SYSTEM
-			var context = m_PlayerContext.InputContext;
+			var context = PlayerContext.InputContext;
 
 			if (context == null)
 				return;
@@ -1022,8 +1032,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 						bool actionsActive = uiScope.enabled
 												&& uiScope.gameObject.activeInHierarchy
-												&& uiScope.m_PlayerContext?.InputContext != null
-												&& hotkeyElement.GetUsedActions(uiScope.m_PlayerContext.InputContext).Any(a => a.enabled);
+												&& uiScope.PlayerContext?.InputContext != null
+												&& hotkeyElement.GetUsedActions(uiScope.PlayerContext.InputContext).Any(a => a.enabled);
 
 						string activeStr = actionsActive ? "Active" : "Inactive";
 						GUI.color = actionsActive ? Color.green : Color.red;
