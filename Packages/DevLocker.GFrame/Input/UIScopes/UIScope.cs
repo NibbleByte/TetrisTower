@@ -183,6 +183,9 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 				}
+				
+				// Got destroyed
+				m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
 				return m_ScopeElements;
 			}
@@ -194,6 +197,9 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 				}
+				
+				// Got destroyed
+				m_DirectChildScopes.RemoveAll((scope) => scope == null);
 
 				return m_DirectChildScopes;
 			}
@@ -687,6 +693,9 @@ namespace DevLocker.GFrame.Input.UIScope
 				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
+			
+			// Got destroyed
+			m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
 			bool changed = false;
 			foreach(IScopeElement scopeElement in scopeElements) {
@@ -711,6 +720,9 @@ namespace DevLocker.GFrame.Input.UIScope
 				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
+			
+			// Got destroyed
+			m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
 			bool changed = false;
 			if (!m_ScopeElements.Contains(scopeElement)) {
@@ -736,6 +748,9 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 				ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 			}
+			
+			// Got destroyed
+			m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
 			return m_ScopeElements.Contains(scopeElement);
 		}
@@ -759,6 +774,11 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				if (AutomaticFocus) {
 					foreach (IScopeElement scopeElement in m_ScopeElements) {
+						
+						// Got destroyed
+						if (scopeElement is MonoBehaviour monoBehaviour && monoBehaviour == null)
+							continue;
+
 						scopeElement.enabled = false;
 					}
 				} else {
@@ -872,6 +892,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			PreProcessInput(active);
 
 			foreach(IScopeElement scopeElement in m_ScopeElements) {
+				
+				// Got destroyed
+				if (scopeElement is MonoBehaviour monoBehaviour && monoBehaviour == null)
+					continue;
 
 				// If scope is already in this state, it is probably the initial run.
 				// Make sure it toggles so it initializes correctly (e.g. hide objects on disable, instead of leaving them out there).
