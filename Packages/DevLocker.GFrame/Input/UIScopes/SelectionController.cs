@@ -1,6 +1,8 @@
+using System;
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -62,15 +64,21 @@ namespace DevLocker.GFrame.Input.UIScope
 			: m_PersistedSelection != null && m_PersistedSelection.activeInHierarchy
 		;
 
-		private bool m_SelectRequested = false;
+		/// <summary>
+		/// Is controller about to do selection on the next update.
+		/// </summary>
+		public bool IsSelectRequested { get; private set; }
 		private bool m_ControlSchemeMatched = true;
 
-		private static Dictionary<PlayerContextUIRootObject, SelectionController> s_ActiveInstances = new Dictionary<PlayerContextUIRootObject, SelectionController>();
+		// Only one should be active per context. It's a list to avoid issues while changing active scopes.
+		private static Dictionary<PlayerContextUIRootObject, List<SelectionController>> s_ActiveInstances = new Dictionary<PlayerContextUIRootObject, List<SelectionController>>();
 
 		private List<CanvasGroup> m_CanvasGroups = new List<CanvasGroup>();
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
+		
+		protected bool m_HasInitialized = false;
 
 		/// <summary>
 		/// Find the first active and interactable selectable from <see cref="StartNavigationGroups"/> or <see cref="StartSelections"/>.
@@ -136,9 +144,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public static SelectionController GetActiveInstanceFor(PlayerContextUIRootObject playerContext)
 		{
-			s_ActiveInstances.TryGetValue(playerContext, out SelectionController instance);
+			s_ActiveInstances.TryGetValue(playerContext, out List<SelectionController> instance);
 
-			return instance;
+			return instance?.FirstOrDefault();
 		}
 
 		protected virtual void Reset()
@@ -154,19 +162,44 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+			
+			m_PlayerContext.AddSetupCallback((delayedSetup) => {
+				m_HasInitialized = true;
+
+				if (delayedSetup && isActiveAndEnabled) {
+					OnEnable();
+				}
+			});
 		}
 
 		protected virtual void OnEnable()
 		{
-			m_SelectRequested = true;
+			if (!m_HasInitialized)
+				return;
+			
+			IsSelectRequested = true;
+			
+			s_ActiveInstances.TryGetValue(m_PlayerContext.GetRootObject(), out List<SelectionController> activeInstances);
+			if (activeInstances == null) {
+				activeInstances = new List<SelectionController>(2);
+				s_ActiveInstances.Add(m_PlayerContext.GetRootObject(), activeInstances);
+			}
+			activeInstances.Add(this);
 
 			CollectParentCanvasGroups();
 		}
 
 		protected virtual void OnDisable()
 		{
-			if (GetActiveInstanceForThisPlayer() == this) {
-				s_ActiveInstances.Remove(m_PlayerContext.GetRootObject());
+			if (!m_HasInitialized)
+				return;
+			
+			s_ActiveInstances.TryGetValue(m_PlayerContext.GetRootObject(), out List<SelectionController> activeInstances);
+			if (activeInstances != null && activeInstances.Contains(this)) {
+				activeInstances.Remove(this);
+				if (activeInstances.Count == 0) {
+					s_ActiveInstances.Remove(m_PlayerContext.GetRootObject());
+				}
 			}
 
 			if (ClearSelectionOnDisable && m_PlayerContext.IsActive) {
@@ -181,7 +214,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		void Update()
 		{
-			if (!m_PlayerContext.IsActive)
+			if (!m_PlayerContext.IsActive || !m_HasInitialized)
 				return;
 
 			if (m_PlayerContext.InputContext != null) {
@@ -201,18 +234,15 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 			}
 
-			if (m_SelectRequested) {
+			if (IsSelectRequested) {
 
 				if (UIUtils.IsLayoutRebuildPending())
 					return;
 
-				SelectionController activeInstance = GetActiveInstanceForThisPlayer();
-
-				// Call this on update, to avoid errors while switching active object (turn on one, turn off another).
-				if (activeInstance == null) {
-					s_ActiveInstances.Add(m_PlayerContext.GetRootObject(), this);
-				} else {
-					Debug.LogError($"[Input] There are two or more {nameof(SelectionController)} instances active at the same time - this is not allowed. Currently active: \"{activeInstance.name}\". Additional instance: \"{name}\"", this);
+				// Call this on update, to avoid errors while switching active object (turn on one, turn off another). In the end, only one should be active.
+				s_ActiveInstances.TryGetValue(m_PlayerContext.GetRootObject(), out List<SelectionController> activeInstances);
+				if (activeInstances == null || activeInstances.Count != 1 || !activeInstances.Contains(this)) {
+					Debug.LogError($"[Input] There are two or more {nameof(SelectionController)} instances active at the same time - this is not allowed. Currently active: {string.Join(", ", activeInstances?.Select(s => s.name) ?? Array.Empty<string>())}. Selection requested for: \"{name}\"", this);
 				}
 
 #if USE_INPUT_SYSTEM
@@ -226,7 +256,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					return;
 #endif
 
-				m_SelectRequested = false;
+				IsSelectRequested = false;
 
 				GameObject targetSelection = (PersistentSelection > 0 && m_PersistedIsAvailable)
 					? m_PersistedSelection
@@ -308,18 +338,6 @@ namespace DevLocker.GFrame.Input.UIScope
 		}
 
 		protected virtual void OnSelected() { }
-
-		protected SelectionController GetActiveInstanceForThisPlayer()
-		{
-			PlayerContextUIRootObject rootObject = m_PlayerContext?.GetRootObject();
-			if (rootObject == null)
-				return null;
-
-			SelectionController result;
-			s_ActiveInstances.TryGetValue(rootObject, out result);
-
-			return result;
-		}
 
 		private void CollectParentCanvasGroups()
 		{

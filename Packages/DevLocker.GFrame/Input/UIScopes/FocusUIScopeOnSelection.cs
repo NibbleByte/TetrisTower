@@ -38,10 +38,15 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_PlayerContext.IsActive)
 				return;
 
+			// Don't steal selection controller selection opportunity.
+			SelectionController activeSelectionController = SelectionController.GetActiveInstanceFor(m_PlayerContext.GetRootObject());
+			if (activeSelectionController && activeSelectionController.IsSelectRequested)
+				return;
+
 			if (m_LastSelectedObject != m_PlayerContext.SelectedGameObject) {
 				m_LastSelectedObject = m_PlayerContext.SelectedGameObject;
 
-				if (!Scope.IsActive && m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(transform)) {
+				if (!Scope.IsActive && m_LastSelectedObject && m_LastSelectedObject.transform.IsChildOf(transform) && m_LastSelectedObject.GetComponentInParent<UIScope>() == Scope) {
 					Scope.Focus();
 				}
 			}
