@@ -1,4 +1,8 @@
 #if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEditor;
 #endif
 using UnityEngine;
@@ -10,8 +14,9 @@ namespace DevLocker.GFrame.Utils
 	/// <summary>
 	/// Use this class with [SerializeReference] attribute to have a "Create" button next to such fields.
 	/// By default [SerializeReference] fields display empty data in the inspector - there is no UI to create data instance.
+	/// Pressing the "Create" button will ask you to select the type to be instantiated - any class that inherits or implements the target field type.
 	///
-	/// Inherit your custom drawer for your class by specifying the class type itself as <typeparamref name="T"/>.
+	/// Create custom drawer of your class that inherits from this one by specifying the target class type itself as <typeparamref name="T"/>.
 	/// It works properly if [SerializeReference] is not present.
 	///
 	/// If you want to have custom drawing of the data, override the <see cref="GetPropertyHeight_Custom(SerializedProperty, GUIContent)"/> and
@@ -61,12 +66,36 @@ namespace DevLocker.GFrame.Utils
 				EditorGUI.EndProperty();
 
 				if (QuickButton(buttonRect, Color.green, "Create")) {
-					property.managedReferenceValue = new T();
+
+					List<Type> availableTypes = AppDomain.CurrentDomain.GetAssemblies()
+						.SelectMany(assembly => assembly.GetTypes())
+						.Where(type => type.IsClass && !type.IsAbstract)
+						.Where(type => typeof(T).IsAssignableFrom(type))
+						.Where(type => type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null) != null)
+						.ToList()
+						;
+
+					availableTypes.Sort((a, b) => a.Name.CompareTo(b.Name));
+
+					var menu = new GenericMenu();
+					foreach(Type type in availableTypes) {
+						menu.AddItem(new GUIContent(type.Name), false, OnTypeSelected, new KeyValuePair<SerializedProperty, Type>(property, type));
+					}
+
+					menu.ShowAsContext();
 				}
 
 			} else {
 				OnGUI_Custom(position, property, label, true);
 			}
+		}
+
+		private void OnTypeSelected(object obj)
+		{
+			var pair = (KeyValuePair<SerializedProperty, Type>)obj;
+
+			pair.Key.managedReferenceValue = Activator.CreateInstance(pair.Value);
+			pair.Key.serializedObject.ApplyModifiedProperties();
 		}
 
 		/// <summary>
