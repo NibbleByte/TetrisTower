@@ -69,7 +69,8 @@ namespace DevLocker.GFrame.Utils
 
 					List<Type> availableTypes = AppDomain.CurrentDomain.GetAssemblies()
 						.SelectMany(assembly => assembly.GetTypes())
-						.Where(type => type.IsClass && !type.IsAbstract)
+						.Where(type => type.IsClass && !type.IsAbstract && !type.IsValueType)
+						//.Where(type => type.GetCustomAttribute<SerializableAttribute>(true) != null)	// TODO: Doesn't find parent attributes.
 						.Where(type => typeof(T).IsAssignableFrom(type))
 						.Where(type => type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null) != null)
 						.ToList()
