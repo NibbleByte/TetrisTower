@@ -62,7 +62,7 @@ namespace TetrisTower.Logic
 				if (isManagedReference) {
 					sizePos.x += 48;
 					sizePos.width = ReferenceButtonWidth;
-					DrawClearButton(property, sizePos, Color.red, "Clear");
+					DrawClearButton(sizePos, property, Color.red, "Clear");
 				}
 
 				position.y += EditorGUIUtility.singleLineHeight;

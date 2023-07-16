@@ -27,7 +27,7 @@ namespace TetrisTower.Logic
 	}
 
 #if UNITY_EDITOR
-	[UnityEditor.CustomPropertyDrawer(typeof(Objective))]
+	[UnityEditor.CustomPropertyDrawer(typeof(Objective), true)]
 	public class ObjectiveDrawer : SerializeReferenceCreatorDrawer<Objective>
 	{
 	}

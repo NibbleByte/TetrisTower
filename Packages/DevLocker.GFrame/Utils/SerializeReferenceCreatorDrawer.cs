@@ -34,6 +34,8 @@ namespace DevLocker.GFrame.Utils
 	{
 		protected const float ReferenceButtonWidth = 60f;
 
+		protected GUIStyle m_TypeLabelStyle;
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			if (property.propertyType == SerializedPropertyType.ManagedReference && string.IsNullOrEmpty(property.managedReferenceFullTypename)) {
@@ -45,6 +47,12 @@ namespace DevLocker.GFrame.Utils
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			if (m_TypeLabelStyle == null) {
+				m_TypeLabelStyle = new GUIStyle(EditorStyles.miniBoldLabel);
+				m_TypeLabelStyle.wordWrap = false;
+				m_TypeLabelStyle.alignment = TextAnchor.MiddleRight;
+			}
+
 			// This property doesn't have the [SerializeReference] attribute.
 			if (property.propertyType != SerializedPropertyType.ManagedReference) {
 				OnGUI_Custom(position, property, label, false);
@@ -114,12 +122,19 @@ namespace DevLocker.GFrame.Utils
 		protected virtual void OnGUI_Custom(Rect position, SerializedProperty property, GUIContent label, bool isManagedReference)
 		{
 			if (isManagedReference) {
+
 				var buttonRect = position;
 				buttonRect.x += buttonRect.width - ReferenceButtonWidth;
 				buttonRect.width = ReferenceButtonWidth;
 				buttonRect.height = EditorGUIUtility.singleLineHeight;
 
-				DrawClearButton(property, buttonRect, Color.red, "Clear");
+				var typeLabelRect = position;
+				typeLabelRect.width -= ReferenceButtonWidth;
+				typeLabelRect.height = EditorGUIUtility.singleLineHeight;
+
+				DrawManagedTypeLabel(typeLabelRect, property, Color.white * 0.8f);
+
+				DrawClearButton(buttonRect, property, Color.red, "Clear");
 			}
 
 			label = EditorGUI.BeginProperty(position, label, property);
@@ -131,10 +146,41 @@ namespace DevLocker.GFrame.Utils
 		}
 
 		/// <summary>
+		/// Draw label with the name of the managed type.
+		/// If type name contains underscores "_", it will be truncated to the first underscore.
+		/// </summary>
+		protected void DrawManagedTypeLabel(Rect typeLabelRect, SerializedProperty property, Color color, GUIStyle style = null)
+		{
+			if (style == null) {
+				style = m_TypeLabelStyle;
+			}
+
+			// If missing, start index is 0, so it's ok.
+			int typeIndex = property.managedReferenceFullTypename.LastIndexOf(".") + 1;
+
+			// End should be the first underscore or string length.
+			int typeEndIndex = property.managedReferenceFullTypename.IndexOf("_", typeIndex + 1) - 1;
+			if (typeEndIndex < 0) {
+				typeEndIndex = property.managedReferenceFullTypename.Length - 1;
+			}
+
+			int assemblyIndex = property.managedReferenceFullTypename.IndexOf(" ") + 1;	// Again, missing will produce 0.
+
+			string typeName = property.managedReferenceFullTypename.Substring(typeIndex, typeEndIndex - typeIndex + 1);
+
+			var prevColor = GUI.color;
+			GUI.color = color;
+
+			GUI.Label(typeLabelRect, new GUIContent(typeName, $"Full managed type name:\n{property.managedReferenceFullTypename.Substring(assemblyIndex)}"), style);
+
+			GUI.color = prevColor;
+		}
+
+		/// <summary>
 		/// Draw the "Clear" button the way you want.
 		/// NOTE: if button is pressed, <see cref="GUIUtility.ExitGUI"/> is called, preventing the code from resuming with empty reference.
 		/// </summary>
-		protected void DrawClearButton(SerializedProperty property, Rect buttonRect, Color color, string text)
+		protected void DrawClearButton(Rect buttonRect, SerializedProperty property, Color color, string text)
 		{
 			if (QuickButton(buttonRect, color, text)) {
 				property.managedReferenceValue = null;
