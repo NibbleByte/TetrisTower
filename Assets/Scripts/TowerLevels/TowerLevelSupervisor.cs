@@ -72,10 +72,6 @@ namespace TetrisTower.TowerLevels
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
-			if (m_PlaythroughData.TowerLevel.RunningState == TowerLevelRunningState.Preparing) {
-				TryShowRulesGreetMessage(m_PlaythroughData.TowerLevel);
-			}
-
 			var levelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (levelController == null) {
 				var placeholder = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
@@ -233,6 +229,7 @@ namespace TetrisTower.TowerLevels
 			}
 
 			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
+			behaviours.OfType<GridLevelController>().FirstOrDefault()?.Deinit();
 
 			return Task.CompletedTask;
 		}
@@ -253,35 +250,6 @@ namespace TetrisTower.TowerLevels
 							;
 					}
 				}
-			}
-		}
-
-		private static void TryShowRulesGreetMessage(GridLevelData levelData)
-		{
-			if (!string.IsNullOrWhiteSpace(levelData.GreetMessage))
-				return;
-
-			if (levelData.ObjectiveEndCount <= 0) {
-				levelData.GreetMessage = "Endless!";
-				return;
-			}
-
-			if (!levelData.Rules.IsObjectiveAllMatchTypes) {
-				string message = "";
-				if (levelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Horizontal)) {
-					message += "Horizontal ";
-				}
-				if (levelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Vertical)) {
-					message += "Vertical ";
-				}
-				if (levelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Diagonals)) {
-					message += "Diagonals ";
-				}
-
-				message += "Only!";
-
-				levelData.GreetMessage = message;
-				return;
 			}
 		}
 

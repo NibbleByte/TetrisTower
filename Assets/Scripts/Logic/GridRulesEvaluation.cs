@@ -21,13 +21,13 @@ namespace TetrisTower.Logic
 		public int MatchVerticalLines = 3;
 		public int MatchDiagonalsLines = 3;
 
-		[Header("Scoring")]
-		[EnumMask]
-		public MatchScoringType ObjectiveType = MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals;
-		public bool IsObjectiveAllMatchTypes =>
-			ObjectiveType == (MatchScoringType)~0 ||
-			ObjectiveType == (MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals)
-			;
+		public int GetMatchLength(MatchScoringType matchType) =>
+			matchType switch {
+				MatchScoringType.Horizontal => MatchHorizontalLines,
+				MatchScoringType.Vertical => MatchVerticalLines,
+				MatchScoringType.Diagonals => MatchDiagonalsLines,
+				_ => throw new ArgumentException(matchType.ToString()),
+			};
 
 		[Header("Special Blocks")]
 		[Tooltip("Chance WildBlocks to spawn. They match with any other type of block.")]

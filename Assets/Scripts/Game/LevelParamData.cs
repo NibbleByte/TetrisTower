@@ -1,6 +1,7 @@
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Logic;
 using UnityEngine;
@@ -21,8 +22,8 @@ namespace TetrisTower.Game
 		// Spawn blocks from the array in range [0, TypesCount).
 		public int InitialSpawnBlockTypesCount = 3;
 
-		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
-		public int ObjectiveEndCount;
+		[SerializeReference]
+		public List<Objective> Objectives;
 
 		public GridRules Rules = new GridRules();
 
@@ -56,8 +57,14 @@ namespace TetrisTower.Game
 
 		public virtual void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
-			if (Rules.ObjectiveType == 0) {
-				Debug.LogError($"{context} has no ObjectiveType set.", context);
+			if (Objectives != null) {
+				if (Objectives.Count == 0) {
+					Debug.LogError($"{context} has no objectives set.", context);
+				} else {
+					foreach(Objective objective in Objectives.Where(obj => obj != null)) {
+						objective.Validate(context);
+					}
+				}
 			}
 
 #if UNITY_EDITOR

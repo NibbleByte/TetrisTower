@@ -3,6 +3,7 @@ using DevLocker.GFrame.Utils;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
 using UnityEngine;
@@ -80,12 +81,33 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				Debug.LogError($"{context} has both level and level assets.", context);
 			}
 
+			bool hasChanges = false;
+			HashSet<Logic.Objective> allObjectives = new HashSet<Logic.Objective>();
+
 			foreach (var level in Levels) {
 				if (level != null) {
 					level.Validate(repo, context);
+
+					for(int i = 0; i < level.Objectives.Count; ++i) {
+						var objective = level.Objectives[i];
+
+						// Levels sharing the same objective reference is not allowed. This is most likely bad setup in Unity.
+						if (objective != null && !allObjectives.Add(objective)) {
+							level.Objectives.RemoveAt(i);
+							i--;
+							hasChanges = true;
+						}
+					}
+
 				} else {
 					Debug.LogError($"{context} has missing levels.", context);
 				}
+
+#if UNITY_EDITOR
+				if (hasChanges) {
+					UnityEditor.EditorUtility.SetDirty(context);
+				}
+#endif
 			}
 		}
 	}

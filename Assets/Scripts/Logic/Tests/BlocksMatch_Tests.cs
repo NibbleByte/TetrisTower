@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using NUnit.Framework;
 using TetrisTower.Game;
+using TetrisTower.Logic.Objectives;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -38,14 +39,13 @@ namespace TetrisTower.Logic
 			MatchVerticalLines = 3,
 			MatchDiagonalsLines = 3,
 
-			ObjectiveType = (MatchScoringType)~0,
-
 			WrapSidesOnMatch = true,
 			WrapSidesOnMove = true,
 		};
 
 		private BlocksGrid m_Grid;
 		private ScoreGrid m_ScoreGrid;
+		private MatchBlocksCount_Objective m_MatchObjective;
 		private GameGrid[] m_Grids;
 
 		private bool m_SkipGridSetup = false;
@@ -87,13 +87,17 @@ namespace TetrisTower.Logic
 			};
 		}
 
-		private IEnumerator SetupGrid(BlockType[,] blocks, GridRules rules, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+		private IEnumerator SetupGrid(BlockType[,] blocks, GridRules rules, MatchScoringType objectiveMatchTypes, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
 			Assert.LessOrEqual(blocks.GetLength(0), MaxRows, $"Wrong rows count.\n{caller}:{lineNumber}");
 			Assert.LessOrEqual(blocks.GetLength(1), MaxColumns, $"Wrong columns count.\n{caller}:{lineNumber}");
 
 			m_Grid = new BlocksGrid(MaxRows, MaxColumns);
 			m_ScoreGrid = new ScoreGrid(MaxRows, MaxColumns, rules);
+			m_MatchObjective = new MatchBlocksCount_Objective();
+			m_MatchObjective.Init(rules, m_ScoreGrid);
+			m_MatchObjective.MatchesEndCount = int.MaxValue;
+			m_MatchObjective.MatchesType = objectiveMatchTypes;
 
 			m_Grids = new GameGrid[] { m_Grid, m_ScoreGrid };
 
@@ -105,6 +109,7 @@ namespace TetrisTower.Logic
 		{
 			m_Grid = null;
 			m_ScoreGrid = null;
+			m_MatchObjective = null;
 			m_Grids = null;
 			m_SkipGridSetup = false;
 		}
@@ -211,13 +216,13 @@ namespace TetrisTower.Logic
 
 		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, int applyActionsCount, int resultScore = -1, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
-			yield return EvaluateGrid(blocks, blocksDone, DefaultRules, applyActionsCount, resultScore, doMirror, lineNumber, caller);
+			yield return EvaluateGrid(blocks, blocksDone, DefaultRules, (MatchScoringType)~0, applyActionsCount, resultScore, doMirror, lineNumber, caller);
 		}
 
-		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, GridRules rules, int applyActionsCount, int resultScore = -1, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+		private IEnumerator EvaluateGrid(BlockType[,] blocks, BlockType[,] blocksDone, GridRules rules, MatchScoringType objectiveMatchTypes, int applyActionsCount, int resultScore = -1, bool doMirror = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
 		{
 			if (!m_SkipGridSetup) {
-				yield return SetupGrid(blocks, rules, lineNumber, caller);
+				yield return SetupGrid(blocks, rules, objectiveMatchTypes, lineNumber, caller);
 			} else {
 				Assert.IsFalse(doMirror, $"Can't do mirror if using custom grid setup.\n{caller}:{lineNumber}");
 			}
@@ -245,7 +250,7 @@ namespace TetrisTower.Logic
 			//
 			if (doMirror) {
 
-				yield return SetupGrid(Mirror(blocks), rules, lineNumber, caller);
+				yield return SetupGrid(Mirror(blocks), rules, objectiveMatchTypes, lineNumber, caller);
 
 				for (int i = 0; i < applyActionsCount; ++i) {
 					var actions = GameGridEvaluation.Evaluate(m_Grid, rules);
@@ -297,18 +302,18 @@ namespace TetrisTower.Logic
 				{ R, R, R, B, B, B, N, S, S, S, N, N, R },
 			};
 
-			yield return SetupGrid(blocks, DefaultRules);
+			yield return SetupGrid(blocks, DefaultRules, (MatchScoringType)~0);
 
 			Assert.AreEqual(MaxRows, m_Grid.Rows);
 			Assert.AreEqual(MaxColumns, m_Grid.Columns);
 
 			AssertGrid(blocks);
 
-			yield return SetupGrid(blocks2, DefaultRules);
+			yield return SetupGrid(blocks2, DefaultRules, (MatchScoringType)~0);
 
 			AssertGrid(blocks2);
 
-			yield return SetupGrid(blocks9, DefaultRules);
+			yield return SetupGrid(blocks9, DefaultRules, (MatchScoringType)~0);
 
 			AssertGrid(blocks9);
 		}
@@ -1110,11 +1115,8 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = (MatchScoringType)~0;
-
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
-				Assert.AreEqual(3 * 3, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, (MatchScoringType)~0, 1, 3*3);
+				Assert.AreEqual(3 * 3, m_MatchObjective.MatchesDone);
 			}
 
 			{
@@ -1129,11 +1131,10 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals;
+				var matchAllTypes = MatchScoringType.Horizontal | MatchScoringType.Vertical | MatchScoringType.Diagonals;
 
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
-				Assert.AreEqual(3 * 3, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, matchAllTypes, 1, 3*3);
+				Assert.AreEqual(3 * 3, m_MatchObjective.MatchesDone);
 			}
 
 			//
@@ -1151,11 +1152,8 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = MatchScoringType.Horizontal;
-
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
-				Assert.AreEqual(1, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, MatchScoringType.Horizontal, 1, 3*3);
+				Assert.AreEqual(1, m_MatchObjective.MatchesDone);
 			}
 
 			{
@@ -1170,11 +1168,8 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = MatchScoringType.Vertical;
-
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
-				Assert.AreEqual(1, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, MatchScoringType.Vertical, 1, 3*3);
+				Assert.AreEqual(1, m_MatchObjective.MatchesDone);
 			}
 
 			{
@@ -1189,11 +1184,8 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, S, S, S, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = MatchScoringType.Diagonals;
-
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*3);
-				Assert.AreEqual(1, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, MatchScoringType.Diagonals, 1, 3*3);
+				Assert.AreEqual(1, m_MatchObjective.MatchesDone);
 			}
 
 			//
@@ -1211,11 +1203,8 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = MatchScoringType.Horizontal;
-
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*2 + 3*3);
-				Assert.AreEqual(2 + 3, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, MatchScoringType.Horizontal, 1, 3*2 + 3*3);
+				Assert.AreEqual(2 + 3, m_MatchObjective.MatchesDone);
 			}
 
 			{
@@ -1231,11 +1220,8 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = MatchScoringType.Vertical;
-
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*2 + 3*3);
-				Assert.AreEqual(2 + 3, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, MatchScoringType.Vertical, 1, 3*2 + 3*3);
+				Assert.AreEqual(2 + 3, m_MatchObjective.MatchesDone);
 			}
 
 			{
@@ -1252,11 +1238,8 @@ namespace TetrisTower.Logic
 					{ N, N, N, N, N, N, N, N, N, N, N, N, N },
 				};
 
-				GridRules rules = DefaultRules;
-				rules.ObjectiveType = MatchScoringType.Diagonals;
-
-				yield return EvaluateGrid(blocks, blocksDone, rules, 1, 3*2 + 3*3);
-				Assert.AreEqual(2 + 3, m_ScoreGrid.ObjectiveProgress);
+				yield return EvaluateGrid(blocks, blocksDone, DefaultRules, MatchScoringType.Diagonals, 1, 3*2 + 3*3);
+				Assert.AreEqual(2 + 3, m_MatchObjective.MatchesDone);
 			}
 		}
 
@@ -1311,7 +1294,7 @@ namespace TetrisTower.Logic
 			m_Grids = new GameGrid[] { m_Grid, m_ScoreGrid };
 
 			m_SkipGridSetup = true;
-			yield return EvaluateGrid(blocks, blocksDone, DefaultRules, 2, 6, false);
+			yield return EvaluateGrid(blocks, blocksDone, 2, 6, false);
 		}
 
 		#endregion

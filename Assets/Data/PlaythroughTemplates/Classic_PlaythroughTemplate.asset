@@ -21,7 +21,7 @@ MonoBehaviour:
     ScoreOnLevelStart: 0
     PlayTimeOnLevelStart: 0
     CurrentLevelIndex: 0
-    Levels:
+    m_Levels:
     - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
@@ -32,12 +32,13 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
       GreetMessage: 
       InitialSpawnBlockTypesCount: 3
-      ObjectiveEndCount: 100
+      Objectives:
+      - rid: 5506456835523608918
+      - rid: 5506456835523608919
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: -1
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -64,12 +65,13 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
       GreetMessage: 
       InitialSpawnBlockTypesCount: 3
-      ObjectiveEndCount: 150
+      Objectives:
+      - rid: 5506456835523608920
+      - rid: 5506456835523608921
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: -1
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -96,76 +98,13 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
       GreetMessage: 
       InitialSpawnBlockTypesCount: 3
-      ObjectiveEndCount: 200
+      Objectives:
+      - rid: 5506456835523608922
+      - rid: 5506456835523608923
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: -1
-        WildBlockChance: 0.05
-        BlockSmiteChance: 0.005
-        RowSmiteChance: 0.005
-        FallSpeedNormalized: 2
-        FallSpeedupPerAction: 0.02
-        MatchesToModifySpawnedBlocksRange: 120
-        ModifyBlocksRangeType: 0
-        WrapSidesOnMatch: 1
-        WrapSidesOnMove: 1
-      GridRows: 9
-      GridColumns: 13
-      ShapeTemplates: []
-      StartGridWithPinnedBlocks: 0
-      StartGrid:
-        rid: -2
-      SkinOverrides: []
-    - BackgroundScene:
-        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
-        m_IsDirty: 0
-        m_ScenePath: Assets/Scenes/TowerScene-1.unity
-      BackgroundSceneMobile:
-        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
-        m_IsDirty: 0
-        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
-      GreetMessage: 
-      InitialSpawnBlockTypesCount: 3
-      ObjectiveEndCount: 30
-      Rules:
-        MatchHorizontalLines: 3
-        MatchVerticalLines: 3
-        MatchDiagonalsLines: 3
-        ObjectiveType: 1
-        WildBlockChance: 0.05
-        BlockSmiteChance: 0.005
-        RowSmiteChance: 0.005
-        FallSpeedNormalized: 2
-        FallSpeedupPerAction: 0.02
-        MatchesToModifySpawnedBlocksRange: 120
-        ModifyBlocksRangeType: 0
-        WrapSidesOnMatch: 1
-        WrapSidesOnMove: 1
-      GridRows: 9
-      GridColumns: 13
-      ShapeTemplates: []
-      StartGridWithPinnedBlocks: 0
-      StartGrid:
-        rid: -2
-      SkinOverrides: []
-    - BackgroundScene:
-        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
-        m_IsDirty: 0
-        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
-      BackgroundSceneMobile:
-        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
-        m_IsDirty: 0
-        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
-      GreetMessage: 
-      InitialSpawnBlockTypesCount: 3
-      ObjectiveEndCount: 300
-      Rules:
-        MatchHorizontalLines: 3
-        MatchVerticalLines: 3
-        MatchDiagonalsLines: 3
-        ObjectiveType: -1
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -191,13 +130,14 @@ MonoBehaviour:
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
       GreetMessage: 
-      InitialSpawnBlockTypesCount: 4
-      ObjectiveEndCount: 40
+      InitialSpawnBlockTypesCount: 3
+      Objectives:
+      - rid: 5506456835523608924
+      - rid: 5506456835523608925
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: 2
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -223,13 +163,14 @@ MonoBehaviour:
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
       GreetMessage: 
-      InitialSpawnBlockTypesCount: 4
-      ObjectiveEndCount: 400
+      InitialSpawnBlockTypesCount: 3
+      Objectives:
+      - rid: 5506456835523608926
+      - rid: 5506456835523608927
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: -1
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -256,12 +197,13 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
       GreetMessage: 
       InitialSpawnBlockTypesCount: 4
-      ObjectiveEndCount: 50
+      Objectives:
+      - rid: 5506456835523608928
+      - rid: 5506456835523608929
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: 4
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -288,12 +230,79 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/_DevTowerScene.unity
       GreetMessage: 
       InitialSpawnBlockTypesCount: 4
-      ObjectiveEndCount: 500
+      Objectives:
+      - rid: 5506456835523608930
+      - rid: 5506456835523608931
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: -1
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 5506456835523608932
+      - rid: 5506456835523608933
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 5506456835523608934
+      - rid: 5506456835523608935
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -320,12 +329,12 @@ MonoBehaviour:
         m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
       GreetMessage: 
       InitialSpawnBlockTypesCount: 5
-      ObjectiveEndCount: 0
+      Objectives:
+      - rid: 5506456835523608937
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
         MatchDiagonalsLines: 3
-        ObjectiveType: -1
         WildBlockChance: 0.05
         BlockSmiteChance: 0.005
         RowSmiteChance: 0.005
@@ -342,8 +351,94 @@ MonoBehaviour:
       StartGrid:
         rid: -2
       SkinOverrides: []
+    m_LevelAssets: []
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 5506456835523608918
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 100
+        MatchesType: 7
+    - rid: 5506456835523608919
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608920
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 150
+        MatchesType: 7
+    - rid: 5506456835523608921
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608922
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 200
+        MatchesType: 7
+    - rid: 5506456835523608923
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608924
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 30
+        MatchesType: 1
+    - rid: 5506456835523608925
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608926
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 5506456835523608927
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608928
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 40
+        MatchesType: 2
+    - rid: 5506456835523608929
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608930
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 400
+        MatchesType: 7
+    - rid: 5506456835523608931
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608932
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 50
+        MatchesType: 4
+    - rid: 5506456835523608933
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608934
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 500
+        MatchesType: 7
+    - rid: 5506456835523608935
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608937
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 1

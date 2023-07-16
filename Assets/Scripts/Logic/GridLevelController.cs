@@ -76,6 +76,19 @@ namespace TetrisTower.Logic
 			FallingColumnAnalogOffset = float.NaN;
 			FallingShapeAnalogRotateOffset = float.NaN;
 			FallingShapeAnalogRotateOffsetBeforeClear = float.NaN;
+
+			LevelData.Objectives.RemoveAll(obj => obj == null);
+
+			foreach (Objective objective in LevelData.Objectives) {
+				objective.Init(this);
+			}
+		}
+
+		public void Deinit()
+		{
+			foreach (Objective objective in LevelData.Objectives) {
+				objective.Deinit(this);
+			}
 		}
 
 		public IEnumerator RunActions(IList<GridAction> actions)
@@ -99,7 +112,6 @@ namespace TetrisTower.Logic
 					MatchHorizontalLines = 0,
 					MatchVerticalLines = 0,
 					MatchDiagonalsLines = 0,
-					ObjectiveType = 0,
 				};
 				actions = GameGridEvaluation.Evaluate(Grid, rules);
 			}
@@ -144,16 +156,57 @@ namespace TetrisTower.Logic
 					default: throw new NotSupportedException(LevelData.Rules.ModifyBlocksRangeType.ToString());
 				}
 
-				if (LevelData.ObjectiveRemainingCount == 0 && !LevelData.IsEndlessGame && !AreGridActionsRunning) {
-					Debug.Log($"Remaining blocks to clear are 0. Player won.");
-					FinishLevel(true);
 
-				} else if (LevelData.SpawnBlockTypesRange != blocksRange) {
+				ObjectiveStatus resolvedStatus = ObjectiveStatus.InProgress;
+				if (!AreGridActionsRunning) {
+					resolvedStatus = ResolveObjectivesTryFinishLevel();
+				}
+
+				// Level finished.
+				if (resolvedStatus != ObjectiveStatus.InProgress)
+					yield break;
+
+				if (LevelData.SpawnBlockTypesRange != blocksRange) {
 					Debug.Log($"Changing blocks range from {LevelData.SpawnBlockTypesRange} to {blocksRange}.", this);
 					LevelData.SpawnBlockTypesRange = blocksRange;
 					SpawnBlockTypesCountChanged?.Invoke();
 				}
 			}
+		}
+
+		public ObjectiveStatus ResolveObjectivesTryFinishLevel()
+		{
+			ObjectiveStatus status = ObjectiveStatus.InProgress;
+
+			if (!LevelData.IsPlaying)
+				throw new InvalidOperationException();
+
+			foreach (Objective objective in LevelData.Objectives) {
+
+				if (objective.Status == ObjectiveStatus.InProgress)
+					continue;
+
+				// Completed status is prioritized over failed.
+				if (objective.Status == ObjectiveStatus.Completed) {
+					status = ObjectiveStatus.Completed;
+					break;
+				}
+
+				status = ObjectiveStatus.Failed;
+			}
+
+			switch (status) {
+
+				case ObjectiveStatus.Completed:
+					FinishLevel(true);
+					break;
+
+				case ObjectiveStatus.Failed:
+					FinishLevel(false);
+					break;
+			}
+
+			return status;
 		}
 
 		private void SelectFallingShape()
@@ -393,7 +446,6 @@ namespace TetrisTower.Logic
 			bool placedInside = placeCoords.Row <= LevelData.PlayableSize.Row; // '<=' as placing on the edge is a warning, not direct fail.
 			placedInside &= placeCoords.Row + placedShape.Rows - 1 < Grid.Rows;
 
-			// Limit was reached, game over.
 			if (placedInside) {
 				yield return RunActions(actions);
 
@@ -402,9 +454,10 @@ namespace TetrisTower.Logic
 					LevelData.FallSpeedNormalized += LevelData.FallSpeedupPerAction;
 					SelectFallingShape();
 				}
+
 			} else {
 
-				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the play area {LevelData.PlayableSize}, grid ({Grid.Rows}, {Grid.Columns}).");
+				Debug.Log($"Placed shape with size ({placedShape.Rows}, {placedShape.Columns}) at {placeCoords}, but that goes outside the play area {LevelData.PlayableSize}, grid ({Grid.Rows}, {Grid.Columns}).", this);
 
 				while (AreGridActionsRunning)
 					yield return null;
@@ -419,7 +472,13 @@ namespace TetrisTower.Logic
 				m_FinishedRuns++;
 
 				PlacedOutsideGrid?.Invoke();
-				FinishLevel(LevelData.IsEndlessGame);
+
+				ObjectiveStatus resolvedStatus = ResolveObjectivesTryFinishLevel();
+
+				// Continue playing if objectives didn't finish the game?
+				if (resolvedStatus == ObjectiveStatus.InProgress && LevelData.IsPlaying) {
+					Debug.LogWarning("Placing blocks outside did not finish level.", this);
+				}
 			}
 		}
 

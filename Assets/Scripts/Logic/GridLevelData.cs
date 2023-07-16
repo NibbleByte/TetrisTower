@@ -2,6 +2,8 @@ using DevLocker.GFrame.Utils;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace TetrisTower.Logic
@@ -66,13 +68,8 @@ namespace TetrisTower.Logic
 		[SerializeReference]
 		public ScoreGrid Score;
 
-		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
-		public int ObjectiveEndCount;
-
-		// Endless games don't have end objective count. When player reaches the top, he wins, instead of loosing.
-		public bool IsEndlessGame => ObjectiveEndCount == 0;
-
-		public int ObjectiveRemainingCount => Mathf.Max(ObjectiveEndCount - Score.ObjectiveProgress, 0);
+		[SerializeReference]
+		public List<Objective> Objectives;
 
 		public TowerLevelRunningState RunningState = TowerLevelRunningState.Preparing;
 		public bool IsPlaying => RunningState <= TowerLevelRunningState.Running;
@@ -90,8 +87,14 @@ namespace TetrisTower.Logic
 
 		public void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
-			if (Rules.ObjectiveType == 0) {
-				Debug.LogError($"{nameof(GridLevelData)} has no ObjectiveType set.", context);
+			if (Objectives != null) {
+				if (Objectives.Count == 0) {
+					Debug.LogError($"{context} has no objectives set.", context);
+				} else {
+					foreach (Objective objective in Objectives.Where(obj => obj != null)) {
+						objective.Validate(context);
+					}
+				}
 			}
 
 			if (BlocksSkinStack != null) {

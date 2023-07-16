@@ -21,7 +21,8 @@ MonoBehaviour:
     ScoreOnLevelStart: 0
     PlayTimeOnLevelStart: 0
     CurrentLevelIndex: 0
-    Levels: []
+    m_Levels: []
+    m_LevelAssets: []
   references:
     version: 2
     RefIds:
@@ -55,7 +56,6 @@ MonoBehaviour:
           MatchHorizontalLines: 3
           MatchVerticalLines: 3
           MatchDiagonalsLines: 3
-          ObjectiveType: -1
           WildBlockChance: 0.05
           BlockSmiteChance: 0.005
           RowSmiteChance: 0.005
@@ -75,7 +75,9 @@ MonoBehaviour:
           Column: 13
         Score:
           rid: -2
-        ObjectiveEndCount: 100
+        Objectives:
+        - rid: 5506456835523608910
+        - rid: 5506456835523608911
         RunningState: 0
         HasWon: 0
         GreetMessage: 
@@ -95,3 +97,12 @@ MonoBehaviour:
             Row: 2
             Column: 0
           Value: 1
+    - rid: 5506456835523608910
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        MatchesEndCount: 100
+        MatchesType: 7
+    - rid: 5506456835523608911
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.Logic.Objectives, asm: TetrisTower.Logic}
+      data:
+        PlacingOutsideIsWin: 0

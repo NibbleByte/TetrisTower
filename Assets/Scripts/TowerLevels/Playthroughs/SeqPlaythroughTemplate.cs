@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +23,18 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_PlayerData.Validate(config.AssetsRepository, this);
 
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
-			var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(m_PlayerData, Saves.SaveManager.GetConverters(config));
+			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
+			var serialized = JsonConvert.SerializeObject(m_PlayerData, typeof(IPlaythroughData), new JsonSerializerSettings() {
+				Converters = Saves.SaveManager.GetConverters(config),
+				TypeNameHandling = TypeNameHandling.Auto,
+				//Formatting = Formatting.Indented,
+			});
 
 			// No need to have the json "TypeNameHandling = Auto" of the root object serialized, as we specify the type in the generics parameter.
-			return Newtonsoft.Json.JsonConvert.DeserializeObject<SeqPlaythroughData>(serialized, Saves.SaveManager.GetConverters(config));
+			return JsonConvert.DeserializeObject<SeqPlaythroughData>(serialized, new JsonSerializerSettings() {
+				Converters = Saves.SaveManager.GetConverters(config),
+				TypeNameHandling = TypeNameHandling.Auto,
+			});
 		}
 
 		public override IEnumerable<LevelParamData> GetAllLevels()

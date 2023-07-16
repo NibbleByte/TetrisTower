@@ -2,6 +2,7 @@ using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TMPro;
@@ -23,15 +24,13 @@ namespace TetrisTower.TowerLevels.UI
 		public string CurrentScorePrefix = "Current: ";
 		public string BlocksClearedCountPrefix = "Blocks: ";
 		public string BonusRatioPrefix = "Bonus Ratio: ";
-		public string RemainingPrefix = "Remaining: ";
 
 		[Header("UI Texts")]
 		public TextMeshProUGUI TotalScoreText;
 		public TextMeshProUGUI CurrentScoreText;
 		public TextMeshProUGUI BlocksClearedCountText;
 		public TextMeshProUGUI BonusRatioText;
-		public TextMeshProUGUI RemainingText;
-		public TextMeshProUGUI RulesText;
+		public TextMeshProUGUI ObjectivesText;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
@@ -74,26 +73,11 @@ namespace TetrisTower.TowerLevels.UI
 				BonusRatioText.text = BonusRatioPrefix + m_LevelData.Score.BonusRatio.ToString("0.000");
 			}
 
-			if (RemainingText) {
-				RemainingText.text = RemainingPrefix + (m_LevelData.IsEndlessGame ? "Endless" : m_LevelData.ObjectiveRemainingCount.ToString());
-			}
-
-			if (RulesText) {
-				RulesText.text = "";
-
-				if (!m_LevelData.Rules.IsObjectiveAllMatchTypes) {
-					if (m_LevelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Horizontal)) {
-						RulesText.text += "Horizontal ";
-					}
-					if (m_LevelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Vertical)) {
-						RulesText.text += "Vertical ";
-					}
-					if (m_LevelData.Rules.ObjectiveType.HasFlag(MatchScoringType.Diagonals)) {
-						RulesText.text += "Diagonals ";
-					}
-
-					RulesText.text += "Only!";
-				}
+			if (ObjectivesText) {
+				ObjectivesText.text = string.Join("\n", m_LevelData.Objectives
+						.Select(obj => obj.GetDisplayText())
+						.Where(t => !string.IsNullOrWhiteSpace(t))
+					);
 			}
 		}
 	}

@@ -29,12 +29,16 @@ namespace TetrisTower.TowerLevels.UI
 
 			context.SetByType(out m_TowerLevel);
 
-			if (m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing && !string.IsNullOrEmpty(m_TowerLevel.LevelData.GreetMessage)) {
-				m_Text.text = m_TowerLevel.LevelData.GreetMessage
-					.Replace(@"\n", "\n")
-					.Replace(@"{ObjectiveEndCount}", m_TowerLevel.LevelData.ObjectiveEndCount.ToString());
+			if (m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing) {
+				string message = m_TowerLevel.LevelData.GreetMessage.Replace(@"\n", "\n");
 
-				enabled = true;
+				foreach (Objective objective in m_TowerLevel.LevelData.Objectives) {
+					message = objective.ProcessGreetMessage(message);
+				}
+
+				m_Text.text = message;
+
+				enabled = !string.IsNullOrWhiteSpace(message);
 
 			} else {
 				m_Text.text = string.Empty;

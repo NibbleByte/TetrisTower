@@ -154,7 +154,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				Grid = lp.StartGrid != null ? new BlocksGrid(lp.StartGrid, totalRows, lp.GridColumns, pinnedBlocks) : new BlocksGrid(totalRows, lp.GridColumns),
 				PlayableSize = new GridCoords(lp.GridRows, lp.GridColumns),
 
-				ObjectiveEndCount = lp.ObjectiveEndCount,
+				Objectives = lp.Objectives.ToList(),
 			};
 
 			return levelData;

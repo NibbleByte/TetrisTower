@@ -30,7 +30,7 @@ namespace DevLocker.GFrame.Utils
 	///
 	/// </summary>
 	/// <typeparam name="T">Class type to be drawn.</typeparam>
-	public class SerializeReferenceCreatorDrawer<T> : PropertyDrawer where T: new()
+	public class SerializeReferenceCreatorDrawer<T> : PropertyDrawer
 	{
 		protected const float ReferenceButtonWidth = 60f;
 
