@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace TetrisTower.Logic.Objectives
 {
+	/// <summary>
+	/// Objective is completed when specified <see cref="MatchesEndCount"/> number of matches is made.
+	/// Can specify the type of matches <see cref="MatchesType"/> as well.
+	/// Cannot fail.
+	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
 	public class MatchBlocksCount_Objective : Objective

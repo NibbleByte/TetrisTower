@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace TetrisTower.Logic.Objectives
 {
+	/// <summary>
+	/// When blocks are placed outside the tower (at the top), this objective is triggered.
+	/// It is considered complete or failed based on the <see cref="PlacingOutsideIsWin"/> flag.
+	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
 	public class PlaceOutside_Objective : Objective

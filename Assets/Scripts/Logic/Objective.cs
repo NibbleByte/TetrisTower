@@ -12,6 +12,9 @@ namespace TetrisTower.Logic
 		Failed,
 	}
 
+	/// <summary>
+	/// Objectives base class. Based on the returned status player may win or lose the level.
+	/// </summary>
 	[JsonObject(MemberSerialization.Fields)]
 	public interface Objective
 	{
