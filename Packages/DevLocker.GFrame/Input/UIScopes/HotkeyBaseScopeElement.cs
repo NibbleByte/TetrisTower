@@ -21,7 +21,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		[Tooltip("Skip the hotkey based on the selected condition.")]
 		[Utils.EnumMask]
 		[HideInInspector]	// Draw manually in the editor.
-		public SkipHotkeyOption SkipHotkey;
+		public SkipHotkeyOption SkipHotkey = SkipHotkeyOption.InputFieldTextFocused;
 
 		[HideInInspector]	// Draw manually in the editor.
 		[SerializeField]

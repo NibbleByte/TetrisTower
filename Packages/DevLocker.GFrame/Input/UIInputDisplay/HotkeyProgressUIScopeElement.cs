@@ -19,7 +19,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 	{
 		[Tooltip("Skip the hotkey on the selected condition.")]
 		[Utils.EnumMask]
-		public SkipHotkeyOption SkipHotkey;
+		public SkipHotkeyOption SkipHotkey = SkipHotkeyOption.InputFieldTextFocused;
 
 		[Tooltip("(Optional) Input action to be used. Can be missing - indicator root will be deactivated.")]
 		[SerializeField]

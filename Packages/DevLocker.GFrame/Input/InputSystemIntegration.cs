@@ -487,11 +487,16 @@ namespace DevLocker.GFrame.Input
 
 			if ((option & SkipHotkeyOption.NonTextSelectableFocused) != 0
 				&& selected
+				&& !selected.GetComponent<UnityEngine.UI.InputField>()
 				&& !selected.GetComponent<TMPro.TMP_InputField>()
 				)
 				return true;
 
 			if ((option & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
+
+				var inputField = selected.GetComponent<UnityEngine.UI.InputField>();
+				if (inputField && inputField.isFocused)
+					return true;
 
 				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
 				if (inputFieldTMP && inputFieldTMP.isFocused)
@@ -504,6 +509,14 @@ namespace DevLocker.GFrame.Input
 
 	public static class InputSystemIntegrationExtensions
 	{
+		/// <summary>
+		/// Checks if currently selected object by this player is text field that is focused.
+		/// </summary>
+		public static bool IsTextFieldFocused(this IPlayerContext context)
+		{
+			return PlayerContextUtils.ShouldSkipHotkey(context, SkipHotkeyOption.InputFieldTextFocused);
+		}
+
 		/// <summary>
 		/// Get the display representations of the matched device for the passed action.
 		/// An action can have multiple bindings for the same device.

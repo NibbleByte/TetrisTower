@@ -203,7 +203,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			if (ClearSelectionOnDisable && m_PlayerContext.IsActive) {
-				m_PlayerContext.SetSelectedGameObject(null);
+				TryClearSelection();
 			}
 
 			if (PersistentSelection == PersistSelectionActionType.PersistOnlyIfObjectIsActiveInHierarchy && !gameObject.activeInHierarchy) {
@@ -224,11 +224,11 @@ namespace DevLocker.GFrame.Input.UIScope
 			// Wait till clickable to work with selection.
 			if (!IsClickable()) {
 				if (!m_ControlSchemeMatched && RemoveSelectionIfDeviceDoesntSupportIt && m_PlayerContext.SelectedGameObject) {
-					m_PlayerContext.SetSelectedGameObject(null);
+					TryClearSelection();
 				}
 
 				if (ClearSelectionOnDisable && m_PlayerContext.SelectedGameObject) {
-					m_PlayerContext.SetSelectedGameObject(null);
+					TryClearSelection();
 				}
 
 				return;
@@ -307,7 +307,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					}
 				} else {
 					if (RemoveSelectionIfDeviceDoesntSupportIt && m_PlayerContext.SelectedGameObject) {
-						m_PlayerContext.SetSelectedGameObject(null);
+						TryClearSelection();
 					}
 				}
 			}
@@ -334,6 +334,13 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				default:
 					throw new System.NotSupportedException(NoSelectionAction.ToString());
+			}
+		}
+
+		private void TryClearSelection()
+		{
+			if (!m_PlayerContext.IsTextFieldFocused()) {
+				m_PlayerContext.SetSelectedGameObject(null);
 			}
 		}
 
