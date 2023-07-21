@@ -32,6 +32,14 @@ namespace DevLocker.GFrame.Input
 			if (m_OnDemandActions) {
 
 				foreach(InputAction actionFromAsset in ActionsMap.Map) {
+#if UNITY_EDITOR
+					// For editor purposes.
+					if (inputContext == null) {
+						yield return actionFromAsset;
+						continue;
+					}
+#endif
+
 					InputAction action = inputContext.FindActionFor(actionFromAsset.name);
 
 					// Context references may be different? No? Too late to check.
@@ -44,6 +52,14 @@ namespace DevLocker.GFrame.Input
 				foreach (InputActionReference actionReference in m_InputActions) {
 					if (actionReference == null)
 						continue;
+
+#if UNITY_EDITOR
+					// For editor purposes.
+					if (inputContext == null) {
+						yield return actionReference;
+						continue;
+					}
+#endif
 
 					InputAction action = inputContext.FindActionFor(actionReference.name);
 					if (action != null) {

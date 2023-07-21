@@ -122,6 +122,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			if (m_InputAction == null)
 				yield break;
 
+#if UNITY_EDITOR
+			// For editor purposes.
+			if (inputContext == null) {
+				yield return m_InputAction;
+				yield break;
+			}
+#endif
+
 			InputAction action = inputContext.FindActionFor(m_InputAction.name);
 			if (action != null) {
 				yield return action;

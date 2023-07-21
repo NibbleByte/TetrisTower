@@ -27,9 +27,16 @@ namespace DevLocker.GFrame.Input.UIScope
 			public bool Foldout = true;
 		}
 
+		private enum DisplayHotkeyType
+		{
+			HideInputDetails,
+			DisplayInputActions,
+			DisplayInputBindings,
+		}
+
 		private UIScopeTreeElement m_RootElement;
 		private bool m_ShowInactiveScopes = false;
-		private bool m_ShowHotkeys = true;
+		private DisplayHotkeyType m_DisplayHotkeys = DisplayHotkeyType.HideInputDetails;
 		private bool m_FocusedScopeWasDrawn = false;
 
 		private Vector2 m_ScrollView = Vector2.zero;
@@ -181,7 +188,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				EditorGUILayout.ObjectField("Focused Scope:", focusedScope, typeof(UIScope), true);
 
-				m_ShowInactiveScopes = EditorGUILayout.Toggle(m_ShowInactiveScopes, GUILayout.Width(16));
+				GUILayout.Space(19);
 			}
 			EditorGUILayout.EndHorizontal();
 
@@ -222,11 +229,17 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			EditorGUILayout.BeginHorizontal();
 			{
+				m_ShowInactiveScopes = EditorGUILayout.Toggle("Show Inactive Scopes", m_ShowInactiveScopes, GUILayout.Width(16));
+
+				m_DisplayHotkeys = (DisplayHotkeyType) EditorGUILayout.EnumPopup(" ", m_DisplayHotkeys);
+			}
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.BeginHorizontal();
+			{
 				if (GUILayout.Button("Rescan")) {
 					BuildScopesTree();
 				}
-
-				m_ShowHotkeys = EditorGUILayout.Toggle(m_ShowHotkeys, GUILayout.Width(16));
 			}
 			EditorGUILayout.EndHorizontal();
 
@@ -384,18 +397,37 @@ namespace DevLocker.GFrame.Input.UIScope
 						scopeLabel = $"\"{scope.name}\" {elementsStatus}";
 
 
-						if (scope.PlayerContext?.InputContext != null) {
+
+						if (m_DisplayHotkeys != DisplayHotkeyType.HideInputDetails) {
 							List<InputAction> hotkeys = new List<InputAction>();
 
 							foreach (var hotkeyElement in scopeElements.OfType<IHotkeysWithInputActions>()) {
-								foreach(InputAction inputAction in hotkeyElement.GetUsedActions(scope.PlayerContext.InputContext)) {
+								foreach (InputAction inputAction in hotkeyElement.GetUsedActions(scope.PlayerContext?.InputContext)) {
 									if (!hotkeys.Contains(inputAction)) {
 										hotkeys.Add(inputAction);
 									}
 								}
 							}
 
-							m_HotkeyNamesBuilder.AppendJoin(' ', hotkeys.Select(a => $"[{a.name}] "));
+							InputControlScheme currentScheme;
+							if (scope.PlayerContext != null) {
+								currentScheme = scope.PlayerContext.InputContext.GetLastUsedInputControlScheme();
+							} else if (m_ForcedDisplayAsset) {
+								currentScheme = new InputControlScheme() { bindingGroup = m_ForcedDisplayAsset.MatchingControlScheme };
+							}
+							InputBinding matchBinding = new InputBinding() { groups = currentScheme.bindingGroup };
+
+							var hotkeysNames = m_DisplayHotkeys == DisplayHotkeyType.DisplayInputActions
+								? hotkeys.Select(a => $"[{a.name}] ")
+								: hotkeys.SelectMany(a => a.bindings).Where(b => matchBinding.Matches(b)).Select(b => {
+									var bname = b.ToDisplayString();
+									if (bname.Length > 2 || bname.Contains(' ') || bname.Contains('/'))
+										bname = $"[{bname}]";
+									return bname;
+								})
+								;
+
+							m_HotkeyNamesBuilder.AppendJoin(' ', hotkeysNames);
 						}
 
 					} else {
@@ -414,10 +446,17 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					GUILayout.Space(8f);
 
-					if (m_ShowHotkeys) {
+					if (m_DisplayHotkeys != DisplayHotkeyType.HideInputDetails) {
 						string hotkeyLabel = m_HotkeyNamesBuilder.ToString();
 						if (!string.IsNullOrEmpty(hotkeyLabel)) {
-							EditorGUILayout.TextField(hotkeyLabel);
+							switch(m_DisplayHotkeys) {
+								case DisplayHotkeyType.DisplayInputActions:
+									EditorGUILayout.TextField(hotkeyLabel);
+									break;
+								case DisplayHotkeyType.DisplayInputBindings:
+									EditorGUILayout.LabelField(hotkeyLabel, EditorStyles.helpBox);
+									break;
+							}
 						}
 					}
 
