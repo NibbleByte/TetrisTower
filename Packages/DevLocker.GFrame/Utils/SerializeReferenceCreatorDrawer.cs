@@ -36,6 +36,8 @@ namespace DevLocker.GFrame.Utils
 
 		protected GUIStyle m_TypeLabelStyle;
 
+		private double m_TypeLabelClickTime;
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			if (property.propertyType == SerializedPropertyType.ManagedReference && string.IsNullOrEmpty(property.managedReferenceFullTypename)) {
@@ -184,7 +186,14 @@ namespace DevLocker.GFrame.Utils
 							.FirstOrDefault();
 
 				if (asset) {
-					AssetDatabase.OpenAsset(asset);
+					// Detect double-click as Event.current.clickCount is weird.
+					if (EditorApplication.timeSinceStartup - m_TypeLabelClickTime < 0.3) {
+						AssetDatabase.OpenAsset(asset);
+					} else {
+						EditorGUIUtility.PingObject(asset);
+					}
+
+					m_TypeLabelClickTime = EditorApplication.timeSinceStartup;
 					GUIUtility.ExitGUI();
 				}
 			}
