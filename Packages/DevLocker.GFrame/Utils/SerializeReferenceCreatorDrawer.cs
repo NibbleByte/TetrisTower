@@ -166,12 +166,29 @@ namespace DevLocker.GFrame.Utils
 
 			int assemblyIndex = property.managedReferenceFullTypename.IndexOf(" ") + 1;	// Again, missing will produce 0.
 
-			string typeName = property.managedReferenceFullTypename.Substring(typeIndex, typeEndIndex - typeIndex + 1);
+			GUIContent typeName = new GUIContent(property.managedReferenceFullTypename.Substring(typeIndex, typeEndIndex - typeIndex + 1));
+			typeName.tooltip = $"Full managed type name:\n{property.managedReferenceFullTypename.Substring(assemblyIndex)}";
+
+			Vector2 labelSize = style.CalcSize(typeName);
+			typeLabelRect.x += typeLabelRect.width - labelSize.x;
+			typeLabelRect.width = labelSize.x;
 
 			var prevColor = GUI.color;
 			GUI.color = color;
 
-			GUI.Label(typeLabelRect, new GUIContent(typeName, $"Full managed type name:\n{property.managedReferenceFullTypename.Substring(assemblyIndex)}"), style);
+
+			if (GUI.Button(typeLabelRect, typeName, style)) {
+				MonoScript asset = AssetDatabase.FindAssets($"t:script {property.managedReferenceFullTypename.Substring(typeIndex)}")
+							.Select(AssetDatabase.GUIDToAssetPath)
+							.Select(AssetDatabase.LoadAssetAtPath<MonoScript>)
+							.FirstOrDefault();
+
+				if (asset) {
+					AssetDatabase.OpenAsset(asset);
+					GUIUtility.ExitGUI();
+				}
+			}
+			EditorGUIUtility.AddCursorRect(typeLabelRect, MouseCursor.Link);
 
 			GUI.color = prevColor;
 		}
