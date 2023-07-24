@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Utils;
 using Newtonsoft.Json;
 using System;
@@ -20,11 +21,10 @@ namespace TetrisTower.Logic
 	{
 		ObjectiveStatus Status { get; }
 
-		void Init(GridLevelController levelController);
-		void Deinit(GridLevelController levelController);
+		void Init(PlayerStatesContext context);
+		void Deinit();
 
 		string GetDisplayText();
-		string ProcessGreetMessage(string message);
 
 		void Validate(UnityEngine.Object context);
 	}

@@ -150,8 +150,6 @@ namespace TetrisTower.TowerLevels
 
 			SetupLights(levelController);
 
-			levelController.Init(m_PlaythroughData.TowerLevel);
-
 			var uiController = GameObject.FindObjectOfType<TowerLevelUIController>(true);
 			if (uiController == null) {
 				GameObject[] uiPrefabs = Platforms.PlatformsUtils.IsMobileOrSimulator
@@ -168,6 +166,7 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 			}
+
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
@@ -187,6 +186,9 @@ namespace TetrisTower.TowerLevels
 				);
 
 
+			// Init before others.
+			levelController.Init(m_PlaythroughData.TowerLevel);
+
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
@@ -196,6 +198,10 @@ namespace TetrisTower.TowerLevels
 
 			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
 				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+			}
+
+			foreach(var objective in levelController.LevelData.Objectives) {
+				objective.Init(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
 			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new TowerPlayState());
@@ -218,6 +224,12 @@ namespace TetrisTower.TowerLevels
 		{
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
+			var levelController = behaviours.OfType<GridLevelController>().First();
+
+			foreach (Objective objective in levelController.LevelData.Objectives) {
+				objective.Deinit();
+			}
+
 			foreach (var behaviour in behaviours) {
 				var listener = behaviour as ILevelLoadedListener;
 				if (listener != null) {
@@ -229,7 +241,6 @@ namespace TetrisTower.TowerLevels
 			}
 
 			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
-			behaviours.OfType<GridLevelController>().FirstOrDefault()?.Deinit();
 
 			return Task.CompletedTask;
 		}

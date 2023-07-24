@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using System.Linq;
 using TetrisTower.Logic;
 using TMPro;
 using UnityEngine;
@@ -11,6 +12,11 @@ namespace TetrisTower.TowerUI
 	/// </summary>
 	public class GreetMessageUIController : MonoBehaviour, ILevelLoadedListener
 	{
+		public interface IGreetMessageProcessor
+		{
+			string ProcessGreetMessage(string message);
+		}
+
 		private TextMeshProUGUI m_Text;
 
 		private GridLevelController m_TowerLevel;
@@ -31,7 +37,7 @@ namespace TetrisTower.TowerUI
 			if (m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing) {
 				string message = m_TowerLevel.LevelData.GreetMessage.Replace(@"\n", "\n");
 
-				foreach (Objective objective in m_TowerLevel.LevelData.Objectives) {
+				foreach (var objective in m_TowerLevel.LevelData.Objectives.OfType<IGreetMessageProcessor>()) {
 					message = objective.ProcessGreetMessage(message);
 				}
 

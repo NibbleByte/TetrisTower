@@ -1,4 +1,4 @@
-using DevLocker.GFrame.Utils;
+using DevLocker.GFrame.Input;
 using Newtonsoft.Json;
 using System;
 using TetrisTower.Logic;
@@ -18,14 +18,18 @@ namespace TetrisTower.TowerObjectives
 
 		public ObjectiveStatus Status { get; private set; }
 
-		public void Init(GridLevelController levelController)
+		[JsonIgnore]
+		private GridLevelController m_LevelController;
+
+		public void Init(PlayerStatesContext context)
 		{
-			levelController.PlacedOutsideGrid += OnPlacedOutsideGrid;
+			context.SetByType(out m_LevelController);
+			m_LevelController.PlacedOutsideGrid += OnPlacedOutsideGrid;
 		}
 
-		public void Deinit(GridLevelController levelController)
+		public void Deinit()
 		{
-			levelController.PlacedOutsideGrid -= OnPlacedOutsideGrid;
+			m_LevelController.PlacedOutsideGrid -= OnPlacedOutsideGrid;
 		}
 
 		private void OnPlacedOutsideGrid()
@@ -39,14 +43,6 @@ namespace TetrisTower.TowerObjectives
 				return "<color=\"orange\"><b>Endless!</b></color>";
 
 			return string.Empty;
-		}
-
-		public string ProcessGreetMessage(string message)
-		{
-			if (PlacingOutsideIsWin && string.IsNullOrWhiteSpace(message))
-				return "Endless!";
-
-			return message;
 		}
 
 		public void Validate(UnityEngine.Object context)

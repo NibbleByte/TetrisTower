@@ -79,16 +79,7 @@ namespace TetrisTower.Logic
 
 			LevelData.Objectives.RemoveAll(obj => obj == null);
 
-			foreach (Objective objective in LevelData.Objectives) {
-				objective.Init(this);
-			}
-		}
-
-		public void Deinit()
-		{
-			foreach (Objective objective in LevelData.Objectives) {
-				objective.Deinit(this);
-			}
+			// Objectives are initialized by the level supervisor after everything is setup.
 		}
 
 		public IEnumerator RunActions(IList<GridAction> actions)

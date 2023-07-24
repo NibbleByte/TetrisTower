@@ -72,8 +72,8 @@ namespace TetrisTower.TowerUI
 
 			if (ObjectivesText) {
 				ObjectivesText.text = string.Join("\n", m_LevelData.Objectives
-						.Select(obj => obj.GetDisplayText())
-						.Where(t => !string.IsNullOrWhiteSpace(t))
+						.Select(obj => obj.GetDisplayText().Trim())
+						.Where(t => !string.IsNullOrEmpty(t))
 					);
 			}
 		}

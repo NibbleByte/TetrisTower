@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace TetrisTower.TowerObjectives
 	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class List_Objective : Objective
+	public class List_Objective : Objective, TowerUI.GreetMessageUIController.IGreetMessageProcessor
 	{
 		// TODO: Maybe each objective should have "IsOptional" field instead.
 		[Tooltip("Is player allowed to fail the objectives with no consequences. If true, this objective can't fail. If not, first failure from the list will fail this objective as well")]
@@ -43,23 +44,23 @@ namespace TetrisTower.TowerObjectives
 			}
 		}
 
-		public void Init(GridLevelController levelController)
+		public void Init(PlayerStatesContext context)
 		{
 			foreach(Objective objective in Objectives) {
 				if (objective == null)
 					continue;
 
-				objective.Init(levelController);
+				objective.Init(context);
 			}
 		}
 
-		public void Deinit(GridLevelController levelController)
+		public void Deinit()
 		{
 			foreach (Objective objective in Objectives) {
 				if (objective == null)
 					continue;
 
-				objective.Deinit(levelController);
+				objective.Deinit();
 			}
 		}
 
@@ -80,11 +81,11 @@ namespace TetrisTower.TowerObjectives
 
 		public string ProcessGreetMessage(string message)
 		{
-			foreach (Objective objective in Objectives) {
+			foreach (var objective in Objectives.OfType<TowerUI.GreetMessageUIController.IGreetMessageProcessor>()) {
 				if (objective == null)
 					continue;
 
-				objective.ProcessGreetMessage(message);
+				message = objective.ProcessGreetMessage(message);
 			}
 
 			return message;

@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Utils;
 using Newtonsoft.Json;
 using System;
@@ -13,7 +14,7 @@ namespace TetrisTower.TowerObjectives
 	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class MatchBlocksCount_Objective : Objective
+	public class MatchBlocksCount_Objective : Objective, TowerUI.GreetMessageUIController.IGreetMessageProcessor
 	{
 		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
 		public int MatchesEndCount;
@@ -32,30 +33,29 @@ namespace TetrisTower.TowerObjectives
 		public int MatchesDone => m_MatchesDone;
 
 		[JsonIgnore]
+		private ScoreGrid m_ScoreGrid;
+
+		[JsonIgnore]
 		private GridRules m_Rules;
 
-		public void Init(GridLevelController levelController)
+		public void Init(PlayerStatesContext context)
 		{
-			levelController.LevelData.Score.ClearActionScored += OnClearActionScored;
-			m_Rules = levelController.LevelData.Rules;
-		}
-
-		public void Deinit(GridLevelController levelController)
-		{
-			levelController.LevelData.Score.ClearActionScored -= OnClearActionScored;
+			var levelController = context.FindByType<GridLevelController>();
+			Init(levelController.LevelData.Rules, levelController.LevelData.Score);
 		}
 
 		// For unit tests.
 		public void Init(GridRules rules, ScoreGrid score)
 		{
-			score.ClearActionScored += OnClearActionScored;
+			m_ScoreGrid = score;
+			m_ScoreGrid.ClearActionScored += OnClearActionScored;
 			m_Rules = rules;
 		}
 
 		// For unit tests.
-		public void Deinit(ScoreGrid score)
+		public void Deinit()
 		{
-			score.ClearActionScored -= OnClearActionScored;
+			m_ScoreGrid.ClearActionScored -= OnClearActionScored;
 		}
 
 		private void OnClearActionScored(ClearMatchedAction action)
@@ -93,10 +93,10 @@ namespace TetrisTower.TowerObjectives
 
 		public string GetDisplayText()
 		{
-			string text = $"Remaining: {MatchesEndCount - m_MatchesDone}\n";
+			string text = $"Remaining: {MatchesEndCount - m_MatchesDone}";
 
 			if (!MatchesAllTypes) {
-				text += "<color=\"orange\"><b>";
+				text += "\n<color=\"orange\"><b>";
 
 				if (MatchesType.HasFlag(MatchScoringType.Horizontal)) {
 					text += "Horizontal ";
