@@ -1,11 +1,10 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
-using System.Collections;
 using TetrisTower.Logic;
 using TMPro;
 using UnityEngine;
 
-namespace TetrisTower.TowerLevels.UI
+namespace TetrisTower.TowerUI
 {
 	/// <summary>
 	/// Show greeting message while in Prepare state, i.e. waiting for player to start the level.

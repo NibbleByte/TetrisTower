@@ -1,10 +1,9 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
-using TetrisTower.TowerLevels.UI;
+using TetrisTower.TowerUI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 

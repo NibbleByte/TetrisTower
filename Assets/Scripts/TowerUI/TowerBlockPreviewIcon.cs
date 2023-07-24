@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TetrisTower.TowerLevels.UI
+namespace TetrisTower.TowerUI
 {
 	public class TowerBlockPreviewIcon : MonoBehaviour
 	{

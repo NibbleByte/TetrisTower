@@ -1,7 +1,5 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.MessageBox;
-using System.Collections;
-using System.Threading.Tasks;
 using TetrisTower.Platforms;
 using TetrisTower.Core.UI;
 using TetrisTower.Game;
@@ -9,6 +7,7 @@ using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using DevLocker.GFrame.Input;
+using TetrisTower.TowerUI;
 
 namespace TetrisTower.TowerLevels
 {
@@ -18,7 +17,7 @@ namespace TetrisTower.TowerLevels
 		private GameConfig m_GameConfig;
 		private PlayerOptions m_Options;
 		private GridLevelController m_LevelController;
-		private UI.TowerLevelUIController m_UIController;
+		private TowerLevelUIController m_UIController;
 
 		private bool m_PointerPressed = false;
 		private bool m_PointerDragConsumed = false;
@@ -48,7 +47,7 @@ namespace TetrisTower.TowerLevels
 			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
 			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
 
-			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
+			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
 			MessageBox.Instance.MessageShown += m_LevelController.PauseLevel;

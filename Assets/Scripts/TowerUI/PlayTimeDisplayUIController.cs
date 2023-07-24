@@ -1,15 +1,12 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace TetrisTower.TowerLevels.UI
+namespace TetrisTower.TowerUI
 {
 	public class PlayTimeDisplayUIController : MonoBehaviour, ILevelLoadedListener
 	{

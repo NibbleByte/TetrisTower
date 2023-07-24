@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.Tools;
+using TetrisTower.TowerUI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,7 +24,7 @@ namespace TetrisTower.TowerLevels
 		private GridLevelController m_TowerLevel;
 
 		private GameContext m_Context;
-		private UI.FlashMessageUIController m_FlashMessage;
+		private FlashMessageUIController m_FlashMessage;
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		private static void ClearStaticsCache()
@@ -60,7 +61,7 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Retry Level");
 
-			UI.TowerLevelUIController.RetryLevel();
+			TowerStatesAPI.RetryLevel();
 		}
 
 		public void Win()

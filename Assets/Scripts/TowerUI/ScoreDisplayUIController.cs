@@ -1,15 +1,12 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace TetrisTower.TowerLevels.UI
+namespace TetrisTower.TowerUI
 {
 	public class ScoreDisplayUIController : MonoBehaviour, ILevelLoadedListener
 	{

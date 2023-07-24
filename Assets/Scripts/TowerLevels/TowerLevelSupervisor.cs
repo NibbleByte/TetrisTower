@@ -3,11 +3,11 @@ using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.MessageBox;
 using DevLocker.Utils;
 using System;
-using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerUI;
 using TetrisTower.Visuals;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -152,7 +152,7 @@ namespace TetrisTower.TowerLevels
 
 			levelController.Init(m_PlaythroughData.TowerLevel);
 
-			var uiController = GameObject.FindObjectOfType<UI.TowerLevelUIController>(true);
+			var uiController = GameObject.FindObjectOfType<TowerLevelUIController>(true);
 			if (uiController == null) {
 				GameObject[] uiPrefabs = Platforms.PlatformsUtils.IsMobileOrSimulator
 					? gameContext.GameConfig.UIPrefabsMobile
@@ -164,7 +164,7 @@ namespace TetrisTower.TowerLevels
 					instance.name = prefab.name;
 
 					if (uiController == null) {
-						uiController = instance.GetComponent<UI.TowerLevelUIController>();
+						uiController = instance.GetComponent<TowerLevelUIController>();
 					}
 				}
 			}
@@ -179,7 +179,7 @@ namespace TetrisTower.TowerLevels
 				m_PlaythroughData,
 				levelController,
 				uiController,
-				behaviours.OfType<UI.FlashMessageUIController>().FirstOrDefault(),
+				behaviours.OfType<FlashMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<ConeVisualsGrid>().First(),
 				behaviours.OfType<TowerConeVisualsController>().First(),
 				behaviours.OfType<Visuals.Effects.FairyMatchingController>().FirstOrDefault(),

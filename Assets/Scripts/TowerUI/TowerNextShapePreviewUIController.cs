@@ -6,7 +6,7 @@ using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TetrisTower.TowerLevels.UI
+namespace TetrisTower.TowerUI
 {
 	public class TowerNextShapePreviewUIController : MonoBehaviour, ILevelLoadedListener
 	{

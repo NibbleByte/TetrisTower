@@ -103,7 +103,13 @@ namespace TetrisTower.GameStarter
 
 						playthroughData.SetupRandomGenerator(StartingRandomSeed, true);
 
-						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, Saves.SaveManager.GetConverters(GameConfig));
+						// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
+						// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
+						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, new Newtonsoft.Json.JsonSerializerSettings() {
+							Converters = Saves.SaveManager.GetConverters(GameConfig),
+							TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto,
+							//Formatting = Formatting.Indented,
+						});
 
 					} else {
 						overrideScene = new DevLocker.Utils.SceneReference(scenePath);

@@ -2,7 +2,6 @@ using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Pools;
 using DG.Tweening;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ using TetrisTower.Visuals;
 using TMPro;
 using UnityEngine;
 
-namespace TetrisTower.TowerLevels.UI
+namespace TetrisTower.TowerUI
 {
 	public class MatchSequenceScoreUIController : MonoBehaviour, ILevelLoadedListener
 	{

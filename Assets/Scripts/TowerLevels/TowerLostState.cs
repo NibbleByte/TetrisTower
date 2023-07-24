@@ -1,11 +1,10 @@
-using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerUI;
 using TetrisTower.Visuals;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,7 +15,7 @@ namespace TetrisTower.TowerLevels
 	{
 		private PlayerControls m_PlayerControls;
 		private GridLevelController m_LevelController;
-		private UI.TowerLevelUIController m_UIController;
+		private TowerLevelUIController m_UIController;
 		private ConeVisualsGrid m_VisualsGrid;
 		private TowerConeVisualsController m_VisualsController;
 
@@ -44,7 +43,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
 			m_InputEnabler.Enable(m_PlayerControls.TowerLevelPlay.PointerPress);
 
-			m_UIController.SwitchState(UI.TowerLevelUIState.Play);
+			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
 			m_StartTime = Time.time;

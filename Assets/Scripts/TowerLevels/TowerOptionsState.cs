@@ -1,14 +1,12 @@
-using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
-using System.Collections;
-using System.Threading.Tasks;
 using TetrisTower.Game;
+using TetrisTower.TowerUI;
 
 namespace TetrisTower.TowerLevels
 {
 	public class TowerOptionsState : IPlayerState
 	{
-		private UI.TowerLevelUIController m_UIController;
+		private TowerLevelUIController m_UIController;
 		private PlayerControls m_PlayerControls;
 
 		private InputEnabler m_InputEnabler;
@@ -21,7 +19,7 @@ namespace TetrisTower.TowerLevels
 			m_InputEnabler = new InputEnabler(this);
 			m_InputEnabler.Enable(m_PlayerControls.UI);
 
-			m_UIController.SwitchState(UI.TowerLevelUIState.Options);
+			m_UIController.SwitchState(TowerLevelUIState.Options);
 		}
 
 		public void ExitState()
