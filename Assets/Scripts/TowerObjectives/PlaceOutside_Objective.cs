@@ -1,9 +1,10 @@
 using DevLocker.GFrame.Utils;
 using Newtonsoft.Json;
 using System;
+using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.Logic.Objectives
+namespace TetrisTower.TowerObjectives
 {
 	/// <summary>
 	/// When blocks are placed outside the tower (at the top), this objective is triggered.

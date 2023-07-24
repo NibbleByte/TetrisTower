@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using NUnit.Framework;
-using TetrisTower.Game;
-using TetrisTower.Logic.Objectives;
+using TetrisTower.TowerObjectives;
 using UnityEngine;
 using UnityEngine.TestTools;
 

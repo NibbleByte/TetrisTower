@@ -1,9 +1,10 @@
 using DevLocker.GFrame.Utils;
 using Newtonsoft.Json;
 using System;
+using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.Logic.Objectives
+namespace TetrisTower.TowerObjectives
 {
 	/// <summary>
 	/// Objective is completed when specified <see cref="MatchesEndCount"/> number of matches is made.

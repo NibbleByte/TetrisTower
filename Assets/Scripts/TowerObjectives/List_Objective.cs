@@ -2,9 +2,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TetrisTower.Logic;
 using UnityEngine;
 
-namespace TetrisTower.Logic.Objectives
+namespace TetrisTower.TowerObjectives
 {
 	/// <summary>
 	/// Waits for all objectives in the list to be completed before returning complete status itself.
