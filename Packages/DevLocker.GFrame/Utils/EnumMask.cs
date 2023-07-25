@@ -21,10 +21,15 @@ namespace DevLocker.GFrame.Utils
 	{
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			if (property.propertyType != SerializedPropertyType.Enum) {
+				EditorGUI.PropertyField(position, property, label, true);
+				return;
+			}
+
 			EditorGUI.BeginProperty(position, label, property);
 
 			EditorGUI.BeginChangeCheck();
-			int value = EditorGUI.MaskField(position, label, property.intValue, property.enumNames);
+			int value = EditorGUI.MaskField(position, label, property.enumValueFlag, property.enumNames);
 			if (EditorGUI.EndChangeCheck()) {
 				property.intValue = value;
 			}
