@@ -1,9 +1,9 @@
 using DevLocker.GFrame.Input;
-using DevLocker.GFrame.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using TetrisTower.Logic;
+using TetrisTower.Visuals;
 using UnityEngine;
 
 namespace TetrisTower.TowerObjectives
@@ -14,31 +14,35 @@ namespace TetrisTower.TowerObjectives
 	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class MatchCoordinates_Objective : Objective
+	public class ClearCoordinates_Objective : Objective
 	{
 		public ObjectiveStatus Status { get; private set; } = ObjectiveStatus.InProgress;
 
 		public List<GridCoords> Coordinates = new List<GridCoords>();
 
 		[JsonIgnore]
+		private ConeVisualsGrid m_VisualsGrid;
+
+		[JsonIgnore]
 		private ScoreGrid m_ScoreGrid;
 
-		public void Init(PlayerStatesContext context)
+		[JsonIgnore]
+		private TowerUI.ObjectivesUIController m_ObjectivesUIController;
+
+		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
 			// TODO: Validate if blocks exist on the coordinates?
-			var levelController = context.FindByType<GridLevelController>();
-			Init(levelController.LevelData.Score);
-		}
+			context.SetByType(out m_VisualsGrid);
 
-		// For unit tests.
-		public void Init(ScoreGrid score)
-		{
-			m_ScoreGrid = score;
+			m_ScoreGrid = context.FindByType<GridLevelController>().LevelData.Score;
 			m_ScoreGrid.ClearActionScored += OnClearActionScored;
+
+			m_ObjectivesUIController = context.TryFindByType<TowerUI.ObjectivesUIController>();
+			TryDisplayObjective();
 		}
 
 		// For unit tests.
-		public void Deinit()
+		public void OnPreLevelUnloading()
 		{
 			m_ScoreGrid.ClearActionScored -= OnClearActionScored;
 		}
@@ -54,9 +58,12 @@ namespace TetrisTower.TowerObjectives
 			}
 		}
 
-		public string GetDisplayText()
+		private void TryDisplayObjective()
 		{
-			return $"Match the highlighted blocks";
+			if (m_ObjectivesUIController == null)
+				return;
+
+			m_ObjectivesUIController.SetObjectiveText(this, $"Match the highlighted blocks");
 		}
 
 		public void Validate(UnityEngine.Object context)

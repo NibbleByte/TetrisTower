@@ -21,13 +21,20 @@ namespace TetrisTower.TowerObjectives
 		[JsonIgnore]
 		private GridLevelController m_LevelController;
 
-		public void Init(PlayerStatesContext context)
+		[JsonIgnore]
+		private TowerUI.ObjectivesUIController m_ObjectivesUIController;
+
+		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
 			context.SetByType(out m_LevelController);
 			m_LevelController.PlacedOutsideGrid += OnPlacedOutsideGrid;
+
+			m_ObjectivesUIController = context.TryFindByType<TowerUI.ObjectivesUIController>();
+
+			TryDisplayObjective();
 		}
 
-		public void Deinit()
+		public void OnPreLevelUnloading()
 		{
 			m_LevelController.PlacedOutsideGrid -= OnPlacedOutsideGrid;
 		}
@@ -37,12 +44,14 @@ namespace TetrisTower.TowerObjectives
 			Status = PlacingOutsideIsWin ? ObjectiveStatus.Completed : ObjectiveStatus.Failed;
 		}
 
-		public string GetDisplayText()
+		private void TryDisplayObjective()
 		{
-			if (PlacingOutsideIsWin)
-				return "<color=\"orange\"><b>Endless!</b></color>";
+			if (m_ObjectivesUIController == null)
+				return;
 
-			return string.Empty;
+			if (PlacingOutsideIsWin) {
+				m_ObjectivesUIController.SetObjectiveText(this, "<color=\"orange\"><b>Endless!</b></color>");
+			}
 		}
 
 		public void Validate(UnityEngine.Object context)

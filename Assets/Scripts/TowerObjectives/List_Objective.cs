@@ -14,7 +14,7 @@ namespace TetrisTower.TowerObjectives
 	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class List_Objective : Objective, TowerUI.GreetMessageUIController.IGreetMessageProcessor
+	public class List_Objective : Objective
 	{
 		// TODO: Maybe each objective should have "IsOptional" field instead.
 		[Tooltip("Is player allowed to fail the objectives with no consequences. If true, this objective can't fail. If not, first failure from the list will fail this objective as well")]
@@ -44,51 +44,24 @@ namespace TetrisTower.TowerObjectives
 			}
 		}
 
-		public void Init(PlayerStatesContext context)
+		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
 			foreach(Objective objective in Objectives) {
 				if (objective == null)
 					continue;
 
-				objective.Init(context);
+				objective.OnPostLevelLoaded(context);
 			}
 		}
 
-		public void Deinit()
+		public void OnPreLevelUnloading()
 		{
 			foreach (Objective objective in Objectives) {
 				if (objective == null)
 					continue;
 
-				objective.Deinit();
+				objective.OnPreLevelUnloading();
 			}
-		}
-
-		public string GetDisplayText()
-		{
-			var displayText = new System.Text.StringBuilder();
-
-			foreach (Objective objective in Objectives) {
-				if (objective == null)
-					continue;
-
-				displayText.AppendLine(objective.GetDisplayText());
-			}
-
-			// TODO: Return text with statuses, so completed get crossed out, while failed are displayed in red?
-			return displayText.ToString();
-		}
-
-		public string ProcessGreetMessage(string message)
-		{
-			foreach (var objective in Objectives.OfType<TowerUI.GreetMessageUIController.IGreetMessageProcessor>()) {
-				if (objective == null)
-					continue;
-
-				message = objective.ProcessGreetMessage(message);
-			}
-
-			return message;
 		}
 
 		public void Validate(UnityEngine.Object context)

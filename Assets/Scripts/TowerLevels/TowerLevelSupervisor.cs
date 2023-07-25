@@ -178,6 +178,8 @@ namespace TetrisTower.TowerLevels
 				m_PlaythroughData,
 				levelController,
 				uiController,
+				behaviours.OfType<ObjectivesUIController>().FirstOrDefault(),
+				behaviours.OfType<GreetMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<FlashMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<ConeVisualsGrid>().First(),
 				behaviours.OfType<TowerConeVisualsController>().First(),
@@ -201,7 +203,7 @@ namespace TetrisTower.TowerLevels
 			}
 
 			foreach(var objective in levelController.LevelData.Objectives) {
-				objective.Init(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+				objective.OnPostLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
 			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new TowerPlayState());
@@ -227,7 +229,7 @@ namespace TetrisTower.TowerLevels
 			var levelController = behaviours.OfType<GridLevelController>().First();
 
 			foreach (Objective objective in levelController.LevelData.Objectives) {
-				objective.Deinit();
+				objective.OnPreLevelUnloading();
 			}
 
 			foreach (var behaviour in behaviours) {

@@ -12,9 +12,16 @@ namespace TetrisTower.TowerUI
 	/// </summary>
 	public class GreetMessageUIController : MonoBehaviour, ILevelLoadedListener
 	{
-		public interface IGreetMessageProcessor
-		{
-			string ProcessGreetMessage(string message);
+		public string Message {
+			get => m_Text.text;
+			set {
+				m_Text.text = value.Replace(@"\n", "\n");
+
+				enabled = m_TowerLevel != null
+					&& m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing
+					&& !string.IsNullOrWhiteSpace(value)
+					;
+			}
 		}
 
 		private TextMeshProUGUI m_Text;
@@ -34,37 +41,19 @@ namespace TetrisTower.TowerUI
 
 			context.SetByType(out m_TowerLevel);
 
-			if (m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing) {
-				string message = m_TowerLevel.LevelData.GreetMessage.Replace(@"\n", "\n");
-
-				foreach (var objective in m_TowerLevel.LevelData.Objectives.OfType<IGreetMessageProcessor>()) {
-					message = objective.ProcessGreetMessage(message);
-				}
-
-				m_Text.text = message;
-
-				enabled = !string.IsNullOrWhiteSpace(message);
-
-			} else {
-				m_Text.text = string.Empty;
-
-				enabled = false;
-			}
+			Message = m_TowerLevel.LevelData.GreetMessage.Replace(@"\n", "\n");
 		}
 
 		public void OnLevelUnloading()
 		{
+			Message = string.Empty;
 			m_TowerLevel = null;
-			m_Text.text = string.Empty;
-
-			enabled = false;
 		}
 
 		void Update()
 		{
 			if (m_TowerLevel == null || m_TowerLevel.LevelData == null || m_TowerLevel.LevelData.RunningState != TowerLevelRunningState.Preparing) {
-				m_Text.text = string.Empty;
-				enabled = false;
+				Message = string.Empty;
 				return;
 			}
 		}

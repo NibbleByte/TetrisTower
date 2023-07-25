@@ -1197,6 +1197,7 @@ GameObject:
   - component: {fileID: 3998645915982916003}
   - component: {fileID: 6017886371565361656}
   - component: {fileID: 5836640994713266301}
+  - component: {fileID: 6736599971068995935}
   m_Layer: 5
   m_Name: ProgressDisplay
   m_TagString: Untagged
@@ -1287,6 +1288,18 @@ MonoBehaviour:
   CurrentScoreText: {fileID: 37430886516236135}
   BlocksClearedCountText: {fileID: 0}
   BonusRatioText: {fileID: 4534842934967127598}
+--- !u!114 &6736599971068995935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640994713266303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77571dfceae5e7f43ab079b03cc23ffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   ObjectivesText: {fileID: 5394078464766789917}
 --- !u!1 &5836640994715852386
 GameObject:
@@ -2400,7 +2413,6 @@ MonoBehaviour:
   CurrentScoreText: {fileID: 9014822509807612511}
   BlocksClearedCountText: {fileID: 1216245282469165633}
   BonusRatioText: {fileID: 553543741779820993}
-  ObjectivesText: {fileID: 0}
 --- !u!114 &8285624101363596056
 MonoBehaviour:
   m_ObjectHideFlags: 0

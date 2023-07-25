@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
@@ -27,7 +28,6 @@ namespace TetrisTower.TowerUI
 		public TextMeshProUGUI CurrentScoreText;
 		public TextMeshProUGUI BlocksClearedCountText;
 		public TextMeshProUGUI BonusRatioText;
-		public TextMeshProUGUI ObjectivesText;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
@@ -68,13 +68,6 @@ namespace TetrisTower.TowerUI
 			}
 			if (BonusRatioText) {
 				BonusRatioText.text = BonusRatioPrefix + m_LevelData.Score.BonusRatio.ToString("0.000");
-			}
-
-			if (ObjectivesText) {
-				ObjectivesText.text = string.Join("\n", m_LevelData.Objectives
-						.Select(obj => obj.GetDisplayText().Trim())
-						.Where(t => !string.IsNullOrEmpty(t))
-					);
 			}
 		}
 	}

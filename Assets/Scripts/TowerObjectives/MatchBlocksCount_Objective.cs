@@ -14,7 +14,7 @@ namespace TetrisTower.TowerObjectives
 	/// </summary>
 	[Serializable]
 	[JsonObject(MemberSerialization.Fields)]
-	public class MatchBlocksCount_Objective : Objective, TowerUI.GreetMessageUIController.IGreetMessageProcessor
+	public class MatchBlocksCount_Objective : Objective
 	{
 		[Tooltip("How much matches (according to the rules) does the player has to do to pass this level. 0 means it is an endless game.")]
 		public int MatchesEndCount;
@@ -38,10 +38,18 @@ namespace TetrisTower.TowerObjectives
 		[JsonIgnore]
 		private GridRules m_Rules;
 
-		public void Init(PlayerStatesContext context)
+		[JsonIgnore]
+		private TowerUI.ObjectivesUIController m_ObjectivesUIController;
+
+		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
 			var levelController = context.FindByType<GridLevelController>();
 			Init(levelController.LevelData.Rules, levelController.LevelData.Score);
+
+			TryProcessGreetMessage(context.TryFindByType<TowerUI.GreetMessageUIController>());
+
+			m_ObjectivesUIController = context.TryFindByType<TowerUI.ObjectivesUIController>();
+			TryDisplayObjective();
 		}
 
 		// For unit tests.
@@ -53,7 +61,7 @@ namespace TetrisTower.TowerObjectives
 		}
 
 		// For unit tests.
-		public void Deinit()
+		public void OnPreLevelUnloading()
 		{
 			m_ScoreGrid.ClearActionScored -= OnClearActionScored;
 		}
@@ -89,10 +97,15 @@ namespace TetrisTower.TowerObjectives
 				}
 				m_MatchesDone = MatchesEndCount;
 			}
+
+			TryDisplayObjective();
 		}
 
-		public string GetDisplayText()
+		private void TryDisplayObjective()
 		{
+			if (m_ObjectivesUIController == null)
+				return;
+
 			string text = $"Remaining: {MatchesEndCount - m_MatchesDone}";
 
 			if (!MatchesAllTypes) {
@@ -111,11 +124,16 @@ namespace TetrisTower.TowerObjectives
 				text += "Only!</b></color>";
 			}
 
-			return text;
+			m_ObjectivesUIController.SetObjectiveText(this, text);
 		}
 
-		public string ProcessGreetMessage(string message)
+		private void TryProcessGreetMessage(TowerUI.GreetMessageUIController messageController)
 		{
+			if (messageController == null)
+				return;
+
+			string message = messageController.Message;
+
 			if (string.IsNullOrWhiteSpace(message)) {
 				if (!MatchesAllTypes) {
 					message = "";
@@ -130,15 +148,13 @@ namespace TetrisTower.TowerObjectives
 					}
 
 					message += "Only!";
-
-					return message;
+					messageController.Message = message;
+					return;
 				}
 			}
 
 
-			return message
-				.Replace("{ObjectiveEndCount}", MatchesEndCount.ToString())
-				;
+			messageController.Message = message.Replace("{ObjectiveEndCount}", MatchesEndCount.ToString());
 		}
 
 		public void Validate(UnityEngine.Object context)

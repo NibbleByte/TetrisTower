@@ -21,10 +21,8 @@ namespace TetrisTower.Logic
 	{
 		ObjectiveStatus Status { get; }
 
-		void Init(PlayerStatesContext context);
-		void Deinit();
-
-		string GetDisplayText();
+		void OnPostLevelLoaded(PlayerStatesContext context);
+		void OnPreLevelUnloading();
 
 		void Validate(UnityEngine.Object context);
 	}
