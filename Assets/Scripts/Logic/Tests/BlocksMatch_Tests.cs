@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using DevLocker.GFrame.Input;
 using NUnit.Framework;
 using TetrisTower.TowerObjectives;
 using UnityEngine;
@@ -42,8 +43,10 @@ namespace TetrisTower.Logic
 			WrapSidesOnMove = true,
 		};
 
-		private BlocksGrid m_Grid;
-		private ScoreGrid m_ScoreGrid;
+		private GridLevelData m_LevelData;
+		private PlayerStatesContext m_Context;
+		private BlocksGrid m_Grid => m_LevelData.Grid;
+		private ScoreGrid m_ScoreGrid => m_LevelData.Score;
 		private MatchBlocksCount_Objective m_MatchObjective;
 		private GameGrid[] m_Grids;
 
@@ -91,23 +94,38 @@ namespace TetrisTower.Logic
 			Assert.LessOrEqual(blocks.GetLength(0), MaxRows, $"Wrong rows count.\n{caller}:{lineNumber}");
 			Assert.LessOrEqual(blocks.GetLength(1), MaxColumns, $"Wrong columns count.\n{caller}:{lineNumber}");
 
-			m_Grid = new BlocksGrid(MaxRows, MaxColumns);
-			m_ScoreGrid = new ScoreGrid(MaxRows, MaxColumns, rules);
-			m_MatchObjective = new MatchBlocksCount_Objective();
-			m_MatchObjective.Init(rules, m_ScoreGrid);
-			m_MatchObjective.MatchesEndCount = int.MaxValue;
-			m_MatchObjective.MatchesType = objectiveMatchTypes;
-
-			m_Grids = new GameGrid[] { m_Grid, m_ScoreGrid };
+			SetupLevelData(new BlocksGrid(MaxRows, MaxColumns), new ScoreGrid(MaxRows, MaxColumns, rules), rules, objectiveMatchTypes, lineNumber, caller);
 
 			yield return m_Grid.ApplyActions(new GridAction[] { SetupPlaceAction(blocks) });
+		}
+
+		private void SetupLevelData(BlocksGrid grid, ScoreGrid scoreGrid, GridRules rules, MatchScoringType objectiveMatchTypes, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+		{
+			m_LevelData = new GridLevelData() {
+				Grid = grid,
+				Rules = rules,
+				Score = scoreGrid,
+			};
+
+			m_Context = new PlayerStatesContext(new object[] {
+				m_LevelData
+			});
+
+			m_MatchObjective = new MatchBlocksCount_Objective();
+			m_MatchObjective.MatchesEndCount = int.MaxValue;
+			m_MatchObjective.MatchesType = objectiveMatchTypes;
+			m_MatchObjective.OnPostLevelLoaded(m_Context);
+
+			m_LevelData.Objectives.Add(m_MatchObjective);
+
+			m_Grids = new GameGrid[] { m_Grid, m_ScoreGrid };
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
-			m_Grid = null;
-			m_ScoreGrid = null;
+			m_LevelData = null;
+			m_Context = null;
 			m_MatchObjective = null;
 			m_Grids = null;
 			m_SkipGridSetup = false;
@@ -1287,13 +1305,39 @@ namespace TetrisTower.Logic
 			var startGrid = new BlocksGrid(MaxRows, MaxColumns);
 			yield return startGrid.ApplyActions(new GridAction[] { SetupPlaceAction(blocks) });
 
-			m_Grid = new BlocksGrid(startGrid, MaxRows, MaxColumns, pinned);
-			m_ScoreGrid = new ScoreGrid(MaxRows, MaxColumns, DefaultRules);
-
-			m_Grids = new GameGrid[] { m_Grid, m_ScoreGrid };
+			SetupLevelData(new BlocksGrid(startGrid, MaxRows, MaxColumns, pinned), new ScoreGrid(MaxRows, MaxColumns, DefaultRules), DefaultRules, (MatchScoringType)~0);
 
 			m_SkipGridSetup = true;
 			yield return EvaluateGrid(blocks, blocksDone, 2, 6, false);
+		}
+
+		#endregion
+
+		#region Objectives Tests
+
+		[UnityTest]
+		public IEnumerator ClearCoordinatesObjective()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ R, R, R, N, N, N, N, N, B, B, B, N, N },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+			};
+
+			yield return SetupGrid(blocks, DefaultRules, (MatchScoringType)~0);
+
+			var objective = new ClearCoordinates_Objective();
+			objective.Coordinates.Add(new GridCoords(0, 0));
+			objective.Coordinates.Add(new GridCoords(0, 2));
+			objective.Coordinates.Add(new GridCoords(0, 8));
+			objective.OnPostLevelLoaded(m_Context);
+
+			m_SkipGridSetup = true;
+			yield return EvaluateGrid(blocks, blocksDone, 1, 6, false);
+
+			Assert.IsTrue(objective.Status == ObjectiveStatus.Completed, $"{nameof(ClearCoordinates_Objective)} did not complete.");
 		}
 
 		#endregion

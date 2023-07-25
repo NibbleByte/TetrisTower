@@ -176,6 +176,7 @@ namespace TetrisTower.TowerLevels
 				gameContext.PlayerControls,
 				gameContext.Options,
 				m_PlaythroughData,
+				m_PlaythroughData.TowerLevel,
 				levelController,
 				uiController,
 				behaviours.OfType<ObjectivesUIController>().FirstOrDefault(),

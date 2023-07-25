@@ -69,7 +69,7 @@ namespace TetrisTower.Logic
 		public ScoreGrid Score;
 
 		[SerializeReference]
-		public List<Objective> Objectives;
+		public List<Objective> Objectives = new List<Objective>();
 
 		public TowerLevelRunningState RunningState = TowerLevelRunningState.Preparing;
 		public bool IsPlaying => RunningState <= TowerLevelRunningState.Running;

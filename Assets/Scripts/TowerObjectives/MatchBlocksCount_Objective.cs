@@ -43,8 +43,10 @@ namespace TetrisTower.TowerObjectives
 
 		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
-			var levelController = context.FindByType<GridLevelController>();
-			Init(levelController.LevelData.Rules, levelController.LevelData.Score);
+			var levelData = context.FindByType<GridLevelData>();
+			m_ScoreGrid = levelData.Score;
+			m_ScoreGrid.ClearActionScored += OnClearActionScored;
+			m_Rules = levelData.Rules;
 
 			TryProcessGreetMessage(context.TryFindByType<TowerUI.GreetMessageUIController>());
 
@@ -52,15 +54,6 @@ namespace TetrisTower.TowerObjectives
 			TryDisplayObjective();
 		}
 
-		// For unit tests.
-		public void Init(GridRules rules, ScoreGrid score)
-		{
-			m_ScoreGrid = score;
-			m_ScoreGrid.ClearActionScored += OnClearActionScored;
-			m_Rules = rules;
-		}
-
-		// For unit tests.
 		public void OnPreLevelUnloading()
 		{
 			m_ScoreGrid.ClearActionScored -= OnClearActionScored;

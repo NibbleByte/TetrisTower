@@ -33,7 +33,7 @@ namespace TetrisTower.TowerObjectives
 		{
 			context.TrySetByType(out m_VisualsGrid);
 
-			m_ScoreGrid = context.FindByType<GridLevelController>().LevelData.Score;
+			m_ScoreGrid = context.FindByType<GridLevelData>().Score;
 			m_ScoreGrid.ClearActionScored += OnClearActionScored;
 
 			m_ObjectivesUIController = context.TryFindByType<TowerUI.ObjectivesUIController>();
