@@ -31,14 +31,14 @@ namespace TetrisTower.TowerObjectives
 
 		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
-			// TODO: Validate if blocks exist on the coordinates?
-			context.SetByType(out m_VisualsGrid);
+			context.TrySetByType(out m_VisualsGrid);
 
 			m_ScoreGrid = context.FindByType<GridLevelController>().LevelData.Score;
 			m_ScoreGrid.ClearActionScored += OnClearActionScored;
 
 			m_ObjectivesUIController = context.TryFindByType<TowerUI.ObjectivesUIController>();
 			TryDisplayObjective();
+			TryHighlightTargetBlocks();
 		}
 
 		// For unit tests.
@@ -64,6 +64,26 @@ namespace TetrisTower.TowerObjectives
 				return;
 
 			m_ObjectivesUIController.SetObjectiveText(this, $"Match the highlighted blocks");
+		}
+
+		private void TryHighlightTargetBlocks()
+		{
+			if (m_VisualsGrid == null)
+				return;
+
+			for(int i = 0; i < Coordinates.Count; ++i) {
+				GridCoords coords = Coordinates[i];
+
+				ConeVisualsBlock block = m_VisualsGrid[coords];
+				if (block == null) {
+					Debug.LogWarning($"ClearCoordinates objective needs block at {coords}, but none was found. No block will be highlighted");
+					Coordinates.RemoveAt(i);
+					i--;
+					continue;
+				}
+
+				block.SetHighlight();
+			}
 		}
 
 		public void Validate(UnityEngine.Object context)
