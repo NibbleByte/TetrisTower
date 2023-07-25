@@ -1,5 +1,6 @@
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.UIUtils;
+using Newtonsoft.Json;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
@@ -157,13 +158,52 @@ namespace TetrisTower.Saves
 	// TODO: Temporary class till we find better place for these.
 	public static class SaveManager
 	{
-		public static Newtonsoft.Json.JsonConverter[] GetConverters(GameConfig config) => new Newtonsoft.Json.JsonConverter[] {
+		public static JsonConverter[] GetConverters(GameConfig config) => new JsonConverter[] {
 				new BlocksSkinSetConverter(config.AssetsRepository),
 				new LevelParamAssetConverter(config.AssetsRepository),
 				new WorldLevelsSetConverter(config.AssetsRepository),
 				new GridShapeTemplateConverter(config.AssetsRepository),
 				new Core.RandomXoShiRo128starstarJsonConverter(),
 		};
+
+		public static TReturn Clone<TReturn>(object data, GameConfig config)
+		{
+			var serialized = Serialize<TReturn>(data, config);
+
+			// No need to have the json "TypeNameHandling = Auto" of the root object serialized, as we specify the type in the generics parameter.
+			return Deserialize<TReturn>(serialized, config);
+		}
+
+		public static TReturn Clone<TData, TReturn>(object data, GameConfig config)
+		{
+			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
+			var serialized = JsonConvert.SerializeObject(data, typeof(TData), new JsonSerializerSettings() {
+				Converters = GetConverters(config),
+				TypeNameHandling = TypeNameHandling.Auto,
+				//Formatting = Formatting.Indented,
+			});
+
+			return Deserialize<TReturn>(serialized, config);
+		}
+
+		public static string Serialize<TData>(object data, GameConfig config)
+		{
+			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
+			return JsonConvert.SerializeObject(data, typeof(TData), new JsonSerializerSettings() {
+				Converters = GetConverters(config),
+				TypeNameHandling = TypeNameHandling.Auto,
+				//Formatting = Formatting.Indented,
+			});
+		}
+
+		public static TReturn Deserialize<TReturn>(string serializeData, GameConfig config)
+		{
+			// No need to have the json "TypeNameHandling = Auto" of the root object serialized, as we specify the type in the generics parameter.
+			return JsonConvert.DeserializeObject<TReturn>(serializeData, new JsonSerializerSettings() {
+				Converters = GetConverters(config),
+				TypeNameHandling = TypeNameHandling.Auto,
+			});
+		}
 	}
 
 }

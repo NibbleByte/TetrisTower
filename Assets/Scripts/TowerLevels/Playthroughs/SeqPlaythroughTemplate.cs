@@ -24,17 +24,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
 			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
-			var serialized = JsonConvert.SerializeObject(m_PlayerData, typeof(IPlaythroughData), new JsonSerializerSettings() {
-				Converters = Saves.SaveManager.GetConverters(config),
-				TypeNameHandling = TypeNameHandling.Auto,
-				//Formatting = Formatting.Indented,
-			});
-
-			// No need to have the json "TypeNameHandling = Auto" of the root object serialized, as we specify the type in the generics parameter.
-			return JsonConvert.DeserializeObject<SeqPlaythroughData>(serialized, new JsonSerializerSettings() {
-				Converters = Saves.SaveManager.GetConverters(config),
-				TypeNameHandling = TypeNameHandling.Auto,
-			});
+			return Saves.SaveManager.Clone<IPlaythroughData, SeqPlaythroughData>(m_PlayerData, config);
 		}
 
 		public override IEnumerable<LevelParamData> GetAllLevels()

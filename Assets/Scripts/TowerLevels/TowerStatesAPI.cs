@@ -44,10 +44,7 @@ namespace TetrisTower.TowerLevels
 			if (!string.IsNullOrEmpty(TowerLevelDebugAPI.__DebugInitialTowerLevel)) {
 				var config = Game.GameManager.Instance.GameContext.GameConfig;
 
-				var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, new Newtonsoft.Json.JsonSerializerSettings() {
-					Converters = Saves.SaveManager.GetConverters(config),
-					TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto,
-				});
+				var deserialized = Saves.SaveManager.Deserialize<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, config);
 
 				playthroughData.ReplaceCurrentLevel(deserialized);
 				Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
