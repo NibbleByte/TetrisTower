@@ -80,6 +80,9 @@ namespace TetrisTower.Logic
 			LevelData.Objectives.RemoveAll(obj => obj == null);
 
 			// Objectives are initialized by the level supervisor after everything is setup.
+
+			// If paused previously, resume (since level may be reused on reload).
+			enabled = true;
 		}
 
 		public IEnumerator RunActions(IList<GridAction> actions)

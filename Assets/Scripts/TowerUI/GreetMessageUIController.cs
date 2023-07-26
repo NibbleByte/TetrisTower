@@ -21,6 +21,8 @@ namespace TetrisTower.TowerUI
 					&& m_TowerLevel.LevelData.RunningState == TowerLevelRunningState.Preparing
 					&& !string.IsNullOrWhiteSpace(value)
 					;
+
+				m_Text.gameObject.SetActive(enabled);
 			}
 		}
 
