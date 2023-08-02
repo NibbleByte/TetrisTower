@@ -34,15 +34,33 @@ namespace UnityTools.AssetProcessingTools
 
 				var layer = new TerrainLayer();
 
-				layer.diffuseTexture = (Texture2D) (material.GetTexture("_MainTex") ?? material.GetTexture("_BaseMap"));
-				layer.normalMapTexture = (Texture2D) material.GetTexture("_BumpMap");
+				layer.diffuseTexture = TryGetTexture(material, "_MainTex", "_BaseMap", "_Albedo", "Albedo");
+				layer.normalMapTexture = TryGetTexture(material, "_BumpMap", "_Normal", "Normal");
 				layer.tileOffset = material.mainTextureOffset;
 				layer.tileSize = material.mainTextureScale;
 
 				AssetDatabase.CreateAsset(layer, targetPath);
+
+				if (layer.diffuseTexture == null) {
+					Debug.LogError($"\"{material.name}\" has no diffuse/albedo texture.", material);
+				}
 			}
 
 			AssetDatabase.SaveAssets();
+		}
+
+		private static Texture2D TryGetTexture(Material material, params string[] propertyNames)
+		{
+			foreach(string propertyName in propertyNames) {
+				if (!material.HasTexture(propertyName))
+					continue;
+
+				Texture2D texture = (Texture2D) material.GetTexture(propertyName);
+				if (texture)
+					return texture;
+			}
+
+			return null;
 		}
 	}
 }
