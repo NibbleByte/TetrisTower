@@ -41,6 +41,10 @@ namespace DevLocker.GFrame.Input.Contexts
 
 				if (m_GlobalUIRootObject == null) {
 					m_GlobalUIRootObject = new GameObject(nameof(GlobalPlayerContext)).AddComponent<PlayerContextUIRootObject>();
+
+					// Make it don't destroy on load until setup is done,
+					// or it will be destroyed on switching scenes in the mean time, causing all component subscribers to skip initialization.
+					DontDestroyOnLoad(m_GlobalUIRootObject);
 				}
 
 				return m_GlobalUIRootObject;
