@@ -141,7 +141,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		/// </summary>
 		public void SetInputAction(InputActionReference inputActionReference)
 		{
-			bool wasEnabled = Application.isPlaying && enabled;
+			bool wasEnabled = Application.isPlaying && isActiveAndEnabled;
 			if (wasEnabled) {
 				OnDisable();
 			}
@@ -253,20 +253,18 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			CurrentlyDisplayedData = displayedData;
 			DisplaysIcon = false;
 
-			if (Text) {
-				string usedText = UseShortText && !string.IsNullOrWhiteSpace(CurrentlyDisplayedData.ShortText)
-					? CurrentlyDisplayedData.ShortText
-					: CurrentlyDisplayedData.Text
-					;
+			string usedText = UseShortText && !string.IsNullOrWhiteSpace(CurrentlyDisplayedData.ShortText)
+				? CurrentlyDisplayedData.ShortText
+				: CurrentlyDisplayedData.Text
+				;
 
-				if (!string.IsNullOrWhiteSpace(FormatText)) {
-					usedText = FormatText.Replace("{Hotkey}", usedText);
-				}
-
-				Text.enabled = CurrentlyDisplayedData.HasText;
-				Text.text = displayDataProvider.FormatBindingDisplayText(usedText);
-				DisplaysIcon = usedText != null ? usedText.Contains("<sprite") : false;
+			if (!string.IsNullOrWhiteSpace(FormatText)) {
+				usedText = FormatText.Replace("{Hotkey}", usedText);
 			}
+
+			Text.enabled = CurrentlyDisplayedData.HasText;
+			Text.text = displayDataProvider.FormatBindingDisplayText(usedText);
+			DisplaysIcon = usedText != null ? usedText.Contains("<sprite") : false;
 
 			if (m_LayoutElement) {
 				m_LayoutElement.ignoreLayout = !Text.enabled;
@@ -281,6 +279,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			m_LayoutElement = GetComponent<LayoutElement>();
 			if (Text == null) {
 				Text = GetComponent<TMPro.TextMeshProUGUI>();
+
+				if (Text == null) {
+					Debug.LogError($"\"{name}\" needs to display input action, but no text component available to do so.", this);
+				}
 			}
 
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {

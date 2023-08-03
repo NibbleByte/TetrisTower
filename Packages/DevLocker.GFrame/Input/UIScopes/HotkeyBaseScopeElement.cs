@@ -217,7 +217,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// </summary>
 		public void SetInputAction(InputActionReference inputActionReference)
 		{
-			bool wasEnabled = Application.isPlaying && enabled;
+			bool wasEnabled = Application.isPlaying && isActiveAndEnabled;
 			if (wasEnabled) {
 				OnDisable();
 			}

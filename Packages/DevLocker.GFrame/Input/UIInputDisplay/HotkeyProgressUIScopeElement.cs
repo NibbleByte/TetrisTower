@@ -86,7 +86,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		/// </summary>
 		public void SetInputAction(InputActionReference inputActionReference)
 		{
-			bool wasEnabled = Application.isPlaying && enabled;
+			bool wasEnabled = Application.isPlaying && isActiveAndEnabled;
 			if (wasEnabled) {
 				OnDisable();
 			}
