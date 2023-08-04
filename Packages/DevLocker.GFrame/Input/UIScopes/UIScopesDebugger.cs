@@ -32,6 +32,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			HideInputDetails,
 			DisplayInputActions,
 			DisplayInputBindings,
+			DisplayInputBoth,
 		}
 
 		private UIScopeTreeElement m_RootElement;
@@ -417,17 +418,8 @@ namespace DevLocker.GFrame.Input.UIScope
 							}
 							InputBinding matchBinding = new InputBinding() { groups = currentScheme.bindingGroup };
 
-							var hotkeysNames = m_DisplayHotkeys == DisplayHotkeyType.DisplayInputActions
-								? hotkeys.Select(a => $"[{a.name}] ")
-								: hotkeys.SelectMany(a => a.bindings).Where(b => matchBinding.Matches(b)).Select(b => {
-									var bname = b.ToDisplayString();
-									if (bname.Length > 2 || bname.Contains(' ') || bname.Contains('/'))
-										bname = $"[{bname}]";
-									return bname;
-								})
-								;
-
-							m_HotkeyNamesBuilder.AppendJoin(' ', hotkeysNames);
+							string separator = m_DisplayHotkeys == DisplayHotkeyType.DisplayInputBindings ? ", " : " | ";
+							m_HotkeyNamesBuilder.AppendJoin(separator, GetHotkeyNames(hotkeys, matchBinding));
 						}
 
 					} else {
@@ -449,14 +441,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					if (m_DisplayHotkeys != DisplayHotkeyType.HideInputDetails) {
 						string hotkeyLabel = m_HotkeyNamesBuilder.ToString();
 						if (!string.IsNullOrEmpty(hotkeyLabel)) {
-							switch(m_DisplayHotkeys) {
-								case DisplayHotkeyType.DisplayInputActions:
-									EditorGUILayout.TextField(hotkeyLabel);
-									break;
-								case DisplayHotkeyType.DisplayInputBindings:
-									EditorGUILayout.LabelField(hotkeyLabel, EditorStyles.helpBox);
-									break;
-							}
+							EditorGUILayout.TextField(hotkeyLabel);
 						}
 					}
 
@@ -501,6 +486,93 @@ namespace DevLocker.GFrame.Input.UIScope
 				if( temp != null )
 					Destroy( temp );
 			}
+		}
+
+		private IEnumerable<string> GetHotkeyNames(IEnumerable<InputAction> actions, InputBinding matchBinding)
+		{
+			switch (m_DisplayHotkeys) {
+				case DisplayHotkeyType.DisplayInputActions:
+					foreach(InputAction action in actions) {
+						yield return $"{action.name}";
+					}
+					break;
+
+				case DisplayHotkeyType.DisplayInputBindings:
+					foreach (InputAction action in actions) {
+						for(int i = 0; i < action.bindings.Count; ++i) {
+							InputBinding binding = action.bindings[i];
+
+							if (binding.isComposite) {
+								if (i < action.bindings.Count - 1 && !matchBinding.Matches(action.bindings[i + 1]))
+									continue;
+
+							} else if (!matchBinding.Matches(binding) || binding.isPartOfComposite) {
+								continue;
+							}
+
+							string bindingName = GetBindingNameToDisplay(action, i);
+							if (string.IsNullOrWhiteSpace(bindingName))
+								continue;
+
+							yield return bindingName;
+						}
+					}
+					break;
+
+				case DisplayHotkeyType.DisplayInputBoth:
+
+					List<string> bindingNames = new List<string>();
+
+					foreach (InputAction action in actions) {
+						bindingNames.Clear();
+
+						for (int i = 0; i < action.bindings.Count; ++i) {
+							InputBinding binding = action.bindings[i];
+
+							if (binding.isComposite) {
+								if (i < action.bindings.Count - 1 && !matchBinding.Matches(action.bindings[i + 1]))
+									continue;
+
+							} else if (!matchBinding.Matches(binding) || binding.isPartOfComposite) {
+								continue;
+							}
+
+							string bindingName = GetBindingNameToDisplay(action, i);
+							if (string.IsNullOrWhiteSpace(bindingName))
+								continue;
+
+							bindingNames.Add(bindingName);
+						}
+
+						if (bindingNames.Count > 0) {
+							yield return $"{action.name} = {string.Join(", ", bindingNames)}";
+						} else {
+							yield return $"{action.name}";
+						}
+					}
+					break;
+
+				default:
+					throw new ArgumentException(m_DisplayHotkeys.ToString());
+			}
+		}
+
+		private static string GetBindingNameToDisplay(InputAction action, int bindingIndex)
+		{
+			string bname;
+			try {
+				bname = action.GetBindingDisplayString(bindingIndex);
+			} catch(NotImplementedException) {
+				// HACK: current version of the InputSystem 1.3.0 doesn't support texts for special bindings like "*/{Submit}".
+				// This is what they say in the MatchControlsRecursive():
+				////TODO: support scavenging a subhierarchy for usages
+				//throw new NotImplementedException("Matching usages inside subcontrols instead of at device root");
+				bname = action.bindings[bindingIndex].ToDisplayString();
+			}
+
+			if (bname.Length > 2 || bname.Contains(' ') || bname.Contains('/'))
+				bname = $"[{bname}]";
+			return bname;
 		}
 
 		#region Event handlers for refresh
