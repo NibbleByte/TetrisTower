@@ -18,26 +18,9 @@ namespace DevLocker.GFrame.Input.UIScope
 {
 	internal class UIScopesDebugger : EditorWindow
 	{
-		private class UIScopeTreeElement
-		{
-			public UIScope Scope;
-			public int Depth = 0;
-			public List<UIScopeTreeElement> Children = new List<UIScopeTreeElement>();
-
-			public bool Foldout = true;
-		}
-
-		private enum DisplayHotkeyType
-		{
-			HideInputDetails,
-			DisplayInputActions,
-			DisplayInputBindings,
-			DisplayInputBoth,
-		}
-
 		private UIScopeTreeElement m_RootElement;
 		private bool m_ShowInactiveScopes = false;
-		private DisplayHotkeyType m_DisplayHotkeys = DisplayHotkeyType.HideInputDetails;
+		private UIScopeDebugUtils.DisplayHotkeyType m_DisplayHotkeys = UIScopeDebugUtils.DisplayHotkeyType.HideInputDetails;
 		private bool m_FocusedScopeWasDrawn = false;
 
 		private Vector2 m_ScrollView = Vector2.zero;
@@ -232,7 +215,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			{
 				m_ShowInactiveScopes = EditorGUILayout.Toggle("Show Inactive Scopes", m_ShowInactiveScopes, GUILayout.Width(16));
 
-				m_DisplayHotkeys = (DisplayHotkeyType) EditorGUILayout.EnumPopup(" ", m_DisplayHotkeys);
+				m_DisplayHotkeys = (UIScopeDebugUtils.DisplayHotkeyType) EditorGUILayout.EnumPopup(" ", m_DisplayHotkeys);
 			}
 			EditorGUILayout.EndHorizontal();
 
@@ -271,27 +254,14 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			try {
 				if (prefabStage == null) {
-					List<GameObject> allObjects = new List<GameObject>();
 
-					for (int i = 0; i < SceneManager.sceneCount; ++i) {
-						allObjects.AddRange(SceneManager.GetSceneAt(i).GetRootGameObjects());
-					}
-
-					allObjects.AddRange(GetDontDestroyOnLoadObjects());
-
-					for (int i = 0; i < allObjects.Count; ++i) {
-
-						if (EditorUtility.DisplayCancelableProgressBar("UIScopes scan", $"Searching \"{allObjects[i].name}\"...", (float) i / allObjects.Count))
-							break;
-
-						GatherScopes(m_RootElement, allObjects[i].transform);
-					}
+					UIScopeDebugUtils.GatherScopes(m_RootElement, GatherScopesIterator);
 
 				} else {
 
 					EditorUtility.DisplayCancelableProgressBar("UIScopes scan", $"Searching \"{prefabStage.prefabContentsRoot.name}\"...", 0f);
 
-					GatherScopes(m_RootElement, prefabStage.prefabContentsRoot.transform);
+					UIScopeDebugUtils.GatherScopes(m_RootElement, prefabStage.prefabContentsRoot.transform, GatherScopesIterator);
 				}
 			}
 			finally {
@@ -300,24 +270,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
-		private void GatherScopes(UIScopeTreeElement element, Transform transform)
+		private void GatherScopesIterator(Transform transform)
 		{
 			if (m_ForceInputDevice == null) {
 				m_ForceInputDevice = transform.GetComponent<ForceInputDevice>();
-			}
-
-			UIScope scope = transform.GetComponent<UIScope>();
-			if (scope) {
-				if (scope.IsRoot) {
-					element = m_RootElement;
-				}
-
-				element.Children.Add(new UIScopeTreeElement() { Scope = scope, Depth = element.Depth + 1 });
-				element = element.Children.Last();
-			}
-
-			foreach(Transform child in transform) {
-				GatherScopes(element, child);
 			}
 		}
 
@@ -399,7 +355,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 
 
-						if (m_DisplayHotkeys != DisplayHotkeyType.HideInputDetails) {
+						if (m_DisplayHotkeys != UIScopeDebugUtils.DisplayHotkeyType.HideInputDetails) {
 							List<InputAction> hotkeys = new List<InputAction>();
 
 							foreach (var hotkeyElement in scopeElements.OfType<IHotkeysWithInputActions>()) {
@@ -418,8 +374,8 @@ namespace DevLocker.GFrame.Input.UIScope
 							}
 							InputBinding matchBinding = new InputBinding() { groups = currentScheme.bindingGroup };
 
-							string separator = m_DisplayHotkeys == DisplayHotkeyType.DisplayInputBindings ? ", " : " | ";
-							m_HotkeyNamesBuilder.AppendJoin(separator, GetHotkeyNames(hotkeys, matchBinding));
+							string separator = m_DisplayHotkeys == UIScopeDebugUtils.DisplayHotkeyType.DisplayInputBindings ? ", " : " | ";
+							m_HotkeyNamesBuilder.AppendJoin(separator, UIScopeDebugUtils.GetHotkeyNames(hotkeys, matchBinding, m_DisplayHotkeys));
 						}
 
 					} else {
@@ -438,7 +394,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					GUILayout.Space(8f);
 
-					if (m_DisplayHotkeys != DisplayHotkeyType.HideInputDetails) {
+					if (m_DisplayHotkeys != UIScopeDebugUtils.DisplayHotkeyType.HideInputDetails) {
 						string hotkeyLabel = m_HotkeyNamesBuilder.ToString();
 						if (!string.IsNullOrEmpty(hotkeyLabel)) {
 							EditorGUILayout.TextField(hotkeyLabel);
@@ -460,119 +416,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			foreach(UIScopeTreeElement child in element.Children) {
 				SetFoldoutRecursively(child, foldout);
 			}
-		}
-
-
-		// Turns out DontDestroyOnLoad scene is not included in the SceneManager.
-		// https://forum.unity.com/threads/editor-script-how-to-access-objects-under-dontdestroyonload-while-in-play-mode.442014/#post-3570916
-		private GameObject[] GetDontDestroyOnLoadObjects()
-		{
-			if (!Application.isPlaying)
-				return Array.Empty<GameObject>();
-
-			GameObject temp = null;
-			try
-			{
-				temp = new GameObject();
-				DontDestroyOnLoad(temp);
-				Scene dontDestroyOnLoad = temp.scene;
-				Destroy(temp);
-				temp = null;
-
-				return dontDestroyOnLoad.GetRootGameObjects();
-			}
-			finally
-			{
-				if( temp != null )
-					Destroy( temp );
-			}
-		}
-
-		private IEnumerable<string> GetHotkeyNames(IEnumerable<InputAction> actions, InputBinding matchBinding)
-		{
-			switch (m_DisplayHotkeys) {
-				case DisplayHotkeyType.DisplayInputActions:
-					foreach(InputAction action in actions) {
-						yield return $"{action.name}";
-					}
-					break;
-
-				case DisplayHotkeyType.DisplayInputBindings:
-					foreach (InputAction action in actions) {
-						for(int i = 0; i < action.bindings.Count; ++i) {
-							InputBinding binding = action.bindings[i];
-
-							if (binding.isComposite) {
-								if (i < action.bindings.Count - 1 && !matchBinding.Matches(action.bindings[i + 1]))
-									continue;
-
-							} else if (!matchBinding.Matches(binding) || binding.isPartOfComposite) {
-								continue;
-							}
-
-							string bindingName = GetBindingNameToDisplay(action, i);
-							if (string.IsNullOrWhiteSpace(bindingName))
-								continue;
-
-							yield return bindingName;
-						}
-					}
-					break;
-
-				case DisplayHotkeyType.DisplayInputBoth:
-
-					List<string> bindingNames = new List<string>();
-
-					foreach (InputAction action in actions) {
-						bindingNames.Clear();
-
-						for (int i = 0; i < action.bindings.Count; ++i) {
-							InputBinding binding = action.bindings[i];
-
-							if (binding.isComposite) {
-								if (i < action.bindings.Count - 1 && !matchBinding.Matches(action.bindings[i + 1]))
-									continue;
-
-							} else if (!matchBinding.Matches(binding) || binding.isPartOfComposite) {
-								continue;
-							}
-
-							string bindingName = GetBindingNameToDisplay(action, i);
-							if (string.IsNullOrWhiteSpace(bindingName))
-								continue;
-
-							bindingNames.Add(bindingName);
-						}
-
-						if (bindingNames.Count > 0) {
-							yield return $"{action.name} = {string.Join(", ", bindingNames)}";
-						} else {
-							yield return $"{action.name}";
-						}
-					}
-					break;
-
-				default:
-					throw new ArgumentException(m_DisplayHotkeys.ToString());
-			}
-		}
-
-		private static string GetBindingNameToDisplay(InputAction action, int bindingIndex)
-		{
-			string bname;
-			try {
-				bname = action.GetBindingDisplayString(bindingIndex);
-			} catch(NotImplementedException) {
-				// HACK: current version of the InputSystem 1.3.0 doesn't support texts for special bindings like "*/{Submit}".
-				// This is what they say in the MatchControlsRecursive():
-				////TODO: support scavenging a subhierarchy for usages
-				//throw new NotImplementedException("Matching usages inside subcontrols instead of at device root");
-				bname = action.bindings[bindingIndex].ToDisplayString();
-			}
-
-			if (bname.Length > 2 || bname.Contains(' ') || bname.Contains('/'))
-				bname = $"[{bname}]";
-			return bname;
 		}
 
 		#region Event handlers for refresh

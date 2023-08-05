@@ -119,7 +119,15 @@ namespace DevLocker.GFrame.Input.UIScope
 		public static event ScopeEvent ScopeDeactivating;
 		public static event ScopeEvent ScopeUnfocusing;
 
-		public UIScope LastFocusedScope => m_LastFocusedScope;
+		public UIScope LastFocusedScope {
+			get => m_LastFocusedScope;
+			set {
+				if (value == this)
+					throw new ArgumentException($"Previous scope can't be itself {name}");
+
+				m_LastFocusedScope = value;
+			}
+		}
 		private UIScope m_LastFocusedScope;
 
 		public int ScopeDepth => m_ScopeDepth;
@@ -183,7 +191,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 				}
-				
+
 				// Got destroyed
 				m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
@@ -197,7 +205,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 				}
-				
+
 				// Got destroyed
 				m_DirectChildScopes.RemoveAll((scope) => scope == null);
 
@@ -693,7 +701,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
-			
+
 			// Got destroyed
 			m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
@@ -720,7 +728,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				// It is fine, they will get scanned on initialize or getter propery for owned elements.
 				return;
 			}
-			
+
 			// Got destroyed
 			m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
@@ -748,7 +756,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
 				ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 			}
-			
+
 			// Got destroyed
 			m_ScopeElements.RemoveAll((se) => se is MonoBehaviour monoBehaviour && monoBehaviour == null);
 
@@ -774,7 +782,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				if (AutomaticFocus) {
 					foreach (IScopeElement scopeElement in m_ScopeElements) {
-						
+
 						// Got destroyed
 						if (scopeElement is MonoBehaviour monoBehaviour && monoBehaviour == null)
 							continue;
@@ -892,7 +900,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			PreProcessInput(active);
 
 			foreach(IScopeElement scopeElement in m_ScopeElements) {
-				
+
 				// Got destroyed
 				if (scopeElement is MonoBehaviour monoBehaviour && monoBehaviour == null)
 					continue;
