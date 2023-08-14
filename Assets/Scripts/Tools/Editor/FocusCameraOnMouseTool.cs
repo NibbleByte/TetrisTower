@@ -17,7 +17,11 @@ namespace UnityTools.AssetProcessingTools
 			if (Application.isPlaying)
 				return;
 
-			SceneView.duringSceneGui += FocusCameraOnSceneGUI;
+			if (SceneView.lastActiveSceneView.autoRepaintOnSceneChange) {
+				SceneView.duringSceneGui += FocusCameraOnSceneGUI;
+			} else {
+				FocusCameraOnGameView();
+			}
 
 			UnsubscribeForRevert();
 			SubscribeForRevert();
@@ -39,6 +43,28 @@ namespace UnityTools.AssetProcessingTools
 			PrefabStage.prefabStageClosing -= OnPrefabStageChanged;
 		}
 
+		private static void FocusCameraOnGameView()
+		{
+			GameObject rotatorGO = GameObject.Find("TowerRotator");
+			if (rotatorGO == null) {
+				Debug.LogError("No camera rotator found!");
+				return;
+			}
+
+			GameObject towerGO = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
+			if (towerGO == null) {
+				Debug.LogError("No tower placeholder found.");
+				return;
+			}
+
+			var camera = rotatorGO.GetComponentInChildren<Camera>();
+			Vector3 mousePos = Event.current.mousePosition;	// Turns out this works in the MenuItem call.
+			mousePos.y = Screen.height - mousePos.y;
+			Ray ray = camera.ScreenPointToRay(mousePos);
+
+			FocusRotatorTo(rotatorGO, towerGO, ray);
+		}
+
 		private static void FocusCameraOnSceneGUI(SceneView sceneView)
 		{
 			SceneView.duringSceneGui -= FocusCameraOnSceneGUI;
@@ -55,14 +81,27 @@ namespace UnityTools.AssetProcessingTools
 				return;
 			}
 
-			var plane = new Plane(Vector3.up, towerGO.transform.position);
-
 			Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
-			float rayDist;
-			plane.Raycast(ray, out rayDist);
+			FocusRotatorTo(rotatorGO, towerGO, ray);
+		}
 
-			Vector3 focusPos = ray.GetPoint(rayDist);
+		private static void FocusRotatorTo(GameObject rotatorGO, GameObject towerGO, Ray ray)
+		{
+			Vector3 focusPos;
+			if (Physics.Raycast(ray, out RaycastHit hitInfo)) {
+				focusPos = hitInfo.point;
+
+			} else {
+
+				var plane = new Plane(Vector3.up, towerGO.transform.position);
+
+				if (!plane.Raycast(ray, out float rayDist))
+					return;
+
+				focusPos = ray.GetPoint(rayDist);
+			}
+
 
 			focusPos.y = rotatorGO.transform.position.y;
 			rotatorGO.transform.LookAt(focusPos, Vector3.up);
