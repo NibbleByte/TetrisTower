@@ -12,8 +12,6 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 	/// </summary>
 	public class SampleMainMenuLevelSupervisor : ILevelSupervisor
 	{
-		private InputEnabler m_InputEnabler;
-
 #if GFRAME_ASYNC
 		public async Task LoadAsync()
 #else
@@ -59,8 +57,7 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 				);
 
 			// The whole level is UI, so enable it for the whole level.
-			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(gameContext.PlayerControls.Sample_UI);
+			PlayerContextUIRootObject.GlobalPlayerContext.InputContext.Enable(this, gameContext.PlayerControls.Sample_UI);
 		}
 
 #if GFRAME_ASYNC
@@ -69,7 +66,7 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 		public IEnumerator Unload()
 #endif
 		{
-			m_InputEnabler.Dispose();
+			PlayerContextUIRootObject.GlobalPlayerContext.InputContext.Disable(this);
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;

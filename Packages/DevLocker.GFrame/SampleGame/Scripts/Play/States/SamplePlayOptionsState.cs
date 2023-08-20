@@ -13,22 +13,19 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private SamplePlayerControls m_PlayerControls;
 		private SamplePlayUIController m_UIController;
 
-		private InputEnabler m_InputEnabler;
-
 		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_UIController);
 
-			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.Sample_UI);
+			m_PlayerControls.Enable(this, m_PlayerControls.Sample_UI);
 
 			m_UIController.SwitchState(PlayUIState.Options);
 		}
 
 		public void ExitState()
 		{
-			m_InputEnabler.Dispose();
+			m_PlayerControls.Disable(this);
 		}
 	}
 }

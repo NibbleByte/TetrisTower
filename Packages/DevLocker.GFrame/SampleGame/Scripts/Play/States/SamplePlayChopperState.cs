@@ -17,22 +17,19 @@ namespace DevLocker.GFrame.SampleGame.Play
 		private SamplePlayerController m_PlayerController;
 		private SamplePlayUIController m_UIController;
 
-		private InputEnabler m_InputEnabler;
-
 		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_PlayerController);
 			context.SetByType(out m_UIController);
 
-			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.Sample_UI);
-			m_InputEnabler.Enable(m_PlayerControls.Sample_PlayChopper);
+			m_PlayerControls.Enable(this, m_PlayerControls.Sample_UI);
+			m_PlayerControls.Enable(this, m_PlayerControls.Sample_PlayChopper);
 			m_PlayerControls.Sample_PlayChopper.SetCallbacks(this);
 
 			// You don't want "Return" key to trigger selected buttons.
-			m_InputEnabler.Disable(m_PlayerControls.Sample_UI.Submit);
-			m_InputEnabler.Disable(m_PlayerControls.Sample_UI.Navigate);
+			m_PlayerControls.Disable(this, m_PlayerControls.Sample_UI.Submit);
+			m_PlayerControls.Disable(this, m_PlayerControls.Sample_UI.Navigate);
 
 			m_UIController.SwitchState(PlayUIState.Play, false);
 		}
@@ -40,7 +37,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public void ExitState()
 		{
 			m_PlayerControls.Sample_PlayChopper.SetCallbacks(null);
-			m_InputEnabler.Dispose();
+			m_PlayerControls.Disable(this);
 		}
 
 		public void OnChopperMovement(InputAction.CallbackContext context)

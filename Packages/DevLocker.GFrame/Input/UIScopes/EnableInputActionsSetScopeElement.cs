@@ -14,8 +14,6 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		public InputActionsSetDef ActionsSet;
 
-		private InputEnabler m_InputEnabler;
-
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
@@ -29,8 +27,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void Awake()
 		{
-			m_InputEnabler = new InputEnabler(this);
-
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {
@@ -47,7 +43,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_HasInitialized)
 				return;
 
-			m_InputEnabler.Enable(GetUsedActions(m_PlayerContext.InputContext));
+			m_PlayerContext.InputContext.Enable(this, GetUsedActions(m_PlayerContext.InputContext));
 		}
 
 		void OnDisable()
@@ -55,7 +51,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (!m_HasInitialized)
 				return;
 
-			m_InputEnabler.Enable(GetUsedActions(m_PlayerContext.InputContext));
+			m_PlayerContext.InputContext.Disable(this, GetUsedActions(m_PlayerContext.InputContext));
 		}
 
 		public IEnumerable<InputAction> GetUsedActions(IInputContext inputContext)

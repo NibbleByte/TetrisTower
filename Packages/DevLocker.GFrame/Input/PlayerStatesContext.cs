@@ -97,6 +97,9 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public void AddReference<T>(T reference)
 		{
+			if (reference == null)
+				throw new ArgumentNullException();
+
 			if (m_Context.OfType<T>().Any())
 				throw new ArgumentException($"Trying to add reference of type \"{nameof(T)}\" that already exists. {reference}");
 

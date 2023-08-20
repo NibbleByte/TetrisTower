@@ -33,8 +33,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private Coroutine m_CancelCheckAfterPeformCrt;
 
-		protected InputEnabler m_InputEnabler;
-
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
 
@@ -48,8 +46,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected virtual void Awake()
 		{
-			m_InputEnabler = new InputEnabler(this);
-
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
 
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {
@@ -89,7 +85,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				action.performed += OnInputPerformed;
 				action.canceled += OnInputCancel;
 
-				m_InputEnabler.Enable(action);
+				m_PlayerContext.InputContext.Enable(this, action);
 			}
 		}
 
@@ -105,11 +101,11 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_ActionStarted = false;
 			m_ActionPerformed = false;
 
-			foreach (InputAction action in m_InputEnabler.ToList()) {
+			foreach (InputAction action in m_PlayerContext.InputContext.GetInputActionsEnabledBy(this).ToList()) {
 				action.started -= OnInputStarted;
 				action.performed -= OnInputPerformed;
 				action.canceled -= OnInputCancel;
-				m_InputEnabler.Disable(action);
+				m_PlayerContext.InputContext.Disable(this, action);
 			}
 		}
 

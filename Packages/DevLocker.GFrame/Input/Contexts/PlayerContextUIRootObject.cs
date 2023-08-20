@@ -129,6 +129,10 @@ namespace DevLocker.GFrame.Input.Contexts
 			StatesStack = new PlayerStateStack(references);
 			StatesStack.Context.AddReference(this);
 
+			if (!references.OfType<IInputContext>().Any()) {
+				StatesStack.Context.AddReference(InputContext);
+			}
+
 			StatesStackCreated?.Invoke();
 		}
 

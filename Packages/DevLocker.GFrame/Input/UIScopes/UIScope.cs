@@ -213,6 +213,41 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+		/// <summary>
+		/// Get all child scopes recursively, not just the direct children.
+		/// If hierarchy changed, you may want to re-scan the child scopes <see cref="ScanForOwnedScopeElements()"></see>
+		/// </summary>
+		public List<UIScope> GetAllChildScopes()
+		{
+			var childScopes = new List<UIScope>();
+
+			GetAllChildScopes(this, childScopes);
+
+			return childScopes;
+		}
+
+		/// <summary>
+		/// Get all elements of this and any child scopes recursively, not just the direct children.
+		/// If hierarchy changed, you may want to re-scan the child scopes <see cref="ScanForOwnedScopeElements()"></see>
+		/// </summary>
+		public IEnumerable<IScopeElement> GetAllChildScopeElements()
+		{
+			var childScopes = new List<UIScope>();
+
+			GetAllChildScopes(this, childScopes);
+
+			foreach(IScopeElement element in OwnedElements) {
+				yield return element;
+			}
+
+			foreach(UIScope scope in childScopes) {
+				foreach (IScopeElement element in scope.OwnedElements) {
+					yield return element;
+				}
+			}
+		}
+
+
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
 
@@ -814,6 +849,14 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+		private static void GetAllChildScopes(UIScope parentScope, List<UIScope> childScopes)
+		{
+			foreach(UIScope scope in parentScope.DirectChildScopes) {
+				childScopes.Add(scope);
+				GetAllChildScopes(scope, childScopes);
+			}
+		}
+
 		protected static UIScope[] CollectScopes(Component target)
 		{
 			return target
@@ -927,8 +970,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 			}
 
-			// Pushing input on stack will reset the actions anyway.
-			if (ResetAllActionsOnEnable && active && !PushInputStack) {
+			if (ResetAllActionsOnEnable && active) {
 
 				// Resets all enabled actions. This will interrupt their progress and any gesture, drag, sequence will be canceled.
 				// Useful on changing states or scopes, so gestures, drags, sequences don't leak in.
@@ -942,13 +984,22 @@ namespace DevLocker.GFrame.Input.UIScope
 			if (active) {
 
 				if (PushInputStack) {
-					context.PushActionsState(this);
+
+					// Prepare a mask so child scope elements can enable actions normally, suppressing the previously active ones.
+					var actionsMask = GetAllChildScopeElements()
+						.OfType<IHotkeysWithInputActions>()
+						.SelectMany(element => element.GetUsedActions(context))
+						.ToHashSet()
+						;
 
 					if (IncludeUIActions) {
 						foreach (var action in context.GetUIActions()) {
-							action.Enable();
+							actionsMask.Add(action);
+							context.Enable(this, action);
 						}
 					}
+
+					context.PushOrSetActionsMask(this, actionsMask);
 				}
 
 			}
@@ -965,7 +1016,14 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			if (!active) {
 				if (PushInputStack) {
-					context.PopActionsState(this);
+
+					if (IncludeUIActions) {
+						foreach (var action in context.GetUIActions()) {
+							context.Disable(this, action);
+						}
+					}
+
+					context.PopActionsMask(this);
 				}
 			}
 #endif

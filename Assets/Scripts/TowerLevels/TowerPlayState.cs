@@ -28,8 +28,6 @@ namespace TetrisTower.TowerLevels
 
 		private int m_LastUpdateFrame;
 
-		private InputEnabler m_InputEnabler;
-
 		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_PlayerControls);
@@ -38,14 +36,13 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_GameConfig);
 			context.SetByType(out m_Options);
 
-			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.UI);
-			m_InputEnabler.Enable(m_PlayerControls.TowerLevelPlay);
+			m_PlayerControls.Enable(this, m_PlayerControls.UI);
+			m_PlayerControls.Enable(this, m_PlayerControls.TowerLevelPlay);
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(this);
 
 			// You don't want "Return" key to trigger selected buttons.
-			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
-			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
+			m_PlayerControls.Disable(this, m_PlayerControls.UI.Submit);
+			m_PlayerControls.Disable(this, m_PlayerControls.UI.Navigate);
 
 			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
@@ -57,7 +54,7 @@ namespace TetrisTower.TowerLevels
 		public void ExitState()
 		{
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
-			m_InputEnabler.Dispose();
+			m_PlayerControls.Disable(this);
 
 			MessageBox.Instance.MessageShown -= m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed -= m_LevelController.ResumeLevel;

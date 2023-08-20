@@ -13,8 +13,6 @@ namespace TetrisTower.HomeScreen
 {
 	public class HomeScreenLevelSupervisor : ILevelSupervisor
 	{
-		private InputEnabler m_InputEnabler;
-
 		public async Task LoadAsync()
 		{
 			var gameContext = GameManager.Instance.GameContext;
@@ -46,13 +44,12 @@ namespace TetrisTower.HomeScreen
 			//	);
 
 			// The whole level is UI, so enable it for the whole level.
-			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(gameContext.PlayerControls.UI);
+			gameContext.PlayerControls.Enable(this, gameContext.PlayerControls.UI);
 		}
 
 		public Task UnloadAsync()
 		{
-			m_InputEnabler.Dispose();
+			GameManager.Instance.GameContext.PlayerControls.Disable(this);
 
 			return Task.CompletedTask;
 		}

@@ -168,7 +168,9 @@ namespace DevLocker.GFrame.Input
 	}
 
 	/// <summary>
-	/// Implement this if your game uses Unity Input system with generated IInputActionCollection.
+	/// Implement this if your game uses Unity Input system with generated <see cref="IInputActionCollection"/>.
+	/// HINT: Your implementation of <see cref="IInputActionCollection"/> can also implement this interface,
+	///		  forwarding the calls to the real input context so it is easier to use.
 	/// </summary>
 	public interface IInputContext
 	{
@@ -189,25 +191,57 @@ namespace DevLocker.GFrame.Input
 		InputDevice ForcedDevice { get; set; }
 
 		/// <summary>
+		/// Does the current device support UI navigation.
+		/// </summary>
+		bool DeviceSupportsUINavigationSelection { get; }
+
+		/// <summary>
 		/// Find InputAction by action name or id.
 		/// </summary>
 		InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false);
 
 		/// <summary>
-		/// Push a new entry in the input actions stack, by specifying who is the source of the request.
-		/// All Enable() / Disable() InputAction calls after that belong to the newly pushed (top) entry.
-		/// If resetActions is true, all InputActions will be disabled after this call.
-		/// Previous top entry will record the InputActions enabled flags at the moment and re-apply them when it is reactivated.
-		/// It is strongly recommended to implement this method using <see cref="InputActionsStack" />.
+		/// Enable action via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		void PushActionsState(object source, bool resetActions = true);
+		void Enable(object source, InputAction action);
 
 		/// <summary>
-		/// Removes an entry made from the specified source in the input actions stack.
-		/// If that entry was the top of the stack, next entry state's enabled flags are applied to the InputActions.
-		/// It is strongly recommended to implement this method using <see cref="InputActionsStack" />.
+		/// Disable action via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		bool PopActionsState(object source);
+		void Disable(object source, InputAction action);
+
+		/// <summary>
+		/// Disable all input actions enabled by the provided source object via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		void Disable(object source);
+
+		/// <summary>
+		/// Returns all input actions enabled by specified source.
+		/// </summary>
+		IEnumerable<InputAction> GetInputActionsEnabledBy(object source);
+
+		/// <summary>
+		/// Push actions mask filtering in actions allowed to be enabled in the <see cref="InputActionsMaskedStack"/>.
+		/// If mask is added or set to the top of the stack it will be applied immediately disabling any actions not included.
+		/// Masks not on the top of the stack don't affect the actions state.
+		/// </summary>
+		void PushOrSetActionsMask(object source, IEnumerable<InputAction> actionsMask, bool setBackToTop = false);
+
+		/// <summary>
+		/// Remove actions mask by the source it pushed it in the <see cref="InputActionsMaskedStack"/>.
+		/// Removing it will restore the actions state according to the next mask in the stack or their original tracked state.
+		/// </summary>
+		void PopActionsMask(object source);
 
 		/// <summary>
 		/// Return all actions required for the UI input to work properly.
@@ -267,11 +301,6 @@ namespace DevLocker.GFrame.Input
 		IInputBindingDisplayDataProvider GetCurrentDisplayDataProvider();
 
 		/// <summary>
-		/// Does the current device support UI navigation.
-		/// </summary>
-		bool DeviceSupportsUINavigationSelection { get; }
-
-		/// <summary>
 		/// Dispose the context when you finished working with it.
 		/// </summary>
 		void Dispose();
@@ -285,181 +314,6 @@ namespace DevLocker.GFrame.Input
 	{
 		InputFieldTextFocused = 1 << 0,
 		NonTextSelectableFocused = 1 << 1,
-	}
-
-	/// <summary>
-	/// Use this to specify what <see cref="InputAction"/>s should be enabled.
-	/// When you're done using them call <see cref="Dispose"/> to disable them back.
-	/// Has checks to see if action state is what is expected and will warn if there are some conflicts.
-	/// </summary>
-	public class InputEnabler : IDisposable, IEnumerable<InputAction>
-	{
-		private object m_Source;
-		private List<InputAction> m_Actions = new List<InputAction>();
-
-		/// <summary>
-		/// Provide source for debug & logging purposes.
-		/// </summary>
-		public InputEnabler(object source)
-		{
-			m_Source = source;
-		}
-
-		/// <summary>
-		/// Enable specified actions and remember them for later.
-		/// </summary>
-		public IEnumerable<InputAction> Enable(IInputContext context, params InputActionReference[] actionReferences)
-		{
-			if (actionReferences.Length == 0)
-				throw new ArgumentException("Empty actions array");
-
-			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
-			Enable(actions);
-			return actions;
-		}
-
-		/// <summary>
-		/// Enable specified actions and remember them for later.
-		/// </summary>
-		public IEnumerable<InputAction> Enable(IInputContext context, IEnumerable<InputActionReference> actionReferences)
-		{
-			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
-			Enable(actions);
-			return actions;
-		}
-
-		/// <summary>
-		/// Enable specified actions and remember them for later.
-		/// </summary>
-		public void Enable(params InputAction[] actions)
-		{
-			if (actions.Length == 0)
-				throw new ArgumentException("Empty actions array");
-
-			Enable((IEnumerable<InputAction>)actions);
-		}
-
-		/// <summary>
-		/// Enable specified actions and remember them for later.
-		/// </summary>
-		public void Enable(IEnumerable<InputAction> actions)
-		{
-			foreach (InputAction action in actions) {
-
-				if (m_Actions.Contains(action)) {
-					Debug.LogWarning($"[Input] Trying to enable InputAction \"{action.name}\" that is already owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
-					continue;
-				}
-
-				if (action.enabled) {
-					Debug.LogError($"[Input] Trying to enable InputAction \"{action.name}\" that is already enabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
-
-				} else {
-					action.Enable();
-					m_Actions.Add(action);
-				}
-			}
-		}
-
-
-		/// <summary>
-		/// Disable and forget specified actions.
-		/// </summary>
-		public IEnumerable<InputAction> Disable(IInputContext context, params InputActionReference[] actionReferences)
-		{
-			if (actionReferences.Length == 0)
-				throw new ArgumentException("Empty actions array");
-
-			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
-			Disable(actions);
-			return actions;
-		}
-
-		/// <summary>
-		/// Disable and forget specified actions.
-		/// </summary>
-		public IEnumerable<InputAction> Disable(IInputContext context, IEnumerable<InputActionReference> actionReferences)
-		{
-			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
-			Disable(actions);
-			return actions;
-		}
-
-		/// <summary>
-		/// Disable and forget specified actions.
-		/// </summary>
-		public void Disable(params InputAction[] actions)
-		{
-			if (actions.Length == 0)
-				throw new ArgumentException("Empty actions array");
-
-			Disable((IEnumerable<InputAction>)actions);
-		}
-
-		/// <summary>
-		/// Disable and forget specified actions.
-		/// </summary>
-		public void Disable(IEnumerable<InputAction> actions)
-		{
-			foreach (InputAction action in actions) {
-
-				if (!m_Actions.Contains(action)) {
-					Debug.LogWarning($"[Input] Trying to disable InputAction \"{action.name}\" that is not owned by \"{m_Source}\".", m_Source as UnityEngine.Object);
-					continue;
-				}
-
-				if (action.enabled) {
-					action.Disable();
-					m_Actions.Remove(action);
-				} else {
-					Debug.LogError($"[Input] Trying to disable InputAction \"{action.name}\" that is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
-					m_Actions.Remove(action);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Enable specified actions and remember them for later.
-		/// </summary>
-		public void Enable(InputActionMap inputActionsMap)
-		{
-			foreach(InputAction action in inputActionsMap) {
-				Enable(action);
-			}
-		}
-
-		/// <summary>
-		/// Disable and forget specified actions.
-		/// </summary>
-		public void Disable(InputActionMap inputActionsMap)
-		{
-			foreach(InputAction action in inputActionsMap) {
-				Disable(action);
-			}
-		}
-
-		/// <summary>
-		/// Call this when you're done using those InputActions to disable all of them.
-		/// </summary>
-		public void Dispose()
-		{
-			foreach (InputAction action in m_Actions) {
-				if (action.enabled) {
-					action.Disable();
-				}else {
-					Debug.LogError($"[Input] Trying to disable InputAction \"{action.name}\" is already disabled! This indicates hotkey conflict. Source: \"{m_Source}\"", m_Source as UnityEngine.Object);
-				}
-			}
-
-			m_Source = null;
-			m_Actions = null;
-		}
-
-		public int Count => m_Actions.Count;
-
-		public IEnumerator<InputAction> GetEnumerator() => m_Actions.GetEnumerator();
-
-		IEnumerator IEnumerable.GetEnumerator() => m_Actions.GetEnumerator();
 	}
 
 	public class PlayerContextUtils
@@ -568,37 +422,182 @@ namespace DevLocker.GFrame.Input
 			return currentDisplayDataProvider.FormatBindingDisplayText(usedText);
 		}
 
+
+		// ======================================================================== \\
+		// ======================================================================== \\
+		// ======================================================================== \\
+
+		#region IInputContext Enable/Disable Actions
+
 		/// <summary>
-		/// Enable <see cref="inputAction"/> using the <see cref="inputEnabler"/>
+		/// Enable action via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static void Enable(this InputAction inputAction, InputEnabler inputEnabler)
+		public static void Enable(this InputAction action, object source, IInputContext context)
 		{
-			inputEnabler.Enable(inputAction);
+			context.Enable(source, action);
 		}
 
 		/// <summary>
-		/// Disable <see cref="inputAction"/> using the <see cref="inputEnabler"/>
+		/// Enable actions via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static void Disable(this InputAction inputAction, InputEnabler inputEnabler)
+		public static void Enable(this IInputContext context, object source, IEnumerable<InputAction> inputActions)
 		{
-			inputEnabler.Disable(inputAction);
+			foreach (InputAction action in inputActions) {
+				context.Enable(source, action);
+			}
 		}
 
 		/// <summary>
-		/// Enable <see cref="inputReference"/> using the <see cref="inputEnabler"/> for <see cref="context"/>
+		/// Enable actions via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static InputAction Enable(this InputActionReference inputReference, IInputContext context, InputEnabler inputEnabler)
+		public static void Enable(this IInputContext context, object source, InputActionMap inputActionsMap)
 		{
-			return inputEnabler.Enable(context, inputReference).First();
+			foreach (InputAction action in inputActionsMap) {
+				context.Enable(source, action);
+			}
 		}
 
 		/// <summary>
-		/// Disable <see cref="inputReference"/> using the <see cref="inputEnabler"/> for <see cref="context"/>
+		/// Enable actions via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static InputAction Disable(this InputActionReference inputReference, IInputContext context, InputEnabler inputEnabler)
+		public static IEnumerable<InputAction> Enable(this IInputContext context, object source, params InputActionReference[] actionReferences)
 		{
-			return inputEnabler.Disable(context, inputReference).First();
+			if (actionReferences.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			context.Enable(source, actions);
+			return actions;
 		}
+
+		/// <summary>
+		/// Enable actions via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static IEnumerable<InputAction> Enable(this IInputContext context, object source, IEnumerable<InputActionReference> actionReferences)
+		{
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			context.Enable(source, actions);
+			return actions;
+		}
+
+		/// <summary>
+		/// Enable actions via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static void Enable(this IInputContext context, object source, params InputAction[] actions)
+		{
+			if (actions.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			context.Enable(source, (IEnumerable<InputAction>)actions);
+		}
+
+		// --------------------------------------------------------------------------------------------------------- \\
+
+		/// <summary>
+		/// Disable action via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static void Disable(this InputAction action, object source, IInputContext context)
+		{
+			context.Disable(source, action);
+		}
+
+		/// <summary>
+		/// Disable actions via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static void Disable(this IInputContext context, object source, IEnumerable<InputAction> inputActions)
+		{
+			foreach (InputAction action in inputActions) {
+				context.Disable(source, action);
+			}
+		}
+
+		/// <summary>
+		/// Disable actions via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static void Disable(this IInputContext context, object source, InputActionMap inputActionsMap)
+		{
+			foreach (InputAction action in inputActionsMap) {
+				context.Disable(source, action);
+			}
+		}
+
+		/// <summary>
+		/// Disable actions via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static IEnumerable<InputAction> Disable(this IInputContext context, object source, params InputActionReference[] actionReferences)
+		{
+			if (actionReferences.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			context.Disable(source, actions);
+			return actions;
+		}
+
+		/// <summary>
+		/// Disable actions via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static IEnumerable<InputAction> Disable(this IInputContext context, object source, IEnumerable<InputActionReference> actionReferences)
+		{
+			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
+			context.Disable(source, actions);
+			return actions;
+		}
+
+		/// <summary>
+		/// Disable actions via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static void Disable(this IInputContext context, object source, params InputAction[] actions)
+		{
+			if (actions.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			context.Disable(source, (IEnumerable<InputAction>)actions);
+		}
+
+		#endregion
 	}
 }
 #endif

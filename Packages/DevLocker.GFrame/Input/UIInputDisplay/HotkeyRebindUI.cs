@@ -69,7 +69,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				return;
 
 			// Actions need to be disabled in order to be re-bind.
-			m_PlayerContext.InputContext.PushActionsState(this, true);
+			m_PlayerContext.InputContext.PushOrSetActionsMask(this, new InputAction[0]);
 
 			m_RebindOperation = action.PerformInteractiveRebinding();
 			m_RebindOperation.WithTargetBinding(DisplayUI.CurrentlyDisplayedData.BindingIndex);
@@ -147,7 +147,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			m_RebindOperation.Dispose();
 			m_RebindOperation = null;
 
-			m_PlayerContext?.InputContext?.PopActionsState(this);
+			m_PlayerContext?.InputContext?.PopActionsMask(this);
 
 			DisplayUI.RefreshDisplay();
 			RebindFinished.Invoke();
@@ -163,7 +163,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			m_RebindOperation.Dispose();
 			m_RebindOperation = null;
 
-			m_PlayerContext?.InputContext?.PopActionsState(this);
+			m_PlayerContext?.InputContext?.PopActionsMask(this);
 
 			DisplayUI.RefreshDisplay();
 			RebindFinished.Invoke();

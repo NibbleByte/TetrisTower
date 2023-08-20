@@ -20,7 +20,7 @@ namespace DevLocker.GFrame.Input.Contexts
 	{
 		public PlayerInput PlayerInput { get; }
 
-		public InputActionsStack InputActionsStack { get; }
+		public InputActionsMaskedStack InputActionsMaskedStack { get; }
 
 		public IReadOnlyCollection<InputAction> UIActions { get; }
 
@@ -58,14 +58,14 @@ namespace DevLocker.GFrame.Input.Contexts
 			}
 		}
 
-		public InputComponentContext(PlayerInput playerInput, InputActionsStack inputStack, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
+		public InputComponentContext(PlayerInput playerInput, InputActionsMaskedStack inputStack, IEnumerable<IInputBindingDisplayDataProvider> bindingDisplayProviders = null)
 		{
 			PlayerInput = playerInput;
 
 			// We'll control the input actions.
 			PlayerInput.defaultActionMap = "";
 
-			InputActionsStack = inputStack;
+			InputActionsMaskedStack = inputStack;
 			var uiActions = new List<InputAction>();
 			if (PlayerInput.uiInputModule) {
 				uiActions.Add(PlayerInput.actions.FindAction(PlayerInput.uiInputModule.point?.action?.id ?? new Guid()));
@@ -121,6 +121,8 @@ namespace DevLocker.GFrame.Input.Contexts
 
 			InputSystem.onEvent -= OnInputSystemEvent;
 			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
+
+			InputActionsMaskedStack.ForceClearAllEnableRequests();
 		}
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false)
@@ -136,14 +138,34 @@ namespace DevLocker.GFrame.Input.Contexts
 			yield return PlayerInput.actions.FindAction(actionNameOrId, throwIfNotFound);
 		}
 
-		public void PushActionsState(object source, bool resetActions = true)
+		public void Enable(object source, InputAction action)
 		{
-			InputActionsStack.PushActionsState(source, resetActions);
+			InputActionsMaskedStack.Enable(source, action);
 		}
 
-		public bool PopActionsState(object source)
+		public void Disable(object source, InputAction action)
 		{
-			return InputActionsStack.PopActionsState(source);
+			InputActionsMaskedStack.Disable(source, action);
+		}
+
+		public void Disable(object source)
+		{
+			InputActionsMaskedStack.Disable(source);
+		}
+
+		public IEnumerable<InputAction> GetInputActionsEnabledBy(object source)
+		{
+			return InputActionsMaskedStack.GetInputActionsEnabledBy(source);
+		}
+
+		public void PushOrSetActionsMask(object source, IEnumerable<InputAction> actionsMask, bool setBackToTop = false)
+		{
+			InputActionsMaskedStack.PushOrSetActionsMask(source, actionsMask, setBackToTop);
+		}
+
+		public void PopActionsMask(object source)
+		{
+			InputActionsMaskedStack.PopActionsMask(source);
 		}
 
 		public IEnumerable<InputAction> GetUIActions()

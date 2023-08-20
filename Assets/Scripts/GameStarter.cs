@@ -1,6 +1,7 @@
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.UIUtils;
 using Newtonsoft.Json;
+using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
@@ -29,6 +30,8 @@ namespace TetrisTower.GameStarter
 		// private as we don't want people accessing this singleton.
 		private static GameStarter m_Instance;
 
+		private DevLocker.GFrame.Input.InputActionsMaskedStack.InputActionConflictsReport m_LastInputConflictsReport = new();
+
 		void Awake()
 		{
 			if (m_Instance) {
@@ -40,7 +43,6 @@ namespace TetrisTower.GameStarter
 			DontDestroyOnLoad(gameObject);
 
 			var playerControls = new PlayerControls();
-			playerControls.InitStack();
 
 			var gameInputObject = Instantiate(GameConfig.GameInputPrefab, transform);
 			Instantiate(GameConfig.MessageBoxPrefab.gameObject, transform);
@@ -49,7 +51,8 @@ namespace TetrisTower.GameStarter
 			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();
 			uiInputModule.actionsAsset = playerControls.asset;
 
-			var inputContext = new InputCollectionContext(playerControls, playerControls.InputStack, playerControls.UI.Get(), GameConfig.BindingDisplayAssets);
+			var inputContext = new InputCollectionContext(playerControls, playerControls.UI.Get(), GameConfig.BindingDisplayAssets);
+			playerControls.SetInputContext(inputContext);
 
 			PlayerContextUIRootObject.GlobalPlayerContext.SetupGlobal(uiInputModule.GetComponent<EventSystem>(), inputContext);
 
@@ -148,6 +151,21 @@ namespace TetrisTower.GameStarter
 		{
 			if (m_Instance == this) {
 				m_Instance = null;
+			}
+		}
+
+		private void LateUpdate()
+		{
+			// Check for InputActions conflicts at the end of every frame and report.
+			var inputContext = (InputCollectionContext)PlayerContextUIRootObject.GlobalPlayerContext.InputContext;
+			if (inputContext != null) {
+				var conflictsReport = inputContext.InputActionsMaskedStack.GetConflictingActionRequests(inputContext.GetUIActions());
+				if (!m_LastInputConflictsReport.Equals(conflictsReport) && conflictsReport.Conflicts.Count > 0) {
+					var conflictStrings = conflictsReport.Conflicts.Select(pair => $"{pair.Key.name} [{string.Join(", ", pair.Value)}]");
+					Debug.LogError($"[Input] Input actions in conflict found:\n{string.Join('\n', conflictStrings)}", this);
+				}
+
+				m_LastInputConflictsReport = conflictsReport;
 			}
 		}
 	}

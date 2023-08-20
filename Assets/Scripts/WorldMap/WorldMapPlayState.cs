@@ -28,22 +28,19 @@ namespace TetrisTower.WorldMap
 		private Vector2 m_PointerPressedLastPosition;
 		private Vector2 m_DragInertia;
 
-		private InputEnabler m_InputEnabler;
-
 		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_UIController);
 
-			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.UI);
-			m_InputEnabler.Enable(m_PlayerControls.WorldMapPlay);
+			m_PlayerControls.Enable(this, m_PlayerControls.UI);
+			m_PlayerControls.Enable(this, m_PlayerControls.WorldMapPlay);
 			m_PlayerControls.WorldMapPlay.SetCallbacks(this);
 
 			// You don't want "Return" key to trigger selected buttons.
-			m_InputEnabler.Disable(m_PlayerControls.UI.Submit);
-			m_InputEnabler.Disable(m_PlayerControls.UI.Navigate);
+			m_PlayerControls.Disable(this, m_PlayerControls.UI.Submit);
+			m_PlayerControls.Disable(this, m_PlayerControls.UI.Navigate);
 
 			m_UIController.SwitchState(UI.WorldMapUIState.Play);
 		}
@@ -51,7 +48,7 @@ namespace TetrisTower.WorldMap
 		public void ExitState()
 		{
 			m_PlayerControls.WorldMapPlay.SetCallbacks(null);
-			m_InputEnabler.Dispose();
+			m_PlayerControls.Disable(this);
 		}
 
 		public void OnPointerClick(InputAction.CallbackContext context)

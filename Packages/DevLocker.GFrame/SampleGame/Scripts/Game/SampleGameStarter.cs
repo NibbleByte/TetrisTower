@@ -7,6 +7,7 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.EventSystems;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
+using System.Linq;
 
 namespace DevLocker.GFrame.SampleGame.Game
 {
@@ -31,6 +32,8 @@ namespace DevLocker.GFrame.SampleGame.Game
 		// private as we don't want people accessing this singleton.
 		private static SampleGameStarter m_Instance;
 
+		private InputActionsMaskedStack.InputActionConflictsReport m_LastInputConflictsReport = new ();
+
 		void Awake()
 		{
 			if (m_Instance) {
@@ -42,7 +45,6 @@ namespace DevLocker.GFrame.SampleGame.Game
 			DontDestroyOnLoad(gameObject);
 
 			var playerControls = new SamplePlayerControls();
-			playerControls.InitStack();
 
 			var gameInputObject = Instantiate(GameInputPrefab, transform);
 			var levelFader = Instantiate(LevelFader.gameObject, transform).GetComponent<UIUtils.UISimpleCanvasGroupFader>();
@@ -57,7 +59,8 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 			playerInput.uiInputModule = uiInputModule;
 
-			var inputContext = new InputComponentContext(playerInput, playerControls.InputStack, BindingDisplayAssets);
+			var inputContext = new InputComponentContext(playerInput, new InputActionsMaskedStack(playerControls), BindingDisplayAssets);
+			playerControls.SetInputContext(inputContext);
 
 			PlayerContextUIRootObject.GlobalPlayerContext.SetupGlobal(uiInputModule.GetComponent<EventSystem>(), inputContext);
 
@@ -113,6 +116,21 @@ namespace DevLocker.GFrame.SampleGame.Game
 		{
 			if (m_Instance == this) {
 				m_Instance = null;
+			}
+		}
+
+		private void LateUpdate()
+		{
+			// Check for InputActions conflicts at the end of every frame and report.
+			var inputContext = (InputComponentContext)PlayerContextUIRootObject.GlobalPlayerContext.InputContext;
+			if (inputContext != null) {
+				var conflictsReport = inputContext.InputActionsMaskedStack.GetConflictingActionRequests(inputContext.GetUIActions());
+				if (!m_LastInputConflictsReport.Equals(conflictsReport) && conflictsReport.Conflicts.Count > 0) {
+					var conflictStrings = conflictsReport.Conflicts.Select(pair => $"- \"{pair.Key.name}\" [{string.Join(", ", pair.Value)}]");
+					Debug.LogError($"[Input] Input actions in conflict found:\n{string.Join('\n', conflictStrings)}", this);
+				}
+
+				m_LastInputConflictsReport = conflictsReport;
 			}
 		}
 

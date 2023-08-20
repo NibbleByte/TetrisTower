@@ -19,8 +19,6 @@ namespace TetrisTower.TowerLevels
 		private ConeVisualsGrid m_VisualsGrid;
 		private TowerConeVisualsController m_VisualsController;
 
-		private InputEnabler m_InputEnabler;
-
 		private ILostAnimationExecutor m_CurrentAnimation;
 		private bool m_Interrupted;
 
@@ -35,13 +33,12 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_VisualsController);
 
 
-			m_InputEnabler = new InputEnabler(this);
-			m_InputEnabler.Enable(m_PlayerControls.UI);
-			m_InputEnabler.Enable(m_PlayerControls.CommonHotkeys);
+			m_PlayerControls.Enable(this, m_PlayerControls.UI);
+			m_PlayerControls.Enable(this, m_PlayerControls.CommonHotkeys);
 			m_PlayerControls.CommonHotkeys.SetCallbacks(this);
 			// HACK: Listen for touch-screen tapping as they don't have CommonHotkeys (back button is not ideal).
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
-			m_InputEnabler.Enable(m_PlayerControls.TowerLevelPlay.PointerPress);
+			m_PlayerControls.Enable(this, m_PlayerControls.TowerLevelPlay.PointerPress);
 
 			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
@@ -71,7 +68,7 @@ namespace TetrisTower.TowerLevels
 		{
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnPointerPressed;
 			m_PlayerControls.CommonHotkeys.SetCallbacks(null);
-			m_InputEnabler.Dispose();
+			m_PlayerControls.Disable(this);
 
 			if (!m_Interrupted) {
 				m_Interrupted = true;

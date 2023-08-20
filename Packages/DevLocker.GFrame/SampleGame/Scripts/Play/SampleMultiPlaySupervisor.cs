@@ -69,7 +69,6 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 			foreach(MultiplayerEventSystem eventSystem in eventSystems) {
 				var playerControls = new SamplePlayerControls();
-				playerControls.InitStack();
 
 				var playerInput = eventSystem.GetComponent<PlayerInput>();
 				var playerController = playerInput.camera.GetComponentInParent<SamplePlayerController>();
@@ -89,7 +88,8 @@ namespace DevLocker.GFrame.SampleGame.Play
 				eventSystem.gameObject.SetActive(false);
 				eventSystem.gameObject.SetActive(true);
 
-				var inputContext = new InputComponentContext(playerInput, playerControls.InputStack, GameObject.FindObjectOfType<SampleGameStarter>().BindingDisplayAssets);
+				var inputContext = new InputComponentContext(playerInput, new InputActionsMaskedStack(playerControls), GameObject.FindObjectOfType<SampleGameStarter>().BindingDisplayAssets);
+				playerControls.SetInputContext(inputContext);
 
 				//
 				// Now the states stack & UI root...
