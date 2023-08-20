@@ -65,6 +65,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			EmptyFocus = 20,
 		}
 
+		public enum ScopeType
+		{
+			Normal = 0,
+			Root = 1,
+			ModalRoot = 4,
+		}
+
 		/// <summary>
 		/// Contains all scopes used by certain player,
 		/// since every player needs to have their own active & focused scopes.
@@ -81,8 +88,12 @@ namespace DevLocker.GFrame.Input.UIScope
 			public Queue<KeyValuePair<UIScope, bool>> PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
 		}
 
-		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of closest root will remain inactive).")]
-		public bool IsRoot = false;
+		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of closest root will remain inactive).\n\nModal root scopes will push an actions mask to the input stack with all child elements, suppressing any hotkeys outside the scope (e.g. player states input).")]
+		[UnityEngine.Serialization.FormerlySerializedAs("IsRoot")]
+		public ScopeType Type = ScopeType.Normal;
+
+		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
+		public bool IncludeUIActions = true;
 
 		[Tooltip("If on, you can choose OnEnable and OnDisable automatic focus behaviour.\n\nIf off, this scope will always be active when enabled and vice versa. You'll have to manually handle this and it will be excluded from any focus schemes (i.e. it can be active while another scope is focused + parents). You'll be responsible for managing conflicts.")]
 		public bool AutomaticFocus = true;
@@ -95,14 +106,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		public List<UIScope> OnDisableScopes;
 
 #if USE_INPUT_SYSTEM
-		[Space]
 		[Tooltip("Reset all input actions.\nThis will interrupt their progress and any gesture, drag, sequence will be canceled.")]
 		public bool ResetAllActionsOnEnable = true;
-
-		[Tooltip("Use this for modal windows to suppress background hotkeys.\n\nPushes a new input state in the stack.\nOn deactivating, will pop this state and restore the previous one.\nThe only enabled actions will be the used ones by (under) this scope.")]
-		public bool PushInputStack = false;
-		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
-		public bool IncludeUIActions = true;
 #endif
 
 		public event Action Activated;
@@ -870,7 +875,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			// Find if there is a root scope and trim the parents.
 			// Do it now, at the last moment, instead of CollectScopes(), so correct depth can be set.
-			int rootIndex = Array.FindLastIndex(nextScopes, s => s.IsRoot);
+			int rootIndex = Array.FindLastIndex(nextScopes, s => s.Type >= ScopeType.Root);
 			if (rootIndex > 0) {
 				nextScopes = new ArraySegment<UIScope>(nextScopes, rootIndex, nextScopes.Length - rootIndex).ToArray();
 			}
@@ -983,7 +988,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			if (active) {
 
-				if (PushInputStack) {
+				if (Type == ScopeType.ModalRoot) {
 
 					// Prepare a mask so child scope elements can enable actions normally, suppressing the previously active ones.
 					var actionsMask = GetAllChildScopeElements()
@@ -1015,7 +1020,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 
 			if (!active) {
-				if (PushInputStack) {
+				if (Type == ScopeType.ModalRoot) {
 
 					if (IncludeUIActions) {
 						foreach (var action in context.GetUIActions()) {
@@ -1047,7 +1052,11 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			var uiScope = (UIScope)target;
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IsRoot)));
+			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.Type)));
+			if (uiScope.Type == UIScope.ScopeType.ModalRoot) {
+				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IncludeUIActions)));
+			}
+
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.AutomaticFocus)));
 
 			if (uiScope.AutomaticFocus) {
@@ -1061,11 +1070,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 #if USE_INPUT_SYSTEM
 			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.ResetAllActionsOnEnable)));
-
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.PushInputStack)));
-			if (uiScope.PushInputStack) {
-				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IncludeUIActions)));
-			}
 #endif
 
 			serializedObject.ApplyModifiedProperties();
