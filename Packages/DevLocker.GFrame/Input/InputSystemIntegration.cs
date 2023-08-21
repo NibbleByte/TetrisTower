@@ -487,6 +487,20 @@ namespace DevLocker.GFrame.Input
 		}
 
 		/// <summary>
+		/// Enable action via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static InputAction Enable(this IInputContext context, object source, InputActionReference actionReference)
+		{
+			var action = context.FindActionFor(actionReference);
+			context.EnableAction(source, action);
+			return action;
+		}
+
+		/// <summary>
 		/// Enable actions via <see cref="InputActionsMaskedStack"/>
 		/// If mask is applied it may not be enabled.
 		/// Always enable/disable actions via this input context.
@@ -570,6 +584,19 @@ namespace DevLocker.GFrame.Input
 			foreach (InputAction action in actionsMap) {
 				context.DisableAction(source, action);
 			}
+		}
+
+		/// <summary>
+		/// Disable action via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static InputAction Disable(this IInputContext context, object source, InputActionReference actionReference)
+		{
+			var action = context.FindActionFor(actionReference);
+			context.DisableAction(source, action);
+			return action;
 		}
 
 		/// <summary>
