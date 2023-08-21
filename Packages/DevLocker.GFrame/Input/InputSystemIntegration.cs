@@ -207,7 +207,7 @@ namespace DevLocker.GFrame.Input
 		///
 		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		void Enable(object source, InputAction action);
+		void EnableAction(object source, InputAction action);	// Don't name "Enable()" as it causes conflicts with the extension methods.
 
 		/// <summary>
 		/// Disable action via <see cref="InputActionsMaskedStack"/>
@@ -215,7 +215,7 @@ namespace DevLocker.GFrame.Input
 		///
 		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		void Disable(object source, InputAction action);
+		void DisableAction(object source, InputAction action);	// Don't name "Disable()" as it causes conflicts with the extension methods.
 
 		/// <summary>
 		/// Disable all input actions enabled by the provided source object via <see cref="InputActionsMaskedStack"/>
@@ -223,7 +223,7 @@ namespace DevLocker.GFrame.Input
 		///
 		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		void Disable(object source);
+		void DisableAll(object source);
 
 		/// <summary>
 		/// Returns all input actions enabled by specified source.
@@ -438,7 +438,7 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public static void Enable(this InputAction action, object source, IInputContext context)
 		{
-			context.Enable(source, action);
+			context.EnableAction(source, action);
 		}
 
 		/// <summary>
@@ -448,10 +448,13 @@ namespace DevLocker.GFrame.Input
 		///
 		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static void Enable(this IInputContext context, object source, IEnumerable<InputAction> inputActions)
+		public static void Enable(this IInputContext context, object source, params InputAction[] actions)
 		{
-			foreach (InputAction action in inputActions) {
-				context.Enable(source, action);
+			if (actions.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			foreach (InputAction action in actions) {
+				context.EnableAction(source, action);
 			}
 		}
 
@@ -462,10 +465,24 @@ namespace DevLocker.GFrame.Input
 		///
 		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static void Enable(this IInputContext context, object source, InputActionMap inputActionsMap)
+		public static void Enable(this IInputContext context, object source, IEnumerable<InputAction> actions)
 		{
-			foreach (InputAction action in inputActionsMap) {
-				context.Enable(source, action);
+			foreach (InputAction action in actions) {
+				context.EnableAction(source, action);
+			}
+		}
+
+		/// <summary>
+		/// Enable actions via <see cref="InputActionsMaskedStack"/>
+		/// If mask is applied it may not be enabled.
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static void Enable(this IInputContext context, object source, InputActionMap actionsMap)
+		{
+			foreach (InputAction action in actionsMap) {
+				context.EnableAction(source, action);
 			}
 		}
 
@@ -500,21 +517,6 @@ namespace DevLocker.GFrame.Input
 			return actions;
 		}
 
-		/// <summary>
-		/// Enable actions via <see cref="InputActionsMaskedStack"/>
-		/// If mask is applied it may not be enabled.
-		/// Always enable/disable actions via this input context.
-		///
-		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
-		/// </summary>
-		public static void Enable(this IInputContext context, object source, params InputAction[] actions)
-		{
-			if (actions.Length == 0)
-				throw new ArgumentException("Empty actions array");
-
-			context.Enable(source, (IEnumerable<InputAction>)actions);
-		}
-
 		// --------------------------------------------------------------------------------------------------------- \\
 
 		/// <summary>
@@ -525,7 +527,7 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public static void Disable(this InputAction action, object source, IInputContext context)
 		{
-			context.Disable(source, action);
+			context.DisableAction(source, action);
 		}
 
 		/// <summary>
@@ -534,10 +536,13 @@ namespace DevLocker.GFrame.Input
 		///
 		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static void Disable(this IInputContext context, object source, IEnumerable<InputAction> inputActions)
+		public static void Disable(this IInputContext context, object source, params InputAction[] actions)
 		{
-			foreach (InputAction action in inputActions) {
-				context.Disable(source, action);
+			if (actions.Length == 0)
+				throw new ArgumentException("Empty actions array");
+
+			foreach (InputAction action in actions) {
+				context.DisableAction(source, action);
 			}
 		}
 
@@ -547,10 +552,23 @@ namespace DevLocker.GFrame.Input
 		///
 		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
 		/// </summary>
-		public static void Disable(this IInputContext context, object source, InputActionMap inputActionsMap)
+		public static void Disable(this IInputContext context, object source, IEnumerable<InputAction> actions)
 		{
-			foreach (InputAction action in inputActionsMap) {
-				context.Disable(source, action);
+			foreach (InputAction action in actions) {
+				context.DisableAction(source, action);
+			}
+		}
+
+		/// <summary>
+		/// Disable actions via <see cref="InputActionsMaskedStack"/>
+		/// Always enable/disable actions via this input context.
+		///
+		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
+		/// </summary>
+		public static void Disable(this IInputContext context, object source, InputActionMap actionsMap)
+		{
+			foreach (InputAction action in actionsMap) {
+				context.DisableAction(source, action);
 			}
 		}
 
@@ -581,20 +599,6 @@ namespace DevLocker.GFrame.Input
 			var actions = actionReferences.Select(ar => context.FindActionFor(ar));
 			context.Disable(source, actions);
 			return actions;
-		}
-
-		/// <summary>
-		/// Disable actions via <see cref="InputActionsMaskedStack"/>
-		/// Always enable/disable actions via this input context.
-		///
-		/// Enable requests are ref-counted by the source objects. No source object requests, action will be disabled.
-		/// </summary>
-		public static void Disable(this IInputContext context, object source, params InputAction[] actions)
-		{
-			if (actions.Length == 0)
-				throw new ArgumentException("Empty actions array");
-
-			context.Disable(source, (IEnumerable<InputAction>)actions);
 		}
 
 		#endregion

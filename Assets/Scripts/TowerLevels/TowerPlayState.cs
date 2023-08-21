@@ -54,7 +54,7 @@ namespace TetrisTower.TowerLevels
 		public void ExitState()
 		{
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
-			m_PlayerControls.Disable(this);
+			m_PlayerControls.DisableAll(this);
 
 			MessageBox.Instance.MessageShown -= m_LevelController.PauseLevel;
 			MessageBox.Instance.MessageClosed -= m_LevelController.ResumeLevel;

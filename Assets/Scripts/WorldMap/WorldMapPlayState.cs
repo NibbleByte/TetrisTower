@@ -48,7 +48,7 @@ namespace TetrisTower.WorldMap
 		public void ExitState()
 		{
 			m_PlayerControls.WorldMapPlay.SetCallbacks(null);
-			m_PlayerControls.Disable(this);
+			m_PlayerControls.DisableAll(this);
 		}
 
 		public void OnPointerClick(InputAction.CallbackContext context)

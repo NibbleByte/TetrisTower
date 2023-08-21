@@ -68,7 +68,7 @@ namespace TetrisTower.TowerLevels
 		{
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnPointerPressed;
 			m_PlayerControls.CommonHotkeys.SetCallbacks(null);
-			m_PlayerControls.Disable(this);
+			m_PlayerControls.DisableAll(this);
 
 			if (!m_Interrupted) {
 				m_Interrupted = true;

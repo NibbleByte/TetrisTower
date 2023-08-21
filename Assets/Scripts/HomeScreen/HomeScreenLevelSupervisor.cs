@@ -49,7 +49,7 @@ namespace TetrisTower.HomeScreen
 
 		public Task UnloadAsync()
 		{
-			GameManager.Instance.GameContext.PlayerControls.Disable(this);
+			GameManager.Instance.GameContext.PlayerControls.DisableAll(this);
 
 			return Task.CompletedTask;
 		}

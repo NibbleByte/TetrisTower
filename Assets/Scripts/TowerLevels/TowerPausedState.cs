@@ -31,7 +31,7 @@ namespace TetrisTower.TowerLevels
 			m_LevelController.ResumeLevel();
 
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(null);
-			m_PlayerControls.Disable(this);
+			m_PlayerControls.DisableAll(this);
 		}
 	}
 }

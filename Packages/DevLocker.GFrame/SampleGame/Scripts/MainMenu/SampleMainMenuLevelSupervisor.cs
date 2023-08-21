@@ -66,7 +66,7 @@ namespace DevLocker.GFrame.SampleGame.MainMenu
 		public IEnumerator Unload()
 #endif
 		{
-			PlayerContextUIRootObject.GlobalPlayerContext.InputContext.Disable(this);
+			PlayerContextUIRootObject.GlobalPlayerContext.InputContext.DisableAll(this);
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;

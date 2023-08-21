@@ -25,7 +25,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 
 		public void ExitState()
 		{
-			m_PlayerControls.Disable(this);
+			m_PlayerControls.DisableAll(this);
 		}
 	}
 }

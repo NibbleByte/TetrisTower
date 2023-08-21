@@ -100,17 +100,17 @@ namespace DevLocker.GFrame.Input.Contexts
 			yield return InputActionsCollection.FindAction(actionNameOrId, throwIfNotFound);
 		}
 
-		public void Enable(object source, InputAction action)
+		public void EnableAction(object source, InputAction action)
 		{
 			InputActionsMaskedStack.Enable(source, action);
 		}
 
-		public void Disable(object source, InputAction action)
+		public void DisableAction(object source, InputAction action)
 		{
 			InputActionsMaskedStack.Disable(source, action);
 		}
 
-		public void Disable(object source)
+		public void DisableAll(object source)
 		{
 			InputActionsMaskedStack.Disable(source);
 		}

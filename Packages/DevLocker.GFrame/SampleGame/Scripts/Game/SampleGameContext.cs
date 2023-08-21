@@ -32,9 +32,9 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public InputDevice ForcedDevice { get => InputContext.ForcedDevice; set => InputContext.ForcedDevice = value; }
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false) => InputContext.FindActionFor(actionNameOrId, throwIfNotFound);
-		public void Enable(object source, InputAction action) => InputContext.Enable(source, action);
-		public void Disable(object source, InputAction action) => InputContext.Disable(source, action);
-		public void Disable(object source) => InputContext.Disable(source);
+		public void EnableAction(object source, InputAction action) => InputContext.EnableAction(source, action);
+		public void DisableAction(object source, InputAction action) => InputContext.DisableAction(source, action);
+		public void DisableAll(object source) => InputContext.DisableAll(source);
 		public IEnumerable<InputAction> GetInputActionsEnabledBy(object source) => InputContext.GetInputActionsEnabledBy(source);
 
 		public void PushOrSetActionsMask(object source, IEnumerable<InputAction> actionsMask, bool setBackToTop = false) => InputContext.PushOrSetActionsMask(source, actionsMask, setBackToTop);

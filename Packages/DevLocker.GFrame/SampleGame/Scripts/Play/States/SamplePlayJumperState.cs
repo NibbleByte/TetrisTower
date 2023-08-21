@@ -37,7 +37,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public void ExitState()
 		{
 			m_PlayerControls.Sample_PlayJumper.SetCallbacks(null);
-			m_PlayerControls.Disable(this);
+			m_PlayerControls.DisableAll(this);
 		}
 
 		public void OnJumperMovement(InputAction.CallbackContext context)

@@ -65,7 +65,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 		public IEnumerator Unload()
 #endif
 		{
-			SampleLevelsManager.Instance.GameContext.PlayerControls.Disable(this);
+			SampleLevelsManager.Instance.GameContext.PlayerControls.DisableAll(this);
 
 #if GFRAME_ASYNC
 			return Task.CompletedTask;
