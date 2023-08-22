@@ -122,12 +122,14 @@ namespace DevLocker.GFrame.SampleGame.Game
 		private void LateUpdate()
 		{
 			// Check for InputActions conflicts at the end of every frame and report.
-			var inputContext = (InputComponentContext)PlayerContextUIRootObject.GlobalPlayerContext.InputContext;
+			var inputContext = (InputCollectionContext)PlayerContextUIRootObject.GlobalPlayerContext.InputContext;
 			if (inputContext != null) {
 				var conflictsReport = inputContext.InputActionsMaskedStack.GetConflictingActionRequests(inputContext.GetUIActions());
-				if (!m_LastInputConflictsReport.Equals(conflictsReport) && conflictsReport.Conflicts.Count > 0) {
-					var conflictStrings = conflictsReport.Conflicts.Select(pair => $"- \"{pair.Key.name}\" [{string.Join(", ", pair.Value)}]");
-					Debug.LogError($"[Input] Input actions in conflict found:\n{string.Join('\n', conflictStrings)}", this);
+				if (!m_LastInputConflictsReport.Equals(conflictsReport) && conflictsReport.HasIssuesFound) {
+					var conflictStrings = conflictsReport.Conflicts.Select(pair => $"- {pair.Key.name} [{string.Join(", ", pair.Value)}]");
+					var illegalStrings = conflictsReport.IllegalActions.Select(action => $"- {action.name} [ILLEGAL]");
+
+					Debug.LogError($"[Input] Input actions in conflict found:\n{string.Join('\n', conflictStrings.Concat(illegalStrings))}", this);
 				}
 
 				m_LastInputConflictsReport = conflictsReport;

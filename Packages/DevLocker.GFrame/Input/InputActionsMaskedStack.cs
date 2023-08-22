@@ -23,15 +23,26 @@ namespace DevLocker.GFrame.Input
 
 		public struct InputActionConflictsReport
 		{
+			/// <summary>
+			/// Actions that have 2 or more users that requested it enabled.
+			/// </summary>
 			public List<KeyValuePair<InputAction, IReadOnlyCollection<object>>> Conflicts => m_Conflicts != null ? m_Conflicts : (m_Conflicts = new ());
 			private List<KeyValuePair<InputAction, IReadOnlyCollection<object>>> m_Conflicts;
+
+			/// <summary>
+			/// Actions that no one asked the <see cref="IInputContext"/> to enable, but they are enabled anyway. This means that some code is bypassing the <see cref="IInputContext"/>.
+			/// </summary>
+			public List<InputAction> IllegalActions => m_IllegalActions != null ? m_IllegalActions : (m_IllegalActions = new ());
+			public List<InputAction> m_IllegalActions;
+
+			public bool HasIssuesFound => Conflicts.Count > 0 || IllegalActions.Count > 0;
 
 			/// <summary>
 			/// Compare if two collections of conflicts are equal.
 			/// </summary>
 			public bool Equals(InputActionConflictsReport conflictsReport)
 			{
-				return conflictsReport.Conflicts.SequenceEqual(Conflicts);
+				return conflictsReport.Conflicts.SequenceEqual(Conflicts) && conflictsReport.IllegalActions.SequenceEqual(IllegalActions);
 			}
 		}
 
@@ -67,6 +78,10 @@ namespace DevLocker.GFrame.Input
 			if (!m_Actions.TryGetValue(action, out HashSet<object> enableSources))
 				throw new ArgumentException($"Input action \"{action}\" is not part of the tracked actions.");
 
+			if (enableSources.Count == 0 && action.enabled) {
+				UnityEngine.Debug.LogError($"Trying to enable input action \"{action.name}\" by {source}, but it is already enabled. Some code is enabling input actions without the IInputContext!");
+			}
+
 			enableSources.Add(source);
 
 			if (m_CurrentActionsMask?.Contains(action) ?? true) {
@@ -90,6 +105,10 @@ namespace DevLocker.GFrame.Input
 
 			if (!m_Actions.TryGetValue(action, out HashSet<object> enableSources))
 				throw new ArgumentException($"Input action \"{action}\" is not part of the tracked actions.");
+
+			if (enableSources.Count > 0 && !action.enabled) {
+				UnityEngine.Debug.LogError($"Trying to disable input action \"{action.name}\" by {source}, but it is already disabled. Some code is disabling input actions without the IInputContext!");
+			}
 
 			enableSources.Remove(source);
 
@@ -224,6 +243,12 @@ namespace DevLocker.GFrame.Input
 			var conflictsReport = new InputActionConflictsReport();
 
 			foreach(var pair in m_Actions) {
+
+				// If no sources but action is enabled means some code is enabling actions without the IInputContext.
+				if (pair.Value.Count == 0 && pair.Key.enabled) {
+					conflictsReport.IllegalActions.Add(pair.Key);
+					continue;
+				}
 
 				if (pair.Value.Count <= 1)
 					continue;
