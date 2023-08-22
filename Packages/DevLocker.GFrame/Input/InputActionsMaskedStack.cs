@@ -155,6 +155,14 @@ namespace DevLocker.GFrame.Input
 			}
 		}
 
+		public IEnumerable<object> GetEnablingSourcesFor(InputAction action)
+		{
+			if (m_Actions.TryGetValue(action, out HashSet<object> enablingSources))
+				return enablingSources;
+
+			return Array.Empty<object>();
+		}
+
 		/// <summary>
 		/// Push actions mask filtering in actions allowed to be enabled.
 		/// If mask is added or set to the top of the stack it will be applied immediately disabling any actions not included.

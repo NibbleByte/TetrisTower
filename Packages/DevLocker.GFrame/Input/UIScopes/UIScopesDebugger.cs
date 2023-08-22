@@ -332,10 +332,12 @@ namespace DevLocker.GFrame.Input.UIScope
 					m_HotkeyNamesBuilder.Clear();
 
 					if (scope) {
-
+						IInputContext context = null;
 						var scopeElements = new List<IScopeElement>();
+
 						if (Application.isPlaying) {
 							scopeElements = scope.OwnedElements.ToList();
+							context = scope.PlayerContext?.InputContext;
 						} else {
 							var directChildScopes = new List<UIScope>();
 							UIScope.ScanForOwnedScopeElements(scope, scope.transform, scopeElements, directChildScopes);
@@ -359,7 +361,7 @@ namespace DevLocker.GFrame.Input.UIScope
 							List<InputAction> hotkeys = new List<InputAction>();
 
 							foreach (var hotkeyElement in scopeElements.OfType<IHotkeysWithInputActions>()) {
-								foreach (InputAction inputAction in hotkeyElement.GetUsedActions(scope.PlayerContext?.InputContext)) {
+								foreach (InputAction inputAction in hotkeyElement.GetUsedActions(context)) {
 									if (!hotkeys.Contains(inputAction)) {
 										hotkeys.Add(inputAction);
 									}
@@ -367,15 +369,15 @@ namespace DevLocker.GFrame.Input.UIScope
 							}
 
 							InputControlScheme currentScheme;
-							if (scope.PlayerContext != null) {
-								currentScheme = scope.PlayerContext.InputContext.GetLastUsedInputControlScheme();
+							if (context != null) {
+								currentScheme = context.GetLastUsedInputControlScheme();
 							} else if (m_ForcedDisplayAsset) {
 								currentScheme = new InputControlScheme() { bindingGroup = m_ForcedDisplayAsset.MatchingControlScheme };
 							}
 							InputBinding matchBinding = new InputBinding() { groups = currentScheme.bindingGroup };
 
 							string separator = m_DisplayHotkeys == UIScopeDebugUtils.DisplayHotkeyType.DisplayInputBindings ? ", " : " | ";
-							m_HotkeyNamesBuilder.AppendJoin(separator, UIScopeDebugUtils.GetHotkeyNames(hotkeys, matchBinding, m_DisplayHotkeys));
+							m_HotkeyNamesBuilder.AppendJoin(separator, UIScopeDebugUtils.GetHotkeyNames(context, hotkeys, matchBinding, m_DisplayHotkeys));
 						}
 
 					} else {

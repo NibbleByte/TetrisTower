@@ -31,6 +31,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			DisplayInputActions,
 			DisplayInputBindings,
 			DisplayInputBoth,
+			DisplayInputUsers,
 		}
 
 		public static string GetScopesInfo(DisplayHotkeyType displayHotkeys = DisplayHotkeyType.HideInputDetails, bool includeDisabled = false, InputControlScheme schemeMask = default)
@@ -76,9 +77,12 @@ namespace DevLocker.GFrame.Input.UIScope
 					scopeStatus = InactiveStatus;
 				}
 
+				IInputContext context = null;
 				var scopeElements = new List<IScopeElement>();
+
 				if (Application.isPlaying) {
 					scopeElements = scope.OwnedElements.ToList();
+					context = scope.PlayerContext?.InputContext;
 				} else {
 					var directChildScopes = new List<UIScope>();
 					UIScope.ScanForOwnedScopeElements(scope, scope.transform, scopeElements, directChildScopes);
@@ -98,7 +102,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					List<InputAction> hotkeys = new List<InputAction>();
 
 					foreach (var hotkeyElement in scopeElements.OfType<IHotkeysWithInputActions>()) {
-						foreach (InputAction inputAction in hotkeyElement.GetUsedActions(scope.PlayerContext?.InputContext)) {
+						foreach (InputAction inputAction in hotkeyElement.GetUsedActions(context)) {
 							if (!hotkeys.Contains(inputAction)) {
 								hotkeys.Add(inputAction);
 							}
@@ -109,7 +113,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					string separator = displayHotkeys == DisplayHotkeyType.DisplayInputBindings ? ", " : " | ";
 					output.Append(" => ");
-					output.AppendJoin(separator, GetHotkeyNames(hotkeys, matchBinding, displayHotkeys));
+					output.AppendJoin(separator, GetHotkeyNames(context, hotkeys, matchBinding, displayHotkeys));
 				}
 
 				output.AppendLine();
@@ -118,7 +122,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
-		public static IEnumerable<string> GetHotkeyNames(IEnumerable<InputAction> actions, InputBinding matchBinding, DisplayHotkeyType displayType)
+		public static IEnumerable<string> GetHotkeyNames(IInputContext context, IEnumerable<InputAction> actions, InputBinding matchBinding, DisplayHotkeyType displayType)
 		{
 			switch (displayType) {
 				case DisplayHotkeyType.DisplayInputActions:
@@ -180,6 +184,57 @@ namespace DevLocker.GFrame.Input.UIScope
 							yield return $"{action.name}";
 						}
 					}
+					break;
+
+				case DisplayHotkeyType.DisplayInputUsers:
+					if (context == null)
+						yield break;
+
+					var usersStr = new StringBuilder();
+
+					foreach (InputAction action in actions) {
+						usersStr.Clear();
+
+						foreach(object user in context.InputActionsMaskedStack.GetEnablingSourcesFor(action)) {
+							usersStr.Append('"');
+
+							if (user is MonoBehaviour behaviour) {
+								if (behaviour == null) {
+									usersStr.Append("<Destroyed Behaviour>");
+								} else {
+									var transforms = behaviour.GetComponentsInParent<Transform>(true);
+									foreach (Transform transform in transforms.Reverse()) {
+										usersStr.Append(transform.name).Append("/");
+									}
+
+									usersStr.Append(behaviour.GetType().Name);
+								}
+
+							} else if (user is GameObject go) {
+								if (go == null) {
+									usersStr.Append("<Destroyed GameObject>");
+								} else {
+									var transforms = go.GetComponentsInParent<Transform>(true);
+									foreach(Transform transform in transforms.Reverse()) {
+										usersStr.Append(transform.name).Append("/");
+									}
+
+									usersStr.Append("gameObject");
+								}
+
+							} else {
+								usersStr.Append(user?.ToString());
+							}
+
+							usersStr.Append("\"; ");
+						}
+
+						if (usersStr.Length > 0) {
+							usersStr.Remove(usersStr.Length - 2, 2);
+							yield return $"{action.name} = {usersStr}";
+						}
+					}
+
 					break;
 
 				default:

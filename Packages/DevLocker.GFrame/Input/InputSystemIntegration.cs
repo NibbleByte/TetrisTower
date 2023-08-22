@@ -190,6 +190,8 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		InputDevice ForcedDevice { get; set; }
 
+		InputActionsMaskedStack InputActionsMaskedStack { get; }
+
 		/// <summary>
 		/// Does the current device support UI navigation.
 		/// </summary>

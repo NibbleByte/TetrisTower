@@ -122,7 +122,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 		private void LateUpdate()
 		{
 			// Check for InputActions conflicts at the end of every frame and report.
-			var inputContext = (InputCollectionContext)PlayerContextUIRootObject.GlobalPlayerContext.InputContext;
+			var inputContext = PlayerContextUIRootObject.GlobalPlayerContext.InputContext;
 			if (inputContext != null) {
 				var conflictsReport = inputContext.InputActionsMaskedStack.GetConflictingActionRequests(inputContext.GetUIActions());
 				if (!m_LastInputConflictsReport.Equals(conflictsReport) && conflictsReport.HasIssuesFound) {

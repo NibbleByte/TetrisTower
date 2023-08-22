@@ -32,6 +32,8 @@ namespace TetrisTower.Game
 
 		public InputDevice ForcedDevice { get => InputContext.ForcedDevice; set => InputContext.ForcedDevice = value; }
 
+		public InputActionsMaskedStack InputActionsMaskedStack => InputContext.InputActionsMaskedStack;
+
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false) => InputContext.FindActionFor(actionNameOrId, throwIfNotFound);
 		public void EnableAction(object source, InputAction action) => InputContext.EnableAction(source, action);
 		public void DisableAction(object source, InputAction action) => InputContext.DisableAction(source, action);
