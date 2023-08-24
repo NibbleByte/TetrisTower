@@ -232,6 +232,39 @@ MonoBehaviour:
       SkinOverrides:
       - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
     - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 99d25815216f2234cb08aad3fb7014d2, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Egypt.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: Match the highlighted blocks
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 668326610786320445
+      - rid: 668326610786320387
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 1
+      StartGrid:
+        rid: 668326610786320439
+      SkinOverrides: []
+    - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1.unity
@@ -242,8 +275,8 @@ MonoBehaviour:
       GreetMessage: 
       InitialSpawnBlockTypesCount: 5
       Objectives:
-      - rid: 5506456835523608591
-      - rid: 5506456835523608592
+      - rid: 668326610786320384
+      - rid: 668326610786320385
       Rules:
         MatchHorizontalLines: 3
         MatchVerticalLines: 3
@@ -302,6 +335,42 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 668326610786320384
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 668326610786320385
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 668326610786320387
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 668326610786320439
+      type: {class: BlocksGrid, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
+      data:
+        m_Rows: 9
+        m_Columns: 13
+        m_Blocks: 00000000e803000005000000e803000005000000e80300000000000000000000e803000005000000e803000005000000e80300000000000000000000e803000006000000e803000000000000000000000000000000000000e803000006000000e803000000000000000000000000000000000000e8030000000000000000000000000000000000000000000000000000e80300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+        m_PinnedCoords: []
+    - rid: 668326610786320445
+      type: {class: ClearCoordinates_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        Coordinates:
+        - Row: 0
+          Column: 2
+        - Row: 1
+          Column: 3
+        - Row: 0
+          Column: 4
+        - Row: 0
+          Column: 9
+        - Row: 1
+          Column: 10
+        - Row: 0
+          Column: 11
     - rid: 5506456835523608576
       type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
@@ -357,15 +426,6 @@ MonoBehaviour:
         MatchesEndCount: 40
         MatchesType: 1
     - rid: 5506456835523608590
-      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
-      data:
-        PlacingOutsideIsWin: 0
-    - rid: 5506456835523608591
-      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
-      data:
-        MatchesEndCount: 300
-        MatchesType: 7
-    - rid: 5506456835523608592
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0

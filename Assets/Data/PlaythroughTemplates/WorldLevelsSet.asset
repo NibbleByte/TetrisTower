@@ -130,6 +130,86 @@ MonoBehaviour:
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0
+--- !u!114 &-3451992996147784845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: EgyptID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 99d25815216f2234cb08aad3fb7014d2, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Egypt.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: Match the highlighted blocks
+    InitialSpawnBlockTypesCount: 4
+    Objectives:
+    - rid: 668326610786320430
+    - rid: 668326610786320417
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 1
+    StartGrid:
+      rid: 668326610786320418
+    SkinOverrides: []
+    LevelID: EgyptID
+    WorldMapPosition: {x: 6.232, y: -33.922}
+    PreviewImage: {fileID: 21300000, guid: 47cb94af5f5aa0f44a65940274f0f387, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 668326610786320417
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 668326610786320418
+      type: {class: BlocksGrid, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
+      data:
+        m_Rows: 9
+        m_Columns: 13
+        m_Blocks: 00000000e803000005000000e803000005000000e80300000000000000000000e803000005000000e803000005000000e80300000000000000000000e803000006000000e803000000000000000000000000000000000000e803000006000000e803000000000000000000000000000000000000e8030000000000000000000000000000000000000000000000000000e80300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+        m_PinnedCoords: []
+    - rid: 668326610786320430
+      type: {class: ClearCoordinates_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        Coordinates:
+        - Row: 0
+          Column: 2
+        - Row: 1
+          Column: 3
+        - Row: 0
+          Column: 4
+        - Row: 0
+          Column: 9
+        - Row: 1
+          Column: 10
+        - Row: 0
+          Column: 11
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,6 +230,7 @@ MonoBehaviour:
   - {fileID: 2539950144918906801}
   - {fileID: 3075740806775852930}
   - {fileID: -5133656246103420669}
+  - {fileID: -3451992996147784845}
   LevelsLinks:
   - LevelID1: BabylonID
     LevelID2: ColosseumID
@@ -159,6 +240,10 @@ MonoBehaviour:
     LevelID2: StonehengeID
   - LevelID1: StonehengeID
     LevelID2: VikingsID
+  - LevelID1: BabylonID
+    LevelID2: EgyptID
+  - LevelID1: AtlantisID
+    LevelID2: EgyptID
 --- !u!114 &1554497649489288964
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -73,7 +73,7 @@ namespace TetrisTower.Logic
 			if (m_Unfolded) {
 
 				// Rows or columns changed - resize the grid, while preserving the data inside.
-				if (rows != rowsProp.intValue || columns != columnsProp.intValue) {
+				if (rows != rowsProp.intValue || columns != columnsProp.intValue || gridProp.arraySize != rows * columns) {
 					rows = rowsProp.intValue;
 					columns = columnsProp.intValue;
 					gridProp.arraySize = rows * columns;

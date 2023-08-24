@@ -90,6 +90,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		{
 			var levelAsset = ScriptableObject.CreateInstance<WorldMapLevelParamAsset>();
 
+			levelAsset.LevelParam = levelAsset.LevelParam ?? new WorldMapLevelParamData();
 			levelAsset.LevelParam.LevelID = levelAsset.name = $"Level-{m_Levels.Length:00}";
 
 			m_Levels = m_Levels.Concat(new [] { levelAsset }).ToArray();
