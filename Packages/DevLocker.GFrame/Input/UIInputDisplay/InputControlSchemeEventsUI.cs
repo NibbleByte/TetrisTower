@@ -80,6 +80,17 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			});
 		}
 
+		void OnDestroy()
+		{
+			// Remove references for easier memory profiling and debugging. NOTE: if object was never awaken, this won't get executed.
+			m_PlayerContext = null;
+
+			foreach (ControlSchemeActionSettings bind in ControlSchemeActions) {
+				bind.OnSchemeActive.RemoveAllListeners();
+				bind.OnSchemeInactive.RemoveAllListeners();
+			}
+		}
+
 		void OnEnable()
 		{
 			if (!m_HasInitialized)
@@ -110,6 +121,10 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			if (!m_HasInitialized)
 				return;
 
+			if (m_PlayerContext?.InputContext != null) {
+				m_PlayerContext.InputContext.LastUsedInputControlSchemeChanged -= OnLastUsedInputControlSchemeChanged;
+			}
+
 			// Changing levels or stopping the game - don't trigger events as this may cause headaches.
 			if (!gameObject.scene.isLoaded)
 				return;
@@ -119,9 +134,6 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 				enabled = false;
 				return;
 			}
-
-			m_PlayerContext.InputContext.LastUsedInputControlSchemeChanged -= OnLastUsedInputControlSchemeChanged;
-
 
 			if (!string.IsNullOrEmpty(m_LastControlScheme)) {
 

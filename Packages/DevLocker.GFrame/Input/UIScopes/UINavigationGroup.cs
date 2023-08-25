@@ -192,6 +192,28 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+		protected virtual void OnDestroy()
+		{
+			// Remove references for easier memory profiling and debugging. NOTE: if object was never awaken, this won't get executed.
+			m_FirstSelectable = null;
+			m_LastSelectable = null;
+
+			WrapUp = default;
+			WrapDown = default;
+			WrapLeft = default;
+			WrapRight = default;
+
+			m_AllActiveSelectables = null;
+			m_AllActiveSelectables1 = null;
+			m_AllActiveSelectables2 = null;
+			m_ManagedSelectables?.Clear();
+
+			m_LastSelectedObject = null;
+
+			Include.Clear();
+			Exclude.Clear();
+		}
+
 		/// <summary>
 		/// Call this in dire situations (re-parenting selectables).
 		/// Will clear caches and rescan for selectables on the next frame if auto-scan enabled, or immediately if not.

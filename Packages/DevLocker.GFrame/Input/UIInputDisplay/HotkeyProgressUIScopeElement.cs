@@ -111,6 +111,16 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			});
 		}
 
+		protected virtual void OnDestroy()
+		{
+			// Remove references for easier memory profiling and debugging. NOTE: if object was never awaken, this won't get executed.
+			m_PlayerContext = null;
+
+			Started.RemoveAllListeners();
+			Cancelled.RemoveAllListeners();
+			Performed.RemoveAllListeners();
+		}
+
 		protected virtual void OnEnable()
 		{
 			if (!m_HasInitialized)

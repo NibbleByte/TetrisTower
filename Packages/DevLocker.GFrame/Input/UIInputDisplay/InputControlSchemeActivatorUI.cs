@@ -78,6 +78,14 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			});
 		}
 
+		void OnDestroy()
+		{
+			// Remove references for easier memory profiling and debugging. NOTE: if object was never awaken, this won't get executed.
+			m_PlayerContext = null;
+
+			ControlSchemeObjects.Clear();
+		}
+
 		void OnEnable()
 		{
 			if (!m_HasInitialized)
@@ -106,13 +114,15 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 			if (!m_HasInitialized)
 				return;
 
+			if (m_PlayerContext?.InputContext != null) {
+				m_PlayerContext.InputContext.LastUsedInputControlSchemeChanged -= OnLastUsedInputControlSchemeChanged;
+			}
+
 			if (m_PlayerContext.InputContext == null) {
 				Debug.LogWarning($"[Input] {nameof(InputControlSchemeActivatorUI)} {name} can't be used if Unity Input System is not provided.", this);
 				enabled = false;
 				return;
 			}
-
-			m_PlayerContext.InputContext.LastUsedInputControlSchemeChanged -= OnLastUsedInputControlSchemeChanged;
 
 			if (!string.IsNullOrEmpty(m_LastControlScheme)) {
 				foreach (ControlSchemeActiveObjects bind in ControlSchemeObjects) {

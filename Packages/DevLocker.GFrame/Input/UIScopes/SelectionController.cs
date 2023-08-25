@@ -77,7 +77,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		// Used for multiple event systems (e.g. split screen).
 		protected IPlayerContext m_PlayerContext;
-		
+
 		protected bool m_HasInitialized = false;
 
 		/// <summary>
@@ -162,7 +162,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		protected virtual void Awake()
 		{
 			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
-			
+
 			m_PlayerContext.AddSetupCallback((delayedSetup) => {
 				m_HasInitialized = true;
 
@@ -172,13 +172,26 @@ namespace DevLocker.GFrame.Input.UIScope
 			});
 		}
 
+		protected virtual void OnDestroy()
+		{
+			// Remove references for easier memory profiling and debugging. NOTE: if object was never awaken, this won't get executed.
+			StartSelections.Clear();
+			StartNavigationGroups.Clear();
+
+			m_PersistedSelectable = null;
+			m_PersistedSelection = null;
+
+			m_CanvasGroups = null;
+			m_PlayerContext = null;
+		}
+
 		protected virtual void OnEnable()
 		{
 			if (!m_HasInitialized)
 				return;
-			
+
 			IsSelectRequested = true;
-			
+
 			s_ActiveInstances.TryGetValue(m_PlayerContext.GetRootObject(), out List<SelectionController> activeInstances);
 			if (activeInstances == null) {
 				activeInstances = new List<SelectionController>(2);
@@ -193,7 +206,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			if (!m_HasInitialized)
 				return;
-			
+
 			s_ActiveInstances.TryGetValue(m_PlayerContext.GetRootObject(), out List<SelectionController> activeInstances);
 			if (activeInstances != null && activeInstances.Contains(this)) {
 				activeInstances.Remove(this);
