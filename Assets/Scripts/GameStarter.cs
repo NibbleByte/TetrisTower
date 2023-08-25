@@ -133,6 +133,20 @@ namespace TetrisTower.GameStarter
 				var supervisor = GameContext.CurrentPlaythrough.PrepareSupervisor();
 				if (supervisor is TowerLevelSupervisor seqSupervisor) {
 					seqSupervisor.SetSceneOverride(overrideScene);
+
+				} if (supervisor is WorldMapLevelSupervisor worldSupervisor) {
+					WorldPlaythroughData worldPlaythrough = (WorldPlaythroughData)GameContext.CurrentPlaythrough;
+
+					string scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
+					WorldMapLevelParamData level = worldPlaythrough.GetAllLevels()
+						.OfType<WorldMapLevelParamData>()
+						.FirstOrDefault(l => l.BackgroundScene.ScenePath == scenePath || l.BackgroundSceneMobile.ScenePath == scenePath)
+						;
+
+					if (level != null) {
+						worldPlaythrough.SetCurrentLevel(level.LevelID);
+						supervisor = worldPlaythrough.PrepareSupervisor();	// Will change the supervisor type.
+					}
 				} else {
 					Debug.LogWarning($"Unsupported supervisor {supervisor}", this);
 				}
