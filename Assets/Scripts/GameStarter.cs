@@ -134,7 +134,7 @@ namespace TetrisTower.GameStarter
 				if (supervisor is TowerLevelSupervisor seqSupervisor) {
 					seqSupervisor.SetSceneOverride(overrideScene);
 
-				} if (supervisor is WorldMapLevelSupervisor worldSupervisor) {
+				} else if (supervisor is WorldMapLevelSupervisor worldSupervisor) {
 					WorldPlaythroughData worldPlaythrough = (WorldPlaythroughData)GameContext.CurrentPlaythrough;
 
 					string scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
