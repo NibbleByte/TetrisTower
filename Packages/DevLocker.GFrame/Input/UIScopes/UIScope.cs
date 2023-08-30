@@ -459,7 +459,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			// HACK: On turning off the game OnDisable() gets called which may call methods on destroyed objects.
 			int activeIndex = Array.IndexOf(m_PlayerSet.ActiveScopes, this);
-			if (activeIndex != -1 && !m_GameQuitting) {
+			if (activeIndex == -1 || m_GameQuitting)
+				return;
+
+			try {
 
 				// Proceed only if this is the deepest scope (i.e. the focused one).
 				if (activeIndex != m_PlayerSet.ActiveScopes.Length - 1) {
@@ -533,6 +536,20 @@ namespace DevLocker.GFrame.Input.UIScope
 					;
 
 				SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
+
+			}
+			finally {
+
+				// Don't keep reference to destroyed scope, but keep alive ones as they are iterated through.
+				if (m_LastFocusedScope == null && !ReferenceEquals(m_LastFocusedScope, null)) {
+					m_LastFocusedScope = null;
+				}
+
+				// HACK: If modal root gets closed, clear last reference to avoid memory leaks.
+				//		 (in case this is a DontDestroyOnLoad persistent object, like MessageBox)
+				if (m_LastFocusedScope && Type == ScopeType.ModalRoot) {
+					m_LastFocusedScope = null;
+				}
 			}
 		}
 
