@@ -331,6 +331,13 @@ namespace DevLocker.GFrame.Input.UIScope
 			return true;
 		}
 
+		protected virtual void OnDestroy()
+		{
+			// Remove references for easier memory profiling and debugging. NOTE: if object was never awaken, this won't get executed.
+			OnDisableScopes?.Clear();
+			m_LastFocusedScope = null;
+		}
+
 		void OnEnable()
 		{
 			if (!m_HasInitialized)
@@ -423,6 +430,10 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 
 			m_FrameEnabled = -1;
+			// Don't keep reference to destroyed scope, but keep alive ones as they are iterated through.
+			if (m_LastFocusedScope == null && !ReferenceEquals(m_LastFocusedScope, null)) {
+				m_LastFocusedScope = null;
+			}
 
 			if (!AutomaticFocus) {
 				SetScopeState(false);
