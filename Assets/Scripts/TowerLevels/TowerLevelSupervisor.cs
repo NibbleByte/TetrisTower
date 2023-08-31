@@ -102,7 +102,10 @@ namespace TetrisTower.TowerLevels
 					Transform[] decors = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
 
 					foreach(Transform overrideDecor in overrideDecors) {
-						overrideDecor.SetParent(levelController.transform, true);
+						// Child of tower decors were already moved - don't change their hierarchy.
+						if (overrideDecor.IsChildOf(placeholder.transform)) {
+							overrideDecor.SetParent(levelController.transform, true);
+						}
 					}
 
 					foreach(Transform decor in decors) {
