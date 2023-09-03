@@ -20,24 +20,81 @@ namespace TetrisTower.Visuals
 
 		public bool IsHighlighted => State == VisualsBlockState.Highlighted;
 
-		private Effects.ConeVisualsMaterialsDatabase m_MaterialsDatabase;
 		private Renderer m_Renderer;
 		private Material m_OriginalMaterial;
 
+		private MaterialPropertyBlock m_AppliedBlock;
+		private Material m_AppliedMaterial;
+
+		private int m_HighlightEnabledId;
 
 		void Awake()
 		{
-			m_MaterialsDatabase = GetComponentInParent<Effects.ConeVisualsMaterialsDatabase>();
 			m_Renderer = GetComponentInChildren<Renderer>();
 			m_OriginalMaterial = m_Renderer.sharedMaterial;
+
+			m_HighlightEnabledId = Shader.PropertyToID("_HighlightEnabled");
+		}
+
+		void OnDestroy()
+		{
+			if (m_AppliedMaterial) {
+				Destroy(m_AppliedMaterial);
+			}
+		}
+
+		public ConeVisualsBlock SetFloat(string propertyName, float value)
+		{
+			if (m_AppliedBlock == null) {
+				Debug.LogError($"No material property block to apply float {propertyName} {value} to.", this);
+				return this;
+			}
+
+			m_AppliedBlock.SetFloat(propertyName, value);
+
+			return this;
+		}
+
+		public ConeVisualsBlock SetFloat(int propertyNameId, float value)
+		{
+			if (m_AppliedBlock == null) {
+				Debug.LogError($"No material property block to apply float {propertyNameId} {value} to.", this);
+				return this;
+			}
+
+			m_AppliedBlock.SetFloat(propertyNameId, value);
+
+			return this;
+		}
+
+		public void ReapplyMaterialPropertyBlock()
+		{
+			if (m_AppliedBlock == null) {
+				Debug.LogError("No material property block to reapply.", this);
+				return;
+			}
+
+			m_Renderer.SetPropertyBlock(m_AppliedBlock);
+		}
+
+
+		private void ClearMaterialPropertyBlock()
+		{
+			m_AppliedBlock = null;
+			m_Renderer.SetPropertyBlock(null);	// Setting it to null clears the used block and allows batching.
 		}
 
 
 		public void RestoreToNormal()
 		{
+			ClearMaterialPropertyBlock(); // So it can be SRP Batched again.
+
 			m_Renderer.sharedMaterial = m_OriginalMaterial;
 
-			m_Renderer.SetPropertyBlock(null);	// So it can be SRP Batched again.
+			if (m_AppliedMaterial) {
+				Destroy(m_AppliedMaterial);
+				m_AppliedMaterial = null;
+			}
 
 			State = VisualsBlockState.Normal;
 		}
@@ -61,34 +118,46 @@ namespace TetrisTower.Visuals
 				return;
 			}
 
-			m_Renderer.sharedMaterial = m_MaterialsDatabase.GetHighlightSharedMaterial(m_OriginalMaterial);
+			if (m_AppliedBlock != null) {
+				Debug.LogWarning($"Failed changing state to {VisualsBlockState.Highlighted} as there is a materials property block in use, on {name}", this);
+				return;
+			}
 
 			State = VisualsBlockState.Highlighted;
+			
+			m_AppliedBlock = new MaterialPropertyBlock();
+			m_AppliedBlock.SetFloat(m_HighlightEnabledId, 1f);
+
+			ReapplyMaterialPropertyBlock();
 		}
 
-		public void SetFallTrailEffect()
+		public ConeVisualsBlock StartFallTrailEffect(Shader fallTrailEffectShader)
 		{
 			if (State == VisualsBlockState.FallTrailEffect)
-				return;
+				return this;
 
 			if (State != VisualsBlockState.Normal) {
 				Debug.LogWarning($"Failed changing state to {VisualsBlockState.FallTrailEffect} from {State}, on {name}", this);
-				return;
+				return this;
 			}
 
-			m_Renderer.sharedMaterial = m_MaterialsDatabase.GetFallTrailEffectSharedMaterial(m_OriginalMaterial);
+			if (m_AppliedBlock != null) {
+				Debug.LogWarning($"Failed changing state to {VisualsBlockState.FallTrailEffect} as there is a materials property block in use, on {name}", this);
+				return this;
+			}
 
 			State = VisualsBlockState.FallTrailEffect;
-		}
 
-		public void SetMaterialPropertyBlock(MaterialPropertyBlock block)
-		{
-			if (State == VisualsBlockState.Normal) {
-				Debug.LogWarning($"Trying to set material property block while state is normal on block {name}", this);
-				return;
-			}
 
-			m_Renderer.SetPropertyBlock(block);
+			m_AppliedMaterial = new Material(m_OriginalMaterial);
+			m_AppliedMaterial.name += $"_{fallTrailEffectShader.name}";
+			m_AppliedMaterial.shader = fallTrailEffectShader;
+
+			m_Renderer.sharedMaterial = m_AppliedMaterial;
+
+			m_AppliedBlock = new MaterialPropertyBlock();
+
+			return this;
 		}
 	}
 }

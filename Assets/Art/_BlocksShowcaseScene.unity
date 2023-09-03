@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4397552, g: 0.48818004, b: 0.56839955, a: 1}
+  m_IndirectSpecularColor: {r: 0.16245425, g: 0.20326349, b: 0.28290048, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -754,6 +754,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  FallTrailEffectShader: {fileID: -6465566751694194690, guid: 6b409a2e029e9d24188594f4804715c1, type: 3}
+  ParticlesTemplate: {fileID: 0}
 --- !u!114 &613792021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -771,20 +773,6 @@ MonoBehaviour:
   - {fileID: 1813549367}
   - {fileID: 1029722765}
   - {fileID: 560387402}
---- !u!114 &613792022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 117083879}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98a7e66412bf7f44fb060634bd3c0347, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HighlightShader: {fileID: -6465566751694194690, guid: 4aae06a10810d9a4ba4ea4717d795be7, type: 3}
-  FallTrailEffectShader: {fileID: -6465566751694194690, guid: 6b409a2e029e9d24188594f4804715c1, type: 3}
 --- !u!1 &633608002
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,6 +803,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
@@ -831,6 +820,7 @@ MonoBehaviour:
   m_TrackedDeviceOrientationAction: {fileID: 1025543830046995696, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
 --- !u!114 &633608004
 MonoBehaviour:
   m_ObjectHideFlags: 0

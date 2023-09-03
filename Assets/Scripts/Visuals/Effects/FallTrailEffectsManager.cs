@@ -10,7 +10,6 @@ namespace TetrisTower.Visuals.Effects
 			public GameObject OriginalBlockGO;
 			public Vector3 LastOriginalScale;
 			public ConeVisualsBlock EffectBlock;
-			public MaterialPropertyBlock MaterialProperties;
 		}
 
 		private class BlocksGroup : List<EffectBlockEntry>
@@ -41,6 +40,8 @@ namespace TetrisTower.Visuals.Effects
 		public float DampSpeed = 0.04f;
 		public float FinishDistance = 0.006f;
 		public AnimationCurve AlphaCurve = AnimationCurve.EaseInOut(0f, 0f, 0.1f, 0.6f);
+
+		public Shader FallTrailEffectShader;
 
 		[Tooltip("Optional - Partical effect to be moved with the bottom falling block of the group.")]
 		public ParticleSystem ParticlesTemplate;
@@ -74,28 +75,27 @@ namespace TetrisTower.Visuals.Effects
 			foreach(GameObject block in blocks) {
 
 				GameObject effectGO = Instantiate(block, block.transform.position, block.transform.rotation, parent);
-				ConeVisualsBlock effectBlock = effectGO.GetComponent<ConeVisualsBlock>();
+				effectGO.name = $"_{block.name}_Effect";
+				effectGO.transform.localScale = block.transform.localScale + new Vector3(AddSideScale, 0f, 0f);
+				effectGO.transform.position = block.transform.position + block.transform.forward * AddForwardOffset;
 
+				ConeVisualsBlock effectBlock = effectGO.GetComponent<ConeVisualsBlock>();
 				if (effectBlock == null) {
 					effectBlock = effectGO.AddComponent<ConeVisualsBlock>();
 				}
 
-				effectBlock.RestoreToNormal();	// Just in case, if it came highlighted or something.
-				effectBlock.SetFallTrailEffect();
-				effectBlock.gameObject.name = $"_{block.name}_Effect";
-				effectBlock.transform.localScale = block.transform.localScale + new Vector3(AddSideScale, 0f, 0f);
-				effectBlock.transform.position = block.transform.position + block.transform.forward * AddForwardOffset;
+				effectBlock.RestoreToNormal();  // Just in case, if it came highlighted or something.
+				effectBlock.StartFallTrailEffect(FallTrailEffectShader)
+					// Make sure alpha is off for the first frame or it flashes.
+					.SetFloat(m_AlphaPropID, 0f)
+					.ReapplyMaterialPropertyBlock()
+					;
 
 				var entry = new EffectBlockEntry() {
 					OriginalBlockGO = block,
 					LastOriginalScale = block.transform.localScale,
 					EffectBlock = effectBlock,
-					MaterialProperties = new MaterialPropertyBlock(),
 				};
-
-				// Make sure alpha is off for the first frame or it flashes.
-				entry.MaterialProperties.SetFloat(m_AlphaPropID, 0f);
-				entry.EffectBlock.SetMaterialPropertyBlock(entry.MaterialProperties);
 
 				group.Add(entry);
 			}
@@ -201,12 +201,12 @@ namespace TetrisTower.Visuals.Effects
 					float topScale = 1f - (group.Count - 1 - (entryIndex - 1)) * scalePerPoint;
 					float bottomScale = 1f - (group.Count - 1 - entryIndex) * scalePerPoint;
 
-					entry.MaterialProperties.SetFloat(m_BottomPropID, bottomScale);
-					entry.MaterialProperties.SetFloat(m_TopScalePropID, topScale);
-
-					entry.MaterialProperties.SetFloat(m_AlphaPropID, alpha);
-
-					entry.EffectBlock.SetMaterialPropertyBlock(entry.MaterialProperties);
+					entry.EffectBlock
+						.SetFloat(m_BottomPropID, bottomScale)
+						.SetFloat(m_TopScalePropID, topScale)
+						.SetFloat(m_AlphaPropID, alpha)
+						.ReapplyMaterialPropertyBlock()
+						;
 				}
 			}
 		}
