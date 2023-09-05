@@ -106,7 +106,7 @@ namespace DevLocker.GFrame.Input
 			if (!m_Actions.TryGetValue(action, out HashSet<object> enableSources))
 				throw new ArgumentException($"Input action \"{action}\" is not part of the tracked actions.");
 
-			if (enableSources.Count > 0 && !action.enabled) {
+			if (enableSources.Count > 0 && !action.enabled && (m_CurrentActionsMask?.Contains(action) ?? true)) {
 				UnityEngine.Debug.LogError($"Trying to disable input action \"{action.name}\" by {source}, but it is already disabled. Some code is disabling input actions without the IInputContext!");
 			}
 
@@ -263,7 +263,8 @@ namespace DevLocker.GFrame.Input
 
 				// If there are two users, one from the player state, another from the mask (i.e. modal dialog), it is ok to have conflicts.
 				// At least for the UI actions.
-				if (pair.Value.Count == 2 && m_MasksStack.Count > 0 && m_CurrentActionsMask.Contains(pair.Key) && uiActions.Contains(pair.Key))
+				// Current mask can be empty (e.g. loading screen supressing all actions, including of a modal dialog left in the background to be destroyed by the next scene)
+				if (pair.Value.Count == 2 && m_MasksStack.Count > 0 /*&& m_CurrentActionsMask.Contains(pair.Key)*/ && uiActions.Contains(pair.Key))
 					continue;
 
 				conflictsReport.Conflicts.Add(KeyValuePair.Create<InputAction, IReadOnlyCollection<object>>(pair.Key, pair.Value));
