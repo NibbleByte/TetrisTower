@@ -265,6 +265,39 @@ MonoBehaviour:
         rid: 668326610786320439
       SkinOverrides: []
     - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 8eb4cbf6164b5334a8e791576d567ce5, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Sahara.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 6777769135320858640
+      - rid: 6777769135320858641
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 26fc42ece68979a478aa5357ff0b77f9, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/TowerScene-1.unity
@@ -426,6 +459,15 @@ MonoBehaviour:
         MatchesEndCount: 40
         MatchesType: 1
     - rid: 5506456835523608590
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 6777769135320858640
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 6777769135320858641
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0

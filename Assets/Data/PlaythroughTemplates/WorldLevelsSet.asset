@@ -231,6 +231,7 @@ MonoBehaviour:
   - {fileID: 3075740806775852930}
   - {fileID: -5133656246103420669}
   - {fileID: -3451992996147784845}
+  - {fileID: 4486701649466151832}
   LevelsLinks:
   - LevelID1: BabylonID
     LevelID2: ColosseumID
@@ -243,6 +244,8 @@ MonoBehaviour:
   - LevelID1: BabylonID
     LevelID2: EgyptID
   - LevelID1: AtlantisID
+    LevelID2: EgyptID
+  - LevelID1: SaharaID
     LevelID2: EgyptID
 --- !u!114 &1554497649489288964
 MonoBehaviour:
@@ -455,3 +458,67 @@ MonoBehaviour:
         m_Columns: 13
         m_Blocks: 00000000e803000000000000e80300000000000000000000e803000000000000e803000000000000e803000000000000e803000000000000e803000000000000e80300000000000000000000e803000000000000e803000000000000e803000000000000e803000000000000e8030000e8030000e80300000000000000000000e803000000000000e803000000000000e8030000e8030000e8030000000000000000000000000000000000000000000000000000e8030000e8030000e8030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
         m_PinnedCoords: []
+--- !u!114 &4486701649466151832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: SaharaID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 8eb4cbf6164b5334a8e791576d567ce5, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Sahara.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 4
+    Objectives:
+    - rid: 6777769135320858624
+    - rid: 6777769135320858625
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: SaharaID
+    WorldMapPosition: {x: 1.3, y: -38}
+    PreviewImage: {fileID: 21300000, guid: e0155211452add4479f8204b2df441c4, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6777769135320858624
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 6777769135320858625
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0

@@ -330,37 +330,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: {x: -0.4, y: 0, z: -0.6}
---- !u!1 &713942823
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 713942824}
-  m_Layer: 0
-  m_Name: TowerLevelPlaceholder-OldLocation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &713942824
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 713942823}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -38.36707, y: 1.02, z: -53.129948}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &823110822
 GameObject:
   m_ObjectHideFlags: 0
@@ -5301,7 +5270,7 @@ Transform:
   - {fileID: 823110823}
   - {fileID: 1498444768}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1152442665
 GameObject:
@@ -5382,7 +5351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameConfig: {fileID: 11400000, guid: afd2790b73a91f8468fb087a28f729ac, type: 2}
-  StartingPlaythroughTemplate: {fileID: 11400000, guid: efdc5531b22032b4dbe51c2c7255b45c, type: 2}
+  StartingPlaythroughTemplate: {fileID: 11400000, guid: 292dd2cbcdd45d44e942a7c29b6ac36c, type: 2}
   StartingRandomSeed: 0
   GameContext:
     rid: -2
@@ -5404,7 +5373,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1441971209 stripped
 GameObject:
@@ -5689,7 +5658,7 @@ Transform:
   m_Children:
   - {fileID: 487280206}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2123733324
 GameObject:
@@ -5769,7 +5738,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1305033909077702650, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1305033909077702650, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: m_LocalPosition.x
