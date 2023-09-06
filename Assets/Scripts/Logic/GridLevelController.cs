@@ -19,6 +19,8 @@ namespace TetrisTower.Logic
 
 		public bool IsPaused => !enabled;
 
+		public float DeltaPlayTime { get; private set; }
+
 		public event Action RunningActionsSequenceFinished;
 		public event Action SpawnBlockTypesCountChanged;
 		public event Action PlacingFallingShape;
@@ -558,11 +560,13 @@ namespace TetrisTower.Logic
 		public void PauseLevel()
 		{
 			enabled = false;
+			DeltaPlayTime = 0;
 		}
 
 		public void ResumeLevel()
 		{
 			enabled = true;
+			DeltaPlayTime = Time.deltaTime;
 		}
 
 		void Update()
@@ -585,6 +589,11 @@ namespace TetrisTower.Logic
 				}
 
 				LevelData.PlayTime += Time.deltaTime;
+				DeltaPlayTime = Time.deltaTime;
+
+			} else {
+
+				DeltaPlayTime = 0;
 			}
 		}
 

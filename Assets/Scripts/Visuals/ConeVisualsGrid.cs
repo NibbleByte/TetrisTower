@@ -76,6 +76,10 @@ namespace TetrisTower.Visuals
 			private set => m_Blocks[coords.Row, coords.Column] = value;
 		}
 
+		public delegate void VisualsBlockEventHandler(ConeVisualsBlock block);
+		public event VisualsBlockEventHandler CreatedVisualsBlock;
+		public event VisualsBlockEventHandler DestroyingVisualsBlock;
+
 		private ConeVisualsBlock[,] m_Blocks;
 
 		public Vector3 ConeApex { get; private set; }
@@ -147,6 +151,18 @@ namespace TetrisTower.Visuals
 			ConeApex = transform.position + Vector3.up * ConeHeight;
 			m_ScaleChangeRatio = FrontFaceTopEdgeLength / FrontFaceBottomEdgeLength;
 			ConeSectorEulerAngle = 360f / columns;
+		}
+
+		public IEnumerable<ConeVisualsBlock> GetAllBlocks()
+		{
+			for (int row = 0; row < Rows; ++row) {
+				for (int column = 0; column < Columns; ++column) {
+					ConeVisualsBlock block = m_Blocks[row, column];
+					if (block) {
+						yield return block;
+					}
+				}
+			}
 		}
 
 		public Vector3 GridDistanceToScale(float fallDistance) => Vector3.one * Mathf.Pow(m_ScaleChangeRatio, Rows - fallDistance);
@@ -227,17 +243,6 @@ namespace TetrisTower.Visuals
 			var vertexEnd = GridToWorldBackCenter(coords);
 
 			return vertexStart + (vertexEnd - vertexStart) / 2f;
-		}
-
-		private void DestroyInstances()
-		{
-			for (int row = 0; row < Rows; ++row) {
-				for (int column = 0; column < Columns; ++column) {
-					if (this[row, column]) {
-						GameObject.Destroy(this[row, column].gameObject);
-					}
-				}
-			}
 		}
 
 		public IEnumerator ApplyActions(IEnumerable<GridAction> actions)
@@ -380,8 +385,7 @@ namespace TetrisTower.Visuals
 				if (visualsBlock.MatchHits != 0) {
 					visualsBlock.IsHighlighted = true;
 				} else {
-					GameObject.Destroy(this[coord].gameObject);
-					this[coord] = null;
+					DestroyInstanceAt(coord);
 				}
 
 				if (displayScoreCoord == coord && m_ScoreGrid != null && m_ScoreGrid.LastMatchBonus.ResultBonusScore > 0) {
@@ -480,8 +484,31 @@ namespace TetrisTower.Visuals
 					visualsBlock.IsHighlighted = true;
 				}
 
+				CreatedVisualsBlock?.Invoke(visualsBlock);
+
 			} else {
 				GameObject.Destroy(reuseVisuals);
+			}
+		}
+
+		private void DestroyInstanceAt(GridCoords coords)
+		{
+			ConeVisualsBlock block = this[coords];
+
+			DestroyingVisualsBlock?.Invoke(block);
+
+			GameObject.Destroy(block.gameObject);
+			this[coords] = null;
+		}
+
+		private void DestroyInstances()
+		{
+			for (int row = 0; row < Rows; ++row) {
+				for (int column = 0; column < Columns; ++column) {
+					if (this[row, column]) {
+						DestroyInstanceAt(new GridCoords(row, column));
+					}
+				}
 			}
 		}
 

@@ -38,6 +38,13 @@ namespace TetrisTower.Visuals
 
 		#region Material Properties
 
+		public float GetFloat(int propertyNameId)
+		{
+			float value;
+			m_FloatProperties.TryGetValue(propertyNameId, out value);
+			return value;
+		}
+
 		public ConeVisualsBlock SetFloat(int propertyNameId, float value)
 		{
 			m_FloatProperties[propertyNameId] = value;
@@ -45,6 +52,14 @@ namespace TetrisTower.Visuals
 			m_AppliedBlock.SetFloat(propertyNameId, value);
 
 			return this;
+		}
+
+
+		public Texture GetTexture(int propertyNameId)
+		{
+			Texture value;
+			m_TextureProperties.TryGetValue(propertyNameId, out value);
+			return value;
 		}
 
 		public ConeVisualsBlock SetTexture(int propertyNameId, Texture texture)
