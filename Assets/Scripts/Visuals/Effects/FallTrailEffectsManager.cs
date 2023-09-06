@@ -84,11 +84,10 @@ namespace TetrisTower.Visuals.Effects
 					effectBlock = effectGO.AddComponent<ConeVisualsBlock>();
 				}
 
-				effectBlock.RestoreToNormal();  // Just in case, if it came highlighted or something.
-				effectBlock.StartFallTrailEffect(FallTrailEffectShader)
+				effectBlock.OverrideShader(FallTrailEffectShader)
 					// Make sure alpha is off for the first frame or it flashes.
 					.SetFloat(m_AlphaPropID, 0f)
-					.ReapplyMaterialPropertyBlock()
+					.ApplyProperties()
 					;
 
 				var entry = new EffectBlockEntry() {
@@ -205,7 +204,7 @@ namespace TetrisTower.Visuals.Effects
 						.SetFloat(m_BottomPropID, bottomScale)
 						.SetFloat(m_TopScalePropID, topScale)
 						.SetFloat(m_AlphaPropID, alpha)
-						.ReapplyMaterialPropertyBlock()
+						.ApplyProperties()
 						;
 				}
 			}

@@ -98,8 +98,8 @@ namespace TetrisTower.TowerLevels
 				for(int column = 0; column < m_VisualsGrid.Columns; ++column) {
 					ConeVisualsBlock visualBlock = m_VisualsGrid[row, column];
 					if (visualBlock) {
-						visualBlock.RestoreToNormal();
-						visualBlocks.Add(new KeyValuePair<GridCoords, ConeVisualsBlock>(new GridCoords(row, column), visualBlock));
+						visualBlock.IsHighlighted = false;
+						visualBlocks.Add(KeyValuePair.Create(new GridCoords(row, column), visualBlock));
 					}
 				}
 			}

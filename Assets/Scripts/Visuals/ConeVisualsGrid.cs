@@ -378,7 +378,7 @@ namespace TetrisTower.Visuals
 				visualsBlock.MatchHits--;
 
 				if (visualsBlock.MatchHits != 0) {
-					visualsBlock.SetHighlight();
+					visualsBlock.IsHighlighted = true;
 				} else {
 					GameObject.Destroy(this[coord].gameObject);
 					this[coord] = null;
@@ -446,9 +446,9 @@ namespace TetrisTower.Visuals
 				}
 
 				if (visualsBlock.IsHighlighted && movedPair.Value.Row < m_PlayableArea.Row) {
-					visualsBlock.RestoreToNormal(VisualsBlockState.Highlighted);
+					visualsBlock.IsHighlighted = false;
 				} else if (!visualsBlock.IsHighlighted && movedPair.Value.Row >= m_PlayableArea.Row) {
-					visualsBlock.SetHighlight();
+					visualsBlock.IsHighlighted = true;
 				}
 			}
 
@@ -477,7 +477,7 @@ namespace TetrisTower.Visuals
 
 				// Warn that this is outside play area.
 				if (coords.Row >= m_PlayableArea.Row) {
-					visualsBlock.SetHighlight();
+					visualsBlock.IsHighlighted = true;
 				}
 
 			} else {

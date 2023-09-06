@@ -1,24 +1,13 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 namespace TetrisTower.Visuals
 {
-	public enum VisualsBlockState
-	{
-		Normal,
-		Highlighted,
-		FallTrailEffect,
-	}
-
 	public class ConeVisualsBlock : MonoBehaviour
 	{
-
 		[NonSerialized]
 		public int MatchHits = 0;
-
-		public VisualsBlockState State { get; private set; }
-
-		public bool IsHighlighted => State == VisualsBlockState.Highlighted;
 
 		private Renderer m_Renderer;
 		private Material m_OriginalMaterial;
@@ -26,10 +15,14 @@ namespace TetrisTower.Visuals
 		private MaterialPropertyBlock m_AppliedBlock;
 		private Material m_AppliedMaterial;
 
+		private Dictionary<int, float> m_FloatProperties = new ();
+		private Dictionary<int, Texture> m_TextureProperties = new ();
+
 		private int m_HighlightEnabledId;
 
 		void Awake()
 		{
+			m_AppliedBlock = new MaterialPropertyBlock();
 			m_Renderer = GetComponentInChildren<Renderer>();
 			m_OriginalMaterial = m_Renderer.sharedMaterial;
 
@@ -43,51 +36,95 @@ namespace TetrisTower.Visuals
 			}
 		}
 
-		public ConeVisualsBlock SetFloat(string propertyName, float value)
-		{
-			if (m_AppliedBlock == null) {
-				Debug.LogError($"No material property block to apply float {propertyName} {value} to.", this);
-				return this;
-			}
-
-			m_AppliedBlock.SetFloat(propertyName, value);
-
-			return this;
-		}
+		#region Material Properties
 
 		public ConeVisualsBlock SetFloat(int propertyNameId, float value)
 		{
-			if (m_AppliedBlock == null) {
-				Debug.LogError($"No material property block to apply float {propertyNameId} {value} to.", this);
-				return this;
-			}
+			m_FloatProperties[propertyNameId] = value;
 
 			m_AppliedBlock.SetFloat(propertyNameId, value);
 
 			return this;
 		}
 
-		public void ReapplyMaterialPropertyBlock()
+		public ConeVisualsBlock SetTexture(int propertyNameId, Texture texture)
 		{
-			if (m_AppliedBlock == null) {
-				Debug.LogError("No material property block to reapply.", this);
-				return;
+			m_TextureProperties[propertyNameId] = texture;
+
+			m_AppliedBlock.SetTexture(propertyNameId, texture);
+
+			return this;
+		}
+
+		public ConeVisualsBlock ClearProperty(int propertyNameId) => ClearProperties(propertyNameId);
+
+		public ConeVisualsBlock ClearProperties(params int[] propertyNameIds)
+		{
+			bool removed = false;
+
+			foreach(int propertyNameId in propertyNameIds) {
+				removed = m_FloatProperties.Remove(propertyNameId) | removed;
+				removed = m_TextureProperties.Remove(propertyNameId) | removed;
 			}
 
-			m_Renderer.SetPropertyBlock(m_AppliedBlock);
+
+			if (removed) {
+				m_AppliedBlock.Clear();
+
+				foreach (var pair in m_FloatProperties) {
+					m_AppliedBlock.SetFloat(pair.Key, pair.Value);
+				}
+
+				foreach (var pair in m_TextureProperties) {
+					m_AppliedBlock.SetTexture(pair.Key, pair.Value);
+				}
+			}
+
+			return this;
 		}
 
-
-		private void ClearMaterialPropertyBlock()
+		public void ClearAllProperties()
 		{
-			m_AppliedBlock = null;
-			m_Renderer.SetPropertyBlock(null);	// Setting it to null clears the used block and allows batching.
+			m_AppliedBlock.Clear();
+
+			m_FloatProperties.Clear();
+			m_TextureProperties.Clear();
+
+			ApplyProperties();
 		}
 
-
-		public void RestoreToNormal()
+		public void ApplyProperties()
 		{
-			ClearMaterialPropertyBlock(); // So it can be SRP Batched again.
+			if (m_FloatProperties.Count == 0 && m_TextureProperties.Count == 0) {
+				m_Renderer.SetPropertyBlock(null);
+			} else {
+				m_Renderer.SetPropertyBlock(m_AppliedBlock);
+			}
+		}
+
+		#endregion
+
+		#region Shader Override
+
+		public ConeVisualsBlock OverrideShader(Shader shader)
+		{
+			if (m_AppliedMaterial) {
+				Destroy(m_AppliedMaterial);
+			}
+
+			m_AppliedMaterial = new Material(m_OriginalMaterial);
+			m_AppliedMaterial.name += $"_{shader.name}";
+			m_AppliedMaterial.shader = shader;
+
+			m_Renderer.sharedMaterial = m_AppliedMaterial;
+
+			return this;
+		}
+
+		public void ClearShaderOverride()
+		{
+			// NOTE: calling this will leak the properties for this shader that are set by the user.
+			//		 User should clear those up if needed.
 
 			m_Renderer.sharedMaterial = m_OriginalMaterial;
 
@@ -95,69 +132,24 @@ namespace TetrisTower.Visuals
 				Destroy(m_AppliedMaterial);
 				m_AppliedMaterial = null;
 			}
-
-			State = VisualsBlockState.Normal;
 		}
 
-		public void RestoreToNormal(VisualsBlockState expectedState)
-		{
-			if (State != expectedState && expectedState != VisualsBlockState.Normal) {
-				Debug.LogWarning($"{nameof(ConeVisualsBlock)}.{nameof(RestoreToNormal)}() expected {expectedState}, but found {State}, on {name}", this);
-			}
+		#endregion
 
-			RestoreToNormal();
+		private bool m_IsHighlighted;
+		public bool IsHighlighted {
+			get => m_IsHighlighted;
+			set {
+				if (value) {
+					SetFloat(m_HighlightEnabledId, 1f);
+				} else {
+					ClearProperty(m_HighlightEnabledId);
+				}
+				ApplyProperties();
+
+				m_IsHighlighted = value;
+			}
 		}
 
-		public void SetHighlight()
-		{
-			if (State == VisualsBlockState.Highlighted)
-				return;
-
-			if (State != VisualsBlockState.Normal) {
-				Debug.LogWarning($"Failed changing state to {VisualsBlockState.Highlighted} from {State}, on {name}", this);
-				return;
-			}
-
-			if (m_AppliedBlock != null) {
-				Debug.LogWarning($"Failed changing state to {VisualsBlockState.Highlighted} as there is a materials property block in use, on {name}", this);
-				return;
-			}
-
-			State = VisualsBlockState.Highlighted;
-			
-			m_AppliedBlock = new MaterialPropertyBlock();
-			m_AppliedBlock.SetFloat(m_HighlightEnabledId, 1f);
-
-			ReapplyMaterialPropertyBlock();
-		}
-
-		public ConeVisualsBlock StartFallTrailEffect(Shader fallTrailEffectShader)
-		{
-			if (State == VisualsBlockState.FallTrailEffect)
-				return this;
-
-			if (State != VisualsBlockState.Normal) {
-				Debug.LogWarning($"Failed changing state to {VisualsBlockState.FallTrailEffect} from {State}, on {name}", this);
-				return this;
-			}
-
-			if (m_AppliedBlock != null) {
-				Debug.LogWarning($"Failed changing state to {VisualsBlockState.FallTrailEffect} as there is a materials property block in use, on {name}", this);
-				return this;
-			}
-
-			State = VisualsBlockState.FallTrailEffect;
-
-
-			m_AppliedMaterial = new Material(m_OriginalMaterial);
-			m_AppliedMaterial.name += $"_{fallTrailEffectShader.name}";
-			m_AppliedMaterial.shader = fallTrailEffectShader;
-
-			m_Renderer.sharedMaterial = m_AppliedMaterial;
-
-			m_AppliedBlock = new MaterialPropertyBlock();
-
-			return this;
-		}
 	}
 }

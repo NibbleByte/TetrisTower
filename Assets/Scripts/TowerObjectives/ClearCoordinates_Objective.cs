@@ -82,7 +82,7 @@ namespace TetrisTower.TowerObjectives
 					continue;
 				}
 
-				block.SetHighlight();
+				block.IsHighlighted = true;
 			}
 		}
 

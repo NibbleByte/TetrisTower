@@ -30,14 +30,14 @@ namespace TetrisTower.Visuals.Effects
 		public void HighlightBlocks()
 		{
 			foreach(var block in m_Blocks) {
-				block.SetHighlight();
+				block.IsHighlighted = true;
 			}
 		}
 
 		public void RestoreToNormalBlocks()
 		{
 			foreach(var block in m_Blocks) {
-				block.RestoreToNormal();
+				block.ClearAllProperties();
 				block.gameObject.SetActive(true);
 			}
 
