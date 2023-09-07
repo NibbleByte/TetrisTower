@@ -973,14 +973,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &41229047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3137,14 +3136,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &133684601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4461,14 +4459,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &190079117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5006,14 +5003,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &223250095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5543,14 +5539,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &249962576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6426,9 +6421,11 @@ MonoBehaviour:
     up to that one or top is reached.
 
 
-    This can be used in addition with "Push
-    Input Stack" to completly isolate from the current game state (otherways game
-    input not defined by scopes will continue working).'
+    Scopes can also be set as "ModalRoot".
+    These will push an actions mask to the input stack with all child elements, suppressing
+    any hotkeys outside the scope (e.g. player states input). Useful for modal dialogs.
+    Normal scopes can''t steal focus on enable from such instances. Press F5 for
+    a demo.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6943,14 +6940,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &329005680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8204,14 +8200,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &366762841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8399,14 +8394,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &369432835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10024,14 +10018,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!1 &458562230
 GameObject:
   m_ObjectHideFlags: 0
@@ -12189,14 +12182,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 20
   OnDisableBehaviour: 5
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &516266830
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12811,14 +12803,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!1 &540250531
 GameObject:
   m_ObjectHideFlags: 0
@@ -12952,14 +12943,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &540250538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15016,14 +15006,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 0
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &692682709
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15434,14 +15423,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &707024438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16964,14 +16952,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &760973057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18611,14 +18598,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!1 &825042751
 GameObject:
   m_ObjectHideFlags: 0
@@ -19134,14 +19120,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &846973236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20123,14 +20108,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &880308243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21899,14 +21883,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &981790162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23550,14 +23533,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 2
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1016082982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24048,14 +24030,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 1
+  Type: 1
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1034013390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24622,14 +24603,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 20
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 0
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1071169837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26950,14 +26930,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1164405387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29240,14 +29219,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!1001 &1312315625
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29389,14 +29367,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1316358548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29568,14 +29545,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 0
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1331933433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33109,14 +33085,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1462420246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39391,14 +39366,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1743657238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39446,7 +39420,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1743657235}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2653b394dbaee6439e7194f78070339, type: 3}
+  m_Script: {fileID: 11500000, guid: e456fb4a416c94f41acf5509b3497b48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   StartSelectionSource: 0
@@ -39929,7 +39903,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -400
+      value: -420
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -40180,14 +40154,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1770283049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42507,14 +42480,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!114 &1925213971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42930,14 +42902,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 1
+  Type: 1
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!1 &1966513302
 GameObject:
   m_ObjectHideFlags: 0
@@ -44461,24 +44432,28 @@ MonoBehaviour:
     Here are some rules about focusing
     scopes:
 
-    - If UIScope gets enabled it will gain focus by default.
+    - If UIScope gets enabled it will gain focus by default (unless
+    focused is ModalRoot).
+
+    - If focused UIScope gets disabled, it will try to
+    focus the deepest enabled scope available, by default.
+
+    - Unity OnEnable()
+    and OnDisable() methods are called in RANDOM order, do not rely on the hierarchy!
 
     -
-    If focused UIScope gets disabled, it will try to focus the deepest enabled scope
-    available, by default.
+    If multiple scopes are enabled at the same time, you can prioritize one of them
+    to get focused in the end.
 
-    - Unity OnEnable() and OnDisable() methods are called
-    in RANDOM order, do not rely on the hierarchy!
-
-    - If multiple scopes are
-    enabled at the same time, you can prioritize one of them to get focused in the
-    end.
+    - Scopes set as ModalRoot will persist their
+    focus and suppress input hotkeys not managed by them (example - press F5).
 
 
-    Dig in the hierarchy and check all UIScope components.
+    Dig
+    in the hierarchy and check all UIScope components.
 
-    Try deactivate
-    and reactivate scopes and see what happens.'
+    Try deactivate and reactivate
+    scopes and see what happens.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -45582,7 +45557,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -400
+      value: -420
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -46518,14 +46493,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRoot: 0
+  Type: 0
+  IncludeUIActions: 1
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
   OnDisableScopes: []
   ResetAllActionsOnEnable: 1
-  PushInputStack: 0
-  IncludeUIActions: 1
 --- !u!1 &2115530841
 GameObject:
   m_ObjectHideFlags: 0

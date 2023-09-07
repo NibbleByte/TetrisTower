@@ -88,7 +88,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			public Queue<KeyValuePair<UIScope, bool>> PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
 		}
 
-		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of closest root will remain inactive).\n\nModal root scopes will push an actions mask to the input stack with all child elements, suppressing any hotkeys outside the scope (e.g. player states input).")]
+		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of closest root will remain inactive).\n\nModal root scopes will push an actions mask to the input stack with all child elements, suppressing any hotkeys outside the scope (e.g. player states input). Useful for modal dialogs. Normal scopes can't steal focus on enable from such instances.")]
 		[UnityEngine.Serialization.FormerlySerializedAs("IsRoot")]
 		public ScopeType Type = ScopeType.Normal;
 
@@ -375,6 +375,11 @@ namespace DevLocker.GFrame.Input.UIScope
 				SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, nextScopes);
 
 			} else {
+
+				// Normal scopes can't steal focus from ModalRoots.
+				UIScope modalActiveScope = m_PlayerSet.ActiveScopes.FirstOrDefault(s => s.Type == ScopeType.ModalRoot);
+				if (Type != ScopeType.ModalRoot && modalActiveScope && !transform.IsChildOf(modalActiveScope.transform))
+					return;
 
 				// OnEnabled() order of execution is undefined - sometimes parent invoked first, sometimes the children.
 				// Ensure that collections don't have any duplicates and are filled in the right order - parent to child.
