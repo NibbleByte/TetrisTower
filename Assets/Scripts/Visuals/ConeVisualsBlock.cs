@@ -16,6 +16,7 @@ namespace TetrisTower.Visuals
 		private Material m_AppliedMaterial;
 
 		private Dictionary<int, float> m_FloatProperties = new ();
+		private Dictionary<int, Vector4> m_VectorProperties = new ();
 		private Dictionary<int, Texture> m_TextureProperties = new ();
 
 		private int m_HighlightEnabledId;
@@ -54,6 +55,22 @@ namespace TetrisTower.Visuals
 			return this;
 		}
 
+		public Vector4 GetVector(int propertyNameId)
+		{
+			Vector4 value;
+			m_VectorProperties.TryGetValue(propertyNameId, out value);
+			return value;
+		}
+
+		public ConeVisualsBlock SetVector(int propertyNameId, Vector4 value)
+		{
+			m_VectorProperties[propertyNameId] = value;
+
+			m_AppliedBlock.SetVector(propertyNameId, value);
+
+			return this;
+		}
+
 
 		public Texture GetTexture(int propertyNameId)
 		{
@@ -79,6 +96,7 @@ namespace TetrisTower.Visuals
 
 			foreach(int propertyNameId in propertyNameIds) {
 				removed = m_FloatProperties.Remove(propertyNameId) | removed;
+				removed = m_VectorProperties.Remove(propertyNameId) | removed;
 				removed = m_TextureProperties.Remove(propertyNameId) | removed;
 			}
 
@@ -88,6 +106,10 @@ namespace TetrisTower.Visuals
 
 				foreach (var pair in m_FloatProperties) {
 					m_AppliedBlock.SetFloat(pair.Key, pair.Value);
+				}
+
+				foreach (var pair in m_VectorProperties) {
+					m_AppliedBlock.SetVector(pair.Key, pair.Value);
 				}
 
 				foreach (var pair in m_TextureProperties) {
@@ -103,6 +125,7 @@ namespace TetrisTower.Visuals
 			m_AppliedBlock.Clear();
 
 			m_FloatProperties.Clear();
+			m_VectorProperties.Clear();
 			m_TextureProperties.Clear();
 
 			ApplyProperties();
@@ -110,7 +133,7 @@ namespace TetrisTower.Visuals
 
 		public void ApplyProperties()
 		{
-			if (m_FloatProperties.Count == 0 && m_TextureProperties.Count == 0) {
+			if (0 == m_FloatProperties.Count + m_VectorProperties.Count + m_TextureProperties.Count) {
 				m_Renderer.SetPropertyBlock(null);
 			} else {
 				m_Renderer.SetPropertyBlock(m_AppliedBlock);

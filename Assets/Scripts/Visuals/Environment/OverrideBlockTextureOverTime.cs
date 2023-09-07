@@ -16,6 +16,7 @@ namespace TetrisTower.Visuals.Environment
 		[Range(0f, 1f)]
 		public float OverrideMax = 1f;
 
+		public Vector2 PatternRandomOffset = new Vector2(20f, 20f);
 		public float PatternScale = 50f;
 
 		private GridLevelController m_LevelController;
@@ -25,6 +26,7 @@ namespace TetrisTower.Visuals.Environment
 
 		private int m_OverrideTextureID;
 		private int m_OverrideValueID;
+		private int m_OverridePatternOffsetID;
 		private int m_OverridePatternScaleID;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
@@ -34,6 +36,7 @@ namespace TetrisTower.Visuals.Environment
 
 			m_OverrideTextureID = Shader.PropertyToID("_Override_Map");
 			m_OverrideValueID = Shader.PropertyToID("_Override_Value");
+			m_OverridePatternOffsetID = Shader.PropertyToID("_Override_Pattern_Offset");
 			m_OverridePatternScaleID = Shader.PropertyToID("_Override_Pattern_Scale");
 
 			m_VisualsGrid.CreatedVisualsBlock += OnCreatedVisualsBlock;
@@ -61,6 +64,7 @@ namespace TetrisTower.Visuals.Environment
 
 			block.SetTexture(m_OverrideTextureID, OverrideTexture)
 				.SetFloat(m_OverridePatternScaleID, PatternScale)
+				.SetVector(m_OverridePatternOffsetID, UnityEngine.Random.insideUnitCircle * PatternRandomOffset)
 				.ApplyProperties()
 				;
 		}
@@ -88,6 +92,15 @@ namespace TetrisTower.Visuals.Environment
 				value = Mathf.Clamp(value + OverrideSpeed * m_LevelController.DeltaPlayTime, 0f, OverrideMax);
 
 				block.SetFloat(m_OverrideValueID, value)
+					.ApplyProperties();
+			}
+		}
+
+		[ContextMenu("Set Blocks To Max Override")]
+		private void SetBlocksToMaxOverride()
+		{
+			foreach(ConeVisualsBlock block in m_Blocks) {
+				block.SetFloat(m_OverrideValueID, OverrideMax)
 					.ApplyProperties();
 			}
 		}
