@@ -76,6 +76,9 @@ namespace TetrisTower.Visuals
 			private set => m_Blocks[coords.Row, coords.Column] = value;
 		}
 
+		public IReadOnlyList<ConeVisualsBlock> AllBlocks => m_AllBlocks;
+		private List<ConeVisualsBlock> m_AllBlocks = new();
+
 		public delegate void VisualsBlockEventHandler(ConeVisualsBlock block);
 		public event VisualsBlockEventHandler CreatedVisualsBlock;
 		public event VisualsBlockEventHandler DestroyingVisualsBlock;
@@ -151,18 +154,6 @@ namespace TetrisTower.Visuals
 			ConeApex = transform.position + Vector3.up * ConeHeight;
 			m_ScaleChangeRatio = FrontFaceTopEdgeLength / FrontFaceBottomEdgeLength;
 			ConeSectorEulerAngle = 360f / columns;
-		}
-
-		public IEnumerable<ConeVisualsBlock> GetAllBlocks()
-		{
-			for (int row = 0; row < Rows; ++row) {
-				for (int column = 0; column < Columns; ++column) {
-					ConeVisualsBlock block = m_Blocks[row, column];
-					if (block) {
-						yield return block;
-					}
-				}
-			}
 		}
 
 		public Vector3 GridDistanceToScale(float fallDistance) => Vector3.one * Mathf.Pow(m_ScaleChangeRatio, Rows - fallDistance);
@@ -484,6 +475,8 @@ namespace TetrisTower.Visuals
 					visualsBlock.IsHighlighted = true;
 				}
 
+				m_AllBlocks.Add(visualsBlock);
+
 				CreatedVisualsBlock?.Invoke(visualsBlock);
 
 			} else {
@@ -496,6 +489,8 @@ namespace TetrisTower.Visuals
 			ConeVisualsBlock block = this[coords];
 
 			DestroyingVisualsBlock?.Invoke(block);
+
+			m_AllBlocks.Remove(block);
 
 			GameObject.Destroy(block.gameObject);
 			this[coords] = null;

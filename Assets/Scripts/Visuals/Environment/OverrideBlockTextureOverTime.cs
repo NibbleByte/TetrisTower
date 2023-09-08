@@ -22,8 +22,6 @@ namespace TetrisTower.Visuals.Environment
 		private GridLevelController m_LevelController;
 		private ConeVisualsGrid m_VisualsGrid;
 
-		private List<ConeVisualsBlock> m_Blocks = new ();
-
 		private int m_OverrideTextureID;
 		private int m_OverrideValueID;
 		private int m_OverridePatternOffsetID;
@@ -40,9 +38,8 @@ namespace TetrisTower.Visuals.Environment
 			m_OverridePatternScaleID = Shader.PropertyToID("_Override_Pattern_Scale");
 
 			m_VisualsGrid.CreatedVisualsBlock += OnCreatedVisualsBlock;
-			m_VisualsGrid.DestroyingVisualsBlock += OnDestroyingVisualsBlock;
 
-			foreach(ConeVisualsBlock block in m_VisualsGrid.GetAllBlocks()) {
+			foreach (ConeVisualsBlock block in m_VisualsGrid.AllBlocks) {
 				OnCreatedVisualsBlock(block);
 			}
 		}
@@ -50,28 +47,18 @@ namespace TetrisTower.Visuals.Environment
 		public void OnLevelUnloading()
 		{
 			m_VisualsGrid.CreatedVisualsBlock -= OnCreatedVisualsBlock;
-			m_VisualsGrid.DestroyingVisualsBlock -= OnDestroyingVisualsBlock;
 			m_VisualsGrid = null;
 
 			m_LevelController = null;
-
-			m_Blocks.Clear();
 		}
 
 		private void OnCreatedVisualsBlock(ConeVisualsBlock block)
 		{
-			m_Blocks.Add(block);
-
 			block.SetTexture(m_OverrideTextureID, OverrideTexture)
 				.SetFloat(m_OverridePatternScaleID, PatternScale)
 				.SetVector(m_OverridePatternOffsetID, UnityEngine.Random.insideUnitCircle * PatternRandomOffset)
 				.ApplyProperties()
 				;
-		}
-
-		private void OnDestroyingVisualsBlock(ConeVisualsBlock block)
-		{
-			m_Blocks.Remove(block);
 		}
 
 		void OnValidate()
@@ -86,7 +73,7 @@ namespace TetrisTower.Visuals.Environment
 			if (m_VisualsGrid == null)
 				return;
 
-			foreach(ConeVisualsBlock block in m_Blocks) {
+			foreach(ConeVisualsBlock block in m_VisualsGrid.AllBlocks) {
 				float value = block.GetFloat(m_OverrideValueID);
 
 				value = Mathf.Clamp(value + OverrideSpeed * m_LevelController.DeltaPlayTime, 0f, OverrideMax);
@@ -99,7 +86,7 @@ namespace TetrisTower.Visuals.Environment
 		[ContextMenu("Set Blocks To Max Override")]
 		private void SetBlocksToMaxOverride()
 		{
-			foreach(ConeVisualsBlock block in m_Blocks) {
+			foreach(ConeVisualsBlock block in m_VisualsGrid.AllBlocks) {
 				block.SetFloat(m_OverrideValueID, OverrideMax)
 					.ApplyProperties();
 			}
