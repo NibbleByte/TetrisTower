@@ -63,6 +63,30 @@ namespace TetrisTower.WorldMap
 			}
 
 			m_PlaythroughData.__ReplaceAccomplishments(accomplishments);
+			m_PlaythroughData.DataIntegrityCheck();
+			m_WorldLevel.StartCoroutine(m_WorldLevel.RevealUnlockedLocations());
+		}
+
+		public void CompleteLevel(string levelID)
+		{
+			var accomplishments = new List<WorldLevelAccomplishment>();
+
+			foreach (var levelData in m_PlaythroughData.GetAllLevels().OfType<WorldMapLevelParamData>()) {
+				WorldLevelAccomplishment accomplishment = m_PlaythroughData.GetAccomplishment(levelData.LevelID);
+
+				if (!accomplishment.IsValid) {
+					accomplishment.LevelID = levelData.LevelID;
+				}
+
+				if (levelID == levelData.LevelID) {
+					accomplishment.State = WorldLocationState.Completed;
+				}
+
+				accomplishments.Add(accomplishment);
+			}
+
+			m_PlaythroughData.__ReplaceAccomplishments(accomplishments);
+			m_PlaythroughData.DataIntegrityCheck();
 			m_WorldLevel.StartCoroutine(m_WorldLevel.RevealUnlockedLocations());
 		}
 

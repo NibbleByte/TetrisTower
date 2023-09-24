@@ -232,6 +232,39 @@ MonoBehaviour:
       SkinOverrides:
       - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
     - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 3a064c98f1c61db47b2ed3a5ca56a0a7, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Greece.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: Verticals Only
+      InitialSpawnBlockTypesCount: 5
+      Objectives:
+      - rid: 6777769563818557462
+      - rid: 6777769563818557463
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0
+        RowSmiteChance: 0
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
         m_SceneAsset: {fileID: 102900000, guid: 99d25815216f2234cb08aad3fb7014d2, type: 3}
         m_IsDirty: 0
         m_ScenePath: Assets/Scenes/WorldStory/W_Egypt.unity
@@ -468,6 +501,15 @@ MonoBehaviour:
         MatchesEndCount: 300
         MatchesType: 7
     - rid: 6777769135320858641
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 6777769563818557462
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 50
+        MatchesType: 2
+    - rid: 6777769563818557463
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0

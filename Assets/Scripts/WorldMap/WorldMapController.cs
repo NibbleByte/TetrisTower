@@ -44,7 +44,8 @@ namespace TetrisTower.WorldMap
 
 		private struct LocationBind
 		{
-			public string LevelID;
+			public string LevelID => Level.LevelID;
+			public WorldMapLevelParamData Level;
 			public WorldMapLocation WorldLocation;
 			public UI.WorldMapLocationUITracker UITracker;
 
@@ -63,9 +64,9 @@ namespace TetrisTower.WorldMap
 
 			foreach (WorldMapLevelParamData level in m_PlaythroughData.GetAllLevels()) {
 				var locationBind = new LocationBind() {
-					LevelID = level.LevelID
+					Level = level,
 				};
-
+				
 				locationBind.WorldLocation = GameObject.Instantiate(WorldMapLocationPrefab, LocationsRoot);
 				locationBind.WorldLocation.name = "L-" + level.LevelID;
 				locationBind.WorldLocation.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
@@ -135,6 +136,13 @@ namespace TetrisTower.WorldMap
 
 		private void LoadLocation(string levelID)
 		{
+#if UNITY_EDITOR
+			if (UnityEngine.InputSystem.Keyboard.current.ctrlKey.isPressed || UnityEngine.InputSystem.Keyboard.current.shiftKey.isPressed) {
+				FindObjectOfType<WorldMapDebugAPI>().CompleteLevel(levelID);
+				return;
+			}
+#endif
+
 			m_PlaythroughData.SetCurrentLevel(levelID);
 
 			var supervisor = m_PlaythroughData.PrepareSupervisor();
@@ -178,6 +186,14 @@ namespace TetrisTower.WorldMap
 				if (locationBind.UITracker.State.IsVisible()) {
 					locationBind.UITracker.SetZoomLevel(ZoomNormalized);
 				}
+
+#if UNITY_EDITOR
+				Vector3 localPos = locationBind.WorldLocation.transform.localPosition;
+				Vector2 mapPos = locationBind.Level.WorldMapPosition;
+				if (localPos.x != mapPos.x || localPos.z != mapPos.y) {
+					locationBind.WorldLocation.transform.localPosition = new Vector3(mapPos.x, 0f, mapPos.y);
+				}
+#endif
 			}
 		}
 	}

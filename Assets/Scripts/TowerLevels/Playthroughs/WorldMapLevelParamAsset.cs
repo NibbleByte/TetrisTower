@@ -70,7 +70,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			return EditorGUI.GetPropertyHeight(property.FindPropertyRelative(nameof(WorldLevelsLink.LevelID1))) * 2 + 4f /* Padding */;
+			return EditorGUIUtility.singleLineHeight;
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -79,31 +79,31 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			//position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
+			WorldLevelsSet worldLevelsSet = (WorldLevelsSet)property.serializedObject.targetObject;
+			string[] levelIDs = worldLevelsSet.Levels.Select(x => x.LevelID).ToArray();
+
 			links.Clear();
 			links.Add(property.FindPropertyRelative(nameof(WorldLevelsLink.LevelID1)));
 			links.Add(property.FindPropertyRelative(nameof(WorldLevelsLink.LevelID2)));
 
 			float linkHeight = EditorGUI.GetPropertyHeight(links[0]);
 
+			const float padding = 4f;
+
 			for (int i = 0; i < links.Count; ++i) {
 				SerializedProperty linkProp = links[i];
 
 				Rect idPos = position;
-				idPos.width *= 0.75f;
+				idPos.width = position.width / links.Count - links.Count * padding;
+				idPos.x = position.x + i * position.width / links.Count + i * padding;
 				idPos.height = linkHeight;
-				idPos.y = position.y + i * linkHeight;
 
-				Rect assetPos = idPos;
-				assetPos.x += idPos.width;
-				assetPos.width = position.width - idPos.width;
-
-				EditorGUI.PropertyField(idPos, linkProp);
-				var levelObject = EditorGUI.ObjectField(assetPos, null, typeof(WorldMapLevelParamAsset), false) as WorldMapLevelParamAsset;
-				if (levelObject) {
-					linkProp.stringValue = levelObject.LevelParam.LevelID;
+				EditorGUI.BeginChangeCheck();
+				int selectedIndex = EditorGUI.Popup(idPos, Array.IndexOf(levelIDs, linkProp.stringValue), levelIDs);
+				if (EditorGUI.EndChangeCheck()) {
+					linkProp.stringValue = levelIDs[selectedIndex];
 				}
 			}
-
 
 			EditorGUI.EndProperty();
 		}
