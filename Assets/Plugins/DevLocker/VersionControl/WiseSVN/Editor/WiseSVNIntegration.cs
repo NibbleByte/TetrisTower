@@ -386,6 +386,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
 					return StatusOperationResult.UnableToConnectError;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return StatusOperationResult.Timeout;
+
 				return StatusOperationResult.UnknownError;
 			}
 
@@ -505,6 +509,14 @@ namespace DevLocker.VersionControl.WiseSVN
 
 			path = path.Replace('\\', '/');
 
+			// Only files can be locked.
+			// If repository is out of date it may receive entries for existing files on the server that are not present locally yet.
+			if (!File.Exists(path)) {
+				lockDetails.Path = path;
+				lockDetails.OperationResult = StatusOperationResult.TargetPathNotFound;
+				return lockDetails;
+			}
+
 			//
 			// Find the repository url of the path.
 			// We need to call "svn info [repo-url]" in order to get up to date repository information.
@@ -535,6 +547,12 @@ namespace DevLocker.VersionControl.WiseSVN
 					// Could not find the command executable. The user hasn't installed their CLI (Command Line Interface) so we're missing an "svn.exe" in the PATH environment.
 					if (result.Error.Contains("0x80004005")) {
 						lockDetails.OperationResult = StatusOperationResult.ExecutableNotFound;
+						return lockDetails;
+					}
+
+					// Operation took too long, shell utils time out kicked in.
+					if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN)) {
+						lockDetails.OperationResult = StatusOperationResult.Timeout;
 						return lockDetails;
 					}
 
@@ -574,6 +592,12 @@ namespace DevLocker.VersionControl.WiseSVN
 					// svn: E731001: No such host is known.
 					if (result.Error.Contains("E170013") || result.Error.Contains("E731001")) {
 						lockDetails.OperationResult = StatusOperationResult.UnableToConnectError;
+						return lockDetails;
+					}
+
+					// Operation took too long, shell utils time out kicked in.
+					if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN)) {
+						lockDetails.OperationResult = StatusOperationResult.Timeout;
 						return lockDetails;
 					}
 
@@ -681,6 +705,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("W160042"))
 					return LockOperationResult.RemoteHasChanges;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return LockOperationResult.Timeout;
+
 				return LockOperationResult.UnknownError;
 			}
 
@@ -769,6 +797,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
 					return LockOperationResult.UnableToConnectError;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return LockOperationResult.Timeout;
+
 				return LockOperationResult.UnknownError;
 			}
 
@@ -848,6 +880,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				// svn: E731001: No such host is known.
 				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
 					return UpdateOperationResult.UnableToConnectError;
+
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return UpdateOperationResult.Timeout;
 
 				return UpdateOperationResult.UnknownError;
 			}
@@ -975,6 +1011,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
 					return CommitOperationResult.UnableToConnectError;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return CommitOperationResult.Timeout;
+
 				return CommitOperationResult.UnknownError;
 			}
 
@@ -1027,6 +1067,11 @@ namespace DevLocker.VersionControl.WiseSVN
 
 			var result = ShellUtils.ExecuteCommand(SVN_Command, $"revert --targets \"{targetsFileToUse}\" --depth {depth} {removeAddedArg}", timeout, shellMonitor);
 			if (result.HasErrors) {
+
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return RevertOperationResult.Timeout;
+
 				return RevertOperationResult.UnknownError;
 			}
 
@@ -1256,6 +1301,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009"))
 					return ListOperationResult.NotFound;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return ListOperationResult.Timeout;
+
 				return ListOperationResult.UnknownError;
 			}
 
@@ -1338,6 +1387,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				// svn: E200009: Could not list all targets because some targets don't exist
 				if (result.Error.Contains("E155010") || result.Error.Contains("E155007") || result.Error.Contains("E160013") || result.Error.Contains("E200009"))
 					return LogOperationResult.NotFound;
+
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return LogOperationResult.Timeout;
 
 				return LogOperationResult.UnknownError;
 			}
@@ -1514,6 +1567,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("W200017"))
 					return PropOperationResult.Success;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return PropOperationResult.Timeout;
+
 				return PropOperationResult.UnknownError;
 			}
 
@@ -1608,6 +1665,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("E155010") || result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009") || result.Error.Contains("E200005"))
 					return PropOperationResult.NotFound;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return PropOperationResult.Timeout;
+
 				return PropOperationResult.UnknownError;
 			}
 
@@ -1640,6 +1701,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				if (result.Error.Contains("E155010") || result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009") || result.Error.Contains("E200005"))
 					return ChangelistOperationResult.NotFound;
 
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return ChangelistOperationResult.Timeout;
+
 				return ChangelistOperationResult.UnknownError;
 			}
 
@@ -1666,6 +1731,10 @@ namespace DevLocker.VersionControl.WiseSVN
 				// svn: E155010: The node '...' was not found.
 				if (result.Error.Contains("E155010") || result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009") || result.Error.Contains("E200005"))
 					return ChangelistOperationResult.NotFound;
+
+				// Operation took too long, shell utils time out kicked in.
+				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+					return ChangelistOperationResult.Timeout;
 
 				return ChangelistOperationResult.UnknownError;
 			}
@@ -1920,6 +1989,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				return AssetMoveResult.DidNotMove;
 
 			var oldStatusData = GetStatus(oldPath);
+			bool isFolder = Directory.Exists(oldPath);
 
 			if (oldStatusData.Status == VCFileStatus.Unversioned) {
 
@@ -1951,7 +2021,7 @@ namespace DevLocker.VersionControl.WiseSVN
 				return AssetMoveResult.DidNotMove;
 			}
 
-			if (oldStatusData.IsConflicted || (Directory.Exists(oldPath) && HasAnyConflicts(oldPath))) {
+			if (oldStatusData.IsConflicted || (isFolder && HasAnyConflicts(oldPath))) {
 				if (Silent || EditorUtility.DisplayDialog(
 					"Conflicted files",
 					$"Failed to move the files\n\"{oldPath}\"\nbecause it has conflicts. Resolve them first!",
@@ -1963,6 +2033,23 @@ namespace DevLocker.VersionControl.WiseSVN
 				return AssetMoveResult.FailedMove;
 			}
 
+			if (m_PersonalPrefs.AskOnMovingFolders && isFolder && oldStatusData.Status != VCFileStatus.Unversioned && !Application.isBatchMode) {
+				if (!Silent && !EditorUtility.DisplayDialog(
+					"Move Versioned Folder?",
+					$"Do you really want to move this folder in SVN?\n\"{oldPath}\"",
+					"Yes",
+					"No"
+#if UNITY_2019_4_OR_NEWER
+					, DialogOptOutDecisionType.ForThisSession, "WiseSVN.AskOnMovingFolders"
+				)) {
+#else
+				)) {
+#endif
+					Debug.Log($"User aborted move of folder \"{oldPath}\".");
+					return AssetMoveResult.FailedMove;
+				}
+			}
+
 			using (var reporter = CreateReporter()) {
 
 				if (!CheckAndAddParentFolderIfNeeded(newPath, true, reporter))
@@ -1970,7 +2057,7 @@ namespace DevLocker.VersionControl.WiseSVN
 
 
 				if (m_ProjectPrefs.MoveBehaviour == SVNMoveBehaviour.UseAddAndDeleteForAllAssets ||
-					m_ProjectPrefs.MoveBehaviour == SVNMoveBehaviour.UseAddAndDeleteForFolders && Directory.Exists(oldPath)
+					m_ProjectPrefs.MoveBehaviour == SVNMoveBehaviour.UseAddAndDeleteForFolders && isFolder
 					) {
 
 					return MoveAssetByAddDeleteOperations(oldPath, newPath, reporter)
@@ -2153,7 +2240,7 @@ namespace DevLocker.VersionControl.WiseSVN
 					break;
 
 				default:
-					displayMessage = "SVN error happened while processing the assets. Check the logs.";
+					displayMessage = $"SVN \"{result}\" error occurred while processing the assets. Check the logs for more info.";
 					break;
 			}
 

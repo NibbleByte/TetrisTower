@@ -52,6 +52,9 @@ namespace DevLocker.VersionControl.WiseSVN.Shell
 
 		public const string USER_ABORTED_LOG = "User aborted the operation...";
 
+		// If result error message contains this string token, the operation was interrupted due to time out.
+		public const string TIME_OUT_ERROR_TOKEN = "[ERR_TIME_OUT]";
+
 		public static ShellResult ExecuteCommand(string command, string args)
 		{
 			return ExecuteCommand(command, args, true);
@@ -216,7 +219,7 @@ namespace DevLocker.VersionControl.WiseSVN.Shell
 
 				// If process is still running, the timeout kicked in.
 				if (!process.HasExited) {
-					result.Error += $"Command [{shellArgs.Command} {shellArgs.Args}] timed out.";
+					result.Error += $"Command [{shellArgs.Command} {shellArgs.Args}] timed out. {TIME_OUT_ERROR_TOKEN}";
 				}
 			}
 
@@ -256,10 +259,50 @@ namespace DevLocker.VersionControl.WiseSVN.Shell
 					}
 				}
 
-				// TODO: This still hangs sometimes. Last fix: added process.CancelOutputRead()
-				//		 Keep an eye if this keeps happening.
-				//		 Useful article: https://newbedev.com/process-sometimes-hangs-while-waiting-for-exit
+				// HACK: Dispose sometimes hangs for unknown reason. Hope this helps. Let me know if another hang is experienced.
+				if (string.IsNullOrWhiteSpace(result.Output) && string.IsNullOrWhiteSpace(result.Error)) {
+					Thread.Sleep(50);
+				}
+
 				process.Dispose();
+				// This still hangs sometimes. Fixes tried:
+				// - added process.CancelOutputRead()
+				// - Sleep on empty result. I think it got stuck on empty result from GetStatus() for a file.
+				// Useful article: https://newbedev.com/process-sometimes-hangs-while-waiting-for-exit
+				//
+				// Last hang encountered: processing a lot of assets after migration of Unity version. Unity hang for a lot of time.
+				// Breaking in with debugger yielded this stack:
+				//
+				// [Native Transition]
+				// WaitHandle.WaitOneNative()
+				// WaitHandle.InternalWaitOne()
+				// WaitHandle.WaitOne()
+				// WaitHandle.WaitOne()
+				// WaitHandle.WaitOne()
+				// AsyncStreamReader.Dispose()
+				// AsyncStreamReader.Close()
+				// Process.Close()
+				// Process.Dispose()
+				// Component.Dispose()
+				// ShellUtils.ExecuteCommand()
+				// ShellUtils.ExecuteCommand()
+				// WiseSVNIntegration.GetStatuses()
+				// WiseSVNIntegration.GetStatus()
+				// SVNStatusesDatabase.PostProcessAssets()
+				// SVNStatusesDatabaseAssetPostprocessor.OnPostprocessAllAssets()
+				// ...
+				// VisualEffectAssetModificationProcessor.OnWillSaveAssets()
+				// ...
+				// AssetModificationProcessorInternal.OnWillSaveAssets()
+				// ...
+				// MaterialPostprocessor.SaveAssetsToDisk()
+				// MaterialReimporter.<> c.< RegisterUpgraderReimport > b__2_0()
+				// EditorApplication.Internal_CallUpdateFunctions()
+				//
+				// The stream Dispose() kept waiting for signal. The wait handler kept returning WaitTimeout:
+				// https://github.com/microsoft/referencesource/blob/51cf7850defa8a17d815b4700b67116e3fa283c2/mscorlib/system/threading/waithandle.cs#L252
+				//
+				// Alternative: create a thread to dispose processes in a concurrent queue. If it hangs, nobody would care (may prevent Unity from closing in Batch mode?).
 			}
 
 			return result;

@@ -43,7 +43,7 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 		};
 
 		public const string PROJECT_PREFERENCES_MENU = "Assets/SVN/SVN Preferences";
-		[MenuItem(PROJECT_PREFERENCES_MENU, false, SVNContextMenusManager.MenuItemPriorityStart + 130)]
+		[MenuItem(PROJECT_PREFERENCES_MENU, false, SVNContextMenusManager.MenuItemPriorityStart + 150)]
 		public static void ShowProjectPreferences()
 		{
 			ShowProjectPreferences(PreferencesTab.Personal);
@@ -284,6 +284,8 @@ namespace DevLocker.VersionControl.WiseSVN.Preferences
 			EditorGUI.EndDisabledGroup();
 
 			EditorGUI.EndDisabledGroup();
+
+			m_PersonalPrefs.AskOnMovingFolders = EditorGUILayout.Toggle(new GUIContent("Ask On Moving Folders", "Ask for confirmation when moving folders inside Unity."), m_PersonalPrefs.AskOnMovingFolders);
 
 			m_PersonalPrefs.SvnCLIPath = EditorGUILayout.TextField(new GUIContent("SVN CLI Path", "Specify SVN CLI (svn.exe) binary path to use or leave empty for the defaults.\n\nNOTE: this will override the project preference. Coordinate this with your team."), m_PersonalPrefs.SvnCLIPath);
 
