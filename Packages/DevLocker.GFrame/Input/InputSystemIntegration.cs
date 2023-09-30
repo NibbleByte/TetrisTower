@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
+using UnityEngine.UI;
 
 namespace DevLocker.GFrame.Input
 {
@@ -339,25 +340,17 @@ namespace DevLocker.GFrame.Input
 			if (context == null)
 				return true;
 
-			var selected = context.SelectedGameObject;
-
 			if ((option & SkipHotkeyOption.NonTextSelectableFocused) != 0
-				&& selected
-				&& !selected.GetComponent<UnityEngine.UI.InputField>()
-				&& !selected.GetComponent<TMPro.TMP_InputField>()
+				&& context.SelectedGameObject
+				&& !context.IsTextFieldFocused()
 				)
 				return true;
 
-			if ((option & SkipHotkeyOption.InputFieldTextFocused) != 0 && selected) {
-
-				var inputField = selected.GetComponent<UnityEngine.UI.InputField>();
-				if (inputField && inputField.isFocused)
-					return true;
-
-				var inputFieldTMP = selected.GetComponent<TMPro.TMP_InputField>();
-				if (inputFieldTMP && inputFieldTMP.isFocused)
-					return true;
-			}
+			if ((option & SkipHotkeyOption.InputFieldTextFocused) != 0
+				&& context.SelectedGameObject
+				&& context.IsTextFieldFocused()
+				)
+				return true;
 
 			return false;
 		}
@@ -370,7 +363,17 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public static bool IsTextFieldFocused(this IPlayerContext context)
 		{
-			return PlayerContextUtils.ShouldSkipHotkey(context, SkipHotkeyOption.InputFieldTextFocused);
+			GameObject currentSelection = context.SelectedGameObject;
+			if (currentSelection == null)
+				return false;
+
+			if (currentSelection.TryGetComponent(out InputField inputField) && inputField.isFocused)
+				return true;
+
+			if (currentSelection.TryGetComponent(out TMPro.TMP_InputField inputFieldTMP) && inputFieldTMP.isFocused)
+				return true;
+
+			return false;
 		}
 
 		/// <summary>

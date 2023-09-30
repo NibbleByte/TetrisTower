@@ -117,6 +117,20 @@ namespace DevLocker.GFrame.Input.UIScope
 			return null;
 		}
 
+		/// <summary>
+		/// Set the persistant selectable for this controller.
+		/// If set to null then the start selection will be used.
+		///
+		/// Also check <see cref="PersistentSelection"/>.
+		/// </summary>
+		/// <param name="selectable"></param>
+		public void SetPersistantSelection(Selectable selectable)
+		{
+			m_PersistedSelectable = selectable;
+			m_PersistedSelection = selectable != null ? selectable.gameObject : null;
+			m_PlayerContext?.SetSelectedGameObject(m_PersistedSelection);
+		}
+
 		public virtual bool IsInStartSelection(Selectable selectable)
 		{
 			switch(StartSelectionSource) {
