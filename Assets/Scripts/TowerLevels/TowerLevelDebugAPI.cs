@@ -239,7 +239,7 @@ namespace TetrisTower.TowerLevels
 
 					if (clearCoords.Count > 0) {
 						var actions = new List<GridAction>() { new ClearMatchedAction() { MatchedType = MatchScoringType.Horizontal, Coords = clearCoords } };
-						StartCoroutine(m_TowerLevel.RunActions(actions));
+						m_TowerLevel.StartRunActions(actions);
 					}
 				}
 			}

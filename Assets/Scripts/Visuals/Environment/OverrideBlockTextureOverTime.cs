@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Timing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +43,8 @@ namespace TetrisTower.Visuals.Environment
 			foreach (ConeVisualsBlock block in m_VisualsGrid.AllBlocks) {
 				OnCreatedVisualsBlock(block);
 			}
+
+			m_LevelController.Timing.PostUpdate += LevelUpdate;
 		}
 
 		public void OnLevelUnloading()
@@ -49,6 +52,7 @@ namespace TetrisTower.Visuals.Environment
 			m_VisualsGrid.CreatedVisualsBlock -= OnCreatedVisualsBlock;
 			m_VisualsGrid = null;
 
+			m_LevelController.Timing.PostUpdate -= LevelUpdate;
 			m_LevelController = null;
 		}
 
@@ -68,7 +72,7 @@ namespace TetrisTower.Visuals.Environment
 			}
 		}
 
-		void Update()
+		private void LevelUpdate()
 		{
 			if (m_VisualsGrid == null)
 				return;
@@ -76,7 +80,7 @@ namespace TetrisTower.Visuals.Environment
 			foreach(ConeVisualsBlock block in m_VisualsGrid.AllBlocks) {
 				float value = block.GetFloat(m_OverrideValueID);
 
-				value = Mathf.Clamp(value + OverrideSpeed * m_LevelController.DeltaPlayTime, 0f, OverrideMax);
+				value = Mathf.Clamp(value + OverrideSpeed * WiseTiming.DeltaTime, 0f, OverrideMax);
 
 				block.SetFloat(m_OverrideValueID, value)
 					.ApplyProperties();

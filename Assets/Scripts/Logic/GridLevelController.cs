@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Timing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,13 +14,12 @@ namespace TetrisTower.Logic
 		// For debug to be displayed by the Inspector!
 		[SerializeReference] private GridLevelData m_DebugLevelData;
 
+		public WiseTiming Timing { get; private set; }
 
 		public List<GameGrid> Grids { get; private set; } = new List<GameGrid>();
 		public BlocksGrid Grid => LevelData?.Grid;
 
-		public bool IsPaused => !enabled;
-
-		public float DeltaPlayTime { get; private set; }
+		public bool IsPaused { get; private set; } = false;
 
 		public event Action RunningActionsSequenceFinished;
 		public event Action SpawnBlockTypesCountChanged;
@@ -43,9 +43,10 @@ namespace TetrisTower.Logic
 
 		private float m_FallingSpeedup = 0;
 
-		public void Init(GridLevelData data)
+		public void Init(GridLevelData data, WiseTiming timing)
 		{
 			LevelData = m_DebugLevelData = data;
+			Timing = timing;
 
 			if (LevelData.Score == null) {
 				LevelData.Score = new ScoreGrid(LevelData.Grid.Rows, LevelData.Grid.Columns, LevelData.Rules);
@@ -84,7 +85,15 @@ namespace TetrisTower.Logic
 			// Objectives are initialized by the level supervisor after everything is setup.
 
 			// If paused previously, resume (since level may be reused on reload).
-			enabled = true;
+			IsPaused = false;
+
+			Timing.PreUpdate += LevelUpdate;
+			Timing.PostUpdate += LevelLateUpdate;
+		}
+
+		public void StartRunActions(IList<GridAction> actions)
+		{
+			Timing.StartCoroutine(RunActions(actions), this);
 		}
 
 		public IEnumerator RunActions(IList<GridAction> actions)
@@ -559,22 +568,16 @@ namespace TetrisTower.Logic
 
 		public void PauseLevel()
 		{
-			enabled = false;
-			DeltaPlayTime = 0;
+			IsPaused = true;
 		}
 
 		public void ResumeLevel()
 		{
-			enabled = true;
-			DeltaPlayTime = Time.deltaTime;
+			IsPaused = false;
 		}
 
-		void Update()
+		private void LevelUpdate()
 		{
-			// Wait for level to be initialized.
-			if (LevelData == null)
-				return;
-
 			if (LevelData.FallingShape != null) {
 				UpdateFallShape();
 
@@ -585,19 +588,15 @@ namespace TetrisTower.Logic
 			if (LevelData.IsPlaying) {
 
 				if (LevelData.RunningState == TowerLevelRunningState.Preparing) {
-					LevelData.PrepareTime += Time.deltaTime;
+					LevelData.PrepareTime += WiseTiming.DeltaTime;
 				}
 
-				LevelData.PlayTime += Time.deltaTime;
-				DeltaPlayTime = Time.deltaTime;
+				LevelData.PlayTime += WiseTiming.DeltaTime;
 
-			} else {
-
-				DeltaPlayTime = 0;
 			}
 		}
 
-		void LateUpdate()
+		private void LevelLateUpdate()
 		{
 			ValidateAnalogMoveOffset();
 		}
@@ -636,7 +635,7 @@ namespace TetrisTower.Logic
 				return;
 
 			// Clamp to avoid skipping over a cell on hiccups.
-			LevelData.FallDistanceNormalized += Mathf.Clamp01(Time.deltaTime * (LevelData.FallSpeedNormalized + m_FallingSpeedup));
+			LevelData.FallDistanceNormalized += Mathf.Clamp01(WiseTiming.DeltaTime * (LevelData.FallSpeedNormalized + m_FallingSpeedup));
 
 			var fallCoords = LevelData.FallShapeCoords;
 
@@ -657,7 +656,7 @@ namespace TetrisTower.Logic
 					var fallShape = LevelData.FallingShape;
 					LevelData.FallingShape = null;
 
-					StartCoroutine(PlaceFallingShape(fallCoords, fallShape));
+					Timing.StartCoroutine(PlaceFallingShape(fallCoords, fallShape), this);
 					break;
 				}
 			}

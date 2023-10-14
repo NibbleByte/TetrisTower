@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Timing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,9 +34,12 @@ namespace TetrisTower.Visuals.Effects
 		private Vector3? m_ChasePosWaypoint;
 		private float m_ChaseEndDuration = 0;
 
-		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius)
+		private WiseTiming m_Timing;
+
+		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius, WiseTiming timing)
 		{
 			RestPoints = fairyRestPoints.ToArray();
+			m_Timing = timing;
 
 			if (RestPoints.Length < 2) {
 				Debug.LogError($"Fairy doesn't have enough rest points to patrol to! Disabling!", this);
@@ -62,6 +66,8 @@ namespace TetrisTower.Visuals.Effects
 					}
 				}
 			}
+
+			m_Timing.PreUpdate += LevelUpdate;
 		}
 
 		public IEnumerator ChaseTo(Vector3 chasePos)
@@ -92,7 +98,7 @@ namespace TetrisTower.Visuals.Effects
 				m_CurrentRestPointTime = 0f;
 
 			} else {
-				m_CurrentRestPointTime += Time.deltaTime;
+				m_CurrentRestPointTime += WiseTiming.DeltaTime;
 			}
 
 
@@ -124,11 +130,11 @@ namespace TetrisTower.Visuals.Effects
 			}
 
 
-			m_Heading = Vector3.RotateTowards(m_Heading, dir, rotateSpeed * Time.deltaTime, float.MaxValue);
+			m_Heading = Vector3.RotateTowards(m_Heading, dir, rotateSpeed * WiseTiming.DeltaTime, float.MaxValue);
 
-			m_Speed = Mathf.Lerp(m_Speed, targetSpeed, Time.deltaTime * 2f);
+			m_Speed = Mathf.Lerp(m_Speed, targetSpeed, WiseTiming.DeltaTime * 2f);
 
-			transform.position += m_Heading * Time.deltaTime * m_Speed;
+			transform.position += m_Heading * WiseTiming.DeltaTime * m_Speed;
 
 			Debug.DrawLine(m_CurrentRestPoint.position, m_CurrentRestPoint.position + Vector3.up * 2, Color.blue);
 		}
@@ -139,9 +145,9 @@ namespace TetrisTower.Visuals.Effects
 
 			Debug.DrawLine(targetPos, targetPos + Vector3.up * 2, Color.red);
 
-			m_Speed = Mathf.Lerp(m_Speed, ChaseSpeed, Time.deltaTime * 2f);
+			m_Speed = Mathf.Lerp(m_Speed, ChaseSpeed, WiseTiming.DeltaTime * 2f);
 
-			transform.position = Vector3.MoveTowards(transform.position, targetPos, m_Speed * Time.deltaTime);
+			transform.position = Vector3.MoveTowards(transform.position, targetPos, m_Speed * WiseTiming.DeltaTime);
 
 			if (m_ChasePosWaypoint.HasValue && Vector3.Distance(transform.position, m_ChasePosWaypoint.Value) < 0.2f) {
 				m_ChasePosWaypoint = null;
@@ -149,7 +155,7 @@ namespace TetrisTower.Visuals.Effects
 			}
 
 			if (Vector3.Distance(transform.position, m_ChasePos.Value) < 0.2f) {
-				m_ChaseEndDuration += Time.deltaTime;
+				m_ChaseEndDuration += WiseTiming.DeltaTime;
 
 				if (m_ChaseEndDuration >= ChaseEndDelay) {
 					m_Speed = ChaseSpeed * 0.3f;
@@ -168,12 +174,8 @@ namespace TetrisTower.Visuals.Effects
 			}
 		}
 
-		void Update()
+		private void LevelUpdate()
 		{
-			// Not initialized yet...
-			if (m_CurrentRestPoint == null)
-				return;
-
 			if (m_ChasePos.HasValue) {
 				ChaseUpdate();
 			} else {

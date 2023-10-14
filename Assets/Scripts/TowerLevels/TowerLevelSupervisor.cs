@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.MessageBox;
+using DevLocker.GFrame.Timing;
 using DevLocker.Utils;
 using System;
 using System.Linq;
@@ -170,6 +171,9 @@ namespace TetrisTower.TowerLevels
 				}
 			}
 
+			var timeComponent = levelController.gameObject.AddComponent<WiseTimingComponent>();
+			timeComponent.Timing = new WiseTiming();
+			timeComponent.enabled = false;
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
@@ -182,6 +186,7 @@ namespace TetrisTower.TowerLevels
 				m_PlaythroughData.TowerLevel,
 				levelController,
 				uiController,
+				timeComponent.Timing,
 				behaviours.OfType<ObjectivesUIController>().FirstOrDefault(),
 				behaviours.OfType<GreetMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<FlashMessageUIController>().FirstOrDefault(),
@@ -193,7 +198,7 @@ namespace TetrisTower.TowerLevels
 
 
 			// Init before others.
-			levelController.Init(m_PlaythroughData.TowerLevel);
+			levelController.Init(m_PlaythroughData.TowerLevel, timeComponent.Timing);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
@@ -210,6 +215,9 @@ namespace TetrisTower.TowerLevels
 				objective.OnPostLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
 			}
 
+
+			timeComponent.enabled = true;
+
 			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new TowerPlayState());
 
 			if (m_PlaythroughData.TowerLevel.IsPlaying) {
@@ -217,7 +225,7 @@ namespace TetrisTower.TowerLevels
 				// If save came with available matches, or pending actions, do them.
 				var pendingActions = GameGridEvaluation.Evaluate(levelData.Grid, levelData.Rules);
 				if (pendingActions.Count > 0) {
-					levelController.StartCoroutine(levelController.RunActions(pendingActions));
+					levelController.StartRunActions(pendingActions);
 
 					while (levelController.AreGridActionsRunning) {
 						await Task.Yield();
@@ -247,6 +255,8 @@ namespace TetrisTower.TowerLevels
 			}
 
 			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
+
+			GameObject.DestroyImmediate(levelController.GetComponent<WiseTimingComponent>());
 
 			return Task.CompletedTask;
 		}

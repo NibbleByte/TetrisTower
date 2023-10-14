@@ -118,7 +118,7 @@ namespace TetrisTower.TowerLevels
 				new PlaceAction() { PlaceCoords = GridCoords.Zero, PlacedShape = new BlocksShape() { ShapeCoords = shapeCoords.ToArray() } }
 			};
 
-			m_LevelController.StartCoroutine(m_LevelController.RunActions(actions));
+			m_LevelController.StartRunActions(actions);
 		}
 
 		private bool IsFilledUpWithBonusBlocks()

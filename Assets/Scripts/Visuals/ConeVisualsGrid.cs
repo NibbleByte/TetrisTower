@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Timing;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,6 +95,7 @@ namespace TetrisTower.Visuals
 		private BlocksSkinStack m_BlocksSkinStack;
 		private GridRules m_Rules;
 		private ScoreGrid m_ScoreGrid = null;
+		private WiseTiming m_Timing;
 
 		private GridCoords m_PlayableArea;
 
@@ -102,6 +104,8 @@ namespace TetrisTower.Visuals
 		public void Init(PlayerStatesContext context)
 		{
 			GridLevelController towerLevel = context.FindByType<GridLevelController>();
+			m_Timing = towerLevel.Timing;
+
 			BlocksGrid grid = towerLevel.Grid;
 
 			if (m_Blocks != null) {
@@ -138,7 +142,7 @@ namespace TetrisTower.Visuals
 				var fairyRestPoints = found.Where(go => go.transform.IsChildOf(transform)).Select(go => go.transform).ToArray();
 
 				if (fairyRestPoints.Length >= 2) {
-					m_Fairy.Init(fairyRestPoints, transform.position, ConeOuterRadius);
+					m_Fairy.Init(fairyRestPoints, transform.position, ConeOuterRadius, m_Timing);
 				} else {
 					Debug.LogWarning("Couldn't find enough fairy rest point. Need at least 2. Destroying the fairy.", this);
 
