@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.Tools;
+using TetrisTower.TowerLevels.Replays;
 using TetrisTower.TowerUI;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,6 +24,7 @@ namespace TetrisTower.TowerLevels
 		private IPlaythroughData m_PlaythroughData;
 		private GridLevelController m_TowerLevel;
 		private TowerStatesAPI m_TowerLevelAPI;
+		private ReplayRecording m_ReplayRecording;
 
 		private GameContext m_Context;
 		private FlashMessageUIController m_FlashMessage;
@@ -40,6 +42,7 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_Context);
 			context.SetByType(out m_FlashMessage);
 			context.SetByType(out m_TowerLevelAPI);
+			context.TrySetByType(out m_ReplayRecording);
 		}
 
 		public void OnLevelUnloading()
@@ -71,14 +74,26 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Win Level");
 
-			m_TowerLevel.FinishLevel(true);
+			if (m_ReplayRecording != null) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_EndLevel, 1);
+
+				if (!m_ReplayRecording.GridLevelController.LevelData.IsPlaying) {
+					m_ReplayRecording.EndReplayRecording(m_ReplayRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+				}
+			}
 		}
 
 		public void Lose()
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Lose Level");
 
-			m_TowerLevel.FinishLevel(false);
+			if (m_ReplayRecording != null) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_EndLevel, 0);
+
+				if (!m_ReplayRecording.GridLevelController.LevelData.IsPlaying) {
+					m_ReplayRecording.EndReplayRecording(m_ReplayRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+				}
+			}
 		}
 
 		public void Save()

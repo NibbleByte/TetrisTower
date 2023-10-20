@@ -96,8 +96,7 @@ namespace TetrisTower.TowerLevels
 
 		private void InterruptAnimation()
 		{
-			m_LevelData.Score.ConsumeBonusScore();
-			m_LevelController.ClearSelectedShape();
+			m_LevelController.ConsumeFinishBonus();
 
 			var shapeCoords = new List<BlocksShape.ShapeBind>();
 
@@ -145,8 +144,7 @@ namespace TetrisTower.TowerLevels
 				return;
 
 			if (IsFilledUpWithBonusBlocks()) {
-				m_LevelData.Score.ConsumeBonusScore();
-				m_LevelController.ClearSelectedShape();
+				m_LevelController.ConsumeFinishBonus();
 
 				m_BonusFillUpTime = Time.time;
 				return;

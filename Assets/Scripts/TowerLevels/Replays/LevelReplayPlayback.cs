@@ -15,6 +15,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 		public ReplayRecording PlaybackRecording;
 		private int m_PlaybackIndex = 0;
+		private bool m_PlaybackFinished = false;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
@@ -25,40 +26,65 @@ namespace TetrisTower.TowerLevels.Replays
 		{
 		}
 
+		private void EndPlayback()
+		{
+			string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+			if (currentState != PlaybackRecording.FinalState) {
+				m_FlashMessage.ShowMessage("Replay Desynced", false);
+
+				Debug.LogError($"Replay current state doesn't match the final playback state. Compared states:", this);
+				Debug.LogError(currentState, this);
+				Debug.LogError(PlaybackRecording.FinalState, this);
+			} else {
+				Debug.Log($"Replay playback finished succesfully!", this);
+			}
+
+			m_PlaybackFinished = true;
+		}
+
 		void Update()
 		{
 			if (PlaybackRecording.GridLevelController.IsPaused)
 				return;
 
-			if (m_PlaybackIndex == PlaybackRecording.Actions.Count) {
-				string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
-				if (currentState != PlaybackRecording.FinalState) {
-					m_FlashMessage.ShowMessage("Replay Desynced", false);
-
-					Debug.LogError($"Replay current state doesn't match the final playback state. Compared states:", this);
-					Debug.LogError(currentState, this);
-					Debug.LogError(PlaybackRecording.FinalState, this);
-				} else {
-					Debug.Log($"Replay playback finished succesfully!", this);
-				}
-
-				enabled = false;
+			if (m_PlaybackFinished) {
+				Timing.UpdateCoroutines(Time.deltaTime);
 				return;
 			}
 
 			while (m_PlaybackIndex < PlaybackRecording.Actions.Count) {
 				ReplayAction action = PlaybackRecording.Actions[m_PlaybackIndex];
+
+				if (action.ActionType == ReplayActionType.RecordingEnd) {
+					EndPlayback();
+					return;
+				}
+
 				m_PlaybackIndex++;
+
+				// Because we ++ above, index is now pointing to the next one.
+				ReplayActionType nextType = m_PlaybackIndex < PlaybackRecording.Actions.Count
+					? PlaybackRecording.Actions[m_PlaybackIndex].ActionType
+					: default;
 
 				action.Replay(PlaybackRecording.GridLevelController);
 
-				// Continue next frame.
-				if (action.ActionType == ReplayActionType.Update)
+				// Continue next frame, unless this is the final frame. If ending - run immediately or the Won animation will change the state.
+				if (action.ActionType == ReplayActionType.Update && nextType != ReplayActionType.RecordingEnd)
 					return;
 
-				// Don't show if last action - it's probably when the user paused the game to end the replay record. Equals count as ++ above.
-				if (action.ActionType == ReplayActionType.Pause && m_PlaybackIndex != PlaybackRecording.Actions.Count) {
-					m_FlashMessage.ShowMessage("Pause Skipped");
+				// If playback finishes before replay end, don't continue, display desync right away.
+				if (!PlaybackRecording.GridLevelController.LevelData.IsPlaying) {
+					EndPlayback();
+					return;
+				}
+
+				if (action.ActionType == ReplayActionType.Pause) {
+					// Don't show if last action (right before ending) - it's probably when the user paused the game to end the replay record.
+					// NOTE: m_PlaybackIndex is the next action at the moment, because of the ++ above.
+					if (m_PlaybackIndex >= PlaybackRecording.Actions.Count || nextType != ReplayActionType.RecordingEnd) {
+						m_FlashMessage.ShowMessage("Pause Skipped");
+					}
 				}
 			}
 		}

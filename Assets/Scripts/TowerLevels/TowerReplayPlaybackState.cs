@@ -4,10 +4,11 @@ using TetrisTower.Logic;
 using DevLocker.GFrame.Input;
 using TetrisTower.TowerUI;
 using System.Linq;
+using DevLocker.GFrame;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerReplayPlaybackState : IPlayerState
+	public class TowerReplayPlaybackState : IPlayerState, IUpdateListener
 	{
 		private PlayerControls m_PlayerControls;
 		private IInputContext m_InputContext;
@@ -56,6 +57,15 @@ namespace TetrisTower.TowerLevels
 		private void ResumeLevel()
 		{
 			m_LevelController.ResumeLevel();
+		}
+
+		public void Update()
+		{
+			if (m_LevelController.LevelData != null && !m_LevelController.LevelData.IsPlaying) {
+				// Check for this in Update, rather than the event, in case the level finished while in another state.
+				GameManager.Instance.PushGlobalState(m_LevelController.LevelData.HasWon ? new TowerWonState() : new TowerLostState());
+				return;
+			}
 		}
 	}
 }

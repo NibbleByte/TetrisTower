@@ -31,7 +31,7 @@ namespace TetrisTower.TowerLevels
 
 			// On replay playback, this will be null.
 			if (m_ReplayRecording != null) {
-				m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Pause));
+				m_ReplayRecording.AddAndRun(ReplayActionType.Pause);
 			}
 		}
 

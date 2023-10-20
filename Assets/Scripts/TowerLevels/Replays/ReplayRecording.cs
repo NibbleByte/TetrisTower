@@ -23,6 +23,11 @@ namespace TetrisTower.TowerLevels.Replays
 		FallSpeedUp = 16,
 
 		Pause = 20,
+
+
+		Cheat_EndLevel = 40,
+
+		RecordingEnd = 99,
 	}
 
 	[JsonObject(MemberSerialization.Fields)]
@@ -64,6 +69,10 @@ namespace TetrisTower.TowerLevels.Replays
 				// Advance the random sequence in case of pause to prevent easy modifying of the replay. And maybe "cheating".
 				case ReplayActionType.Pause: levelController.LevelData.Random.Next(); break;
 
+				case ReplayActionType.Cheat_EndLevel: levelController.FinishLevel(Value != 0); break;
+
+				case ReplayActionType.RecordingEnd: /* Do nothing, used as marker. */ break;
+
 				default: throw new NotSupportedException(ActionType.ToString());
 			}
 		}
@@ -74,6 +83,8 @@ namespace TetrisTower.TowerLevels.Replays
 	{
 		public IReadOnlyList<ReplayAction> Actions => m_Actions;
 		private List<ReplayAction> m_Actions = new List<ReplayAction>();
+
+		public bool HasEnding => m_Actions.LastOrDefault().ActionType == ReplayActionType.RecordingEnd;
 
 		public string InitialState { get; private set; }
 		public string FinalState { get; private set; }
@@ -92,10 +103,23 @@ namespace TetrisTower.TowerLevels.Replays
 			return clone;
 		}
 
-		public void AddAction(ReplayAction action) => m_Actions.Add(action);
+		public void AddAction(ReplayAction action)
+		{
+			if (HasEnding)
+				throw new InvalidOperationException($"Trying to add action {action.ActionType} after recording has ended is now allowed.");
+
+			m_Actions.Add(action);
+		}
 		public void AddAndRun(ReplayAction action)
 		{
-			m_Actions.Add(action);
+			AddAction(action);
+			action.Replay(GridLevelController);
+		}
+
+		public void AddAndRun(ReplayActionType actionType, float value = 0f)
+		{
+			var action = new ReplayAction(actionType, value);
+			AddAction(action);
 			action.Replay(GridLevelController);
 		}
 
@@ -104,8 +128,13 @@ namespace TetrisTower.TowerLevels.Replays
 			InitialState = Saves.SaveManager.Serialize<GridLevelData>(levelData, gameConfig);
 		}
 
-		public void SaveFinalState(GridLevelData levelData, GameConfig gameConfig)
+		public void EndReplayRecording(GridLevelData levelData, GameConfig gameConfig)
 		{
+			if (HasEnding)
+				throw new InvalidOperationException("Trying to end replay recording, when it is already ended.");
+
+			AddAndRun(ReplayActionType.RecordingEnd);
+
 			FinalState = Saves.SaveManager.Serialize<GridLevelData>(levelData, gameConfig);
 		}
 

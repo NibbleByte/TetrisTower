@@ -566,6 +566,19 @@ namespace TetrisTower.Logic
 			FinishedLevel?.Invoke();
 		}
 
+		public void ConsumeFinishBonus()
+		{
+			if (LevelData.IsPlaying || !LevelData.HasWon) {
+				Debug.LogError($"Trying to consume finish bonus, but level is playing or not won!", this);
+				return;
+			}
+
+			LevelData.Score.ConsumeBonusScore();
+			ClearSelectedShape();
+
+			RunningActionsSequenceFinished?.Invoke();
+		}
+
 		public void PauseLevel()
 		{
 			IsPaused = true;

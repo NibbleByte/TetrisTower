@@ -1,4 +1,5 @@
 using DevLocker.GFrame.Timing;
+using TetrisTower.Game;
 using UnityEngine;
 
 namespace TetrisTower.TowerLevels.Replays
@@ -15,8 +16,17 @@ namespace TetrisTower.TowerLevels.Replays
 
 		void Update()
 		{
-			if (!Recording.GridLevelController.IsPaused && Recording.GridLevelController.LevelData.IsPlaying) {
-				Recording.AddAndRun(new ReplayAction(ReplayActionType.Update, Time.deltaTime));
+			if (Recording.GridLevelController.IsPaused)
+				return;
+
+			if (Recording.GridLevelController.LevelData.IsPlaying && !Recording.HasEnding) {
+				Recording.AddAndRun(ReplayActionType.Update, Time.deltaTime);
+
+				if (!Recording.GridLevelController.LevelData.IsPlaying && !Recording.HasEnding) {
+					Recording.EndReplayRecording(Recording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+				}
+			} else {
+				Timing.UpdateCoroutines(Time.deltaTime);
 			}
 		}
 	}
