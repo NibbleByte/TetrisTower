@@ -76,10 +76,6 @@ namespace TetrisTower.TowerLevels
 
 			if (m_ReplayRecording != null) {
 				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_EndLevel, 1);
-
-				if (!m_ReplayRecording.GridLevelController.LevelData.IsPlaying) {
-					m_ReplayRecording.EndReplayRecording(m_ReplayRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
-				}
 			}
 		}
 
@@ -89,10 +85,6 @@ namespace TetrisTower.TowerLevels
 
 			if (m_ReplayRecording != null) {
 				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_EndLevel, 0);
-
-				if (!m_ReplayRecording.GridLevelController.LevelData.IsPlaying) {
-					m_ReplayRecording.EndReplayRecording(m_ReplayRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
-				}
 			}
 		}
 

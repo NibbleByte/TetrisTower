@@ -21,10 +21,6 @@ namespace TetrisTower.TowerLevels.Replays
 
 			if (Recording.GridLevelController.LevelData.IsPlaying && !Recording.HasEnding) {
 				Recording.AddAndRun(ReplayActionType.Update, Time.deltaTime);
-
-				if (!Recording.GridLevelController.LevelData.IsPlaying && !Recording.HasEnding) {
-					Recording.EndReplayRecording(Recording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
-				}
 			} else {
 				Timing.UpdateCoroutines(Time.deltaTime);
 			}

@@ -114,13 +114,18 @@ namespace TetrisTower.TowerLevels.Replays
 		{
 			AddAction(action);
 			action.Replay(GridLevelController);
+
+			if (!GridLevelController.LevelData.IsPlaying) {
+
+				AddAction(new ReplayAction(ReplayActionType.RecordingEnd));
+
+				FinalState = Saves.SaveManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+			}
 		}
 
 		public void AddAndRun(ReplayActionType actionType, float value = 0f)
 		{
-			var action = new ReplayAction(actionType, value);
-			AddAction(action);
-			action.Replay(GridLevelController);
+			AddAndRun(new ReplayAction(actionType, value));
 		}
 
 		public void SaveInitialState(GridLevelData levelData, GameConfig gameConfig)
@@ -128,14 +133,14 @@ namespace TetrisTower.TowerLevels.Replays
 			InitialState = Saves.SaveManager.Serialize<GridLevelData>(levelData, gameConfig);
 		}
 
-		public void EndReplayRecording(GridLevelData levelData, GameConfig gameConfig)
+		public void EndReplayRecording()
 		{
 			if (HasEnding)
 				throw new InvalidOperationException("Trying to end replay recording, when it is already ended.");
 
 			AddAndRun(ReplayActionType.RecordingEnd);
 
-			FinalState = Saves.SaveManager.Serialize<GridLevelData>(levelData, gameConfig);
+			FinalState = Saves.SaveManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 		}
 
 		public string GetSavedState(GridLevelData levelData, GameConfig gameConfig)

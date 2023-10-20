@@ -128,7 +128,7 @@ namespace TetrisTower.TowerLevels
 				// Record BEFORE finishing the level so result would be the same for the playback.
 				var recording = PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 				if (!recording.HasEnding) {
-					recording.EndReplayRecording(m_PlaythroughData.TowerLevel, m_Config);
+					recording.EndReplayRecording();
 				}
 				recording = recording.Clone();
 
