@@ -28,6 +28,11 @@ namespace TetrisTower.TowerUI
 		[Tooltip("Elements needed only when game is playing (i.e. not won / lost animation).")]
 		public GameObject[] PlayingOnlyElements;
 
+		[Tooltip("Elements to be displayed when replay is being recorded (i.e. normal game).")]
+		public GameObject[] ReplayRecordingElements;
+		[Tooltip("Elements to be displayed when replay is being played back.")]
+		public GameObject[] ReplayPlaybackElements;
+
 		void Awake()
 		{
 			foreach (var bind in StatePanels) {
@@ -68,6 +73,17 @@ namespace TetrisTower.TowerUI
 		{
 			foreach(var element in PlayingOnlyElements) {
 				element.SetActive(isPlaying);
+			}
+		}
+
+		public void SetIsReplayPlaying(bool isReplayPlaying)
+		{
+			foreach(GameObject element in ReplayRecordingElements) {
+				element.SetActive(!isReplayPlaying);
+			}
+
+			foreach(GameObject element in ReplayPlaybackElements) {
+				element.SetActive(isReplayPlaying);
 			}
 		}
 	}

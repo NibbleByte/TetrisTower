@@ -33,6 +33,8 @@ namespace TetrisTower.HomeScreen
 
 			TowerLevels.TowerLevelDebugAPI.__DebugInitialTowerLevel = string.Empty;
 
+			gameContext.SetCurrentPlaythrough((IPlaythroughData) null);
+
 			// StateStack not needed for now.
 			//var levelController = GameObject.FindObjectOfType<HomeScreenController>();
 			//

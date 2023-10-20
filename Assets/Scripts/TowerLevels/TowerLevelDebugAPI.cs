@@ -1,7 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.MessageBox;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using TetrisTower.Game;
 using TetrisTower.Logic;
@@ -21,7 +20,9 @@ namespace TetrisTower.TowerLevels
 
 		private GameObject m_ProfilerStatsObject;
 
+		private IPlaythroughData m_PlaythroughData;
 		private GridLevelController m_TowerLevel;
+		private TowerStatesAPI m_TowerLevelAPI;
 
 		private GameContext m_Context;
 		private FlashMessageUIController m_FlashMessage;
@@ -34,9 +35,11 @@ namespace TetrisTower.TowerLevels
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
+			context.SetByType(out m_PlaythroughData);
 			context.SetByType(out m_TowerLevel);
 			context.SetByType(out m_Context);
 			context.SetByType(out m_FlashMessage);
+			context.SetByType(out m_TowerLevelAPI);
 		}
 
 		public void OnLevelUnloading()
@@ -61,7 +64,7 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Retry Level");
 
-			TowerStatesAPI.RetryLevel();
+			m_TowerLevelAPI.RetryLevel();
 		}
 
 		public void Win()
@@ -82,40 +85,26 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Game Saved");
 
-			SaveGame(m_Context);
+			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
+			string savedData = Saves.SaveManager.Serialize<IPlaythroughData>(m_PlaythroughData, m_Context.GameConfig);
+			PlayerPrefs.SetString("Debug_SavedGame", savedData);
+			PlayerPrefs.Save();
+			Debug.Log(savedData);
 		}
 
 		public void Load()
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Game Loaded");
 
-			LoadGame(m_Context);
-		}
-
-		public static void SaveGame(GameContext context)
-		{
-			if (context.CurrentPlaythrough != null) {
-				// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
-				string savedData = Saves.SaveManager.Serialize<IPlaythroughData>(context.CurrentPlaythrough, context.GameConfig);
-				PlayerPrefs.SetString("Debug_SavedGame", savedData);
-				PlayerPrefs.Save();
-				Debug.Log(savedData);
-			} else {
-				Debug.Log("No game in progress.");
-			}
-		}
-
-		public static void LoadGame(GameContext context)
-		{
 			string savedData = PlayerPrefs.GetString("Debug_SavedGame");
 			if (string.IsNullOrEmpty(savedData)) {
 				Debug.Log("No save found.");
 				return;
 			}
 
-			var playthrough = Saves.SaveManager.Deserialize<IPlaythroughData>(savedData, context.GameConfig);
+			var playthrough = Saves.SaveManager.Deserialize<IPlaythroughData>(savedData, m_Context.GameConfig);
 
-			context.SetCurrentPlaythrough(playthrough);
+			m_Context.SetCurrentPlaythrough(playthrough);
 			GameManager.Instance.SwitchLevelAsync(playthrough.PrepareSupervisor());
 		}
 

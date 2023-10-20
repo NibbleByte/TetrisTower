@@ -1,4 +1,10 @@
+using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Input.Contexts;
+using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerLevels.Playthroughs;
+using TetrisTower.TowerLevels.Replays;
 using UnityEngine;
 
 namespace TetrisTower.TowerLevels
@@ -6,78 +12,134 @@ namespace TetrisTower.TowerLevels
 	/// <summary>
 	/// Exposes methods for switching states and other useful operations (public methods to be linked in the UI).
 	/// </summary>
-	public class TowerStatesAPI : MonoBehaviour
+	public class TowerStatesAPI : MonoBehaviour, ILevelLoadedListener
 	{
+		private IPlaythroughData m_PlaythroughData;
+		private IPlayerContext m_PlayerContext;
+		private GameConfig m_Config;
+
+		private bool m_IsReplay => m_PlaythroughData is ReplayPlaythroughData;
+
+		public void OnLevelLoaded(PlayerStatesContext context)
+		{
+			context.SetByType(out m_PlaythroughData);
+			context.SetByType(out m_Config);
+
+			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+		}
+
+		public void OnLevelUnloading()
+		{
+			// Just in case...
+			m_PlaythroughData = null;
+			m_Config = null;
+
+			m_PlayerContext = null;
+		}
+
 		public void PauseLevel()
 		{
-			Game.GameManager.Instance.SetGlobalState(new TowerPausedState());
+			m_PlayerContext.StatesStack.SetState(new TowerPausedState());
 		}
 
 		public void ResumeLevel()
 		{
-			Game.GameManager.Instance.SetGlobalState(new TowerPlayState());
+			m_PlayerContext.StatesStack.SetState(m_IsReplay ? new TowerReplayPlaybackState() : new TowerPlayState());
 		}
 
 		public void OpenOptions()
 		{
-			Game.GameManager.Instance.PushGlobalState(new TowerOptionsState());
+			m_PlayerContext.StatesStack.SetState(new TowerOptionsState());
 		}
 
 		public void QuitLevel()
 		{
-			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
+			m_PlaythroughData.QuitLevel();
 
-			playthroughData.QuitLevel();
-
-			Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
+			GameManager.Instance.SwitchLevelAsync(m_PlaythroughData.PrepareSupervisor());
 		}
 
 		public void ExitToHomeScreen()
 		{
-			Game.GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());
+			GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());
 		}
 
-		public static void RetryLevel()
+		public void RetryLevel()
 		{
-			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
+			RetryLevelApply(m_PlaythroughData);
 
-			if (!string.IsNullOrEmpty(TowerLevelDebugAPI.__DebugInitialTowerLevel)) {
-				var config = Game.GameManager.Instance.GameContext.GameConfig;
+			GameManager.Instance.SwitchLevelAsync(m_PlaythroughData.PrepareSupervisor());
+		}
 
-				var deserialized = Saves.SaveManager.Deserialize<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, config);
+		private void RetryLevelApply(IPlaythroughData playthroughData)
+		{
+			if (!string.IsNullOrEmpty(TowerLevelDebugAPI.__DebugInitialTowerLevel) && !m_IsReplay) {
+
+				var deserialized = Saves.SaveManager.Deserialize<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, m_Config);
 
 				playthroughData.ReplaceCurrentLevel(deserialized);
-				Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
 				return;
 			}
 
 			Debug.Assert(playthroughData.TowerLevel != null);
 
 			playthroughData.RetryLevel();
-
-			Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
 		}
 
 		public void GoToNextLevel()
 		{
+			if (!GoToNextLevelApply(m_PlaythroughData))
+				return;
+
+			if (m_PlaythroughData.HaveFinishedLevels) {
+				ExitToHomeScreen();
+			} else {
+				GameManager.Instance.SwitchLevelAsync(m_PlaythroughData.PrepareSupervisor());
+			}
+
+		}
+
+		private static bool GoToNextLevelApply(IPlaythroughData playthroughData)
+		{
 			TowerLevelDebugAPI.__DebugInitialTowerLevel = string.Empty;
 
-			var playthroughData = Game.GameManager.Instance.GameContext.CurrentPlaythrough;
 			Debug.Assert(playthroughData.TowerLevel != null);
 
 			if (!playthroughData.TowerLevel.HasWon) {
 				Debug.LogError($"Trying to start the next level, while the player hasn't won the current one. Abort.");
-				return;
+				return false;
 			}
 
 			playthroughData.FinishLevel();
 
-			if (playthroughData.HaveFinishedLevels) {
-				ExitToHomeScreen();
-			} else {
-				Game.GameManager.Instance.SwitchLevelAsync(playthroughData.PrepareSupervisor());
+			return true;
+		}
+
+		public void ReplayLevel()
+		{
+			if (m_PlaythroughData.TowerLevel == null) {
+				Debug.LogError($"Trying to replay level that isn't started.");
+				return;
 			}
 
+			IPlaythroughData nextPlaythroughData = m_PlaythroughData;
+
+			if (!m_IsReplay) {
+				// Record BEFORE finishing the level so result would be the same for the playback.
+				var recording = PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
+				recording = recording.Clone();
+				recording.SaveFinalState(m_PlaythroughData.TowerLevel, m_Config);
+
+				nextPlaythroughData = new ReplayPlaythroughData(recording, m_PlaythroughData);
+			}
+
+			if (!m_PlaythroughData.TowerLevel.IsPlaying && m_PlaythroughData.TowerLevel.HasWon) {
+				GoToNextLevelApply(m_PlaythroughData);
+			} else {
+				RetryLevelApply(m_PlaythroughData);
+			}
+
+			GameManager.Instance.SwitchLevelAsync(nextPlaythroughData.PrepareSupervisor());
 		}
 	}
 }

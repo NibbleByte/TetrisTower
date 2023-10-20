@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerLevels.Playthroughs;
+using TetrisTower.TowerLevels.Replays;
 using TetrisTower.TowerUI;
 using TetrisTower.Visuals;
 using UnityEngine;
@@ -171,9 +173,29 @@ namespace TetrisTower.TowerLevels
 				}
 			}
 
-			var timeComponent = levelController.gameObject.AddComponent<WiseTimingComponent>();
-			timeComponent.Timing = new WiseTiming();
-			timeComponent.enabled = false;
+
+
+
+			WiseTiming timing;
+			LevelReplayPlayback playbackComponent = null;
+			LevelReplayRecorder recordComponent = null;
+
+			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
+				playbackComponent = levelController.gameObject.AddComponent<LevelReplayPlayback>();
+				playbackComponent.PlaybackRecording = replayPlaythroughData.GetReplayRecording(levelController);
+				playbackComponent.enabled = false;
+
+				timing = playbackComponent.Timing;
+			} else {
+				recordComponent = levelController.gameObject.AddComponent<LevelReplayRecorder>();
+				recordComponent.Recording.SaveInitialState(m_PlaythroughData.TowerLevel, gameContext.GameConfig);
+				recordComponent.Recording.GridLevelController = levelController;
+				recordComponent.enabled = false;
+
+				timing = recordComponent.Timing;
+			}
+
+			uiController.SetIsReplayPlaying(playbackComponent != null);
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
@@ -186,19 +208,21 @@ namespace TetrisTower.TowerLevels
 				m_PlaythroughData.TowerLevel,
 				levelController,
 				uiController,
-				timeComponent.Timing,
+				timing,
+				recordComponent?.Recording, // Provide it for recording, otherwise, don't need it.
 				behaviours.OfType<ObjectivesUIController>().FirstOrDefault(),
 				behaviours.OfType<GreetMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<FlashMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<ConeVisualsGrid>().First(),
 				behaviours.OfType<TowerConeVisualsController>().First(),
 				behaviours.OfType<Visuals.Effects.FairyMatchingController>().FirstOrDefault(),
+				behaviours.OfType<TowerStatesAPI>().First(),
 				behaviours.OfType<ILostAnimationExecutor>().ToArray()	// Tower level prefab OR scene ones.
 				);
 
 
 			// Init before others.
-			levelController.Init(m_PlaythroughData.TowerLevel, timeComponent.Timing);
+			levelController.Init(m_PlaythroughData.TowerLevel, timing);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
@@ -216,9 +240,13 @@ namespace TetrisTower.TowerLevels
 			}
 
 
-			timeComponent.enabled = true;
+			if (playbackComponent) {
+				playbackComponent.enabled = true;
+			} else {
+				recordComponent.enabled = true;
+			}
 
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new TowerPlayState());
+			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(playbackComponent ? new TowerReplayPlaybackState() : new TowerPlayState());
 
 			if (m_PlaythroughData.TowerLevel.IsPlaying) {
 				GridLevelData levelData = m_PlaythroughData.TowerLevel;
@@ -256,7 +284,8 @@ namespace TetrisTower.TowerLevels
 
 			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
 
-			GameObject.DestroyImmediate(levelController.GetComponent<WiseTimingComponent>());
+			GameObject.DestroyImmediate(levelController.GetComponent<LevelReplayRecorder>());
+			GameObject.DestroyImmediate(levelController.GetComponent<LevelReplayPlayback>());
 
 			return Task.CompletedTask;
 		}

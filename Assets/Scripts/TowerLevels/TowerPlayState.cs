@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using DevLocker.GFrame.Input;
 using TetrisTower.TowerUI;
+using TetrisTower.TowerLevels.Replays;
 
 namespace TetrisTower.TowerLevels
 {
@@ -18,6 +19,7 @@ namespace TetrisTower.TowerLevels
 		private PlayerOptions m_Options;
 		private GridLevelController m_LevelController;
 		private TowerLevelUIController m_UIController;
+		private ReplayRecording m_ReplayRecording;
 
 		private bool m_PointerPressed = false;
 		private bool m_PointerDragConsumed = false;
@@ -35,6 +37,7 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_UIController);
 			context.SetByType(out m_GameConfig);
 			context.SetByType(out m_Options);
+			context.SetByType(out m_ReplayRecording);
 
 			m_PlayerControls.Enable(this, m_PlayerControls.UI);
 			m_PlayerControls.Enable(this, m_PlayerControls.TowerLevelPlay);
@@ -47,8 +50,8 @@ namespace TetrisTower.TowerLevels
 			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
-			MessageBox.Instance.MessageShown += m_LevelController.PauseLevel;
-			MessageBox.Instance.MessageClosed += m_LevelController.ResumeLevel;
+			MessageBox.Instance.MessageShown += PauseLevel;
+			MessageBox.Instance.MessageClosed += ResumeLevel;
 		}
 
 		public void ExitState()
@@ -56,42 +59,53 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
 			m_PlayerControls.DisableAll(this);
 
-			MessageBox.Instance.MessageShown -= m_LevelController.PauseLevel;
-			MessageBox.Instance.MessageClosed -= m_LevelController.ResumeLevel;
+			MessageBox.Instance.MessageShown -= PauseLevel;
+			MessageBox.Instance.MessageClosed -= ResumeLevel;
+		}
+
+		private void PauseLevel()
+		{
+			m_LevelController.PauseLevel();
+			m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Pause));
+		}
+
+		private void ResumeLevel()
+		{
+			m_LevelController.ResumeLevel();
 		}
 
 		public void OnMoveShapeLeft(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				m_LevelController.RequestFallingShapeMove(-1);
+				m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Move, -1));
 			}
 		}
 
 		public void OnMoveShapeRight(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				m_LevelController.RequestFallingShapeMove(+1);
+				m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Move, +1));
 			}
 		}
 
 		public void OnRotateShapeUp(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				m_LevelController.RequestFallingShapeRotate(+1);
+				m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Rotate, +1));
 			}
 		}
 
 		public void OnRotateShapeDown(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				m_LevelController.RequestFallingShapeRotate(-1);
+				m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Rotate, -1));
 			}
 		}
 
 		public void OnFallSpeedUp(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				m_LevelController.RequestFallingSpeedUp(m_GameConfig.FallSpeedup);
+				m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.FallSpeedUp, m_GameConfig.FallSpeedup));
 			}
 		}
 
@@ -99,7 +113,7 @@ namespace TetrisTower.TowerLevels
 		public void OnPointerFallSpeedUp(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				m_LevelController.RequestFallingSpeedUp(m_GameConfig.FallSpeedup);
+				m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.FallSpeedUp, m_GameConfig.FallSpeedup));
 
 				// Avoid executing both actions, because they are set as "Pass through".
 				m_PlayerControls.TowerLevelPlay.PointerPress.Reset();
@@ -143,8 +157,8 @@ namespace TetrisTower.TowerLevels
 					m_PointerPressed = false;
 					m_PointerDragConsumed = false;
 					m_PointerDragSwiped = false;
-					m_LevelController.ClearFallingShapeAnalogMoveOffset();
-					m_LevelController.ClearFallingShapeAnalogRotateOffset();
+					m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.ClearMoveOffset));
+					m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.ClearRotateOffset));
 
 
 					var pressDuration = Time.time - m_PointerPressedTime;
@@ -165,19 +179,19 @@ namespace TetrisTower.TowerLevels
 						//Debug.Log($"Swipe: time - {pressDuration}, dist - {pressDistance.magnitude}");
 
 						if (Vector2.Dot(Vector2.up, pressDir) >= m_GameConfig.SwipeConformity) {
-							m_LevelController.RequestFallingShapeRotate(+1);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Rotate, +1));
 						}
 
 						if (Vector2.Dot(Vector2.down, pressDir) >= m_GameConfig.SwipeConformity) {
-							m_LevelController.RequestFallingShapeRotate(-1);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Rotate, -1));
 						}
 
 						if (Vector2.Dot(Vector2.right, pressDir) >= m_GameConfig.SwipeConformity) {
-							m_LevelController.RequestFallingShapeMove(-1);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Move, -1));
 						}
 
 						if (Vector2.Dot(Vector2.left, pressDir) >= m_GameConfig.SwipeConformity) {
-							m_LevelController.RequestFallingShapeMove(+1);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.Move, +1));
 						}
 					}
 					break;
@@ -188,7 +202,7 @@ namespace TetrisTower.TowerLevels
 						return;
 
 					m_PointerPressed = false;
-					m_LevelController.ClearFallingShapeAnalogMoveOffset();
+					m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.ClearMoveOffset));
 					break;
 
 			}
@@ -222,7 +236,7 @@ namespace TetrisTower.TowerLevels
 				// Horizontal drag in progress - move
 				if (!float.IsNaN(m_LevelController.FallingColumnAnalogOffset)) {
 					if (Mathf.Abs(dragLastDistance.x) > 0.01f) {
-						m_LevelController.AddFallingShapeAnalogMoveOffset(-dragLastDistance.x * m_GameConfig.AnalogMoveSpeed / InputMetrics.InputPrecision);
+						m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.OffsetMove, -dragLastDistance.x * m_GameConfig.AnalogMoveSpeed / InputMetrics.InputPrecision));
 					}
 
 				// Vertical drag in progress - rotate
@@ -247,12 +261,12 @@ namespace TetrisTower.TowerLevels
 						if (isSwipe && !m_PointerDragSwiped && Mathf.Abs(rotateValue + currentRotateOffset) >= 0.5f) {
 							m_PointerDragSwiped = true;
 							rotateValue += rotateSign * 0.2f; // 0.5 means visually rotation is half-way. Snap it visually towards the end.
-							m_LevelController.AddFallingShapeAnalogRotateOffset(rotateValue);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.OffsetRotate, rotateValue));
 
 							//Debug.LogWarning($"SWIPE! SKIP! {dragFullDistance.y} for {dragDuration}");
 
 						} else if (!isSwipe || !m_PointerDragSwiped) {
-							m_LevelController.AddFallingShapeAnalogRotateOffset(rotateValue);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.OffsetRotate, rotateValue));
 						}
 
 					}
@@ -266,7 +280,7 @@ namespace TetrisTower.TowerLevels
 						m_PlayerControls.TowerLevelPlay.PointerFallSpeedUp.Reset();
 
 						if (Mathf.Abs(dragFullDistance.x) > Mathf.Abs(dragFullDistance.y)) {
-							m_LevelController.AddFallingShapeAnalogMoveOffset(-dragFullDistance.x * m_GameConfig.AnalogMoveSpeed / InputMetrics.InputPrecision);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.OffsetMove, -dragFullDistance.x * m_GameConfig.AnalogMoveSpeed / InputMetrics.InputPrecision));
 						} else {
 							float rotateSign = Mathf.Sign(dragFullDistance.y);
 							float rotateValue = rotateSign * Mathf.Min(
@@ -284,7 +298,7 @@ namespace TetrisTower.TowerLevels
 								//Debug.LogWarning($"SWIPE INITIAL! SKIP! {rotateValue} for {dragDuration}");
 							}
 
-							m_LevelController.AddFallingShapeAnalogRotateOffset(rotateValue);
+							m_ReplayRecording.AddAndRun(new ReplayAction(ReplayActionType.OffsetRotate, rotateValue));
 						}
 					}
 				}
