@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using UnityEngine;
 
 namespace TetrisTower.TowerLevels.Replays
 {
@@ -22,6 +23,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 		FallSpeedUp = 16,
 
+		// Keep gameplay changing actions before Pause.
 		Pause = 20,
 
 
@@ -36,16 +38,16 @@ namespace TetrisTower.TowerLevels.Replays
 		public ReplayActionType ActionType;
 		public float Value;
 
-		public ReplayAction(ReplayActionType actionType)
-		{
-			ActionType = actionType;
-			Value = 0;
-		}
+		/// <summary>
+		/// Expected value AFTER the new one is applied.
+		/// </summary>
+		public float ExpectedResultValue;
 
-		public ReplayAction(ReplayActionType actionType, float value)
+		public ReplayAction(ReplayActionType actionType, float value = 0)
 		{
 			ActionType = actionType;
 			Value = value;
+			ExpectedResultValue = 0f;
 		}
 
 
@@ -75,7 +77,20 @@ namespace TetrisTower.TowerLevels.Replays
 
 				default: throw new NotSupportedException(ActionType.ToString());
 			}
+
+			ExpectedResultValue = GetExpectedResultValue(levelController);
 		}
+
+		public float GetExpectedResultValue(GridLevelController levelController) =>
+			ActionType switch {
+				ReplayActionType.Update => levelController.LevelData.FallDistanceNormalized,
+
+				ReplayActionType.Move => levelController.LevelData.FallingColumn,
+
+				ReplayActionType.OffsetMove => levelController.FallingColumnAnalogOffset,
+				ReplayActionType.OffsetRotate => levelController.FallingShapeAnalogRotateOffset,
+				_ => 0f,
+			};
 	}
 
 	[JsonObject(MemberSerialization.Fields)]
@@ -87,10 +102,14 @@ namespace TetrisTower.TowerLevels.Replays
 		public bool HasEnding => m_Actions.LastOrDefault().ActionType == ReplayActionType.RecordingEnd;
 
 		public string InitialState { get; private set; }
+		public Vector3Int InitialFairyPos { get; private set; }
+		public Vector3Int[] InitialFairyRestPoints { get; private set; }
+
 		public string FinalState { get; private set; }
 
+		private const int FloatMultiplier = 1000;
+
 		// TODO: Version.
-		// TODO: Record fairy state.
 
 		[JsonIgnore]
 		public GridLevelController GridLevelController;
@@ -99,38 +118,58 @@ namespace TetrisTower.TowerLevels.Replays
 		{
 			ReplayRecording clone = MemberwiseClone() as ReplayRecording;
 			clone.m_Actions = m_Actions.ToList();
+			InitialFairyRestPoints = clone.InitialFairyRestPoints.ToArray();
 
 			return clone;
 		}
 
-		public void AddAction(ReplayAction action)
+		public void AddAndRun(ReplayActionType actionType, float value = 0f)
 		{
 			if (HasEnding)
-				throw new InvalidOperationException($"Trying to add action {action.ActionType} after recording has ended is now allowed.");
+				throw new InvalidOperationException($"Trying to add action {actionType} after recording has ended is now allowed.");
+
+			var action = new ReplayAction(actionType, value);
+
+			// Execute before adding the action as it will also store the expected value.
+			action.Replay(GridLevelController);
 
 			m_Actions.Add(action);
-		}
-		public void AddAndRun(ReplayAction action)
-		{
-			AddAction(action);
-			action.Replay(GridLevelController);
 
 			if (!GridLevelController.LevelData.IsPlaying) {
 
-				AddAction(new ReplayAction(ReplayActionType.RecordingEnd));
+				m_Actions.Add(new ReplayAction(ReplayActionType.RecordingEnd));
 
 				FinalState = Saves.SaveManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 			}
 		}
 
-		public void AddAndRun(ReplayActionType actionType, float value = 0f)
-		{
-			AddAndRun(new ReplayAction(actionType, value));
-		}
-
-		public void SaveInitialState(GridLevelData levelData, GameConfig gameConfig)
+		public void SaveInitialState(GridLevelData levelData, GameConfig gameConfig, Visuals.Effects.FairyMatchingController fairy, List<Transform> fairyRestPoints)
 		{
 			InitialState = Saves.SaveManager.Serialize<GridLevelData>(levelData, gameConfig);
+			InitialFairyPos = Vector3Int.FloorToInt(fairy.transform.localPosition * FloatMultiplier);
+			InitialFairyRestPoints = fairyRestPoints.Select(t => Vector3Int.FloorToInt(t.localPosition * FloatMultiplier)).ToArray();
+
+			ApplyFairyPositions(fairy, fairyRestPoints);
+		}
+
+		public void ApplyFairyPositions(Visuals.Effects.FairyMatchingController fairy, List<Transform> fairyRestPoints)
+		{
+			fairy.transform.localPosition = InitialFairyPos / FloatMultiplier;
+
+			while(fairyRestPoints.Count > InitialFairyRestPoints.Length) {
+				GameObject.DestroyImmediate(fairyRestPoints[fairyRestPoints.Count - 1]);
+				fairyRestPoints.RemoveAt(fairyRestPoints.Count - 1);
+			}
+
+			for(int i = 0; i < InitialFairyRestPoints.Length; i++) {
+				if (i < fairyRestPoints.Count) {
+					fairyRestPoints[i].localPosition = InitialFairyRestPoints[i] / FloatMultiplier;
+				} else {
+					Transform additionalPoint = GameObject.Instantiate(fairyRestPoints[0].gameObject, fairyRestPoints[0].parent).transform;
+					additionalPoint.localPosition = InitialFairyRestPoints[i] / FloatMultiplier;
+					fairyRestPoints.Add(additionalPoint);
+				}
+			}
 		}
 
 		public void EndReplayRecording()

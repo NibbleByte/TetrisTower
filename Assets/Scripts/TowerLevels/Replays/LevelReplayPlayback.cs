@@ -17,6 +17,12 @@ namespace TetrisTower.TowerLevels.Replays
 		private int m_PlaybackIndex = 0;
 		private bool m_PlaybackFinished = false;
 
+		private enum InterruptReason
+		{
+			DesyncDetected,
+			LevelEndedBeforeReplay,
+		}
+
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			context.SetByType(out m_FlashMessage);
@@ -35,9 +41,23 @@ namespace TetrisTower.TowerLevels.Replays
 				Debug.LogError($"Replay current state doesn't match the final playback state. Compared states:", this);
 				Debug.LogError(currentState, this);
 				Debug.LogError(PlaybackRecording.FinalState, this);
+				enabled = false;
 			} else {
 				Debug.Log($"Replay playback finished succesfully!", this);
 			}
+
+			m_PlaybackFinished = true;
+		}
+
+		private void InterruptPlayback(InterruptReason reason, ReplayAction interruptAction, float resultValue)
+		{
+			string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+
+			m_FlashMessage.ShowMessage("Replay Desynced", false);
+
+			Debug.LogError($"Replay interrupted - {reason}. Action: {interruptAction.ActionType}; Value: {interruptAction.Value}; Expected Value: {interruptAction.ExpectedResultValue}; Found Value: {resultValue}. Current state:", this);
+			Debug.LogError(currentState, this);
+			enabled = false;
 
 			m_PlaybackFinished = true;
 		}
@@ -69,13 +89,19 @@ namespace TetrisTower.TowerLevels.Replays
 
 				action.Replay(PlaybackRecording.GridLevelController);
 
-				// Continue next frame, unless this is the final frame. If ending - run immediately or the Won animation will change the state.
-				if (action.ActionType == ReplayActionType.Update && nextType != ReplayActionType.RecordingEnd)
+				float resultValue = action.GetExpectedResultValue(PlaybackRecording.GridLevelController);
+				if (action.ExpectedResultValue != resultValue) {
+					InterruptPlayback(InterruptReason.DesyncDetected, action, resultValue);
+					return;
+				}
+
+				// Yield next frame if it is a gameplay action. If ending, puase, etc. - run immediately or the Won animation will change the state.
+				if (action.ActionType == ReplayActionType.Update && nextType < ReplayActionType.Pause)
 					return;
 
 				// If playback finishes before replay end, don't continue, display desync right away.
-				if (!PlaybackRecording.GridLevelController.LevelData.IsPlaying) {
-					EndPlayback();
+				if (!PlaybackRecording.GridLevelController.LevelData.IsPlaying && nextType != ReplayActionType.RecordingEnd) {
+					InterruptPlayback(InterruptReason.LevelEndedBeforeReplay, action, resultValue);
 					return;
 				}
 

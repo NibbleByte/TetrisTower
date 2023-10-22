@@ -4,6 +4,7 @@ using DevLocker.GFrame.MessageBox;
 using DevLocker.GFrame.Timing;
 using DevLocker.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
@@ -75,6 +76,9 @@ namespace TetrisTower.TowerLevels
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
+			List<Transform> restPoints;
+			Visuals.Effects.FairyMatchingController fairy;
+
 			var levelController = GameObject.FindObjectOfType<GridLevelController>();
 			if (levelController == null) {
 				var placeholder = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
@@ -126,11 +130,11 @@ namespace TetrisTower.TowerLevels
 				}
 
 
-				Transform[] overrideRestPoints = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToArray();
-				if (overrideRestPoints.Length != 0) {
-					Transform[] restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToArray();
+				restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
+				List<Transform> overrideRestPoints = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
+				if (overrideRestPoints.Count != 0) {
 
-					if (restPoints.Length != 0) {
+					if (restPoints.Count != 0) {
 						foreach (Transform overrideDecor in overrideRestPoints) {
 							overrideDecor.SetParent(restPoints[0].parent, true); // Assume all have the same parent.
 						}
@@ -138,20 +142,29 @@ namespace TetrisTower.TowerLevels
 						foreach (Transform decor in restPoints) {
 							GameObject.DestroyImmediate(decor.gameObject);
 						}
+
+						restPoints = overrideRestPoints;
+
 					} else {
 						Debug.LogError("No rest points found in the instantiated level controller!", levelController);
 					}
 				}
 
+				fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
 				var overrideFairy = placeholder.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
 				if (overrideFairy) {
-					var fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
 					overrideFairy.transform.SetParent(fairy.transform.parent, false);
 					GameObject.DestroyImmediate(fairy.gameObject);
+					fairy = overrideFairy;
 				}
 
 				// Clean any leftovers in the placeholder (for example, temporary camera).
 				placeholder.transform.DestroyChildren(true);
+
+			} else {
+
+				restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
+				fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
 			}
 
 			SetupLights(levelController);
@@ -183,12 +196,13 @@ namespace TetrisTower.TowerLevels
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
 				playbackComponent = levelController.gameObject.AddComponent<LevelReplayPlayback>();
 				playbackComponent.PlaybackRecording = replayPlaythroughData.GetReplayRecording(levelController);
+				playbackComponent.PlaybackRecording.ApplyFairyPositions(fairy, restPoints);
 				playbackComponent.enabled = false;
 
 				timing = playbackComponent.Timing;
 			} else {
 				recordComponent = levelController.gameObject.AddComponent<LevelReplayRecorder>();
-				recordComponent.Recording.SaveInitialState(m_PlaythroughData.TowerLevel, gameContext.GameConfig);
+				recordComponent.Recording.SaveInitialState(m_PlaythroughData.TowerLevel, gameContext.GameConfig, fairy, restPoints);
 				recordComponent.Recording.GridLevelController = levelController;
 				recordComponent.enabled = false;
 
