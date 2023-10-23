@@ -5,6 +5,7 @@ using UnityEngine;
 using TetrisTower.Core;
 using System.Linq;
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Timing;
 
 namespace TetrisTower.Visuals
 {
@@ -18,6 +19,7 @@ namespace TetrisTower.Visuals
 		public ConeVisualsGrid VisualsGrid;
 		private GridLevelController m_TowerLevel;
 		private GridLevelData m_LevelData => m_TowerLevel?.LevelData;
+		private WiseTiming m_Timing => m_TowerLevel.Timing;
 
 		public Transform FallingVisualsContainer;
 
@@ -47,7 +49,7 @@ namespace TetrisTower.Visuals
 		private Tuple<int, int, bool>[] m_RotatingFallingShapeCoordsChange;
 		private float m_RotatingFallingShapeAnalogLastProgress;
 
-		public void Init(PlayerStatesContext context)
+		public void Init(PlayerStatesContext context, System.Random visualsRandom)
 		{
 			if (!isActiveAndEnabled)
 				return;
@@ -61,11 +63,13 @@ namespace TetrisTower.Visuals
 			m_TowerLevel.FallingShapeRotated += OnFallingShapeRotated;
 			m_TowerLevel.FallingShapeSpeedUp += OnFallingShapeSpeedUp;
 
+			m_Timing.PreUpdate += LevelLateUpdate;
+
 			FallingVisualsContainer.SetParent(transform);
 			FallingVisualsContainer.localPosition = Vector3.zero;
 
 			m_TowerLevel.Grids.Add(VisualsGrid);
-			VisualsGrid.Init(context);
+			VisualsGrid.Init(context, visualsRandom);
 
 			DestroyFallingVisuals();
 
@@ -86,6 +90,8 @@ namespace TetrisTower.Visuals
 
 			m_TowerLevel.FallingShapeRotated -= OnFallingShapeRotated;
 			m_TowerLevel.FallingShapeSpeedUp -= OnFallingShapeSpeedUp;
+
+			m_Timing.PreUpdate -= LevelLateUpdate;
 
 		}
 
@@ -160,7 +166,7 @@ namespace TetrisTower.Visuals
 			FallingVisualsShape = m_DebugFallingVisualsShape = null;
 		}
 
-		void Update()
+		void LevelLateUpdate()
 		{
 			if (m_LevelData == null)
 				return;
@@ -194,21 +200,21 @@ namespace TetrisTower.Visuals
 			}
 
 			if (m_CurrentFallingColumn != m_LevelData.FallingColumn || m_ChangingFallingColumnByAnalog) {
-				m_ChangingFallingColumnStarted = Time.time;
+				m_ChangingFallingColumnStarted = m_Timing.TimeElapsed;
 				m_ChangingFallingColumnStartedRotation = FallingVisualsContainer.localRotation;
 				m_ChangingFallingColumn = true;
 				m_ChangingFallingColumnByAnalog = false;
 				m_CurrentFallingColumn = m_LevelData.FallingColumn;
 			}
 
-			if (m_ChangingFallingColumn && Time.time - m_ChangingFallingColumnStarted > ChangeColumnDuration) {
+			if (m_ChangingFallingColumn && m_Timing.TimeElapsed - m_ChangingFallingColumnStarted > ChangeColumnDuration) {
 				m_ChangingFallingColumn = false;
 
 				FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
 			}
 
 			if (m_ChangingFallingColumn) {
-				float progress = (Time.time - m_ChangingFallingColumnStarted) / ChangeColumnDuration;
+				float progress = (m_Timing.TimeElapsed - m_ChangingFallingColumnStarted) / ChangeColumnDuration;
 				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
 
 				FallingVisualsContainer.localRotation = Quaternion.Lerp(m_ChangingFallingColumnStartedRotation, endRotation, progress);
@@ -223,7 +229,7 @@ namespace TetrisTower.Visuals
 			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == m_LevelData.FallingShape.ShapeCoords.Length);
 
 			m_RotatingFallingShape = true;
-			m_RotatingFallingShapeStarted = Time.time;
+			m_RotatingFallingShapeStarted = m_Timing.TimeElapsed;
 
 			m_RotatingFallingShapeCoordsChange = new Tuple<int, int, bool>[FallingVisualsShape.ShapeCoords.Length];
 
@@ -245,6 +251,11 @@ namespace TetrisTower.Visuals
 		private void UpdateFallingVisualsPosition()
 		{
 			if (FallingVisualsShape == null || m_TowerLevel.AreGridActionsRunning)
+				return;
+
+			// FallingShape can be null, but visuals still exist to be reused when the placing finishes. Check SetPlacedShapeToBeReused().
+			// Shape is selected also by the Won animation state.
+			if (m_LevelData.FallingShape == null)
 				return;
 
 			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == m_LevelData.FallingShape.ShapeCoords.Length);
@@ -304,16 +315,16 @@ namespace TetrisTower.Visuals
 				}
 
 				// Simulate normal rotation, from hotkey.
-				m_RotatingFallingShapeStarted = Time.time - ChangeRotationDuration * m_RotatingFallingShapeAnalogLastProgress;
+				m_RotatingFallingShapeStarted = m_Timing.TimeElapsed - ChangeRotationDuration * m_RotatingFallingShapeAnalogLastProgress;
 			}
 
 			// Normal rotation finished.
-			if (m_RotatingFallingShape && !m_RotatingFallingShapeAnalog && Time.time - m_RotatingFallingShapeStarted > ChangeRotationDuration) {
+			if (m_RotatingFallingShape && !m_RotatingFallingShapeAnalog && m_Timing.TimeElapsed - m_RotatingFallingShapeStarted > ChangeRotationDuration) {
 				m_RotatingFallingShape = false;
 			}
 
 			if (m_RotatingFallingShape || m_RotatingFallingShapeAnalog) {
-				float progress = (Time.time - m_RotatingFallingShapeStarted) / ChangeRotationDuration;
+				float progress = (m_Timing.TimeElapsed - m_RotatingFallingShapeStarted) / ChangeRotationDuration;
 
 				if (m_RotatingFallingShapeAnalog) {
 					// 1f - offset simulates that progress is rotating towards the current (start) row, not the next one.

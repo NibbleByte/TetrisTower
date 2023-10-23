@@ -1,4 +1,3 @@
-using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Timing;
 using System.Collections;
@@ -97,14 +96,17 @@ namespace TetrisTower.Visuals
 		private ScoreGrid m_ScoreGrid = null;
 		private WiseTiming m_Timing;
 
+		public System.Random VisualsRandom { get; private set; }
+
 		private GridCoords m_PlayableArea;
 
 		private Effects.FairyMatchingController m_Fairy;
 
-		public void Init(PlayerStatesContext context)
+		public void Init(PlayerStatesContext context, System.Random visualsRandom)
 		{
 			GridLevelController towerLevel = context.FindByType<GridLevelController>();
 			m_Timing = towerLevel.Timing;
+			VisualsRandom = visualsRandom;
 
 			BlocksGrid grid = towerLevel.Grid;
 
@@ -142,7 +144,7 @@ namespace TetrisTower.Visuals
 				var fairyRestPoints = found.Where(go => go.transform.IsChildOf(transform)).Select(go => go.transform).ToArray();
 
 				if (fairyRestPoints.Length >= 2) {
-					m_Fairy.Init(fairyRestPoints, transform.position, ConeOuterRadius, m_Timing);
+					m_Fairy.Init(fairyRestPoints, transform.position, ConeOuterRadius, m_Timing, visualsRandom);
 				} else {
 					Debug.LogWarning("Couldn't find enough fairy rest point. Need at least 2. Destroying the fairy.", this);
 
@@ -401,12 +403,12 @@ namespace TetrisTower.Visuals
 		{
 			if (Application.isPlaying) {
 
-				float startTime = Time.time;
+				float startTime = WiseTiming.Time;
 				bool waitingBlocks = true;
 				while (waitingBlocks) {
 					waitingBlocks = false;
 
-					float timePassed = Time.time - startTime;
+					float timePassed = WiseTiming.Time - startTime;
 
 					foreach (var pair in action.MovedCells) {
 						float distance = GridCoords.Distance(pair.Key, pair.Value);

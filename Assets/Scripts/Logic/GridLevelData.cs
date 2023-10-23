@@ -51,7 +51,7 @@ namespace TetrisTower.Logic
 		// Spawn blocks from the array in range [0, TypesCount).
 		public Vector2Int SpawnBlockTypesRange = new Vector2Int(0, 3);
 
-		[Tooltip("Read-only. Used for debug.")]
+		[Tooltip("Read-only. Used also for VisualsRandom.")]
 		public int RandomInitialLevelSeed;
 
 		// NOTE: This is not the same object as in PlaythroughData. Serializing doesn't work (easily) with references.

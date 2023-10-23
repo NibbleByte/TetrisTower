@@ -35,11 +35,13 @@ namespace TetrisTower.Visuals.Effects
 		private float m_ChaseEndDuration = 0;
 
 		private WiseTiming m_Timing;
+		private System.Random m_VisualsRandom;
 
-		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius, WiseTiming timing)
+		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius, WiseTiming timing, System.Random visualsRandom)
 		{
 			RestPoints = fairyRestPoints.ToArray();
 			m_Timing = timing;
+			m_VisualsRandom = visualsRandom;
 
 			if (RestPoints.Length < 2) {
 				Debug.LogError($"Fairy doesn't have enough rest points to patrol to! Disabling!", this);
@@ -47,7 +49,7 @@ namespace TetrisTower.Visuals.Effects
 				return;
 			}
 
-			m_CurrentRestPoint = RestPoints[UnityEngine.Random.Range(0, RestPoints.Length)];
+			m_CurrentRestPoint = RestPoints[m_VisualsRandom.Next() % RestPoints.Length];
 
 			m_Heading = Vector3.one;
 			m_Speed = IdleSpeed;
@@ -94,7 +96,7 @@ namespace TetrisTower.Visuals.Effects
 				var leftPoints = RestPoints.ToList();
 				leftPoints.Remove(m_CurrentRestPoint);
 
-				m_CurrentRestPoint = leftPoints[UnityEngine.Random.Range(0, leftPoints.Count)];
+				m_CurrentRestPoint = leftPoints[m_VisualsRandom.Next() % leftPoints.Count];
 				m_CurrentRestPointTime = 0f;
 
 			} else {

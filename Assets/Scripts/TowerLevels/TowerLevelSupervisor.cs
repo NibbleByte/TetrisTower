@@ -192,6 +192,7 @@ namespace TetrisTower.TowerLevels
 			WiseTiming timing;
 			LevelReplayPlayback playbackComponent = null;
 			LevelReplayRecorder recordComponent = null;
+			System.Random visualsRandom;
 
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
 				playbackComponent = levelController.gameObject.AddComponent<LevelReplayPlayback>();
@@ -199,10 +200,15 @@ namespace TetrisTower.TowerLevels
 				playbackComponent.PlaybackRecording.ApplyFairyPositions(fairy, restPoints);
 				playbackComponent.enabled = false;
 
+				visualsRandom = new Xoshiro.PRNG32.XoShiRo128starstar(playbackComponent.PlaybackRecording.InitialVisualsRandomSeed);
+
 				timing = playbackComponent.Timing;
 			} else {
+				int seed = m_PlaythroughData.TowerLevel.RandomInitialLevelSeed;
+				visualsRandom = new Xoshiro.PRNG32.XoShiRo128starstar(seed);
+
 				recordComponent = levelController.gameObject.AddComponent<LevelReplayRecorder>();
-				recordComponent.Recording.SaveInitialState(m_PlaythroughData.TowerLevel, gameContext.GameConfig, fairy, restPoints);
+				recordComponent.Recording.SaveInitialState(m_PlaythroughData.TowerLevel, gameContext.GameConfig, fairy, restPoints, seed);
 				recordComponent.Recording.GridLevelController = levelController;
 				recordComponent.enabled = false;
 
@@ -243,7 +249,7 @@ namespace TetrisTower.TowerLevels
 			}
 
 			// Other visuals depend on this, so init it first.
-			behaviours.OfType<TowerConeVisualsController>().First().Init(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+			behaviours.OfType<TowerConeVisualsController>().First().Init(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context, visualsRandom);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
 				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);

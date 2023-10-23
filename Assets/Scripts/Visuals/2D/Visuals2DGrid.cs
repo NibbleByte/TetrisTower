@@ -1,3 +1,4 @@
+using DevLocker.GFrame.Timing;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,12 +158,12 @@ namespace TetrisTower.Visuals2D
 		{
 			if (Application.isPlaying) {
 
-				float startTime = Time.time;
+				float startTime = WiseTiming.Time;
 				bool waitingBlocks = true;
 				while (waitingBlocks) {
 					waitingBlocks = false;
 
-					float timePassed = Time.time - startTime;
+					float timePassed = WiseTiming.Time - startTime;
 
 					foreach (var pair in action.MovedCells) {
 						float distance = GridCoords.Distance(pair.Key, pair.Value);

@@ -49,13 +49,13 @@ namespace TetrisTower.TowerLevels.Replays
 			m_PlaybackFinished = true;
 		}
 
-		private void InterruptPlayback(InterruptReason reason, ReplayAction interruptAction, float resultValue)
+		private void InterruptPlayback(InterruptReason reason, ReplayAction interruptAction, float expectedValue, float resultValue)
 		{
 			string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 
 			m_FlashMessage.ShowMessage("Replay Desynced", false);
 
-			Debug.LogError($"Replay interrupted - {reason}. Action: {interruptAction.ActionType}; Value: {interruptAction.Value}; Expected Value: {interruptAction.ExpectedResultValue}; Found Value: {resultValue}. Current state:", this);
+			Debug.LogError($"Replay interrupted - {reason}. Action: {interruptAction.ActionType}; Value: {interruptAction.Value}; Expected Value: {expectedValue}; Found Value: {resultValue}. Current state:", this);
 			Debug.LogError(currentState, this);
 			enabled = false;
 
@@ -87,11 +87,13 @@ namespace TetrisTower.TowerLevels.Replays
 					? PlaybackRecording.Actions[m_PlaybackIndex].ActionType
 					: default;
 
+				// Expected value will be overriden during replay action.
+				float expectedValue = action.ExpectedResultValue;
+
 				action.Replay(PlaybackRecording.GridLevelController);
 
-				float resultValue = action.GetExpectedResultValue(PlaybackRecording.GridLevelController);
-				if (action.ExpectedResultValue != resultValue) {
-					InterruptPlayback(InterruptReason.DesyncDetected, action, resultValue);
+				if (action.ExpectedResultValue != expectedValue) {
+					InterruptPlayback(InterruptReason.DesyncDetected, action, expectedValue, action.ExpectedResultValue);
 					return;
 				}
 
@@ -101,7 +103,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 				// If playback finishes before replay end, don't continue, display desync right away.
 				if (!PlaybackRecording.GridLevelController.LevelData.IsPlaying && nextType != ReplayActionType.RecordingEnd) {
-					InterruptPlayback(InterruptReason.LevelEndedBeforeReplay, action, resultValue);
+					InterruptPlayback(InterruptReason.LevelEndedBeforeReplay, action, expectedValue, action.ExpectedResultValue);
 					return;
 				}
 
