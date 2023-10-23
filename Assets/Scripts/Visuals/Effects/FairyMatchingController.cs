@@ -20,6 +20,8 @@ namespace TetrisTower.Visuals.Effects
 
 		public Transform[] RestPoints { get; private set; }
 
+		// NOTE: All fields should have their values restarted in the Init() method,
+		// as it may affect the replay playback and cause desync when scene is reused!
 		private Transform m_CurrentRestPoint = null;
 		private float m_CurrentRestPointTime = 0f;
 		private Vector3 m_Heading;
@@ -33,6 +35,9 @@ namespace TetrisTower.Visuals.Effects
 		private Vector3? m_ChasePos;
 		private Vector3? m_ChasePosWaypoint;
 		private float m_ChaseEndDuration = 0;
+
+		// NOTE: All fields should have their values restarted in the Init() method,
+		// as it may affect the replay playback and cause desync when scene is reused!
 
 		private WiseTiming m_Timing;
 		private System.Random m_VisualsRandom;
@@ -49,7 +54,11 @@ namespace TetrisTower.Visuals.Effects
 				return;
 			}
 
+			// NOTE: All fields should have their values restarted in the Init() method,
+			// as it may affect the replay playback and cause desync when scene is reused!
+
 			m_CurrentRestPoint = RestPoints[m_VisualsRandom.Next() % RestPoints.Length];
+			m_CurrentRestPointTime = 0f;
 
 			m_Heading = Vector3.one;
 			m_Speed = IdleSpeed;
@@ -59,6 +68,10 @@ namespace TetrisTower.Visuals.Effects
 
 
 			m_ChaseRestMinDistance = 0;
+
+			m_ChasePos = null;
+			m_ChasePosWaypoint = null;
+			m_ChaseEndDuration = 0;
 
 			foreach(Transform p1 in RestPoints) {
 				foreach(Transform p2 in RestPoints) {
