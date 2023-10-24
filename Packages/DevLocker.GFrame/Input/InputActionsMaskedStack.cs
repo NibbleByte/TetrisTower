@@ -146,7 +146,7 @@ namespace DevLocker.GFrame.Input
 				throw new ArgumentNullException();
 
 			if (source is InputAction)
-				throw new ArgumentException("Disabling by of type source InputAction is not allowed.");
+				throw new ArgumentException("Requests with source type InputAction is not allowed.");
 
 			foreach (var pair in m_Actions) {
 				if (pair.Value.Contains(source)) {
@@ -155,12 +155,33 @@ namespace DevLocker.GFrame.Input
 			}
 		}
 
+		/// <summary>
+		/// Get all sources that enabled specific action.
+		/// </summary>
 		public IEnumerable<object> GetEnablingSourcesFor(InputAction action)
 		{
 			if (m_Actions.TryGetValue(action, out HashSet<object> enablingSources))
 				return enablingSources;
 
 			return Array.Empty<object>();
+		}
+
+		/// <summary>
+		/// Is the specified action enabled by the provided source.
+		/// </summary>
+		public bool IsEnabledBy(InputAction action, object source)
+		{
+			if (source == null)
+				throw new ArgumentNullException();
+
+			if (source is InputAction)
+				throw new ArgumentException("Requests with source type InputAction is not allowed.");
+
+			if (m_Actions.TryGetValue(action, out HashSet<object> enablingSources))
+				return enablingSources.Contains(source);
+
+			return false;
+
 		}
 
 		/// <summary>

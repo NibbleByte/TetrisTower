@@ -38,6 +38,8 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public void DisableAction(object source, InputAction action) => InputContext.DisableAction(source, action);
 		public void DisableAll(object source) => InputContext.DisableAll(source);
 		public IEnumerable<InputAction> GetInputActionsEnabledBy(object source) => InputContext.GetInputActionsEnabledBy(source);
+		public IEnumerable<object> GetEnablingSourcesFor(InputAction action) => InputContext.GetEnablingSourcesFor(action);
+		public bool IsEnabledBy(InputAction action, object source) => InputContext.IsEnabledBy(action, source);
 
 		public void PushOrSetActionsMask(object source, IEnumerable<InputAction> actionsMask, bool setBackToTop = false) => InputContext.PushOrSetActionsMask(source, actionsMask, setBackToTop);
 		public void PopActionsMask(object source) => InputContext.PopActionsMask(source);

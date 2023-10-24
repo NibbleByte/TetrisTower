@@ -234,6 +234,16 @@ namespace DevLocker.GFrame.Input
 		IEnumerable<InputAction> GetInputActionsEnabledBy(object source);
 
 		/// <summary>
+		/// Get all sources that enabled specific action.
+		/// </summary>
+		public IEnumerable<object> GetEnablingSourcesFor(InputAction action);
+
+		/// <summary>
+		/// Is the specified action enabled by the provided source.
+		/// </summary>
+		public bool IsEnabledBy(InputAction action, object source);
+
+		/// <summary>
 		/// Push actions mask filtering in actions allowed to be enabled in the <see cref="InputActionsMaskedStack"/>.
 		/// If mask is added or set to the top of the stack it will be applied immediately disabling any actions not included.
 		/// Masks not on the top of the stack don't affect the actions state.
