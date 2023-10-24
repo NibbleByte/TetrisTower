@@ -476,10 +476,17 @@ namespace DevLocker.GFrame.Input.UIScope
 					return;
 				}
 
+				// Focus on any opened modal roots first. Last one should be the most recent one, right?
+				UIScope fallbackFrameScope =
+					m_PlayerSet.RegisteredScopes.LastOrDefault(s => s.Type == ScopeType.ModalRoot && s.AutomaticFocus && s.OnEnableBehaviour == FocusPolicy.FocusWithFramePriority)
+					?? m_PlayerSet.RegisteredScopes.LastOrDefault(s => s.Type == ScopeType.ModalRoot && s.AutomaticFocus);
 
+				if (fallbackFrameScope) {
+					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(fallbackFrameScope));
+					return;
+				}
 
 				// Something else just activated, use that if appropriate.
-				UIScope fallbackFrameScope = null;
 				foreach(UIScope scope in m_PlayerSet.RegisteredScopes) {
 
 					if (scope.m_FrameEnabled == Time.frameCount) {
@@ -530,6 +537,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				// Focus on enabled scope this frame, even if it doesn't match the OnEnable criteria. Makes sense?
 				if (fallbackFrameScope) {
 					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(fallbackFrameScope));
+					return;
 				}
 
 				UIScope nextScope = GetScopeOnUnfocus(OnDisableBehaviour);
