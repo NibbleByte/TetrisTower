@@ -169,7 +169,7 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Is the specified action enabled by the provided source.
 		/// </summary>
-		public bool IsEnabledBy(InputAction action, object source)
+		public bool IsEnabledBy(object source, InputAction action)
 		{
 			if (source == null)
 				throw new ArgumentNullException();

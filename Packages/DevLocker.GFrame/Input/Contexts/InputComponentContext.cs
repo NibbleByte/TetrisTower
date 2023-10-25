@@ -163,9 +163,9 @@ namespace DevLocker.GFrame.Input.Contexts
 			return InputActionsMaskedStack.GetEnablingSourcesFor(action);
 		}
 
-		public bool IsEnabledBy(InputAction action, object source)
+		public bool IsEnabledBy(object source, InputAction action)
 		{
-			return InputActionsMaskedStack.IsEnabledBy(action, source);
+			return InputActionsMaskedStack.IsEnabledBy(source, action);
 		}
 
 		public void PushOrSetActionsMask(object source, IEnumerable<InputAction> actionsMask, bool setBackToTop = false)

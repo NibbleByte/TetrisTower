@@ -241,7 +241,7 @@ namespace DevLocker.GFrame.Input
 		/// <summary>
 		/// Is the specified action enabled by the provided source.
 		/// </summary>
-		public bool IsEnabledBy(InputAction action, object source);
+		public bool IsEnabledBy(object source, InputAction action);
 
 		/// <summary>
 		/// Push actions mask filtering in actions allowed to be enabled in the <see cref="InputActionsMaskedStack"/>.
