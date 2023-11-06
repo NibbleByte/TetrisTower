@@ -123,20 +123,20 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 #if UNITY_EDITOR
-			if (MouseButtonParts.Contains(button.gameObject)) {
+			if (MouseButtonParts?.Contains(button.gameObject) ?? false) {
 				MouseButtonParts.Remove(button.gameObject);
 				UnityEditor.EditorUtility.SetDirty(this);
 			}
-			if (MouseButtonParts.Contains(gameObject)) {
+			if (MouseButtonParts?.Contains(gameObject) ?? false) {
 				MouseButtonParts.Remove(gameObject);
 				UnityEditor.EditorUtility.SetDirty(this);
 			}
 
-			if (ControllerHotkeyParts.Contains(button.gameObject)) {
+			if (ControllerHotkeyParts?.Contains(button.gameObject) ?? false) {
 				ControllerHotkeyParts.Remove(button.gameObject);
 				UnityEditor.EditorUtility.SetDirty(this);
 			}
-			if (ControllerHotkeyParts.Contains(gameObject)) {
+			if (ControllerHotkeyParts?.Contains(gameObject) ?? false) {
 				ControllerHotkeyParts.Remove(gameObject);
 				UnityEditor.EditorUtility.SetDirty(this);
 			}
