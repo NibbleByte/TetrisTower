@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
+using System;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Playthroughs;
@@ -75,7 +76,7 @@ namespace TetrisTower.TowerLevels
 		{
 			if (!string.IsNullOrEmpty(TowerLevelDebugAPI.__DebugInitialTowerLevel) && !m_IsReplay) {
 
-				var deserialized = Saves.SaveManager.Deserialize<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, m_Config);
+				var deserialized = Saves.SavesManager.Deserialize<GridLevelData>(TowerLevelDebugAPI.__DebugInitialTowerLevel, m_Config);
 
 				playthroughData.ReplaceCurrentLevel(deserialized);
 				return;
@@ -125,7 +126,6 @@ namespace TetrisTower.TowerLevels
 			IPlaythroughData nextPlaythroughData = m_PlaythroughData;
 
 			if (!m_IsReplay) {
-				// Record BEFORE finishing the level so result would be the same for the playback.
 				var recording = PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 				if (!recording.HasEnding) {
 					recording.EndReplayRecording();
@@ -142,6 +142,19 @@ namespace TetrisTower.TowerLevels
 			}
 
 			GameManager.Instance.SwitchLevelAsync(nextPlaythroughData.PrepareSupervisor());
+		}
+
+		public void SaveReplay()
+		{
+			ReplayRecording recording;
+			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
+				// Null controller as we are not gonna execute the recording.
+				recording = replayPlaythroughData.GetReplayRecording(controller: null);
+			} else {
+				recording = PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
+			}
+
+			Saves.SavesManager.SaveReplay($"{DateTime.Now:yyyyMMdd_HHmmss} {m_PlaythroughData.TowerLevel.BackgroundScene.SceneName}", recording, m_Config);
 		}
 	}
 }

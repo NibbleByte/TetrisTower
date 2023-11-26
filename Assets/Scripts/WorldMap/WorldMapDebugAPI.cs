@@ -104,7 +104,7 @@ namespace TetrisTower.WorldMap
 		{
 			if (context.CurrentPlaythrough != null) {
 				// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
-				string savedData = Saves.SaveManager.Serialize<IPlaythroughData>(context.CurrentPlaythrough, context.GameConfig);
+				string savedData = Saves.SavesManager.Serialize<IPlaythroughData>(context.CurrentPlaythrough, context.GameConfig);
 				PlayerPrefs.SetString("Debug_SavedGame", savedData);
 				PlayerPrefs.Save();
 				Debug.Log(savedData);
@@ -121,7 +121,7 @@ namespace TetrisTower.WorldMap
 				return;
 			}
 
-			var playthrough = Saves.SaveManager.Deserialize<IPlaythroughData>(savedData, context.GameConfig);
+			var playthrough = Saves.SavesManager.Deserialize<IPlaythroughData>(savedData, context.GameConfig);
 
 			context.SetCurrentPlaythrough(playthrough);
 			GameManager.Instance.SwitchLevelAsync(playthrough.PrepareSupervisor());

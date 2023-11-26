@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using System.Linq;
 using UnityEngine;
 
 namespace TetrisTower.Game
@@ -8,6 +9,10 @@ namespace TetrisTower.Game
 		public static GameManager Instance { get; private set; }
 
 		public GameContext GameContext { get; private set; }
+
+		private object[] m_Managers;
+
+		public T GetManager<T>() => m_Managers.OfType<T>().First();
 
 		void Awake()
 		{
@@ -33,6 +38,11 @@ namespace TetrisTower.Game
 		public void SetGameContext(GameContext gameContext)
 		{
 			GameContext = gameContext;
+		}
+
+		public void SetManagers(params object[] managers)
+		{
+			m_Managers = managers.ToArray();
 		}
 	}
 }

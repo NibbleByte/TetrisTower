@@ -23,7 +23,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
 			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
-			return Saves.SaveManager.Clone<IPlaythroughData, WorldPlaythroughData>(m_PlayerData, config);
+			return Saves.SavesManager.Clone<IPlaythroughData, WorldPlaythroughData>(m_PlayerData, config);
 		}
 
 		public override IEnumerable<LevelParamData> GetAllLevels() => m_PlayerData.GetAllLevels();

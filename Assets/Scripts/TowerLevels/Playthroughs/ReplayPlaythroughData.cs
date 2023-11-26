@@ -40,7 +40,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
-			m_TowerLevel = Saves.SaveManager.Deserialize<GridLevelData>(m_PlaybackRecording.InitialState, gameConfig);
+			m_TowerLevel = Saves.SavesManager.Deserialize<GridLevelData>(m_PlaybackRecording.InitialState, gameConfig);
 		}
 
 		public ReplayRecording GetReplayRecording(GridLevelController controller)

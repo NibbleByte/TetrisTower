@@ -83,8 +83,11 @@ namespace TetrisTower.WorldMap
 					listener.OnLevelUnloading();
 				}
 
-				// Make sure no coroutines leak to the next level (in case target scene is the same, objects won't be reloaded).
-				behaviour.StopAllCoroutines();
+				// Skip DontDestroyOnLoads.
+				if (behaviour.gameObject.scene.buildIndex != -1) {
+					// Make sure no coroutines leak to the next level (in case target scene is the same, objects won't be reloaded).
+					behaviour.StopAllCoroutines();
+				}
 			}
 
 			return Task.CompletedTask;

@@ -140,13 +140,13 @@ namespace TetrisTower.TowerLevels.Replays
 
 				m_Actions.Add(new ReplayAction(ReplayActionType.RecordingEnd));
 
-				FinalState = Saves.SaveManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+				FinalState = Saves.SavesManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 			}
 		}
 
 		public void SaveInitialState(GridLevelData levelData, GameConfig gameConfig, Visuals.Effects.FairyMatchingController fairy, List<Transform> fairyRestPoints, int initialVisualsRandomSeed)
 		{
-			InitialState = Saves.SaveManager.Serialize<GridLevelData>(levelData, gameConfig);
+			InitialState = Saves.SavesManager.Serialize<GridLevelData>(levelData, gameConfig);
 			InitialFairyPos = Vector3Int.FloorToInt(fairy.transform.localPosition * FloatMultiplier);
 			InitialFairyRestPoints = fairyRestPoints.Select(t => Vector3Int.FloorToInt(t.localPosition * FloatMultiplier)).ToArray();
 			InitialVisualsRandomSeed = initialVisualsRandomSeed;
@@ -181,12 +181,12 @@ namespace TetrisTower.TowerLevels.Replays
 
 			AddAndRun(ReplayActionType.RecordingEnd);
 
-			FinalState = Saves.SaveManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+			FinalState = Saves.SavesManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 		}
 
 		public string GetSavedState(GridLevelData levelData, GameConfig gameConfig)
 		{
-			return Saves.SaveManager.Serialize<GridLevelData>(levelData, gameConfig);
+			return Saves.SavesManager.Serialize<GridLevelData>(levelData, gameConfig);
 		}
 	}
 }

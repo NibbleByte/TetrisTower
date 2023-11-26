@@ -1,6 +1,7 @@
 using DevLocker.GFrame.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
@@ -72,16 +73,16 @@ namespace TetrisTower.Game
 			InputContext = inputContext;
 		}
 
-		public GameConfig GameConfig { get; }
+		public readonly GameConfig GameConfig;
 
-		public PlayerOptions Options { get; } = new PlayerOptions();
+		public readonly PlayerOptions Options = new PlayerOptions();
 
-		public PlayerControls PlayerControls { get; }
+		public readonly PlayerControls PlayerControls;
 
 		public IPlaythroughData CurrentPlaythrough { get; private set; }
 		[SerializeReference] private IPlaythroughData m_DebugPlaythroughData;
 
-		public IInputContext InputContext { get; }
+		public readonly IInputContext InputContext;
 
 		public void SetCurrentPlaythrough(PlaythroughTemplateBase playthroughTemplate)
 		{

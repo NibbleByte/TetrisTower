@@ -93,7 +93,7 @@ namespace TetrisTower.TowerLevels
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Game Saved");
 
 			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
-			string savedData = Saves.SaveManager.Serialize<IPlaythroughData>(m_PlaythroughData, m_Context.GameConfig);
+			string savedData = Saves.SavesManager.Serialize<IPlaythroughData>(m_PlaythroughData, m_Context.GameConfig);
 			PlayerPrefs.SetString("Debug_SavedGame", savedData);
 			PlayerPrefs.Save();
 			Debug.Log(savedData);
@@ -109,7 +109,7 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
-			var playthrough = Saves.SaveManager.Deserialize<IPlaythroughData>(savedData, m_Context.GameConfig);
+			var playthrough = Saves.SavesManager.Deserialize<IPlaythroughData>(savedData, m_Context.GameConfig);
 
 			m_Context.SetCurrentPlaythrough(playthrough);
 			GameManager.Instance.SwitchLevelAsync(playthrough.PrepareSupervisor());
