@@ -8,6 +8,8 @@ using TetrisTower.SystemUI;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Playthroughs;
 using TetrisTower.TowerLevels.Replays;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TetrisTower.Saves
 {
@@ -28,6 +30,8 @@ namespace TetrisTower.Saves
 		private const string ReplayExtension = ".jrep";
 		private const string PlaythroughsExtension = ".wsav";
 		private const string PreferencesExtension = ".pref";
+
+		#region Serialization
 
 		public static TReturn Clone<TReturn>(object data, GameConfig config)
 		{
@@ -68,25 +72,26 @@ namespace TetrisTower.Saves
 			});
 		}
 
+		#endregion
+
+		#region Replays
+
 		public static async void SaveReplay(string name, ReplayRecording recording, GameConfig config)
 		{
-			try {
-				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Block(recording);
+			using (GameManager.Instance.GetManager<BlockingOperationOverlayController>().BlockScope(recording)) {
+				try {
 
-				string content = Serialize<ReplayRecording>(recording, config);
-				await Platforms.PlatformsStorage.WriteFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension), content);
+					string content = Serialize<ReplayRecording>(recording, config);
+					await Platforms.PlatformsStorage.WriteFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension), content);
 
-				GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Replay saved!");
+					GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Replay saved!");
 
-			} catch (Exception ex) {
+				} catch (Exception ex) {
 
-				UnityEngine.Debug.LogException(ex);
+					UnityEngine.Debug.LogException(ex);
 
-				MessageBox.Instance.ShowSimple("Save Failed", $"Replay failed to save!", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action) null);
-
-			} finally {
-
-				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Unblock(recording);
+					MessageBox.Instance.ShowSimple("Save Failed", $"Replay failed to save!", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
+				}
 			}
 		}
 
@@ -95,6 +100,21 @@ namespace TetrisTower.Saves
 			string content = await Platforms.PlatformsStorage.ReadFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension));
 			return Deserialize<ReplayRecording>(content, config);
 		}
+
+		public static async Task<bool> DeleteReplay(string name)
+		{
+			return await Platforms.PlatformsStorage.DeleteFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension));
+		}
+
+		public static async Task<string[]> FetchReplaysList()
+		{
+			string[] paths = await Platforms.PlatformsStorage.ListFilesAsync(ReplaysFolder, ReplayExtension);
+			return paths.Select(p => Path.GetFileNameWithoutExtension(p)).ToArray();
+		}
+
+		#endregion
+
+		#region Playthroughs
 
 		public static async void SavePlaythrough(int slot, WorldPlaythroughData playthroughData, GameConfig config)
 		{
@@ -123,6 +143,8 @@ namespace TetrisTower.Saves
 			string content = await Platforms.PlatformsStorage.ReadFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"));
 			return Deserialize<ReplayRecording>(content, config);
 		}
+
+		#endregion
 	}
 
 }

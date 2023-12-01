@@ -9,6 +9,25 @@ namespace TetrisTower.SystemUI
 {
 	public class BlockingOperationOverlayController : MonoBehaviour
 	{
+		public class Scope : IDisposable
+		{
+			private BlockingOperationOverlayController m_Controller;
+			private object m_Source;
+
+			public Scope(BlockingOperationOverlayController controller, object source)
+			{
+				m_Controller = controller;
+				m_Source = source;
+
+				m_Controller.Block(m_Source);
+			}
+
+			public void Dispose()
+			{
+				m_Controller.Unblock(m_Source);
+			}
+		}
+
 		public float DrawDelay = 1f;
 		[SerializeField] private CanvasGroup Canvas;
 
@@ -18,6 +37,8 @@ namespace TetrisTower.SystemUI
 		{
 			gameObject.SetActive(false);
 		}
+
+		public Scope BlockScope(object source) => new Scope(this, source);
 
 		public void Block(object source)
 		{

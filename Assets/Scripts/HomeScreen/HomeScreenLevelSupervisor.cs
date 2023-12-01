@@ -1,9 +1,11 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.MessageBox;
 using DevLocker.Utils;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
 using UnityEngine;
@@ -35,23 +37,49 @@ namespace TetrisTower.HomeScreen
 
 			gameContext.SetCurrentPlaythrough((IPlaythroughData) null);
 
+			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+
 			// StateStack not needed for now.
-			//var levelController = GameObject.FindObjectOfType<HomeScreenController>();
-			//
-			//StatesStack = PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
-			//	GameContext.GameConfig,
-			//	GameContext.Options,
-			//	GameContext.PlayerControls,
-			//	levelController
-			//	);
+			var levelController = behaviours.OfType<HomeScreenController>().First();
+
+			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
+				gameContext,
+				gameContext.GameConfig,
+				gameContext.Options,
+				gameContext.PlayerControls,
+				levelController
+				);
 
 			// The whole level is UI, so enable it for the whole level.
 			gameContext.PlayerControls.Enable(this, gameContext.PlayerControls.UI);
+
+			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
+				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+			}
+
+			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
+				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+			}
 		}
 
 		public Task UnloadAsync()
 		{
 			GameManager.Instance.GameContext.PlayerControls.DisableAll(this);
+
+			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+
+			foreach (var behaviour in behaviours) {
+				var listener = behaviour as ILevelLoadedListener;
+				if (listener != null) {
+					listener.OnLevelUnloading();
+				}
+
+				// Skip DontDestroyOnLoads.
+				if (behaviour.gameObject.scene.buildIndex != -1) {
+					// Make sure no coroutines leak to the next level (in case target scene is the same, objects won't be reloaded).
+					behaviour.StopAllCoroutines();
+				}
+			}
 
 			return Task.CompletedTask;
 		}

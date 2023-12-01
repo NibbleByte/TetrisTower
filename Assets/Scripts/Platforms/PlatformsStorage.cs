@@ -13,6 +13,7 @@ namespace TetrisTower.Platforms
 	{
 		private static string GetFullPath(string relativeFilePath) => Path.Combine(Application.persistentDataPath, relativeFilePath);
 
+
 		public static async Task WriteFileAsync(string relativeFilePath, string content)
 		{
 			string fullPath = GetFullPath(relativeFilePath);
@@ -29,13 +30,28 @@ namespace TetrisTower.Platforms
 
 		public static bool FileExists(string relativeFilePath)
 		{
-			string fullPath = Path.Combine(Application.persistentDataPath, GetFullPath(relativeFilePath));
+			string fullPath = GetFullPath(relativeFilePath);
 
 			return File.Exists(fullPath);
 		}
 
+		public static async Task<bool> DeleteFileAsync(string relativeFilePath)
+		{
+			if (!FileExists(relativeFilePath))
+				return await Task.FromResult(false);
+
+			string fullPath = GetFullPath(relativeFilePath);
+
+			File.Delete(fullPath);
+
+			return await Task.FromResult(true);
+		}
+
 		public static async Task<string[]> ListFilesAsync(string relativeFolderPath, params string[] extensions)
 		{
+			if (extensions.Length == 0)
+				throw new ArgumentException("Must specify extensions to look for");
+
 			string fullPath = GetFullPath(relativeFolderPath);
 
 			if (!Directory.Exists(fullPath))
