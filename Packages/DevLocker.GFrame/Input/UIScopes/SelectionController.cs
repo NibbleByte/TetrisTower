@@ -329,6 +329,30 @@ namespace DevLocker.GFrame.Input.UIScope
 							m_PersistedSelectable = m_PersistedSelection ? m_PersistedSelection.GetComponent<Selectable>() : null;
 						}
 
+					// Selectable exists, but got deactivated. Check if neighbour selectables are availble to auto-select.
+					} else if (selectable) {
+						Selectable bestSelectable = null;
+						var neighbourSelectables = new Selectable[] {
+							selectable.navigation.selectOnDown,
+							selectable.navigation.selectOnUp,
+							selectable.navigation.selectOnRight,
+							selectable.navigation.selectOnLeft,
+						};
+
+						foreach(Selectable neighbourSelectable in neighbourSelectables) {
+							if (neighbourSelectable && neighbourSelectable.gameObject.activeInHierarchy) {
+								bestSelectable = neighbourSelectable;
+								break;
+							}
+						}
+
+						if (bestSelectable) {
+							m_PlayerContext.SetSelectedGameObject(bestSelectable.gameObject);
+							OnSelected();
+
+						} else {
+							DoNoSelectionAction();
+						}
 					} else {
 						DoNoSelectionAction();
 					}

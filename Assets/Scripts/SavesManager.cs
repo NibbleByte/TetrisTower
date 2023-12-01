@@ -109,7 +109,7 @@ namespace TetrisTower.Saves
 		public static async Task<string[]> FetchReplaysList()
 		{
 			string[] paths = await Platforms.PlatformsStorage.ListFilesAsync(ReplaysFolder, ReplayExtension);
-			return paths.Select(p => Path.GetFileNameWithoutExtension(p)).ToArray();
+			return paths.Select(p => Path.GetFileNameWithoutExtension(p)).OrderBy(n => n).ToArray();
 		}
 
 		#endregion
