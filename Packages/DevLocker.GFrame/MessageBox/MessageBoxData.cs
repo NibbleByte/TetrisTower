@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DevLocker.GFrame.MessageBox
 {
@@ -117,6 +118,23 @@ namespace DevLocker.GFrame.MessageBox
 		public MessageBoxResponseCallback Callback;
 		public object Sender;
 		public object UserData;
+
+		/// <summary>
+		/// Await on the response. In that case you may not provide actual callback.
+		/// </summary>
+		public async Task<MessageBoxResponseData> WaitResponseAsync()
+		{
+			MessageBoxResponseData? response = null;
+			Callback += (r) => {
+				response = r;
+			};
+
+			while(!response.HasValue) {
+				await Task.Yield();
+			}
+
+			return await Task.FromResult(response.Value);
+		}
 	}
 
 	public struct MessageBoxResponseData
