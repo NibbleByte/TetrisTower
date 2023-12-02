@@ -7,7 +7,7 @@ namespace DevLocker.GFrame.UIUtils
 	/// <summary>
 	/// Simple implementation of <see cref="ILevelLoadingScreen"/>.
 	/// </summary>
-	public class UISimpleCanvasGroupFader : MonoBehaviour, ILevelLoadingScreen
+	public class UISimpleCanvasGroupFader_LoadingScreen : MonoBehaviour, ILevelLoadingScreen
 	{
 		public float Duration = 0.25f;
 		public bool TimeScaled = true;  // Should it be timeScale dependent or not.

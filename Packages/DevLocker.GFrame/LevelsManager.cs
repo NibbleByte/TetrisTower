@@ -155,7 +155,12 @@ namespace DevLocker.GFrame
 			ChangingLevel = true;
 			ILevelSupervisor prevLevel = LevelSupervisor;
 
+			foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+				playerContext.IsLevelLoading = true;
+			}
+
 			try {
+
 				if (LevelSupervisor != null) {
 
 					await UnloadingSupervisorAsync();
@@ -208,6 +213,12 @@ namespace DevLocker.GFrame
 
 				if (!OnException(prevLevel, nextLevel, ex)) {
 					throw;
+				}
+
+			} finally {
+
+				foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+					playerContext.IsLevelLoading = false;
 				}
 			}
 		}

@@ -24,7 +24,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public SampleGameContext GameContext;
 
 		public GameObject GameInputPrefab;
-		public UIUtils.UISimpleCanvasGroupFader LevelFader;
+		public UIUtils.UISimpleCanvasGroupFader_LoadingScreen LevelFader;
 		public MessageBox.MessageBox MessageBoxPrefab;
 
 		public InputBindingDisplayAsset[] BindingDisplayAssets;
@@ -47,7 +47,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 			var playerControls = new SamplePlayerControls();
 
 			var gameInputObject = Instantiate(GameInputPrefab, transform);
-			var levelFader = Instantiate(LevelFader.gameObject, transform).GetComponent<UIUtils.UISimpleCanvasGroupFader>();
+			var levelFader = Instantiate(LevelFader.gameObject, transform).GetComponent<UIUtils.UISimpleCanvasGroupFader_LoadingScreen>();
 			Instantiate(MessageBoxPrefab.gameObject, transform);
 
 			gameInputObject.name = gameInputObject.name.Replace("(Clone)", "-Global");

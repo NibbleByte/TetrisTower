@@ -46,7 +46,7 @@ namespace TetrisTower.GameStarter
 
 			var gameInputObject = Instantiate(GameConfig.GameInputPrefab, transform);
 			Instantiate(GameConfig.MessageBoxPrefab.gameObject, transform);
-			var loadingScreen = Instantiate(GameConfig.LoadingScreenPrefab, transform).GetComponentInChildren<UISimpleCanvasGroupFader>(true);
+			var loadingScreen = Instantiate(GameConfig.LoadingScreenPrefab, transform).GetComponentInChildren<UISimpleCanvasGroupFader_LoadingScreen>(true);
 			var systemOverlay = Instantiate(GameConfig.SystemOverlayPrefab, transform);
 
 			var uiInputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>();

@@ -76,6 +76,12 @@ namespace DevLocker.GFrame.Input.Contexts
 		private IPlayerContext.SetupCallbackDelegate m_CallbacksOnSetup;
 
 		/// <summary>
+		/// Bool set by YOUR level manager to true if it is loading and vice-versa.
+		/// Scripts can use this to suppress input or similar while loading.
+		/// </summary>
+		public bool IsLevelLoading = true;
+
+		/// <summary>
 		/// Is the player setup ready.
 		/// </summary>
 		public bool IsActive => EventSystem != null;
