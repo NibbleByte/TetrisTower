@@ -39,6 +39,7 @@ namespace DevLocker.GFrame.MessageBox
 
 #pragma warning disable 0649
 
+		public bool IsShowingMessage => ShownData != null;
 		public MessageData ShownData { get; private set; }
 		private List<MessageData> m_PendingData = new List<MessageData>();
 

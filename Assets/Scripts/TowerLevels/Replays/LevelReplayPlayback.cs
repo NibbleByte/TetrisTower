@@ -9,6 +9,14 @@ namespace TetrisTower.TowerLevels.Replays
 {
 	public class LevelReplayPlayback : MonoBehaviour, ILevelLoadedListener
 	{
+		public enum InterruptReason
+		{
+			None,
+			DesyncDetected,
+			LevelEndedBeforeReplay,
+			FinalStateMismatch,
+		}
+
 		public readonly WiseTiming Timing = new WiseTiming();
 
 		private FlashMessageUIController m_FlashMessage;
@@ -18,11 +26,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 		public bool PlaybackFinished { get; private set; } = false;
 
-		private enum InterruptReason
-		{
-			DesyncDetected,
-			LevelEndedBeforeReplay,
-		}
+		public InterruptReason PlaybackInterruptionReason { get; private set; }
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
@@ -37,12 +41,16 @@ namespace TetrisTower.TowerLevels.Replays
 		{
 			string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 			if (currentState != PlaybackRecording.FinalState) {
-				m_FlashMessage.ShowMessage("Replay Desynced", false);
+				//m_FlashMessage.ShowMessage("Replay Desynced", false);	// MessageBox is displayed by the state.
 
 				Debug.LogError($"Replay current state doesn't match the final playback state. Compared states:", this);
 				Debug.LogError(currentState, this);
 				Debug.LogError(PlaybackRecording.FinalState, this);
+
+				PlaybackInterruptionReason = InterruptReason.FinalStateMismatch;
+
 				enabled = false;
+
 			} else {
 
 				if (PlaybackRecording.GridLevelController.LevelData.IsPlaying) {
@@ -61,10 +69,13 @@ namespace TetrisTower.TowerLevels.Replays
 		{
 			string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 
-			m_FlashMessage.ShowMessage("Replay Desynced", false);
+			//m_FlashMessage.ShowMessage("Replay Desynced", false); // MessageBox is displayed by the state.
 
 			Debug.LogError($"Replay interrupted - {reason}. Action: {interruptAction.ActionType}; Value: {interruptAction.Value}; Expected Value: {expectedValue}; Found Value: {resultValue}. Current state:", this);
 			Debug.LogError(currentState, this);
+
+			PlaybackInterruptionReason = reason;
+
 			enabled = false;
 
 			PlaybackFinished = true;

@@ -71,8 +71,22 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
-			if (m_PlaybackComponent.PlaybackFinished) {
-				GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+			if (m_PlaybackComponent.PlaybackFinished && !MessageBox.Instance.IsShowingMessage) {
+
+				if (m_PlaybackComponent.PlaybackInterruptionReason != LevelReplayPlayback.InterruptReason.None) {
+					MessageBox.Instance.ShowSimple(
+						"Replay Desynced",
+						$"Replay playback was stopped because a desynchronization was detected.\nReason: {m_PlaybackComponent.PlaybackInterruptionReason}\n\nCheck the logs for more info.",
+						MessageBoxIcon.Error,
+						MessageBoxButtons.OK,
+						() => GameManager.Instance.PushGlobalState(new TowerFinishedLevelState()),
+						this
+						);
+
+				} else {
+					GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+				}
+
 				return;
 			}
 		}
