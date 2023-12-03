@@ -32,7 +32,7 @@ namespace TetrisTower.TowerUI
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			// HACK: At the moment the greet message is shared between multiple objectives controllers. Message is set twice.
+			// HACK: At the moment the greet message & visuals grid is shared between multiple objectives controllers. Operations are set twice.
 			context.SetByType(out m_GreetMessageController);
 
 			context.TrySetByType(out m_VisualsGrid);

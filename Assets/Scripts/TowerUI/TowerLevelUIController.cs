@@ -1,4 +1,7 @@
+using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace TetrisTower.TowerUI
@@ -6,13 +9,15 @@ namespace TetrisTower.TowerUI
 	public enum TowerLevelUIState
 	{
 		None = 0,
+
 		Play = 2,
 		Paused = 4,
 		LevelFinished = 6,
+
 		Options = 8,
 	}
 
-	public class TowerLevelUIController : MonoBehaviour
+	public class TowerLevelUIController : MonoBehaviour, ILevelLoadedListener
 	{
 		[Serializable]
 		public struct StatePanelBinds
@@ -24,22 +29,23 @@ namespace TetrisTower.TowerUI
 		public TowerLevelUIState CurrentState = TowerLevelUIState.Play;
 
 		public StatePanelBinds[] StatePanels;
+		public StatePanelBinds[] ReplayStatePanels;
 
 		[Tooltip("Elements needed only when game is playing (i.e. not won / lost animation).")]
 		public GameObject[] PlayingOnlyElements;
 
-		[Tooltip("Elements to be displayed when replay is being recorded (i.e. normal game).")]
-		public GameObject[] ReplayRecordingElements;
-		[Tooltip("Elements to be displayed when replay is being played back.")]
-		public GameObject[] ReplayPlaybackElements;
+		public bool IsReplayPlaying { get; private set; }
 
-		void Awake()
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			foreach (var bind in StatePanels) {
+			foreach (var bind in StatePanels.Concat(ReplayStatePanels)) {
 				bind.Panel.SetActive(false);
 			}
+		}
 
-			SwitchState(CurrentState);
+		public void OnLevelUnloading()
+		{
+
 		}
 
 		public void SwitchState(TowerLevelUIState state)
@@ -60,7 +66,9 @@ namespace TetrisTower.TowerUI
 
 		public GameObject GetPanel(TowerLevelUIState state)
 		{
-			foreach (var bind in StatePanels) {
+			var statePanels = IsReplayPlaying ? ReplayStatePanels : StatePanels;
+
+			foreach (var bind in statePanels) {
 				if (state == bind.State)
 					return bind.Panel;
 			}
@@ -78,13 +86,7 @@ namespace TetrisTower.TowerUI
 
 		public void SetIsReplayPlaying(bool isReplayPlaying)
 		{
-			foreach(GameObject element in ReplayRecordingElements) {
-				element.SetActive(!isReplayPlaying);
-			}
-
-			foreach(GameObject element in ReplayPlaybackElements) {
-				element.SetActive(isReplayPlaying);
-			}
+			IsReplayPlaying = isReplayPlaying;
 		}
 	}
 }
