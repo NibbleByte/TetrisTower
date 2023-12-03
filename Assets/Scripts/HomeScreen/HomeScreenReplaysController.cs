@@ -58,9 +58,16 @@ namespace TetrisTower.HomeScreen
 
 					ReplayRecording recording = await Saves.SavesManager.LoadReplay(replayEntry.ReplayName, m_Config);
 
-					var nextPlaythroughData = new ReplayPlaythroughData(recording, null);
+					if (recording.IsVersionSupported) {
+						var nextPlaythroughData = new ReplayPlaythroughData(recording, null);
 
-					GameManager.Instance.SwitchLevelAsync(nextPlaythroughData.PrepareSupervisor());
+						GameManager.Instance.SwitchLevelAsync(nextPlaythroughData.PrepareSupervisor());
+
+					} else {
+
+						MessageBox.Instance.ShowSimple("Unsupported Replay Version", $"Replay version {recording.Version} is not supported by the current game! Game version is {ReplayRecording.CurrentRuntimeVersion}", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
+
+					}
 
 				} catch (Exception ex) {
 

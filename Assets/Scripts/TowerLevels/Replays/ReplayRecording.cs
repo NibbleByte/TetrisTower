@@ -96,6 +96,11 @@ namespace TetrisTower.TowerLevels.Replays
 	[JsonObject(MemberSerialization.Fields)]
 	public class ReplayRecording
 	{
+		public const int CurrentRuntimeVersion = 1;
+
+		public int Version;
+		public bool IsVersionSupported => Version == CurrentRuntimeVersion;
+
 		public IReadOnlyList<ReplayAction> Actions => m_Actions;
 		private List<ReplayAction> m_Actions = new List<ReplayAction>();
 
@@ -109,8 +114,6 @@ namespace TetrisTower.TowerLevels.Replays
 		public string FinalState { get; private set; }
 
 		private const int FloatMultiplier = 1000;
-
-		// TODO: Version.
 
 		[JsonIgnore]
 		public GridLevelController GridLevelController;
@@ -150,6 +153,8 @@ namespace TetrisTower.TowerLevels.Replays
 			InitialFairyPos = Vector3Int.FloorToInt(fairy.transform.localPosition * FloatMultiplier);
 			InitialFairyRestPoints = fairyRestPoints.Select(t => Vector3Int.FloorToInt(t.localPosition * FloatMultiplier)).ToArray();
 			InitialVisualsRandomSeed = initialVisualsRandomSeed;
+
+			Version = CurrentRuntimeVersion;
 
 			ApplyFairyPositions(fairy, fairyRestPoints);
 		}

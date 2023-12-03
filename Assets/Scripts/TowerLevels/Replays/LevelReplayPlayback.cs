@@ -31,6 +31,10 @@ namespace TetrisTower.TowerLevels.Replays
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			context.SetByType(out m_FlashMessage);
+
+			if (!PlaybackRecording.IsVersionSupported) {
+				Debug.LogError($"Replay version {PlaybackRecording.Version} is older than the currently used {ReplayRecording.CurrentRuntimeVersion}. Expect desync.", this);
+			}
 		}
 
 		public void OnLevelUnloading()
