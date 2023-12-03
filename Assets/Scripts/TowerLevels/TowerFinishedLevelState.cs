@@ -17,6 +17,7 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.Enable(this, m_PlayerControls.UI);
 
 			m_UIController.SwitchState(TowerLevelUIState.LevelFinished);
+			// Don't pause the level as it will interrupt the won bonus animation.
 		}
 
 		public void ExitState()

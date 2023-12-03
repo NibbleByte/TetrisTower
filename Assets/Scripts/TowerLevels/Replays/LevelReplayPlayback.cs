@@ -15,7 +15,8 @@ namespace TetrisTower.TowerLevels.Replays
 
 		public ReplayRecording PlaybackRecording;
 		private int m_PlaybackIndex = 0;
-		private bool m_PlaybackFinished = false;
+
+		public bool PlaybackFinished { get; private set; } = false;
 
 		private enum InterruptReason
 		{
@@ -43,10 +44,17 @@ namespace TetrisTower.TowerLevels.Replays
 				Debug.LogError(PlaybackRecording.FinalState, this);
 				enabled = false;
 			} else {
-				Debug.Log($"Replay playback finished succesfully!", this);
+
+				if (PlaybackRecording.GridLevelController.LevelData.IsPlaying) {
+					// Ended replay from paused menu while playing.
+					Debug.Log($"Replay playback finished succesfully, but level did not! Stop further playback.", this);
+					enabled = false;
+				} else {
+					Debug.Log($"Replay playback finished succesfully!", this);
+				}
 			}
 
-			m_PlaybackFinished = true;
+			PlaybackFinished = true;
 		}
 
 		private void InterruptPlayback(InterruptReason reason, ReplayAction interruptAction, float expectedValue, float resultValue)
@@ -59,7 +67,7 @@ namespace TetrisTower.TowerLevels.Replays
 			Debug.LogError(currentState, this);
 			enabled = false;
 
-			m_PlaybackFinished = true;
+			PlaybackFinished = true;
 		}
 
 		void Update()
@@ -67,7 +75,7 @@ namespace TetrisTower.TowerLevels.Replays
 			if (PlaybackRecording.GridLevelController.IsPaused)
 				return;
 
-			if (m_PlaybackFinished) {
+			if (PlaybackFinished) {
 				Timing.UpdateCoroutines(Time.deltaTime);
 				return;
 			}
