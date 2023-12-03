@@ -230,7 +230,7 @@ namespace TetrisTower.TowerLevels
 				uiController,
 				timing,
 				recordComponent?.Recording, // Provide it for recording, otherwise, don't need it.
-				behaviours.OfType<ObjectivesUIController>().FirstOrDefault(),
+				new MultiObjectivesPresenter(behaviours.OfType<ObjectivesUIController>()),
 				behaviours.OfType<GreetMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<FlashMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<ConeVisualsGrid>().First(),

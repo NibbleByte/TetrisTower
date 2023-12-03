@@ -39,7 +39,7 @@ namespace TetrisTower.TowerObjectives
 		private GridRules m_Rules;
 
 		[JsonIgnore]
-		private TowerUI.ObjectivesUIController m_ObjectivesUIController;
+		private ObjectivesPresenter m_Presenter;
 
 		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
@@ -48,9 +48,9 @@ namespace TetrisTower.TowerObjectives
 			m_ScoreGrid.ClearActionScored += OnClearActionScored;
 			m_Rules = levelData.Rules;
 
-			TryProcessGreetMessage(context.TryFindByType<TowerUI.GreetMessageUIController>());
+			m_Presenter = context.TryFindByType<ObjectivesPresenter>();
+			TryProcessGreetMessage();
 
-			m_ObjectivesUIController = context.TryFindByType<TowerUI.ObjectivesUIController>();
 			TryDisplayObjective();
 		}
 
@@ -96,7 +96,7 @@ namespace TetrisTower.TowerObjectives
 
 		private void TryDisplayObjective()
 		{
-			if (m_ObjectivesUIController == null)
+			if (m_Presenter == null)
 				return;
 
 			string text = $"Remaining: {MatchesEndCount - m_MatchesDone}";
@@ -117,15 +117,15 @@ namespace TetrisTower.TowerObjectives
 				text += "Only!</b></color>";
 			}
 
-			m_ObjectivesUIController.SetObjectiveText(this, text);
+			m_Presenter.SetObjectiveText(this, text);
 		}
 
-		private void TryProcessGreetMessage(TowerUI.GreetMessageUIController messageController)
+		private void TryProcessGreetMessage()
 		{
-			if (messageController == null)
+			if (m_Presenter == null)
 				return;
 
-			string message = messageController.Message;
+			string message = m_Presenter.GreetingMessage;
 
 			if (string.IsNullOrWhiteSpace(message)) {
 				if (!MatchesAllTypes) {
@@ -141,13 +141,13 @@ namespace TetrisTower.TowerObjectives
 					}
 
 					message += "Only!";
-					messageController.Message = message;
+					m_Presenter.GreetingMessage = message;
 					return;
 				}
 			}
 
 
-			messageController.Message = message.Replace("{ObjectiveEndCount}", MatchesEndCount.ToString());
+			m_Presenter.GreetingMessage = message.Replace("{ObjectiveEndCount}", MatchesEndCount.ToString());
 		}
 
 		public void Validate(UnityEngine.Object context)

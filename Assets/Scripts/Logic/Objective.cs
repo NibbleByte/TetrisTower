@@ -2,6 +2,8 @@ using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace TetrisTower.Logic
@@ -25,6 +27,61 @@ namespace TetrisTower.Logic
 		void OnPreLevelUnloading();
 
 		void Validate(UnityEngine.Object context);
+	}
+
+	public interface ObjectivesPresenter
+	{
+		string GreetingMessage { get; set; }
+
+		void SetObjectiveText(Objective objective, string text);
+		void ClearObjectiveText(Objective objective);
+
+		bool HighlightBlock(GridCoords coords);
+	}
+
+	public class MultiObjectivesPresenter : ObjectivesPresenter
+	{
+		public readonly List<ObjectivesPresenter> Presenters = new List<ObjectivesPresenter>();
+
+		public MultiObjectivesPresenter() { }
+
+		public MultiObjectivesPresenter(params ObjectivesPresenter[] presenters) => Presenters.AddRange(presenters);
+
+		public MultiObjectivesPresenter(IEnumerable<ObjectivesPresenter> presenters) => Presenters.AddRange(presenters);
+
+		public string GreetingMessage {
+			get => Presenters.FirstOrDefault()?.GreetingMessage;	// All presenters should have the same message.
+			set {
+				foreach(var presenter in Presenters) {
+					presenter.GreetingMessage = value;
+				}
+			}
+		}
+
+		public void SetObjectiveText(Objective objective, string text)
+		{
+			foreach (var presenter in Presenters) {
+				presenter.SetObjectiveText(objective, text);
+			}
+		}
+
+		public void ClearObjectiveText(Objective objective)
+		{
+			foreach (var presenter in Presenters) {
+				presenter.ClearObjectiveText(objective);
+			}
+		}
+
+		public bool HighlightBlock(GridCoords coords)
+		{
+			bool success = false;
+
+			foreach (var presenter in Presenters) {
+				success = presenter.HighlightBlock(coords) || success;
+			}
+
+			return success;
+		}
 	}
 
 #if UNITY_EDITOR

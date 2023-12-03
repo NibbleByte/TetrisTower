@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using TetrisTower.Logic;
-using TetrisTower.Visuals;
 using UnityEngine;
 
 namespace TetrisTower.TowerObjectives
@@ -21,22 +20,17 @@ namespace TetrisTower.TowerObjectives
 		public List<GridCoords> Coordinates = new List<GridCoords>();
 
 		[JsonIgnore]
-		private ConeVisualsGrid m_VisualsGrid;
-
-		[JsonIgnore]
 		private ScoreGrid m_ScoreGrid;
 
 		[JsonIgnore]
-		private TowerUI.ObjectivesUIController m_ObjectivesUIController;
+		private ObjectivesPresenter m_Presenter;
 
 		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
-			context.TrySetByType(out m_VisualsGrid);
-
 			m_ScoreGrid = context.FindByType<GridLevelData>().Score;
 			m_ScoreGrid.ClearActionScored += OnClearActionScored;
 
-			m_ObjectivesUIController = context.TryFindByType<TowerUI.ObjectivesUIController>();
+			m_Presenter = context.TryFindByType<ObjectivesPresenter>();
 			TryDisplayObjective();
 			TryHighlightTargetBlocks();
 		}
@@ -60,29 +54,27 @@ namespace TetrisTower.TowerObjectives
 
 		private void TryDisplayObjective()
 		{
-			if (m_ObjectivesUIController == null)
+			if (m_Presenter == null)
 				return;
 
-			m_ObjectivesUIController.SetObjectiveText(this, $"Match the highlighted blocks");
+			m_Presenter.SetObjectiveText(this, $"Match the highlighted blocks");
 		}
 
 		private void TryHighlightTargetBlocks()
 		{
-			if (m_VisualsGrid == null)
+			if (m_Presenter == null)
 				return;
 
-			for(int i = 0; i < Coordinates.Count; ++i) {
+			for (int i = 0; i < Coordinates.Count; ++i) {
 				GridCoords coords = Coordinates[i];
 
-				ConeVisualsBlock block = m_VisualsGrid[coords];
-				if (block == null) {
+				bool success = m_Presenter.HighlightBlock(coords);
+				if (!success) {
 					Debug.LogWarning($"ClearCoordinates objective needs block at {coords}, but none was found. No block will be highlighted");
 					Coordinates.RemoveAt(i);
 					i--;
 					continue;
 				}
-
-				block.IsHighlighted = true;
 			}
 		}
 

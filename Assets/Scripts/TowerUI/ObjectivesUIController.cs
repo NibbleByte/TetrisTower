@@ -3,12 +3,13 @@ using DevLocker.GFrame.Input;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Logic;
+using TetrisTower.Visuals;
 using TMPro;
 using UnityEngine;
 
 namespace TetrisTower.TowerUI
 {
-	public class ObjectivesUIController : MonoBehaviour, ILevelLoadedListener
+	public class ObjectivesUIController : MonoBehaviour, ILevelLoadedListener, ObjectivesPresenter
 	{
 		private class ObjectiveTextPair
 		{
@@ -18,14 +19,28 @@ namespace TetrisTower.TowerUI
 
 		public TextMeshProUGUI ObjectivesText;
 
+		private GreetMessageUIController m_GreetMessageController;
+
+		private ConeVisualsGrid m_VisualsGrid;
+
 		private List<ObjectiveTextPair> m_ObjectiveTexts = new List<ObjectiveTextPair>();
+
+		public string GreetingMessage {
+			get => m_GreetMessageController?.Message;
+			set => m_GreetMessageController.Message = value;
+		}
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
+			// HACK: At the moment the greet message is shared between multiple objectives controllers. Message is set twice.
+			context.SetByType(out m_GreetMessageController);
+
+			context.TrySetByType(out m_VisualsGrid);
 		}
 
 		public void OnLevelUnloading()
 		{
+			m_GreetMessageController = null;
 			m_ObjectiveTexts.Clear();
 			if (ObjectivesText) {
 				ObjectivesText.text = string.Empty;
@@ -66,6 +81,17 @@ namespace TetrisTower.TowerUI
 			if (ObjectivesText) {
 				ObjectivesText.text = string.Join("\n", m_ObjectiveTexts.Select(pair => pair.Text));
 			}
+		}
+
+		public bool HighlightBlock(GridCoords coords)
+		{
+			ConeVisualsBlock block = m_VisualsGrid[coords];
+			if (block == null) {
+				return false;
+			}
+
+			block.IsHighlighted = true;
+			return true;
 		}
 	}
 
