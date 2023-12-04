@@ -23,8 +23,7 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_UIController);
 			context.SetByType(out m_InputContext);
-
-			m_PlaybackComponent = m_LevelController.GetComponent<LevelReplayPlayback>();
+			context.SetByType(out m_PlaybackComponent);
 
 			m_PlayerControls.Enable(this, m_PlayerControls.UI);
 

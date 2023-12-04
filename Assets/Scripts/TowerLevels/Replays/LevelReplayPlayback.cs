@@ -21,6 +21,8 @@ namespace TetrisTower.TowerLevels.Replays
 
 		private FlashMessageUIController m_FlashMessage;
 
+		public int PlaybackSpeed = 1;
+
 		public ReplayRecording PlaybackRecording;
 		private int m_PlaybackIndex = 0;
 
@@ -95,6 +97,8 @@ namespace TetrisTower.TowerLevels.Replays
 				return;
 			}
 
+			int startPlaybackIndex = m_PlaybackIndex;
+
 			while (m_PlaybackIndex < PlaybackRecording.Actions.Count) {
 				ReplayAction action = PlaybackRecording.Actions[m_PlaybackIndex];
 
@@ -121,8 +125,13 @@ namespace TetrisTower.TowerLevels.Replays
 				}
 
 				// Yield next frame if it is a gameplay action. If ending, puase, etc. - run immediately or the Won animation will change the state.
-				if (action.ActionType == ReplayActionType.Update && nextType < ReplayActionType.Pause)
-					return;
+				if (action.ActionType == ReplayActionType.Update && nextType < ReplayActionType.Pause) {
+					if (m_PlaybackIndex - startPlaybackIndex < PlaybackSpeed) {
+						continue;
+					} else {
+						return;
+					}
+				}
 
 				// If playback finishes before replay end, don't continue, display desync right away.
 				if (!PlaybackRecording.GridLevelController.LevelData.IsPlaying && nextType != ReplayActionType.RecordingEnd) {
