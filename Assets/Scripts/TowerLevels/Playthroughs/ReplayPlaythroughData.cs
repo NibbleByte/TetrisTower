@@ -29,6 +29,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_ReturnPlaythrough = returnPlaythrough;
 
 			m_PlaybackRecording.GridLevelController = null; // Just in case.
+			m_PlaybackRecording.Fairy = null;				// Just in case.
 		}
 
 		public override ILevelSupervisor PrepareSupervisor()
@@ -43,11 +44,12 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_TowerLevel = Saves.SavesManager.Deserialize<GridLevelData>(m_PlaybackRecording.InitialState, gameConfig);
 		}
 
-		public ReplayRecording GetReplayRecording(GridLevelController controller)
+		public ReplayRecording GetReplayRecording(GridLevelController controller, Visuals.Effects.FairyMatchingController fairy)
 		{
 			// Clone it just in case?
 			ReplayRecording recording = m_PlaybackRecording.Clone();
 			recording.GridLevelController = controller;
+			recording.Fairy = fairy;
 
 			return recording;
 		}

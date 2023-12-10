@@ -196,7 +196,7 @@ namespace TetrisTower.TowerLevels
 
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
 				playbackComponent = levelController.gameObject.AddComponent<LevelReplayPlayback>();
-				playbackComponent.PlaybackRecording = replayPlaythroughData.GetReplayRecording(levelController);
+				playbackComponent.PlaybackRecording = replayPlaythroughData.GetReplayRecording(levelController, fairy);
 				playbackComponent.PlaybackRecording.ApplyFairyPositions(fairy, restPoints);
 				playbackComponent.enabled = false;
 
@@ -210,6 +210,7 @@ namespace TetrisTower.TowerLevels
 				recordComponent = levelController.gameObject.AddComponent<LevelReplayRecorder>();
 				recordComponent.Recording.SaveInitialState(m_PlaythroughData.TowerLevel, gameContext.GameConfig, fairy, restPoints, seed);
 				recordComponent.Recording.GridLevelController = levelController;
+				recordComponent.Recording.Fairy = fairy;
 				recordComponent.enabled = false;
 
 				timing = recordComponent.Timing;

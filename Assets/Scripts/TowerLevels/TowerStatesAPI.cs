@@ -149,7 +149,7 @@ namespace TetrisTower.TowerLevels
 			ReplayRecording recording;
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
 				// Null controller as we are not gonna execute the recording.
-				recording = replayPlaythroughData.GetReplayRecording(controller: null);
+				recording = replayPlaythroughData.GetReplayRecording(controller: null, fairy: null);
 			} else {
 				recording = PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 			}

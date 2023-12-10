@@ -59,6 +59,20 @@ namespace TetrisTower.HomeScreen
 					ReplayRecording recording = await Saves.SavesManager.LoadReplay(replayEntry.ReplayName, m_Config);
 
 					if (recording.IsVersionSupported) {
+
+#if UNITY_EDITOR
+						// Debug: start normal playthrough from selected replay.
+						if (UnityEngine.InputSystem.Keyboard.current?.shiftKey.isPressed ?? false) {
+							Debug.Log("Use replay as start state for normal playthrough.", this);
+
+							var seqPlaythrough = new SeqPlaythroughData();
+							seqPlaythrough.ReplaceCurrentLevel(Saves.SavesManager.Deserialize<Logic.GridLevelData>(recording.InitialState, m_Config));
+
+							GameManager.Instance.SwitchLevelAsync(seqPlaythrough.PrepareSupervisor());
+							return;
+						}
+#endif
+
 						var nextPlaythroughData = new ReplayPlaythroughData(recording, null);
 
 						GameManager.Instance.SwitchLevelAsync(nextPlaythroughData.PrepareSupervisor());

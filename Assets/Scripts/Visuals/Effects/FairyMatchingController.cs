@@ -20,6 +20,12 @@ namespace TetrisTower.Visuals.Effects
 
 		public Transform[] RestPoints { get; private set; }
 
+		// Used for debugging fairy position during replays.
+		public float ReplayReferenceValue => m_ChasePos.HasValue
+			? Vector3.Distance(transform.position, m_ChasePos.Value)				// Positive means chasing.
+			: -Vector3.Distance(transform.position, m_CurrentRestPoint.position)	// Negative means idle
+			;
+
 		// NOTE: All fields should have their values restarted in the Init() method,
 		// as it may affect the replay playback and cause desync when scene is reused!
 		private Transform m_CurrentRestPoint = null;
@@ -39,13 +45,11 @@ namespace TetrisTower.Visuals.Effects
 		// NOTE: All fields should have their values restarted in the Init() method,
 		// as it may affect the replay playback and cause desync when scene is reused!
 
-		private WiseTiming m_Timing;
 		private System.Random m_VisualsRandom;
 
-		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius, WiseTiming timing, System.Random visualsRandom)
+		public void Init(IEnumerable<Transform> fairyRestPoints, Vector3 towerBaseCenter, float towerRadius, System.Random visualsRandom)
 		{
 			RestPoints = fairyRestPoints.ToArray();
-			m_Timing = timing;
 			m_VisualsRandom = visualsRandom;
 
 			if (RestPoints.Length < 2) {
@@ -81,8 +85,6 @@ namespace TetrisTower.Visuals.Effects
 					}
 				}
 			}
-
-			m_Timing.PreUpdate += LevelUpdate;
 		}
 
 		public IEnumerator ChaseTo(Vector3 chasePos)
@@ -103,7 +105,7 @@ namespace TetrisTower.Visuals.Effects
 			}
 		}
 
-		private void IdleUpdate()
+		private void IdleUpdate(float deltaTime)
 		{
 			if (Vector3.Distance(transform.position, m_CurrentRestPoint.position) < 0.2f || m_CurrentRestPointTime > IdleRestPointTimeout) {
 				var leftPoints = RestPoints.ToList();
@@ -113,7 +115,7 @@ namespace TetrisTower.Visuals.Effects
 				m_CurrentRestPointTime = 0f;
 
 			} else {
-				m_CurrentRestPointTime += WiseTiming.DeltaTime;
+				m_CurrentRestPointTime += deltaTime;
 			}
 
 
@@ -145,24 +147,24 @@ namespace TetrisTower.Visuals.Effects
 			}
 
 
-			m_Heading = Vector3.RotateTowards(m_Heading, dir, rotateSpeed * WiseTiming.DeltaTime, float.MaxValue);
+			m_Heading = Vector3.RotateTowards(m_Heading, dir, rotateSpeed * deltaTime, float.MaxValue);
 
-			m_Speed = Mathf.Lerp(m_Speed, targetSpeed, WiseTiming.DeltaTime * 2f);
+			m_Speed = Mathf.Lerp(m_Speed, targetSpeed, deltaTime * 2f);
 
-			transform.position += m_Heading * WiseTiming.DeltaTime * m_Speed;
+			transform.position += m_Heading * deltaTime * m_Speed;
 
 			Debug.DrawLine(m_CurrentRestPoint.position, m_CurrentRestPoint.position + Vector3.up * 2, Color.blue);
 		}
 
-		private void ChaseUpdate()
+		private void ChaseUpdate(float deltaTime)
 		{
 			Vector3 targetPos = (m_ChasePosWaypoint.HasValue) ? m_ChasePosWaypoint.Value : m_ChasePos.Value;
 
 			Debug.DrawLine(targetPos, targetPos + Vector3.up * 2, Color.red);
 
-			m_Speed = Mathf.Lerp(m_Speed, ChaseSpeed, WiseTiming.DeltaTime * 2f);
+			m_Speed = Mathf.Lerp(m_Speed, ChaseSpeed, deltaTime * 2f);
 
-			transform.position = Vector3.MoveTowards(transform.position, targetPos, m_Speed * WiseTiming.DeltaTime);
+			transform.position = Vector3.MoveTowards(transform.position, targetPos, m_Speed * deltaTime);
 
 			if (m_ChasePosWaypoint.HasValue && Vector3.Distance(transform.position, m_ChasePosWaypoint.Value) < 0.2f) {
 				m_ChasePosWaypoint = null;
@@ -170,7 +172,7 @@ namespace TetrisTower.Visuals.Effects
 			}
 
 			if (Vector3.Distance(transform.position, m_ChasePos.Value) < 0.2f) {
-				m_ChaseEndDuration += WiseTiming.DeltaTime;
+				m_ChaseEndDuration += deltaTime;
 
 				if (m_ChaseEndDuration >= ChaseEndDelay) {
 					m_Speed = ChaseSpeed * 0.3f;
@@ -189,12 +191,12 @@ namespace TetrisTower.Visuals.Effects
 			}
 		}
 
-		private void LevelUpdate()
+		public void LevelUpdate(float deltaTime)
 		{
 			if (m_ChasePos.HasValue) {
-				ChaseUpdate();
+				ChaseUpdate(deltaTime);
 			} else {
-				IdleUpdate();
+				IdleUpdate(deltaTime);
 			}
 		}
 

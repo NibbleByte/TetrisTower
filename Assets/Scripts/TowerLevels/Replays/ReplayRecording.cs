@@ -12,6 +12,8 @@ namespace TetrisTower.TowerLevels.Replays
 	{
 		Update = 0,
 
+		FairyPos = 2,
+
 		Move = 4,
 		Rotate = 5,
 
@@ -50,11 +52,15 @@ namespace TetrisTower.TowerLevels.Replays
 			ExpectedResultValue = 0f;
 		}
 
+		public override string ToString() => $"{ActionType} {Value} {ExpectedResultValue}";
 
-		public void Replay(GridLevelController levelController)
+
+		public void Replay(GridLevelController levelController, Visuals.Effects.FairyMatchingController fairy)
 		{
 			switch (ActionType) {
 				case ReplayActionType.Update: levelController.Timing.UpdateCoroutines(Value); break;
+
+				case ReplayActionType.FairyPos: fairy.LevelUpdate(Value); break;
 
 				case ReplayActionType.Move: levelController.RequestFallingShapeMove((int) Value); break;
 				case ReplayActionType.Rotate: levelController.RequestFallingShapeRotate((int) Value); break;
@@ -78,12 +84,13 @@ namespace TetrisTower.TowerLevels.Replays
 				default: throw new NotSupportedException(ActionType.ToString());
 			}
 
-			ExpectedResultValue = GetExpectedResultValue(levelController);
+			ExpectedResultValue = GetExpectedResultValue(levelController, fairy);
 		}
 
-		public float GetExpectedResultValue(GridLevelController levelController) =>
+		public float GetExpectedResultValue(GridLevelController levelController, Visuals.Effects.FairyMatchingController fairy) =>
 			ActionType switch {
 				ReplayActionType.Update => levelController.LevelData.FallDistanceNormalized,
+				ReplayActionType.FairyPos => fairy.ReplayReferenceValue,
 
 				ReplayActionType.Move => levelController.LevelData.FallingColumn,
 
@@ -118,6 +125,9 @@ namespace TetrisTower.TowerLevels.Replays
 		[JsonIgnore]
 		public GridLevelController GridLevelController;
 
+		[JsonIgnore]
+		public Visuals.Effects.FairyMatchingController Fairy;
+
 		public ReplayRecording Clone()
 		{
 			ReplayRecording clone = MemberwiseClone() as ReplayRecording;
@@ -135,7 +145,7 @@ namespace TetrisTower.TowerLevels.Replays
 			var action = new ReplayAction(actionType, value);
 
 			// Execute before adding the action as it will also store the expected value.
-			action.Replay(GridLevelController);
+			action.Replay(GridLevelController, Fairy);
 
 			m_Actions.Add(action);
 
