@@ -27,7 +27,7 @@ namespace TetrisTower.Saves
 		private const string PlaythroughsFolder = "Saves/";
 		private const string PreferencesFolder = "Preferences/";
 
-		private const string ReplayExtension = ".jrep";
+		private const string ReplayExtension = ".trep";
 		private const string PlaythroughsExtension = ".wsav";
 		private const string PreferencesExtension = ".pref";
 
@@ -82,7 +82,8 @@ namespace TetrisTower.Saves
 				try {
 
 					string content = Serialize<ReplayRecording>(recording, config);
-					await Platforms.PlatformsStorage.WriteFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension), content);
+
+					await Platforms.PlatformsStorage.WriteZipFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension), content);
 
 					GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Replay saved!");
 
@@ -97,7 +98,7 @@ namespace TetrisTower.Saves
 
 		public static async Task<ReplayRecording> LoadReplay(string name, GameConfig config)
 		{
-			string content = await Platforms.PlatformsStorage.ReadFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension));
+			string content = await Platforms.PlatformsStorage.ReadZipFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension));
 			return Deserialize<ReplayRecording>(content, config);
 		}
 
@@ -122,7 +123,7 @@ namespace TetrisTower.Saves
 				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Block(playthroughData);
 
 				string content = Serialize<WorldPlaythroughData>(playthroughData, config);
-				await Platforms.PlatformsStorage.WriteFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"), content);
+				await Platforms.PlatformsStorage.WriteZipFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"), content);
 
 				GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Replay Saved!");
 
@@ -140,7 +141,7 @@ namespace TetrisTower.Saves
 
 		public static async Task<ReplayRecording> LoadPlaythrough(int slot, GameConfig config)
 		{
-			string content = await Platforms.PlatformsStorage.ReadFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"));
+			string content = await Platforms.PlatformsStorage.ReadZipFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"));
 			return Deserialize<ReplayRecording>(content, config);
 		}
 

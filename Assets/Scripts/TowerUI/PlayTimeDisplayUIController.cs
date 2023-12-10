@@ -36,6 +36,9 @@ namespace TetrisTower.TowerUI
 
 		void Update()
 		{
+			if (m_PlaythroughData == null)
+				return;
+
 			float seconds = PlaythroughTime ? m_PlaythroughData.TotalPlayTime : m_LevelData.PlayTime;
 			TimeSpan ts = new TimeSpan(0, 0, 0, (int) seconds, (int) Mathf.Round((seconds % 1) * 1000));
 
