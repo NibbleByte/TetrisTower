@@ -23,6 +23,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			None = 0,
 			Wrap = 5,
+			WrapToNextLine = 7,
 			Auto = 10,
 			Explicit = 15,
 			AutoSelectableOfNavigationGroup = 20,
@@ -44,7 +45,11 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			public WrapMode Mode;
 			public bool IsNoneMode => Mode == WrapMode.None;
+
 			public bool IsWrapMode => Mode == WrapMode.Wrap;
+			public bool IsWrapLineMode => Mode == WrapMode.WrapToNextLine;
+			public bool IsAnyWrapMode => IsWrapMode || IsWrapLineMode;
+
 			public bool IsAutoMode => Mode == WrapMode.Auto;
 			public bool IsExplicitMode => Mode == WrapMode.Explicit;
 			public bool IsFirstSelectableOfNavigationGroupMode => Mode == WrapMode.FirstSelectableOfNavigationGroup;
@@ -462,7 +467,10 @@ namespace DevLocker.GFrame.Input.UIScope
 			//
 			// Now do it again to setup wrapping wrap modes, after all links are setup.
 			//
-			if (WrapUp.IsWrapMode || WrapDown.IsWrapMode || WrapLeft.IsWrapMode || WrapRight.IsWrapMode) {
+			if (WrapUp.IsAnyWrapMode || WrapDown.IsAnyWrapMode || WrapLeft.IsAnyWrapMode || WrapRight.IsAnyWrapMode) {
+
+				// Plan all the nav links then assign them - don't change the grid while iterating.
+				List<KeyValuePair<Selectable, Navigation >> pendingNavigations = new List<KeyValuePair<Selectable, Navigation>>(m_ManagedSelectables.Count);
 
 				for (int i = 0; i < m_ManagedSelectables.Count; ++i) {
 					Selectable selectable = m_ManagedSelectables[i];
@@ -472,6 +480,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 					int sanityCount = 0;
 					const int sanityCountLimit = 10000;
+
+					#region Normal Wrap Mode
 
 					if (nav.selectOnUp == null && WrapUp.IsWrapMode) {
 						Selectable it = selectable;
@@ -544,7 +554,89 @@ namespace DevLocker.GFrame.Input.UIScope
 						}
 					}
 
-					selectable.navigation = nav;
+					#endregion
+
+					#region Line Wrap Mode
+
+					if (nav.selectOnUp == null && WrapUp.IsWrapLineMode) {
+						Selectable it = selectable;
+						while (it.navigation.selectOnDown != null && it.navigation.selectOnDown.navigation.selectOnUp == it && it.navigation.selectOnDown != selectable) {
+							it = it.navigation.selectOnDown;
+
+							sanityCount++;
+							if (sanityCount > sanityCountLimit) {
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
+								break;
+							}
+						}
+
+						if (selectable != it) {
+							nav.selectOnUp = it.navigation.selectOnLeft;
+						}
+					}
+
+
+					if (nav.selectOnDown == null && WrapDown.IsAnyWrapMode) {
+						Selectable it = selectable;
+						while (it.navigation.selectOnUp != null && it.navigation.selectOnUp.navigation.selectOnDown == it && it.navigation.selectOnUp != selectable) {
+							it = it.navigation.selectOnUp;
+
+							sanityCount++;
+							if (sanityCount > sanityCountLimit) {
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
+								break;
+							}
+						}
+
+						if (selectable != it) {
+							nav.selectOnDown = it.navigation.selectOnRight;
+						}
+					}
+
+
+					if (nav.selectOnLeft == null && WrapLeft.IsAnyWrapMode) {
+						Selectable it = selectable;
+						while (it.navigation.selectOnRight != null && it.navigation.selectOnRight.navigation.selectOnLeft == it && it.navigation.selectOnRight != selectable) {
+							it = it.navigation.selectOnRight;
+
+							sanityCount++;
+							if (sanityCount > sanityCountLimit) {
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
+								break;
+							}
+						}
+
+						if (selectable != it) {
+							nav.selectOnLeft = it.navigation.selectOnUp;
+						}
+					}
+
+
+					if (nav.selectOnRight == null && WrapRight.IsAnyWrapMode) {
+						Selectable it = selectable;
+						while (it.navigation.selectOnLeft != null && it.navigation.selectOnLeft.navigation.selectOnRight == it && it.navigation.selectOnLeft != selectable) {
+							it = it.navigation.selectOnLeft;
+
+							sanityCount++;
+							if (sanityCount > sanityCountLimit) {
+								Debug.LogError($"[Input] Navigation group couldn't wrap around {selectable}!", this);
+								break;
+							}
+						}
+
+						if (selectable != it) {
+							nav.selectOnRight = it.navigation.selectOnDown;
+						}
+					}
+
+					#endregion
+
+					pendingNavigations.Add(KeyValuePair.Create(selectable, nav));
+				}
+
+				// Assign after all navigation links were evaluated.
+				foreach(var pair in pendingNavigations) {
+					pair.Key.navigation = pair.Value;
 				}
 			}
 		}
@@ -682,6 +774,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			switch (wrapBehaviour.Mode) {
 				case WrapMode.None:
 				case WrapMode.Wrap:
+				case WrapMode.WrapToNextLine:
 				case WrapMode.Auto:
 				case WrapMode.Explicit:
 					// Do nothing, they should be linked already.
@@ -792,6 +885,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			switch (mode) {
 				case UINavigationGroup.WrapMode.None:
 				case UINavigationGroup.WrapMode.Wrap:
+				case UINavigationGroup.WrapMode.WrapToNextLine:
 				case UINavigationGroup.WrapMode.Auto:
 				case UINavigationGroup.WrapMode.Explicit:
 				case UINavigationGroup.WrapMode.AutoSelectableOfNavigationGroup:
@@ -817,6 +911,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			switch (mode) {
 				case UINavigationGroup.WrapMode.None:
 				case UINavigationGroup.WrapMode.Wrap:
+				case UINavigationGroup.WrapMode.WrapToNextLine:
 				case UINavigationGroup.WrapMode.Auto:
 					EditorGUI.PropertyField(position, property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)), new GUIContent());
 					break;
