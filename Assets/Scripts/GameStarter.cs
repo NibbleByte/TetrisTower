@@ -1,6 +1,5 @@
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.UIUtils;
-using Newtonsoft.Json;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
@@ -107,14 +106,14 @@ namespace TetrisTower.GameStarter
 					IPlaythroughData playthroughData = StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
 					string scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
 
-					if (playthroughData.TowerLevel != null) {
-						playthroughData.TowerLevel.BackgroundScene.ScenePath = scenePath;
+					if (playthroughData.ActiveTowerLevels.Any()) {
+						playthroughData.ActiveTowerLevels[0].BackgroundScene.ScenePath = scenePath;
 
 						playthroughData.SetupRandomGenerator(StartingRandomSeed, true);
 
 						// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
 						// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
-						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.TowerLevel, new Newtonsoft.Json.JsonSerializerSettings() {
+						TowerLevelDebugAPI.__DebugInitialTowerLevel = Newtonsoft.Json.JsonConvert.SerializeObject(playthroughData.ActiveTowerLevels[0], new Newtonsoft.Json.JsonSerializerSettings() {
 							Converters = Saves.SavesManager.GetConverters(GameConfig),
 							TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto,
 							//Formatting = Formatting.Indented,

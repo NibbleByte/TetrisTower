@@ -12,7 +12,8 @@ namespace TetrisTower.Game
 	[JsonObject(MemberSerialization.Fields)]
 	public interface IPlaythroughData
 	{
-		GridLevelData TowerLevel { get; }
+		// In case of multiplayer there can be multiple levels active at the same time.
+		IReadOnlyList<GridLevelData> ActiveTowerLevels { get; }
 
 		public BlocksSkinSet BlocksSet { get; }
 
@@ -23,7 +24,7 @@ namespace TetrisTower.Game
 
 		ILevelSupervisor PrepareSupervisor();
 
-		void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
+		GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 
 		void RetryLevel();
 		void QuitLevel();

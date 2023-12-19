@@ -28,8 +28,9 @@ namespace TetrisTower.WorldMap
 				MessageBox.Instance.ForceCloseAllMessages();
 			}
 
-			if (m_PlaythroughData.TowerLevel != null) {
-				CriticalError($"Starting {nameof(WorldMapLevelSupervisor)} with tower level {m_PlaythroughData.TowerLevel.BackgroundScene} in progress. This is not allowed.", true);
+			if (m_PlaythroughData.ActiveTowerLevels.Any()) {
+				CriticalError($"Starting {nameof(WorldMapLevelSupervisor)} with tower level {m_PlaythroughData.ActiveTowerLevels[0].BackgroundScene} in progress. This is not allowed.", true);
+				return;
 			}
 
 			SceneReference scene = Platforms.PlatformsUtils.IsMobileOrSimulator

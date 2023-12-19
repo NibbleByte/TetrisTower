@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: WorldPlaythroughTemplate
   m_EditorClassIdentifier: 
   m_PlayerData:
-    m_TowerLevel:
-      rid: -2
+    m_ActiveTowerLevels: []
     m_BlocksSet: {fileID: 0}
     RandomSeed: 0
     RandomInitialSeed: 0
@@ -23,6 +22,4 @@ MonoBehaviour:
     m_LevelsSet: {fileID: 11400000, guid: 4627b4debeed84d4681b87d1edc51827, type: 2}
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    RefIds: []

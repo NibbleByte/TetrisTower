@@ -23,9 +23,12 @@ namespace TetrisTower.TowerLevels
 		private IPlaythroughData m_PlaythroughData;
 		private SceneReference m_OverrideScene;
 
-		public TowerLevelSupervisor(IPlaythroughData playthroughData)
+		private int m_PlayersCount = 1;
+
+		public TowerLevelSupervisor(IPlaythroughData playthroughData, int playersCount = 1)
 		{
 			m_PlaythroughData = playthroughData;
+			m_PlayersCount = playersCount;
 		}
 
 		public void SetSceneOverride(SceneReference overrideScene)
@@ -41,20 +44,31 @@ namespace TetrisTower.TowerLevels
 				MessageBox.Instance.ForceCloseAllMessages();
 			}
 
-			if (m_PlaythroughData.TowerLevel == null) {
+			// Load levels + scenes per player. Scene index corresponds to the player index.
+			for (int playerIndex = 0; playerIndex < m_PlayersCount; playerIndex++) {
+				await LoadPlayerAsync(gameContext, playerIndex);
+			}
+		}
 
-				m_PlaythroughData.SetupCurrentTowerLevel(gameContext.GameConfig, m_OverrideScene);
+		public async Task LoadPlayerAsync(GameContext gameContext, int playerIndex)
+		{
+			GridLevelData levelData = playerIndex < m_PlaythroughData.ActiveTowerLevels.Count ? m_PlaythroughData.ActiveTowerLevels[playerIndex] : null;
 
-				if (m_PlaythroughData.TowerLevel == null) {
+			if (levelData == null) {
+				// Prepare data for each player (including single player).
+				// For multiplayer a special playthrough should be used that allows for multiple level setup calls.
+				levelData = m_PlaythroughData.SetupCurrentTowerLevel(gameContext.GameConfig, m_OverrideScene);
+
+				if (levelData == null) {
 					CriticalError($"No available level.", true);
 					return;
 				}
 
-				if (m_PlaythroughData.TowerLevel.BackgroundScene.IsEmpty) {
+				if (levelData.BackgroundScene.IsEmpty) {
 					Debug.LogError($"No appropriate scene found in current level! Setting dev one.");
-					m_PlaythroughData.TowerLevel.BackgroundScene = new SceneReference("Assets/Scenes/_DevTowerScene.unity");
+					levelData.BackgroundScene = new SceneReference("Assets/Scenes/_DevTowerScene.unity");
 
-					bool isValidFallback = SceneUtility.GetBuildIndexByScenePath(m_PlaythroughData.TowerLevel.BackgroundScene.ScenePath) >= 0;
+					bool isValidFallback = SceneUtility.GetBuildIndexByScenePath(levelData.BackgroundScene.ScenePath) >= 0;
 
 					CriticalError($"Current level did not have scene specified. Loading fallback.", !isValidFallback);
 
@@ -63,30 +77,44 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 
-			} else if (m_PlaythroughData.TowerLevel.BlocksSkinStack == null || m_PlaythroughData.TowerLevel.BlocksSkinStack.IsEmpty) {
+			// Debug level with preset data.
+			} else if (levelData.BlocksSkinStack == null || levelData.BlocksSkinStack.IsEmpty) {
 
 				// For debug saves, blocks may be missing. Fill them up with the defaults.
-				m_PlaythroughData.TowerLevel.BlocksSkinStack = new BlocksSkinStack(gameContext.GameConfig.DefaultBlocksSet, m_PlaythroughData.BlocksSet);
-				m_PlaythroughData.TowerLevel.BlocksSkinStack.Validate(gameContext.GameConfig.AssetsRepository, gameContext.GameConfig);
+				levelData.BlocksSkinStack = new BlocksSkinStack(gameContext.GameConfig.DefaultBlocksSet, m_PlaythroughData.BlocksSet);
+				levelData.BlocksSkinStack.Validate(gameContext.GameConfig.AssetsRepository, gameContext.GameConfig);
 			}
 
-			var backgroundScene = m_PlaythroughData.TowerLevel.BackgroundScene;
-			if (SceneManager.GetActiveScene().name != backgroundScene.SceneName) {
-				var loadOp = SceneManager.LoadSceneAsync(backgroundScene.ScenePath, LoadSceneMode.Single);
+
+			var backgroundScene = levelData.BackgroundScene;
+			if (SceneManager.GetActiveScene().name != backgroundScene.SceneName || playerIndex != 0) {
+				// Start by loading the first player scene with "Single" argument so it unloads the current one.
+				var loadOp = SceneManager.LoadSceneAsync(backgroundScene.ScenePath, playerIndex == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive);
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
+			// Translate each player objects so they don't collide.
+			if (playerIndex != 0) {
+				var roots = SceneManager.GetSceneAt(playerIndex).GetRootGameObjects();
+				foreach (GameObject root in roots) {
+					root.transform.position += Vector3.right * (playerIndex % 2) * 500f + Vector3.forward * (playerIndex / 2) * 500f;
+				}
+			}
+
+
 			List<Transform> restPoints;
 			Visuals.Effects.FairyMatchingController fairy;
+			Camera camera;
 
-			var levelController = GameObject.FindObjectOfType<GridLevelController>();
+			var levelController = FindObjectOfType<GridLevelController>(playerIndex);
 			if (levelController == null) {
-				var placeholder = GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag);
+				var placeholder = FindGameObjectWithTag(GameTags.TowerPlaceholderTag, playerIndex);
 				if (placeholder == null) {
 					throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load current level.");
 				}
 
 				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
+				SceneManager.MoveGameObjectToScene(levelController.gameObject, SceneManager.GetSceneAt(playerIndex));
 
 				Light overrideBlocksLight = placeholder.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 				if (overrideBlocksLight) {
@@ -95,13 +123,13 @@ namespace TetrisTower.TowerLevels
 					GameObject.DestroyImmediate(blocksLight.gameObject);
 				}
 
-
+				camera = levelController.GetComponentInChildren<Camera>();
 				var overrideCamera = placeholder.GetComponentInChildren<Camera>();
 				if (overrideCamera) {
 					// Move the parent object, since it's position is updated on changing screen orientation.
-					var camera = levelController.GetComponentInChildren<Camera>();
 					overrideCamera.transform.parent.SetParent(camera.transform.parent.parent, false);
 					GameObject.DestroyImmediate(camera.transform.parent.gameObject);
+					camera = overrideCamera;
 				}
 
 				Transform[] overrideDecors = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
@@ -165,11 +193,15 @@ namespace TetrisTower.TowerLevels
 
 				restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
 				fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
+
+				camera = levelController.GetComponentInChildren<Camera>();
 			}
 
-			SetupLights(levelController);
+			SetupLights(levelController, playerIndex);
 
-			var uiController = GameObject.FindObjectOfType<TowerLevelUIController>(true);
+			SetupCamera(camera, playerIndex);
+
+			var uiController = FindObjectOfType<TowerLevelUIController>(playerIndex);
 			if (uiController == null) {
 				GameObject[] uiPrefabs = Platforms.PlatformsUtils.IsMobileOrSimulator
 					? gameContext.GameConfig.UIPrefabsMobile
@@ -179,6 +211,8 @@ namespace TetrisTower.TowerLevels
 				foreach (GameObject prefab in uiPrefabs) {
 					var instance = GameObject.Instantiate<GameObject>(prefab);
 					instance.name = prefab.name;
+
+					SceneManager.MoveGameObjectToScene(instance.gameObject, SceneManager.GetSceneAt(playerIndex));
 
 					if (uiController == null) {
 						uiController = instance.GetComponent<TowerLevelUIController>();
@@ -204,11 +238,11 @@ namespace TetrisTower.TowerLevels
 
 				timing = playbackComponent.Timing;
 			} else {
-				int seed = m_PlaythroughData.TowerLevel.RandomInitialLevelSeed;
+				int seed = levelData.RandomInitialLevelSeed;
 				visualsRandom = new Xoshiro.PRNG32.XoShiRo128starstar(seed);
 
 				recordComponent = levelController.gameObject.AddComponent<LevelReplayRecorder>();
-				recordComponent.Recording.SaveInitialState(m_PlaythroughData.TowerLevel, gameContext.GameConfig, fairy, restPoints, seed);
+				recordComponent.Recording.SaveInitialState(levelData, gameContext.GameConfig, fairy, restPoints, seed);
 				recordComponent.Recording.GridLevelController = levelController;
 				recordComponent.Recording.Fairy = fairy;
 				recordComponent.enabled = false;
@@ -218,7 +252,7 @@ namespace TetrisTower.TowerLevels
 
 			uiController.SetIsReplayPlaying(playbackComponent != null);
 
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+			var behaviours = FindObjectsOfType<MonoBehaviour>(playerIndex);
 
 			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext,
@@ -226,7 +260,7 @@ namespace TetrisTower.TowerLevels
 				gameContext.PlayerControls,
 				gameContext.Options,
 				m_PlaythroughData,
-				m_PlaythroughData.TowerLevel,
+				levelData,
 				levelController,
 				uiController,
 				timing,
@@ -244,7 +278,7 @@ namespace TetrisTower.TowerLevels
 
 
 			// Init before others.
-			levelController.Init(m_PlaythroughData.TowerLevel, timing);
+			levelController.Init(levelData, timing);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
@@ -270,8 +304,7 @@ namespace TetrisTower.TowerLevels
 
 			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(playbackComponent ? new TowerReplayPlaybackState() : new TowerPlayState());
 
-			if (m_PlaythroughData.TowerLevel.IsPlaying) {
-				GridLevelData levelData = m_PlaythroughData.TowerLevel;
+			if (levelData.IsPlaying) {
 				// If save came with available matches, or pending actions, do them.
 				var pendingActions = GameGridEvaluation.Evaluate(levelData.Grid, levelData.Rules);
 				if (pendingActions.Count > 0) {
@@ -286,52 +319,110 @@ namespace TetrisTower.TowerLevels
 
 		public Task UnloadAsync()
 		{
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+			for (int playerIndex = 0; playerIndex < m_PlayersCount; ++playerIndex) {
 
-			var levelController = behaviours.OfType<GridLevelController>().First();
+				var behaviours = FindObjectsOfType<MonoBehaviour>(playerIndex);
 
-			foreach (Objective objective in levelController.LevelData.Objectives) {
-				objective.OnPreLevelUnloading();
-			}
+				var levelController = behaviours.OfType<GridLevelController>().First();
 
-			foreach (var behaviour in behaviours) {
-				var listener = behaviour as ILevelLoadedListener;
-				if (listener != null) {
-					listener.OnLevelUnloading();
+				foreach (Objective objective in levelController.LevelData.Objectives) {
+					objective.OnPreLevelUnloading();
 				}
 
-				// Skip DontDestroyOnLoads.
-				if (behaviour.gameObject.scene.buildIndex != -1) {
-					// Make sure no coroutines leak to the next level (in case target scene is the same, objects won't be reloaded).
-					behaviour.StopAllCoroutines();
+				foreach (var behaviour in behaviours) {
+					var listener = behaviour as ILevelLoadedListener;
+					if (listener != null) {
+						listener.OnLevelUnloading();
+					}
+
+					// Skip DontDestroyOnLoads.
+					if (behaviour.gameObject.scene.buildIndex != -1) {
+						// Make sure no coroutines leak to the next level (in case target scene is the same, objects won't be reloaded).
+						behaviour.StopAllCoroutines();
+					}
 				}
+
+				behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
+
+				GameObject.DestroyImmediate(levelController.GetComponent<LevelReplayRecorder>());
+				GameObject.DestroyImmediate(levelController.GetComponent<LevelReplayPlayback>());
 			}
-
-			behaviours.OfType<TowerConeVisualsController>().FirstOrDefault()?.Deinit();
-
-			GameObject.DestroyImmediate(levelController.GetComponent<LevelReplayRecorder>());
-			GameObject.DestroyImmediate(levelController.GetComponent<LevelReplayPlayback>());
 
 			return Task.CompletedTask;
 		}
 
-		private static void SetupLights(GridLevelController levelController)
+		private static T FindObjectOfType<T>(int playerIndex) where T : Component
+		{
+			return SceneManager.GetSceneAt(playerIndex)
+				.GetRootGameObjects()
+				.SelectMany(root => root.EnumerateComponentsInChildren<T>(true))
+				.FirstOrDefault();
+		}
+
+		private static T[] FindObjectsOfType<T>(int playerIndex) where T : Component
+		{
+			return SceneManager.GetSceneAt(playerIndex)
+				.GetRootGameObjects()
+				.SelectMany(root => root.EnumerateComponentsInChildren<T>(true))
+				.ToArray();
+		}
+
+		private static GameObject FindGameObjectWithTag(string tag, int playerIndex)
+		{
+			return SceneManager.GetSceneAt(playerIndex)
+				.GetRootGameObjects()
+				.SelectMany(root => root.EnumerateComponentsInChildren<Transform>(true))
+				.Where(t => t.CompareTag(tag))
+				.Select(t => t.gameObject)
+				.FirstOrDefault();
+		}
+
+		private static void SetupLights(GridLevelController levelController, int playerIndex)
 		{
 			var blocksLight = levelController.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 
 			if (blocksLight) {
 				blocksLight.cullingMask = GameLayers.BlocksMask;
 
-				var levelLights = GameObject.FindObjectsOfType<Light>();
+				var levelLights = FindObjectsOfType<Light>(playerIndex);
 				foreach(Light light in levelLights) {
 					if (light != blocksLight) {
 						light.cullingMask &= light.GetComponentInParent<Visuals.Effects.FairyMatchingController>()
 							? ~0 // Fairy lights up everything
 							: ~GameLayers.BlocksMask // Light environment without the blocks.
 							;
+
+						// Only one directional light allowed.
+						if (playerIndex != 0 && light.type == LightType.Directional) {
+							light.enabled = false;
+						}
 					}
 				}
 			}
+		}
+
+		private void SetupCamera(Camera camera, int playerIndex)
+		{
+			// Only one audio listener allowed.
+			if (playerIndex != 0) {
+				GameObject.DestroyImmediate(camera.GetComponentInChildren<AudioListener>(true));
+			}
+
+			Rect rect = m_PlayersCount switch {
+				// Full screen
+				1 => new Rect(0f, 0f, 1f, 1f),
+
+				// Side by side
+				2 => new Rect(playerIndex * (1f / m_PlayersCount), 0f, 1f / m_PlayersCount, 1f),
+				3 => new Rect(playerIndex * (1f / m_PlayersCount), 0f, 1f / m_PlayersCount, 1f),
+
+				// 4 corners
+				4 => new Rect((playerIndex % 2) * (2f / m_PlayersCount), ((3 - playerIndex) / 2) * (2f / m_PlayersCount), 2f / m_PlayersCount, 2f / m_PlayersCount),
+
+				_ => throw new NotSupportedException($"{m_PlayersCount} players not supported."),
+			};
+
+			camera.rect = rect;
 		}
 
 		private void CriticalError(string errorMessage, bool fallbackToHomescreen)

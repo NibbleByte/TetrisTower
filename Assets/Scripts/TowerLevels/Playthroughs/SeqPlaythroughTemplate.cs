@@ -16,7 +16,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	{
 		[SerializeField] private SeqPlaythroughData m_PlayerData;
 
-		public override bool HasActiveLevel => m_PlayerData.TowerLevel != null;
+		public override bool HasActiveLevel => m_PlayerData.ActiveTowerLevels.Any();
 
 		public override IPlaythroughData GeneratePlaythroughData(GameConfig config)
 		{
@@ -85,22 +85,22 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			#region Apply to Grid
 
-			m_PlayerData.TowerLevel.FallDistanceNormalized = 0;
-			m_PlayerData.TowerLevel.Grid = new BlocksGrid(blocks.GetLength(0), blocks.GetLength(1));
+			m_PlayerData.ActiveTowerLevels[0].FallDistanceNormalized = 0;
+			m_PlayerData.ActiveTowerLevels[0].Grid = new BlocksGrid(blocks.GetLength(0), blocks.GetLength(1));
 
-			for (int row = 0; row < m_PlayerData.TowerLevel.Grid.Rows; ++row) {
-				for (int column = 0; column < m_PlayerData.TowerLevel.Grid.Columns; ++column) {
+			for (int row = 0; row < m_PlayerData.ActiveTowerLevels[0].Grid.Rows; ++row) {
+				for (int column = 0; column < m_PlayerData.ActiveTowerLevels[0].Grid.Columns; ++column) {
 
 					BlockType blockType = blocks[row, column];
 
 					if (blockType == BlockType.None)
 						continue;
 
-					var coords = new GridCoords(m_PlayerData.TowerLevel.Grid.Rows - 1 - row, column);
+					var coords = new GridCoords(m_PlayerData.ActiveTowerLevels[0].Grid.Rows - 1 - row, column);
 					var placedShape = new BlocksShape() { ShapeCoords = new GridShape<BlockType>.ShapeBind[] { BlocksShape.Bind(new GridCoords(), blockType) } };
 					var action = new PlaceAction() { PlaceCoords = coords, PlacedShape = placedShape };
 
-					var enumerator = m_PlayerData.TowerLevel.Grid.ApplyActions(new PlaceAction[] { action });
+					var enumerator = m_PlayerData.ActiveTowerLevels[0].Grid.ApplyActions(new PlaceAction[] { action });
 					while (enumerator.MoveNext()) {
 						var enumerator2 = enumerator.Current as IEnumerator;
 						if (enumerator2 != null) {
@@ -116,7 +116,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[ContextMenu("Stack up!")]
 		void StackUp()
 		{
-			BlockSkin[] blocksPool = m_PlayerData.TowerLevel.NormalBlocksSkins;
+			BlockSkin[] blocksPool = m_PlayerData.ActiveTowerLevels[0].NormalBlocksSkins;
 			if (blocksPool == null || blocksPool.Length == 0) {
 				GameConfig gameConfig = GameConfig.FindDefaultConfig();
 
@@ -128,10 +128,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				blocksPool = gameConfig.DefaultBlocksSet.BlockSkins.ToArray();
 			}
 
-			for (int row = 0; row < m_PlayerData.TowerLevel.Grid.Rows; ++row) {
-				for(int column = 0; column < m_PlayerData.TowerLevel.Grid.Columns; ++column) {
+			for (int row = 0; row < m_PlayerData.ActiveTowerLevels[0].Grid.Rows; ++row) {
+				for(int column = 0; column < m_PlayerData.ActiveTowerLevels[0].Grid.Columns; ++column) {
 
-					var blockType = row < m_PlayerData.TowerLevel.Grid.Rows - 3
+					var blockType = row < m_PlayerData.ActiveTowerLevels[0].Grid.Rows - 3
 						? blocksPool[(column + row % 2) % blocksPool.Length].BlockType
 						: BlockType.None
 						;
@@ -140,7 +140,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 					var placedShape = new BlocksShape() { ShapeCoords = new GridShape<BlockType>.ShapeBind[] { BlocksShape.Bind(new GridCoords(), blockType) } };
 					var action = new PlaceAction() { PlaceCoords = coords, PlacedShape = placedShape };
 
-					var enumerator = m_PlayerData.TowerLevel.Grid.ApplyActions(new PlaceAction[] { action });
+					var enumerator = m_PlayerData.ActiveTowerLevels[0].Grid.ApplyActions(new PlaceAction[] { action });
 					while (enumerator.MoveNext()) {
 						var enumerator2 = enumerator.Current as IEnumerator;
 						if (enumerator2 != null) {

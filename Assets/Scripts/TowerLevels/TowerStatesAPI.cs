@@ -2,6 +2,7 @@ using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
 using System;
+using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Playthroughs;
@@ -82,7 +83,7 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
-			Debug.Assert(playthroughData.TowerLevel != null);
+			Debug.Assert(playthroughData.ActiveTowerLevels.Any());
 
 			playthroughData.RetryLevel();
 		}
@@ -104,9 +105,9 @@ namespace TetrisTower.TowerLevels
 		{
 			TowerLevelDebugAPI.__DebugInitialTowerLevel = string.Empty;
 
-			Debug.Assert(playthroughData.TowerLevel != null);
+			Debug.Assert(playthroughData.ActiveTowerLevels.Any());
 
-			if (!playthroughData.TowerLevel.HasWon) {
+			if (!playthroughData.ActiveTowerLevels.Any(ld => ld.HasWon)) {
 				Debug.LogError($"Trying to start the next level, while the player hasn't won the current one. Abort.");
 				return false;
 			}
@@ -118,7 +119,7 @@ namespace TetrisTower.TowerLevels
 
 		public void ReplayLevel()
 		{
-			if (m_PlaythroughData.TowerLevel == null) {
+			if (m_PlaythroughData.ActiveTowerLevels.Count == 0) {
 				Debug.LogError($"Trying to replay level that isn't started.");
 				return;
 			}
@@ -135,7 +136,7 @@ namespace TetrisTower.TowerLevels
 				nextPlaythroughData = new ReplayPlaythroughData(recording, m_PlaythroughData);
 			}
 
-			if (!m_PlaythroughData.TowerLevel.IsPlaying && m_PlaythroughData.TowerLevel.HasWon) {
+			if (!m_PlaythroughData.ActiveTowerLevels.Any(ld => ld.IsPlaying) && m_PlaythroughData.ActiveTowerLevels.Any(ld => ld.HasWon)) {
 				GoToNextLevelApply(m_PlaythroughData);
 			} else {
 				RetryLevelApply(m_PlaythroughData);
@@ -154,7 +155,7 @@ namespace TetrisTower.TowerLevels
 				recording = PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 			}
 
-			Saves.SavesManager.SaveReplay($"{DateTime.Now:yyyyMMdd_HHmmss} {m_PlaythroughData.TowerLevel.BackgroundScene.SceneName}", recording, m_Config);
+			Saves.SavesManager.SaveReplay($"{DateTime.Now:yyyyMMdd_HHmmss} {m_PlaythroughData.ActiveTowerLevels[0].BackgroundScene.SceneName}", recording, m_Config);
 		}
 	}
 }

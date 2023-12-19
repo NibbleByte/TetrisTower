@@ -14,8 +14,11 @@ namespace TetrisTower.Core
 			string guid;
 			long localId;
 			UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(this, out guid, out localId);
-			if (SEID != guid) {
-				SEID = guid;
+			bool isSubAsset = UnityEditor.AssetDatabase.IsSubAsset(this);
+			string actualSEID = isSubAsset ? $"{guid}|{localId}" : guid;
+
+			if (SEID != actualSEID) {
+				SEID = actualSEID;
 				UnityEditor.EditorUtility.SetDirty(this);
 			}
 		}

@@ -2,6 +2,7 @@ using DevLocker.GFrame;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
@@ -18,9 +19,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	public abstract class PlaythroughDataBase : IPlaythroughData
 	{
 		[SerializeReference]
-		[FormerlySerializedAs("TowerLevel")]
-		protected GridLevelData m_TowerLevel;
-		public GridLevelData TowerLevel => m_TowerLevel;
+		protected List<GridLevelData> m_ActiveTowerLevels = new List<GridLevelData>();
+		public IReadOnlyList<GridLevelData> ActiveTowerLevels => m_ActiveTowerLevels;
 
 
 
@@ -39,52 +39,55 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 
 		public int ScoreOnLevelStart = 0;
-		public int TotalScore => ScoreOnLevelStart + (m_TowerLevel?.Score.Score ?? 0);
+		public int TotalScore => ScoreOnLevelStart + (m_ActiveTowerLevels.FirstOrDefault()?.Score.Score ?? 0);
 
 		public float PlayTimeOnLevelStart = 0f;
-		public float TotalPlayTime => PlayTimeOnLevelStart + (m_TowerLevel?.PlayTime ?? 0);
+		public float TotalPlayTime => PlayTimeOnLevelStart + (m_ActiveTowerLevels.FirstOrDefault()?.PlayTime ?? 0);
 
 		public abstract bool IsFinalLevel { get; }
 		public abstract bool HaveFinishedLevels { get; }
 
 		public abstract ILevelSupervisor PrepareSupervisor();
 
-		public abstract void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
+		public abstract GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 
 		public void ReplaceCurrentLevel(GridLevelData levelData)
 		{
 			Debug.Log($"Replacing current level with {levelData?.BackgroundScene?.ScenePath}");
-			m_TowerLevel = levelData;
+			m_ActiveTowerLevels.Clear();
+			m_ActiveTowerLevels.Add(levelData);
 		}
 
 		public virtual void RetryLevel()
 		{
-			if (m_TowerLevel == null)
+			if (m_ActiveTowerLevels.Count == 0)
 				throw new InvalidOperationException($"Trying to retry a level when no level is in progress.");
 
-			m_TowerLevel = null;
+			m_ActiveTowerLevels.Clear();
 		}
 
 		public virtual void QuitLevel()
 		{
-			if (m_TowerLevel == null)
+			if (m_ActiveTowerLevels.Count == 0)
 				throw new InvalidOperationException($"Trying to quit a level when no level is in progress.");
 
-			m_TowerLevel = null;
+			m_ActiveTowerLevels.Clear();
 		}
 
 		public virtual void FinishLevel()
 		{
-			if (m_TowerLevel == null || m_TowerLevel.IsPlaying || !m_TowerLevel.HasWon)
+			if (m_ActiveTowerLevels.Count == 0 || m_ActiveTowerLevels[0].IsPlaying || !m_ActiveTowerLevels[0].HasWon)
 				throw new InvalidOperationException($"Trying to finish level while it hasn't been won.");
 
 			// NOTE: This may be done earlier to show the score to the user. In that case, this should do nothing.
-			m_TowerLevel.Score.ConsumeBonusScore();
+			foreach(GridLevelData levelData in m_ActiveTowerLevels) {
+				levelData.Score.ConsumeBonusScore();
+			}
 
-			ScoreOnLevelStart += m_TowerLevel.Score.Score;
-			PlayTimeOnLevelStart += m_TowerLevel.PlayTime;
+			ScoreOnLevelStart += m_ActiveTowerLevels[0].Score.Score;
+			PlayTimeOnLevelStart += m_ActiveTowerLevels[0].PlayTime;
 
-			m_TowerLevel = null;
+			m_ActiveTowerLevels.Clear();
 		}
 
 		public void SetupRandomGenerator(int seed = 0, bool resetCurrentLevelRandom = false)
@@ -98,8 +101,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			Random = new Xoshiro.PRNG32.XoShiRo128starstar(RandomInitialSeed);
 
 			if (resetCurrentLevelRandom) {
-				TowerLevel.RandomInitialLevelSeed = Random.Next();
-				TowerLevel.Random = new Xoshiro.PRNG32.XoShiRo128starstar(TowerLevel.RandomInitialLevelSeed);
+				foreach(GridLevelData levelData in m_ActiveTowerLevels) {
+					levelData.RandomInitialLevelSeed = Random.Next();
+					levelData.Random = new Xoshiro.PRNG32.XoShiRo128starstar(levelData.RandomInitialLevelSeed);
+				}
 			}
 		}
 
@@ -162,8 +167,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public virtual void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
-			if (m_TowerLevel != null) {
-				m_TowerLevel.Validate(repo, context);
+			foreach(GridLevelData levelData in m_ActiveTowerLevels) {
+				if (levelData != null) {
+					levelData.Validate(repo, context);
+				}
 			}
 
 			if (m_BlocksSet) {

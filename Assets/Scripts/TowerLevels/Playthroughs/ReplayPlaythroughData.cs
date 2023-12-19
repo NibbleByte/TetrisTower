@@ -39,9 +39,12 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				: m_ReturnPlaythrough?.PrepareSupervisor() ?? new HomeScreen.HomeScreenLevelSupervisor();
 		}
 
-		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
+		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
-			m_TowerLevel = Saves.SavesManager.Deserialize<GridLevelData>(m_PlaybackRecording.InitialState, gameConfig);
+			m_ActiveTowerLevels.Clear();
+			m_ActiveTowerLevels.Add(Saves.SavesManager.Deserialize<GridLevelData>(m_PlaybackRecording.InitialState, gameConfig));
+
+			return m_ActiveTowerLevels[0];
 		}
 
 		public ReplayRecording GetReplayRecording(GridLevelController controller, Visuals.Effects.FairyMatchingController fairy)

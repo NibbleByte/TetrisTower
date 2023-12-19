@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
+using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -39,12 +40,12 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return new TowerLevelSupervisor(this);
 		}
 
-		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
+		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
 			if (CurrentLevelIndex >= Levels.Length) {
 				Debug.LogError($"Current level {CurrentLevelIndex} is out of range {Levels.Length}. Abort!");
-				m_TowerLevel = null;
-				return;
+				m_ActiveTowerLevels.Clear();
+				return null;
 			}
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -57,13 +58,16 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			}
 #endif
 
-			m_TowerLevel = GenerateTowerLevelData(gameConfig, Levels[CurrentLevelIndex]);
+			m_ActiveTowerLevels.Clear();
+			m_ActiveTowerLevels.Add(GenerateTowerLevelData(gameConfig, Levels[CurrentLevelIndex]));
 
 			if (overrideScene != null) {
-				TowerLevel.BackgroundScene = overrideScene;
+				m_ActiveTowerLevels[0].BackgroundScene = overrideScene;
 			}
 
-			Debug.Log($"Setup current level {CurrentLevelIndex} - \"{m_TowerLevel.BackgroundScene?.ScenePath}\".");
+			Debug.Log($"Setup current level {CurrentLevelIndex} - \"{m_ActiveTowerLevels[0].BackgroundScene?.ScenePath}\".");
+
+			return m_ActiveTowerLevels[0];
 		}
 
 		public override void FinishLevel()

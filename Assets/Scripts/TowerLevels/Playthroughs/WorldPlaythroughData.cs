@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
+using TetrisTower.Logic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace TetrisTower.TowerLevels.Playthroughs
 {
@@ -87,7 +87,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{
-			return TowerLevel == null && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
+			return ActiveTowerLevels.Count == 0 && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
 		}
 
 		/// <summary>
@@ -119,21 +119,24 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			Debug.Log($"Setting current level to {m_CurrentLevelID}");
 		}
 
-		public override void SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
+		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
 			if (string.IsNullOrWhiteSpace(m_CurrentLevelID) || m_LevelsSet.GetLevelData(m_CurrentLevelID) == null) {
 				Debug.LogError($"Current level \"{m_CurrentLevelID}\" is invalid. Abort!");
-				m_TowerLevel = null;
-				return;
+				m_ActiveTowerLevels.Clear();
+				return null;
 			}
 
-			m_TowerLevel = GenerateTowerLevelData(gameConfig, m_LevelsSet.GetLevelData(m_CurrentLevelID));
+			m_ActiveTowerLevels.Clear();
+			m_ActiveTowerLevels.Add(GenerateTowerLevelData(gameConfig, m_LevelsSet.GetLevelData(m_CurrentLevelID)));
 
 			if (overrideScene != null) {
-				TowerLevel.BackgroundScene = overrideScene;
+				m_ActiveTowerLevels[0].BackgroundScene = overrideScene;
 			}
 
-			Debug.Log($"Setup current level {m_CurrentLevelID} - \"{m_TowerLevel.BackgroundScene?.ScenePath}\".");
+			Debug.Log($"Setup current level {m_CurrentLevelID} - \"{m_ActiveTowerLevels[0].BackgroundScene?.ScenePath}\".");
+
+			return m_ActiveTowerLevels[0];
 		}
 
 		public override void QuitLevel()
@@ -149,9 +152,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			ref WorldLevelAccomplishment accomplishment = ref m_Accomplishments[index];
 
-			accomplishment.HighestScore = Mathf.Max(accomplishment.HighestScore, m_TowerLevel.Score.Score);
-			accomplishment.MostClearedBlocks = Mathf.Max(accomplishment.MostClearedBlocks, m_TowerLevel.Score.TotalClearedBlocksCount);
-			accomplishment.BestBonusRatio = Mathf.Max(accomplishment.BestBonusRatio, m_TowerLevel.Score.BonusRatio);
+			accomplishment.HighestScore = Mathf.Max(accomplishment.HighestScore, m_ActiveTowerLevels[0].Score.Score);
+			accomplishment.MostClearedBlocks = Mathf.Max(accomplishment.MostClearedBlocks, m_ActiveTowerLevels[0].Score.TotalClearedBlocksCount);
+			accomplishment.BestBonusRatio = Mathf.Max(accomplishment.BestBonusRatio, m_ActiveTowerLevels[0].Score.BonusRatio);
 
 			accomplishment.State = WorldLocationState.Completed; // TODO: this should be based on the objective.
 

@@ -30,8 +30,8 @@ namespace TetrisTower.Core
 			=> UnityEditor.AssetDatabase.FindAssets($"t:{typeof(SerializableAsset).Name}")
 				.Distinct()
 				.Select(UnityEditor.AssetDatabase.GUIDToAssetPath)
-				.Select(UnityEditor.AssetDatabase.LoadAssetAtPath<SerializableAsset>)
-				.OrderBy(sa => sa.GetType().Name)
+				.SelectMany(path => UnityEditor.AssetDatabase.LoadAllAssetsAtPath(path).OfType<SerializableAsset>())
+				.OrderBy(sa => sa.GetType().Name + sa.name)
 				.ToArray()
 			;
 #endif

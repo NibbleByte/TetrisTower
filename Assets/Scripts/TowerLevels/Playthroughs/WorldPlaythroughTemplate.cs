@@ -15,7 +15,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	{
 		[SerializeField] private WorldPlaythroughData m_PlayerData;
 
-		public override bool HasActiveLevel => m_PlayerData.TowerLevel != null;
+		public override bool HasActiveLevel => m_PlayerData.ActiveTowerLevels.Any();
 
 		public override IPlaythroughData GeneratePlaythroughData(GameConfig config)
 		{
