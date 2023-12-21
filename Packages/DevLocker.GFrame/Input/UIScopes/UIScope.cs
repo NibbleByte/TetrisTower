@@ -376,11 +376,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			} else {
 
-				// Normal scopes can't steal focus from ModalRoots.
-				UIScope modalActiveScope = m_PlayerSet.ActiveScopes.FirstOrDefault(s => s.Type == ScopeType.ModalRoot);
-				if (Type != ScopeType.ModalRoot && modalActiveScope && !transform.IsChildOf(modalActiveScope.transform))
-					return;
-
 				// OnEnabled() order of execution is undefined - sometimes parent invoked first, sometimes the children.
 				// Ensure that collections don't have any duplicates and are filled in the right order - parent to child.
 				UIScope[] nextScopes = CollectScopes(this);
@@ -393,6 +388,11 @@ namespace DevLocker.GFrame.Input.UIScope
 						m_PlayerSet.RegisteredScopes.Add(scope);
 					}
 				}
+
+				// Normal scopes can't steal focus from ModalRoots.
+				UIScope modalActiveScope = m_PlayerSet.ActiveScopes.FirstOrDefault(s => s.Type == ScopeType.ModalRoot);
+				if (Type != ScopeType.ModalRoot && modalActiveScope && !transform.IsChildOf(modalActiveScope.transform))
+					return;
 
 				UIScope lastActive = m_PlayerSet.ActiveScopes.LastOrDefault();
 
@@ -670,7 +670,8 @@ namespace DevLocker.GFrame.Input.UIScope
 		/// <summary>
 		/// Get the scope that would be focused when onfocusing this one with the provided policy.
 		/// </summary>
-		public UIScope GetScopeOnUnfocus(UnfocusPolicy unfocusPolicy)
+		/// <param name="fallbackToAny">In case the policy doesn't yield a scope, should it fallback to any other scope.</param>
+		public UIScope GetScopeOnUnfocus(UnfocusPolicy unfocusPolicy, bool fallbackToAny = true)
 		{
 			UIScope nextScope = null;
 
@@ -686,12 +687,31 @@ namespace DevLocker.GFrame.Input.UIScope
 
 						scopeTransform = scopeTransform.parent;
 					}
+
+					if (nextScope == null) {
+						// No parent scope - find any - don't leave us hanging...
+						if (fallbackToAny) {
+							nextScope = GetScopeOnUnfocus(UnfocusPolicy.FocusPreviousScope, false)
+										?? GetScopeOnUnfocus(UnfocusPolicy.FocusScopeWithHighestDepth, false)
+										;
+						}
+					}
+
 					break;
 
 				case UnfocusPolicy.FocusPreviousScope:
 					nextScope = m_LastFocusedScope;
-					if (nextScope == null)
+					if (nextScope == null) {
+						// No last scope - find any - don't leave us hanging...
+						// Example: scope1 enabled, scope2 enabled, scope1 disabled - no last scope, but active one does exist.
+						if (fallbackToAny) {
+							nextScope = GetScopeOnUnfocus(UnfocusPolicy.FocusParentScope, false)
+										?? GetScopeOnUnfocus(UnfocusPolicy.FocusScopeWithHighestDepth, false)
+										;
+						}
+
 						break;
+					}
 
 					var visitedScopes = new HashSet<UIScope>() { nextScope };
 
@@ -714,6 +734,17 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				case UnfocusPolicy.FocusFirstEnabledScopeFromList:
 					nextScope = OnDisableScopes.FirstOrDefault(s => s.isActiveAndEnabled);
+
+					if (nextScope == null) {
+						// No enabled scope - find any - don't leave us hanging...
+						if (fallbackToAny) {
+							nextScope = GetScopeOnUnfocus(UnfocusPolicy.FocusParentScope, false)
+										?? GetScopeOnUnfocus(UnfocusPolicy.FocusPreviousScope, false)
+										?? GetScopeOnUnfocus(UnfocusPolicy.FocusScopeWithHighestDepth, false)
+										;
+						}
+					}
+
 					break;
 
 				case UnfocusPolicy.EmptyFocus:
