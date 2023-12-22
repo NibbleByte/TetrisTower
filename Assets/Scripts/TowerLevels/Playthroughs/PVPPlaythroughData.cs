@@ -32,8 +32,6 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public override bool IsFinalLevel => true;
 		public override bool HaveFinishedLevels => true;
 
-		private List<GridLevelData> m_TowerLevels = new List<GridLevelData>();
-
 		public override ILevelSupervisor PrepareSupervisor()
 		{
 			return new TowerLevelSupervisor(this, PlayersCount);
@@ -54,7 +52,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			Debug.Log($"Setup current level {m_LevelAsset.name} - \"{levelData.BackgroundScene?.ScenePath}\".");
 
-			m_TowerLevels.Add(levelData);
+			m_ActiveTowerLevels.Add(levelData);
 
 			return levelData;
 		}
