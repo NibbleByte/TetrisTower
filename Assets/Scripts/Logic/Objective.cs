@@ -50,7 +50,7 @@ namespace TetrisTower.Logic
 		public MultiObjectivesPresenter(IEnumerable<ObjectivesPresenter> presenters) => Presenters.AddRange(presenters);
 
 		public string GreetingMessage {
-			get => Presenters.FirstOrDefault()?.GreetingMessage;	// All presenters should have the same message.
+			get => Presenters.FirstOrDefault()?.GreetingMessage ?? "";	// All presenters should have the same message.
 			set {
 				foreach(var presenter in Presenters) {
 					presenter.GreetingMessage = value;

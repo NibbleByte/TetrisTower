@@ -13,6 +13,7 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerLostState : IPlayerState, PlayerControls.ICommonHotkeysActions
 	{
+		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private GridLevelController m_LevelController;
 		private TowerLevelUIController m_UIController;
@@ -26,8 +27,9 @@ namespace TetrisTower.TowerLevels
 
 		public void EnterState(PlayerStatesContext context)
 		{
-			context.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerContext);
 			context.SetByType(out m_PlayerControls);
+			context.SetByType(out m_UIController);
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_VisualsGrid);
 			context.SetByType(out m_VisualsController);
@@ -47,7 +49,7 @@ namespace TetrisTower.TowerLevels
 
 			var lostAnimations = context.TryFindByType<ILostAnimationExecutor[]>();
 			if (lostAnimations == null || lostAnimations.Length == 0) {
-				GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+				m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 			}
 
 			int totalChance = lostAnimations.Sum(la => la.Chance);
@@ -87,7 +89,7 @@ namespace TetrisTower.TowerLevels
 				m_CurrentAnimation.Interrupt();
 			}
 
-			GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+			m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 		}
 
 		private IEnumerator LostAnimationCoroutine()
@@ -110,7 +112,7 @@ namespace TetrisTower.TowerLevels
 			if (m_Interrupted)
 				yield break;
 
-			GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+			m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 		}
 
 		public void OnBack(InputAction.CallbackContext context)

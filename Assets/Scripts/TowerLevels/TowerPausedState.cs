@@ -8,6 +8,8 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerPausedState : IPlayerState, PlayerControls.ITowerLevelPausedActions
 	{
+		private IPlaythroughData m_PlaythroughData;
+		private IPlayerContext m_PlayerContext;
 		private GridLevelController m_LevelController;
 		private PlayerControls m_PlayerControls;
 		private TowerLevelUIController m_UIController;
@@ -15,6 +17,8 @@ namespace TetrisTower.TowerLevels
 
 		public void EnterState(PlayerStatesContext context)
 		{
+			context.SetByType(out m_PlaythroughData);
+			context.SetByType(out m_PlayerContext);
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_UIController);
@@ -26,8 +30,7 @@ namespace TetrisTower.TowerLevels
 
 			m_UIController.SwitchState(TowerLevelUIState.Paused);
 
-
-			m_LevelController.PauseLevel();
+			m_PlaythroughData.PausePlayers(playerWithInputPreserved: m_PlayerContext);
 
 			// On replay playback, this will be null.
 			if (m_ReplayRecording != null) {
@@ -37,7 +40,7 @@ namespace TetrisTower.TowerLevels
 
 		public void ExitState()
 		{
-			m_LevelController.ResumeLevel();
+			m_PlaythroughData.ResumePlayers();
 
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(null);
 			m_PlayerControls.DisableAll(this);

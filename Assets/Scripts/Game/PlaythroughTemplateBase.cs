@@ -1,9 +1,8 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using DevLocker.Utils;
 using Newtonsoft.Json;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TetrisTower.Logic;
 using UnityEngine;
 
@@ -15,6 +14,8 @@ namespace TetrisTower.Game
 		// In case of multiplayer there can be multiple levels active at the same time.
 		IReadOnlyList<GridLevelData> ActiveTowerLevels { get; }
 
+		IEnumerable<PlaythroughPlayer> ActivePlayers { get; }
+
 		public BlocksSkinSet BlocksSet { get; }
 
 		public bool HaveFinishedLevels { get; }
@@ -23,6 +24,10 @@ namespace TetrisTower.Game
 		public int TotalScore { get; }
 
 		ILevelSupervisor PrepareSupervisor();
+
+		void AssignPlayer(PlaythroughPlayer player, GridLevelData levelData);
+		void PausePlayers(IPlayerContext playerWithInputPreserved);
+		void ResumePlayers();
 
 		GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 

@@ -14,6 +14,7 @@ using TetrisTower.TowerLevels.Replays;
 using TetrisTower.TowerUI;
 using TetrisTower.Visuals;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 namespace TetrisTower.TowerLevels
@@ -87,7 +88,7 @@ namespace TetrisTower.TowerLevels
 
 
 			var backgroundScene = levelData.BackgroundScene;
-			if (SceneManager.GetActiveScene().name != backgroundScene.SceneName || playerIndex != 0) {
+			if (SceneManager.GetActiveScene().name != backgroundScene.SceneName || playerIndex != 0 || SceneManager.sceneCount > 1) {
 				// Start by loading the first player scene with "Single" argument so it unloads the current one.
 				var loadOp = SceneManager.LoadSceneAsync(backgroundScene.ScenePath, playerIndex == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive);
 				while (!loadOp.isDone) await Task.Yield();
@@ -252,9 +253,24 @@ namespace TetrisTower.TowerLevels
 
 			uiController.SetIsReplayPlaying(playbackComponent != null);
 
+			//
+			// Setup Input
+			//
+			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
+			var playthroughPlayer = PlaythroughPlayer.Create(gameContext.GameConfig, levelController, camera, uiController.gameObject);
+			m_PlaythroughData.AssignPlayer(playthroughPlayer, levelData);
+
+			// Suppress global input.
+			//PlayerContextUIRootObject.GlobalPlayerContext.EventSystem.gameObject.SetActive(false);
+			playthroughPlayer.EventSystem.gameObject.SetActive(false);	// HACK: force the navigation to work, damn it!
+			playthroughPlayer.EventSystem.gameObject.SetActive(true);
+
+			//
+			// Setup Player Context
+			//
 			var behaviours = FindObjectsOfType<MonoBehaviour>(playerIndex);
 
-			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
+			playerContext.CreatePlayerStack(
 				gameContext,
 				gameContext.GameConfig,
 				gameContext.PlayerControls,
@@ -281,18 +297,18 @@ namespace TetrisTower.TowerLevels
 			levelController.Init(levelData, timing);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
-				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+				await listener.OnLevelLoadingAsync(playerContext.StatesStack.Context);
 			}
 
 			// Other visuals depend on this, so init it first.
-			behaviours.OfType<TowerConeVisualsController>().First().Init(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context, visualsRandom);
+			behaviours.OfType<TowerConeVisualsController>().First().Init(playerContext.StatesStack.Context, visualsRandom);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
-				listener.OnLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+				listener.OnLevelLoaded(playerContext.StatesStack.Context);
 			}
 
 			foreach(var objective in levelController.LevelData.Objectives) {
-				objective.OnPostLevelLoaded(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
+				objective.OnPostLevelLoaded(playerContext.StatesStack.Context);
 			}
 
 
@@ -302,7 +318,7 @@ namespace TetrisTower.TowerLevels
 				recordComponent.enabled = true;
 			}
 
-			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(playbackComponent ? new TowerReplayPlaybackState() : new TowerPlayState());
+			playerContext.StatesStack.SetState(playbackComponent ? new TowerReplayPlaybackState() : new TowerPlayState());
 
 			if (levelData.IsPlaying) {
 				// If save came with available matches, or pending actions, do them.
@@ -319,6 +335,14 @@ namespace TetrisTower.TowerLevels
 
 		public Task UnloadAsync()
 		{
+			foreach(var player in m_PlaythroughData.ActivePlayers) {
+				player.EventSystem.gameObject.SetActive(false);
+			}
+
+			// Restore the global input.
+			PlayerContextUIRootObject.GlobalPlayerContext.EventSystem.gameObject.SetActive(true);
+
+
 			for (int playerIndex = 0; playerIndex < m_PlayersCount; ++playerIndex) {
 
 				var behaviours = FindObjectsOfType<MonoBehaviour>(playerIndex);

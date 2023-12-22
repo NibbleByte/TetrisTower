@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,6 +80,7 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// Bool set by YOUR level manager to true if it is loading and vice-versa.
 		/// Scripts can use this to suppress input or similar while loading.
 		/// </summary>
+		[NonSerialized]
 		public bool IsLevelLoading = true;
 
 		/// <summary>

@@ -12,6 +12,7 @@ namespace TetrisTower.TowerLevels
 	public class TowerWonState : IPlayerState, PlayerControls.ICommonHotkeysActions, IUpdateListener
 	{
 		private GameConfig m_GameConfig;
+		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private TowerLevelUIController m_UIController;
 		private GridLevelController m_LevelController;
@@ -28,8 +29,9 @@ namespace TetrisTower.TowerLevels
 		public void EnterState(PlayerStatesContext context)
 		{
 			context.SetByType(out m_GameConfig);
-			context.SetByType(out m_UIController);
+			context.SetByType(out m_PlayerContext);
 			context.SetByType(out m_PlayerControls);
+			context.SetByType(out m_UIController);
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_FlashMessage);
 
@@ -68,7 +70,7 @@ namespace TetrisTower.TowerLevels
 				return;
 
 			InterruptAnimation();
-			GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+			m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 		}
 
 		public void OnBack(InputAction.CallbackContext context)
@@ -134,7 +136,7 @@ namespace TetrisTower.TowerLevels
 		{
 			if (!float.IsNaN(m_BonusFillUpTime)) {
 				if (m_BonusFillUpTime + 2f < Time.time) {
-					GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+					m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 				}
 
 				return;

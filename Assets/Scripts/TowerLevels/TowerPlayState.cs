@@ -9,11 +9,14 @@ using UnityEngine.InputSystem;
 using DevLocker.GFrame.Input;
 using TetrisTower.TowerUI;
 using TetrisTower.TowerLevels.Replays;
+using System.Linq;
 
 namespace TetrisTower.TowerLevels
 {
 	public class TowerPlayState : IPlayerState, IUpdateListener, PlayerControls.ITowerLevelPlayActions
 	{
+		private IPlaythroughData m_PlaythroughData;
+		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private GameConfig m_GameConfig;
 		private PlayerOptions m_Options;
@@ -32,6 +35,8 @@ namespace TetrisTower.TowerLevels
 
 		public void EnterState(PlayerStatesContext context)
 		{
+			context.SetByType(out m_PlaythroughData);
+			context.SetByType(out m_PlayerContext);
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_UIController);
@@ -65,13 +70,14 @@ namespace TetrisTower.TowerLevels
 
 		private void PauseLevel()
 		{
-			m_LevelController.PauseLevel();
+			m_PlaythroughData.PausePlayers(playerWithInputPreserved: m_PlayerContext);
+
 			m_ReplayRecording.AddAndRun(ReplayActionType.Pause);
 		}
 
 		private void ResumeLevel()
 		{
-			m_LevelController.ResumeLevel();
+			m_PlaythroughData.ResumePlayers();
 		}
 
 		public void OnMoveShapeLeft(InputAction.CallbackContext context)
@@ -212,7 +218,7 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_LevelController.LevelData != null && !m_LevelController.LevelData.IsPlaying) {
 				// Check for this in Update, rather than the event, in case the level finished while in another state.
-				GameManager.Instance.PushGlobalState(m_LevelController.LevelData.HasWon ? new TowerWonState() : new TowerLostState());
+				m_PlayerContext.StatesStack.SetState(m_LevelController.LevelData.HasWon ? new TowerWonState() : new TowerLostState());
 				return;
 			}
 

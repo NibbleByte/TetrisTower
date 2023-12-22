@@ -11,6 +11,8 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerReplayPlaybackState : IPlayerState, IUpdateListener
 	{
+		private IPlaythroughData m_PlaythroughData;
+		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private IInputContext m_InputContext;
 		private GridLevelController m_LevelController;
@@ -19,6 +21,8 @@ namespace TetrisTower.TowerLevels
 
 		public void EnterState(PlayerStatesContext context)
 		{
+			context.SetByType(out m_PlaythroughData);
+			context.SetByType(out m_PlayerContext);
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_UIController);
@@ -54,19 +58,19 @@ namespace TetrisTower.TowerLevels
 
 		private void PauseLevel()
 		{
-			m_LevelController.PauseLevel();
+			m_PlaythroughData.PausePlayers(playerWithInputPreserved: m_PlayerContext);
 		}
 
 		private void ResumeLevel()
 		{
-			m_LevelController.ResumeLevel();
+			m_PlaythroughData.ResumePlayers();
 		}
 
 		public void Update()
 		{
 			if (m_LevelController.LevelData != null && !m_LevelController.LevelData.IsPlaying) {
 				// Check for this in Update, rather than the event, in case the level finished while in another state.
-				GameManager.Instance.PushGlobalState(m_LevelController.LevelData.HasWon ? new TowerWonState() : new TowerLostState());
+				m_PlayerContext.StatesStack.SetState(m_LevelController.LevelData.HasWon ? new TowerWonState() : new TowerLostState());
 				return;
 			}
 
@@ -78,12 +82,12 @@ namespace TetrisTower.TowerLevels
 						$"Replay playback was stopped because a desynchronization was detected.\nReason: {m_PlaybackComponent.PlaybackInterruptionReason}\n\nCheck the logs for more info.",
 						MessageBoxIcon.Error,
 						MessageBoxButtons.OK,
-						() => GameManager.Instance.PushGlobalState(new TowerFinishedLevelState()),
+						() => m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState()),
 						this
 						);
 
 				} else {
-					GameManager.Instance.PushGlobalState(new TowerFinishedLevelState());
+					m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 				}
 
 				return;
