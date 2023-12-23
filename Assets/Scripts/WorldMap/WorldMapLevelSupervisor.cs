@@ -55,7 +55,7 @@ namespace TetrisTower.WorldMap
 			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext,
 				gameContext.GameConfig,
-				gameContext.PlayerControls,
+				gameContext.GlobalControls,
 				gameContext.Options,
 				m_PlaythroughData,
 				levelController,

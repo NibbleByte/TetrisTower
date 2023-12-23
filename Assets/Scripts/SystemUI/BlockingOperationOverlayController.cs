@@ -49,7 +49,7 @@ namespace TetrisTower.SystemUI
 				gameObject.SetActive(true);
 				Canvas.alpha = 0f;
 				StartCoroutine(DelayedShow());
-				GameManager.Instance.GameContext.InputContext.PushOrSetActionsMask(this, Array.Empty<InputAction>());
+				GameManager.Instance.GameContext.GlobalInputContext.PushOrSetActionsMask(this, Array.Empty<InputAction>());
 			}
 
 			m_Blockers.Add(source);
@@ -71,7 +71,7 @@ namespace TetrisTower.SystemUI
 				gameObject.SetActive(false);
 				Canvas.alpha = 0f;
 
-				GameManager.Instance.GameContext.InputContext.PopActionsMask(this);
+				GameManager.Instance.GameContext.GlobalInputContext.PopActionsMask(this);
 			}
 
 			return removed;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.InputSystem.Utilities;
 
 namespace TetrisTower.Game
@@ -34,6 +35,11 @@ namespace TetrisTower.Game
 		public InputDevice ForcedDevice { get => InputContext.ForcedDevice; set => InputContext.ForcedDevice = value; }
 
 		public InputActionsMaskedStack InputActionsMaskedStack => InputContext.InputActionsMaskedStack;
+
+		public InputUser User => InputContext.User;
+
+		public void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None) => InputContext.PerformPairingWithDevice(device, options);
+		public void UnpairDevices() => InputContext.UnpairDevices();
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false) => InputContext.FindActionFor(actionNameOrId, throwIfNotFound);
 		public void EnableAction(object source, InputAction action) => InputContext.EnableAction(source, action);
@@ -66,23 +72,23 @@ namespace TetrisTower.Game
 	[Serializable]
 	public sealed class GameContext
 	{
-		public GameContext(GameConfig config, PlayerControls controls, IInputContext inputContext)
+		public GameContext(GameConfig config, PlayerControls globalControls, IInputContext globalInputContext)
 		{
 			GameConfig = config;
-			PlayerControls = controls;
-			InputContext = inputContext;
+			GlobalControls = globalControls;
+			GlobalInputContext = globalInputContext;
 		}
 
 		public readonly GameConfig GameConfig;
 
 		public readonly PlayerOptions Options = new PlayerOptions();
 
-		public readonly PlayerControls PlayerControls;
+		public readonly PlayerControls GlobalControls;
 
 		public IPlaythroughData CurrentPlaythrough { get; private set; }
 		[SerializeReference] private IPlaythroughData m_DebugPlaythroughData;
 
-		public readonly IInputContext InputContext;
+		public readonly IInputContext GlobalInputContext;
 
 		public void SetCurrentPlaythrough(PlaythroughTemplateBase playthroughTemplate)
 		{

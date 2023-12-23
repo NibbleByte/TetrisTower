@@ -46,12 +46,12 @@ namespace TetrisTower.HomeScreen
 				gameContext,
 				gameContext.GameConfig,
 				gameContext.Options,
-				gameContext.PlayerControls,
+				gameContext.GlobalControls,
 				levelController
 				);
 
 			// The whole level is UI, so enable it for the whole level.
-			gameContext.PlayerControls.Enable(this, gameContext.PlayerControls.UI);
+			gameContext.GlobalControls.Enable(this, gameContext.GlobalControls.UI);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 				await listener.OnLevelLoadingAsync(PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.Context);
@@ -64,7 +64,7 @@ namespace TetrisTower.HomeScreen
 
 		public Task UnloadAsync()
 		{
-			GameManager.Instance.GameContext.PlayerControls.DisableAll(this);
+			GameManager.Instance.GameContext.GlobalControls.DisableAll(this);
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 

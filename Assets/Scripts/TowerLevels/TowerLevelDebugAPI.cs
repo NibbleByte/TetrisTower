@@ -22,6 +22,7 @@ namespace TetrisTower.TowerLevels
 		private GameObject m_ProfilerStatsObject;
 
 		private IPlaythroughData m_PlaythroughData;
+		private PlayerControls m_PlayerControls;
 		private GridLevelController m_TowerLevel;
 		private TowerStatesAPI m_TowerLevelAPI;
 		private ReplayRecording m_ReplayRecording;
@@ -38,6 +39,7 @@ namespace TetrisTower.TowerLevels
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			context.SetByType(out m_PlaythroughData);
+			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_TowerLevel);
 			context.SetByType(out m_Context);
 			context.SetByType(out m_FlashMessage);
@@ -200,12 +202,12 @@ namespace TetrisTower.TowerLevels
 			}
 
 			if (Keyboard.current.f4Key.wasPressedThisFrame) {
-				if (!m_Context.PlayerControls.devices.HasValue) {
+				if (!m_PlayerControls.devices.HasValue) {
 					Debug.LogWarning("Forcing pointer exclusive input!");
-					m_Context.PlayerControls.devices = new InputDevice[] { (InputDevice)Touchscreen.current ?? Mouse.current };
+					m_PlayerControls.devices = new InputDevice[] { (InputDevice)Touchscreen.current ?? Mouse.current };
 				} else {
 					Debug.LogWarning("All devices are processed.");
-					m_Context.PlayerControls.devices = default;
+					m_PlayerControls.devices = default;
 				}
 			}
 

@@ -116,6 +116,7 @@ namespace TetrisTower.TowerLevels
 
 				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 				SceneManager.MoveGameObjectToScene(levelController.gameObject, SceneManager.GetSceneAt(playerIndex));
+				levelController.name = $"{gameContext.GameConfig.TowerLevelController.name} [{playerIndex}]";
 
 				Light overrideBlocksLight = placeholder.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 				if (overrideBlocksLight) {
@@ -211,7 +212,7 @@ namespace TetrisTower.TowerLevels
 
 				foreach (GameObject prefab in uiPrefabs) {
 					var instance = GameObject.Instantiate<GameObject>(prefab);
-					instance.name = prefab.name;
+					instance.name = $"{prefab.name} [{playerIndex}]";
 
 					SceneManager.MoveGameObjectToScene(instance.gameObject, SceneManager.GetSceneAt(playerIndex));
 
@@ -258,12 +259,11 @@ namespace TetrisTower.TowerLevels
 			//
 			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
 			var playthroughPlayer = PlaythroughPlayer.Create(gameContext.GameConfig, levelController, camera, uiController.gameObject);
+			playthroughPlayer.EventSystem.name = $"{gameContext.GameConfig.GameInputPrefab.name} [{playerIndex}]";
 			m_PlaythroughData.AssignPlayer(playthroughPlayer, levelData);
 
 			// Suppress global input.
 			//PlayerContextUIRootObject.GlobalPlayerContext.EventSystem.gameObject.SetActive(false);
-			playthroughPlayer.EventSystem.gameObject.SetActive(false);	// HACK: force the navigation to work, damn it!
-			playthroughPlayer.EventSystem.gameObject.SetActive(true);
 
 			//
 			// Setup Player Context
@@ -273,7 +273,7 @@ namespace TetrisTower.TowerLevels
 			playerContext.CreatePlayerStack(
 				gameContext,
 				gameContext.GameConfig,
-				gameContext.PlayerControls,
+				playthroughPlayer.PlayerControls,
 				gameContext.Options,
 				m_PlaythroughData,
 				levelData,

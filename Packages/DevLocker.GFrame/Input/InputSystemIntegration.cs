@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.UI;
 
@@ -184,6 +185,24 @@ namespace DevLocker.GFrame.Input
 		/// Last device used got changed.
 		/// </summary>
 		event Action LastUsedInputControlSchemeChanged;
+
+		/// <summary>
+		/// Associated input user.
+		/// Useful for local multiplayer / split screen. For single player game, you can skip this.
+		/// </summary>
+		InputUser User { get; }
+
+		/// <summary>
+		/// Pair the given device to a user.
+		/// Useful for local multiplayer / split screen. For single player game, you can skip this.
+		/// </summary>
+		void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None);
+
+		/// <summary>
+		/// Unpair devices from the current user.
+		/// Useful for local multiplayer / split screen. For single player game, you can skip this.
+		/// </summary>
+		void UnpairDevices();
 
 		/// <summary>
 		/// Set to force the context to use only this device and ignore the rest.

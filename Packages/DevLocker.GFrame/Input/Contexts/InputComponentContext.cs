@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.InputSystem.Utilities;
 
 namespace DevLocker.GFrame.Input.Contexts
@@ -30,6 +31,8 @@ namespace DevLocker.GFrame.Input.Contexts
 		/// </summary>
 		public event Action LastUsedDeviceChanged;
 		public event Action LastUsedInputControlSchemeChanged;
+
+		public InputUser User => PlayerInput.user;
 
 		public virtual bool DeviceSupportsUINavigationSelection => m_LastUsedDisplayData?.SupportsUINavigationSelection ?? false;
 
@@ -123,6 +126,18 @@ namespace DevLocker.GFrame.Input.Contexts
 			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
 
 			InputActionsMaskedStack.ForceClearAllEnableRequests();
+		}
+
+		public void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None)
+		{
+			// NOTE: can't assign back user the to PlayerInput, but it should be fine, as it should be a valid user - no change in the struct.
+			InputUser.PerformPairingWithDevice(device, User, options);
+			User.AssociateActionsWithUser(PlayerInput.actions);
+		}
+
+		public void UnpairDevices()
+		{
+			User.UnpairDevices();
 		}
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false)

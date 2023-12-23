@@ -2,7 +2,9 @@ using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
 using TetrisTower.Logic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.InputSystem.Utilities;
 using UnityEngine.SceneManagement;
 
 namespace TetrisTower.Game
@@ -16,7 +18,6 @@ namespace TetrisTower.Game
 		public InputSystemUIInputModule InputModule { get; private set; }
 		public PlayerControls PlayerControls { get; private set; }
 		public PlayerContextUIRootObject PlayerContext { get; private set;}
-		//public PlayerInput PlayerInput { get; private set; }
 		public Camera Camera { get; private set; }
 
 		public IInputContext InputContext { get; private set; }
@@ -37,19 +38,19 @@ namespace TetrisTower.Game
 
 				EventSystem = gameInputObject.GetComponentInChildren<MultiplayerEventSystem>(),
 				InputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>(),
-				//PlayerInput = gameInputObject.GetComponentInChildren<PlayerInput>(),
 
 				Camera = camera,
 			};
 
-			//player.PlayerInput.actions = player.PlayerControls.asset;
-
 			player.InputModule.actionsAsset = player.PlayerControls.asset;  // This will refresh the UI Input action references to the new asset.
-
-			//player.PlayerInput.uiInputModule = player.InputModule;
 
 			player.InputContext = new InputCollectionContext(player.PlayerControls, player.PlayerControls.UI.Get(), config.BindingDisplayAssets);
 			player.PlayerControls.SetInputContext(player.InputContext);
+
+			// HACK: force the navigation to work, damn it! OnEnable() will enable the UI actions, so re-disable them again.
+			player.EventSystem.gameObject.SetActive(false);
+			player.EventSystem.gameObject.SetActive(true);
+			player.PlayerControls.UI.Disable();
 
 			player.PlayerContext.SetupPlayer(player.EventSystem, player.InputContext);
 
@@ -58,13 +59,15 @@ namespace TetrisTower.Game
 
 		public void Pause(bool pauseInput)
 		{
-			// TODO: Pause Input
+			if (pauseInput) {
+				InputContext.PushOrSetActionsMask(this, new InputAction[0]);
+			}
 			LevelController.PauseLevel();
 		}
 
 		public void Resume()
 		{
-			// TODO: Resume Input
+			InputContext.PopActionsMask(this);
 			LevelController.ResumeLevel();
 		}
 
@@ -72,8 +75,8 @@ namespace TetrisTower.Game
 		{
 			// Input & player context will be disposed by the level manager.
 			GameObject.Destroy(EventSystem.gameObject);
-			PlayerControls.Dispose();
 			PlayerControls.Disable();
+			PlayerControls.Dispose();
 		}
 	}
 }

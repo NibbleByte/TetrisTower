@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.InputSystem.Utilities;
 
 namespace DevLocker.GFrame.Input.Contexts
@@ -26,10 +27,10 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public event Action LastUsedInputControlSchemeChanged;
 
+		public InputUser User { get; private set; }
+
 		public virtual bool DeviceSupportsUINavigationSelection => m_LastUsedDisplayData?.SupportsUINavigationSelection ?? false;
 
-
-		private InputDevice[] m_PairedDevices = new InputDevice[0];
 		private InputDevice m_LastUsedDevice;
 		private InputControlScheme m_LastUsedControlScheme;
 
@@ -88,6 +89,23 @@ namespace DevLocker.GFrame.Input.Contexts
 			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
 
 			InputActionsMaskedStack.ForceClearAllEnableRequests();
+
+			if (User.valid) {
+				User.UnpairDevicesAndRemoveUser();
+			}
+		}
+
+		public void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None)
+		{
+			User = InputUser.PerformPairingWithDevice(device, User, options);
+			User.AssociateActionsWithUser(InputActionsCollection);
+		}
+
+		public void UnpairDevices()
+		{
+			if (User.valid) {
+				User.UnpairDevices();
+			}
 		}
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false)
@@ -157,12 +175,7 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public ReadOnlyArray<InputDevice> GetPairedInputDevices()
 		{
-			return m_PairedDevices;
-		}
-
-		public void SetPairedInputDevices(IEnumerable<InputDevice> devices)
-		{
-			m_PairedDevices = devices.ToArray();
+			return User.valid ? User.pairedDevices : new ReadOnlyArray<InputDevice>();
 		}
 
 		public InputControlScheme GetLastUsedInputControlScheme()
@@ -214,7 +227,7 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		protected virtual void OnInputSystemDeviceChange(InputDevice device, InputDeviceChange change)
 		{
-			if (m_PairedDevices.Contains(device) || m_PairedDevices.Length == 0) {
+			if (!User.valid || User.pairedDevices.Contains(device) || User.pairedDevices.Count == 0) {
 
 				// Called when device configuration changes (for example keyboard layout / language), not on switching devices.
 				// Trigger event so UI gets refreshed properly.
@@ -228,7 +241,7 @@ namespace DevLocker.GFrame.Input.Contexts
 			if (m_ForcedDevice != null)
 				return;
 
-			if (m_LastUsedDevice == device || (!m_PairedDevices.Contains(device) && m_PairedDevices.Length != 0))
+			if (m_LastUsedDevice == device || (User.valid && !User.pairedDevices.Contains(device) && User.pairedDevices.Count != 0))
 				return;
 
 			// Some devices like to spam events like crazy.

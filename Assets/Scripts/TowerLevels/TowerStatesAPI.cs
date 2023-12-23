@@ -26,8 +26,7 @@ namespace TetrisTower.TowerLevels
 		{
 			context.SetByType(out m_PlaythroughData);
 			context.SetByType(out m_Config);
-
-			m_PlayerContext = PlayerContextUtils.GetPlayerContextFor(gameObject);
+			context.SetByType(out m_PlayerContext);
 		}
 
 		public void OnLevelUnloading()
@@ -127,7 +126,7 @@ namespace TetrisTower.TowerLevels
 			IPlaythroughData nextPlaythroughData = m_PlaythroughData;
 
 			if (!m_IsReplay) {
-				var recording = PlayerContextUtils.GetPlayerContextFor(gameObject).StatesStack.Context.FindByType<ReplayRecording>();
+				var recording = m_PlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 				if (!recording.HasEnding) {
 					recording.EndReplayRecording();
 				}
@@ -152,7 +151,7 @@ namespace TetrisTower.TowerLevels
 				// Null controller as we are not gonna execute the recording.
 				recording = replayPlaythroughData.GetReplayRecording(controller: null, fairy: null);
 			} else {
-				recording = PlayerContextUtils.GetPlayerContextFor(gameObject).StatesStack.Context.FindByType<ReplayRecording>();
+				recording = m_PlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 			}
 
 			Saves.SavesManager.SaveReplay($"{DateTime.Now:yyyyMMdd_HHmmss} {m_PlaythroughData.ActiveTowerLevels[0].BackgroundScene.SceneName}", recording, m_Config);

@@ -2,6 +2,7 @@ using DevLocker.GFrame.Input;
 using System;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.InputSystem.Utilities;
 
 namespace DevLocker.GFrame.SampleGame.Game
@@ -32,6 +33,11 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public InputDevice ForcedDevice { get => InputContext.ForcedDevice; set => InputContext.ForcedDevice = value; }
 
 		public InputActionsMaskedStack InputActionsMaskedStack => InputContext.InputActionsMaskedStack;
+
+		public InputUser User => InputContext.User;
+
+		public void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None) => InputContext.PerformPairingWithDevice(device, options);
+		public void UnpairDevices() => InputContext.UnpairDevices();
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false) => InputContext.FindActionFor(actionNameOrId, throwIfNotFound);
 		public void EnableAction(object source, InputAction action) => InputContext.EnableAction(source, action);
