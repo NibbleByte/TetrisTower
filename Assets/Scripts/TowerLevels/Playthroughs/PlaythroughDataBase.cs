@@ -83,6 +83,15 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			}
 		}
 
+		private void DisposePlayers()
+		{
+			foreach(var player in m_Players) {
+				player.Dispose();
+			}
+
+			m_Players.Clear();
+		}
+
 		public abstract GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 
 		public void ReplaceCurrentLevel(GridLevelData levelData)
@@ -91,7 +100,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_ActiveTowerLevels.Clear();
 			m_ActiveTowerLevels.Add(levelData);
 
-			m_Players.Clear();
+			DisposePlayers();
 		}
 
 		public virtual void RetryLevel()
@@ -100,7 +109,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				throw new InvalidOperationException($"Trying to retry a level when no level is in progress.");
 
 			m_ActiveTowerLevels.Clear();
-			m_Players.Clear();
+			DisposePlayers();
 		}
 
 		public virtual void QuitLevel()
@@ -109,7 +118,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				throw new InvalidOperationException($"Trying to quit a level when no level is in progress.");
 
 			m_ActiveTowerLevels.Clear();
-			m_Players.Clear();
+			DisposePlayers();
 		}
 
 		public virtual void FinishLevel()
@@ -126,7 +135,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			PlayTimeOnLevelStart += m_ActiveTowerLevels[0].PlayTime;
 
 			m_ActiveTowerLevels.Clear();
-			m_Players.Clear();
+			DisposePlayers();
 		}
 
 		public void SetupRandomGenerator(int seed = 0, bool resetCurrentLevelRandom = false)

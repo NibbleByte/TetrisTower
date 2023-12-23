@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.MessageBox;
 using DevLocker.GFrame.Timing;
@@ -14,7 +15,6 @@ using TetrisTower.TowerLevels.Replays;
 using TetrisTower.TowerUI;
 using TetrisTower.Visuals;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 namespace TetrisTower.TowerLevels
@@ -49,6 +49,8 @@ namespace TetrisTower.TowerLevels
 			for (int playerIndex = 0; playerIndex < m_PlayersCount; playerIndex++) {
 				await LoadPlayerAsync(gameContext, playerIndex);
 			}
+
+			await StartLevels();
 		}
 
 		public async Task LoadPlayerAsync(GameContext gameContext, int playerIndex)
@@ -310,24 +312,33 @@ namespace TetrisTower.TowerLevels
 			foreach(var objective in levelController.LevelData.Objectives) {
 				objective.OnPostLevelLoaded(playerContext.StatesStack.Context);
 			}
+		}
 
+		private async Task StartLevels()
+		{
+			// After all players have loaded their scenes, start the game.
+			foreach(PlaythroughPlayer player in m_PlaythroughData.ActivePlayers) {
 
-			if (playbackComponent) {
-				playbackComponent.enabled = true;
-			} else {
-				recordComponent.enabled = true;
-			}
+				var playbackComponent = player.LevelController.GetComponent<LevelReplayPlayback>();
+				var recordComponent = player.LevelController.GetComponent<LevelReplayRecorder>();
 
-			playerContext.StatesStack.SetState(playbackComponent ? new TowerReplayPlaybackState() : new TowerPlayState());
+				if (playbackComponent) {
+					playbackComponent.enabled = true;
+				} else {
+					recordComponent.enabled = true;
+				}
 
-			if (levelData.IsPlaying) {
-				// If save came with available matches, or pending actions, do them.
-				var pendingActions = GameGridEvaluation.Evaluate(levelData.Grid, levelData.Rules);
-				if (pendingActions.Count > 0) {
-					levelController.StartRunActions(pendingActions);
+				player.PlayerContext.StatesStack.SetState(playbackComponent ? new TowerReplayPlaybackState() : new TowerPlayState());
 
-					while (levelController.AreGridActionsRunning) {
-						await Task.Yield();
+				if (player.LevelData.IsPlaying) {
+					// If save came with available matches, or pending actions, do them.
+					var pendingActions = GameGridEvaluation.Evaluate(player.LevelData.Grid, player.LevelData.Rules);
+					if (pendingActions.Count > 0) {
+						player.LevelController.StartRunActions(pendingActions);
+
+						while (player.LevelController.AreGridActionsRunning) {
+							await Task.Yield();
+						}
 					}
 				}
 			}

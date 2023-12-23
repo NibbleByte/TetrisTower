@@ -22,6 +22,7 @@ namespace TetrisTower.Game
 
 		public IInputContext InputContext { get; private set; }
 
+		public GridLevelData LevelData => LevelController.LevelData;
 		public GridLevelController LevelController { get; private set; }
 
 
