@@ -199,6 +199,15 @@ namespace DevLocker.GFrame.Input
 		void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None);
 
 		/// <summary>
+		/// Will make the user paired with no devices - they won't have any input.
+		/// This is different from <see cref="UnpairDevices()"/>, as unpaired users by default listen for all the devices - <see cref="IInputActionCollection.devices"/>.
+		/// It will unpair any current devices.
+		///
+		/// Useful for local multiplayer / split screen. For single player game, you can skip this.
+		/// </summary>
+		void PerformPairingWithEmptyDevice();
+
+		/// <summary>
 		/// Unpair devices from the current user.
 		/// Useful for local multiplayer / split screen. For single player game, you can skip this.
 		/// </summary>

@@ -101,11 +101,21 @@ namespace DevLocker.GFrame.Input.Contexts
 			User.AssociateActionsWithUser(InputActionsCollection);
 		}
 
+		public void PerformPairingWithEmptyDevice()
+		{
+			UnpairDevices();
+
+			InputActionsCollection.devices = new ReadOnlyArray<InputDevice>();
+		}
+
 		public void UnpairDevices()
 		{
 			if (User.valid) {
 				User.UnpairDevices();
 			}
+
+			// In case user was paired with "empty" device.
+			InputActionsCollection.devices = null;
 		}
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false)

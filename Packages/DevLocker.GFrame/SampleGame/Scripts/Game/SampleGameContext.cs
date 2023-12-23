@@ -37,6 +37,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public InputUser User => InputContext.User;
 
 		public void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None) => InputContext.PerformPairingWithDevice(device, options);
+		public void PerformPairingWithEmptyDevice() => InputContext.PerformPairingWithEmptyDevice();
 		public void UnpairDevices() => InputContext.UnpairDevices();
 
 		public InputAction FindActionFor(string actionNameOrId, bool throwIfNotFound = false) => InputContext.FindActionFor(actionNameOrId, throwIfNotFound);
