@@ -26,7 +26,7 @@ namespace TetrisTower.Game
 		public GridLevelController LevelController { get; private set; }
 
 
-		public static PlaythroughPlayer Create(GameConfig config, GridLevelController levelController, Camera camera, GameObject uiRoot)
+		public static PlaythroughPlayer Create(GameConfig config, GridLevelController levelController, Camera camera, PlayerContextUIRootObject playerContextRoot)
 		{
 			var gameInputObject = GameObject.Instantiate(config.GameInputPrefab);
 			SceneManager.MoveGameObjectToScene(gameInputObject, camera.gameObject.scene);
@@ -35,7 +35,7 @@ namespace TetrisTower.Game
 				LevelController = levelController,
 
 				PlayerControls = new PlayerControls(),
-				PlayerContext = uiRoot.GetComponentInChildren<PlayerContextUIRootObject>(),
+				PlayerContext = playerContextRoot,
 
 				EventSystem = gameInputObject.GetComponentInChildren<MultiplayerEventSystem>(),
 				InputModule = gameInputObject.GetComponentInChildren<InputSystemUIInputModule>(),
@@ -58,18 +58,18 @@ namespace TetrisTower.Game
 			return player;
 		}
 
-		public void Pause(bool pauseInput)
+		public void Pause(bool pauseInput, object source)
 		{
 			if (pauseInput) {
-				InputContext.PushOrSetActionsMask(this, new InputAction[0]);
+				InputContext.PushOrSetActionsMask(source, new InputAction[0]);
 			}
-			LevelController.PauseLevel();
+			LevelController.PauseLevel(source);
 		}
 
-		public void Resume()
+		public void Resume(object source)
 		{
-			InputContext.PopActionsMask(this);
-			LevelController.ResumeLevel();
+			InputContext.PopActionsMask(source);
+			LevelController.ResumeLevel(source);
 		}
 
 		public void Dispose()

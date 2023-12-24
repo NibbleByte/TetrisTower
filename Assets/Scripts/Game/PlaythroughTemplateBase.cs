@@ -26,8 +26,8 @@ namespace TetrisTower.Game
 		ILevelSupervisor PrepareSupervisor();
 
 		void AssignPlayer(PlaythroughPlayer player, GridLevelData levelData);
-		void PausePlayers(IPlayerContext playerWithInputPreserved);
-		void ResumePlayers();
+		void PausePlayers(IPlayerContext playerWithInputPreserved, object source);
+		void ResumePlayers(object source);
 
 		GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 

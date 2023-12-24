@@ -1,5 +1,4 @@
 using DevLocker.GFrame;
-using DevLocker.GFrame.MessageBox;
 using TetrisTower.Platforms;
 using TetrisTower.Core.UI;
 using TetrisTower.Game;
@@ -54,30 +53,12 @@ namespace TetrisTower.TowerLevels
 
 			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
-
-			MessageBox.Instance.MessageShown += PauseLevel;
-			MessageBox.Instance.MessageClosed += ResumeLevel;
 		}
 
 		public void ExitState()
 		{
 			m_PlayerControls.TowerLevelPlay.SetCallbacks(null);
 			m_PlayerControls.DisableAll(this);
-
-			MessageBox.Instance.MessageShown -= PauseLevel;
-			MessageBox.Instance.MessageClosed -= ResumeLevel;
-		}
-
-		private void PauseLevel()
-		{
-			m_PlaythroughData.PausePlayers(playerWithInputPreserved: m_PlayerContext);
-
-			m_ReplayRecording.AddAndRun(ReplayActionType.Pause);
-		}
-
-		private void ResumeLevel()
-		{
-			m_PlaythroughData.ResumePlayers();
 		}
 
 		public void OnMoveShapeLeft(InputAction.CallbackContext context)

@@ -38,9 +38,6 @@ namespace TetrisTower.TowerLevels
 			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);
 
-			MessageBox.Instance.MessageShown += PauseLevel;
-			MessageBox.Instance.MessageClosed += ResumeLevel;
-
 			// Disable player input during playback.
 			var inputActions = m_PlayerControls.Where(a => a.actionMap != m_PlayerControls.TowerLevelPlay.Get());
 			m_InputContext.PushOrSetActionsMask(this, inputActions);
@@ -51,19 +48,6 @@ namespace TetrisTower.TowerLevels
 			m_PlayerControls.DisableAll(this);
 
 			m_InputContext.PopActionsMask(this);
-
-			MessageBox.Instance.MessageShown -= PauseLevel;
-			MessageBox.Instance.MessageClosed -= ResumeLevel;
-		}
-
-		private void PauseLevel()
-		{
-			m_PlaythroughData.PausePlayers(playerWithInputPreserved: m_PlayerContext);
-		}
-
-		private void ResumeLevel()
-		{
-			m_PlaythroughData.ResumePlayers();
 		}
 
 		public void Update()

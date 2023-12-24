@@ -2,6 +2,7 @@ using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.MessageBox;
 using System.Collections.Generic;
+using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.Tools;
@@ -158,6 +159,10 @@ namespace TetrisTower.TowerLevels
 
 		void Update()
 		{
+			// Run only for player paired with keyboard.
+			if (m_PlayerControls != null && m_PlayerControls.devices.HasValue && !m_PlayerControls.devices.Value.OfType<Keyboard>().Any())
+				return;
+
 			if (Keyboard.current.fKey.wasPressedThisFrame) {
 				ToggleFalling();
 			}

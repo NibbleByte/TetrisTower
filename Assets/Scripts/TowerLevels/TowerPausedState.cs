@@ -1,6 +1,5 @@
 using DevLocker.GFrame.Input;
 using TetrisTower.Game;
-using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Replays;
 using TetrisTower.TowerUI;
 
@@ -10,7 +9,6 @@ namespace TetrisTower.TowerLevels
 	{
 		private IPlaythroughData m_PlaythroughData;
 		private IPlayerContext m_PlayerContext;
-		private GridLevelController m_LevelController;
 		private PlayerControls m_PlayerControls;
 		private TowerLevelUIController m_UIController;
 		private ReplayRecording m_ReplayRecording;
@@ -19,7 +17,6 @@ namespace TetrisTower.TowerLevels
 		{
 			context.SetByType(out m_PlaythroughData);
 			context.SetByType(out m_PlayerContext);
-			context.SetByType(out m_LevelController);
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_UIController);
 			context.TrySetByType(out m_ReplayRecording);
@@ -30,7 +27,7 @@ namespace TetrisTower.TowerLevels
 
 			m_UIController.SwitchState(TowerLevelUIState.Paused);
 
-			m_PlaythroughData.PausePlayers(playerWithInputPreserved: m_PlayerContext);
+			m_PlaythroughData.PausePlayers(playerWithInputPreserved: m_PlayerContext, this);
 
 			// On replay playback, this will be null.
 			if (m_ReplayRecording != null) {
@@ -40,7 +37,7 @@ namespace TetrisTower.TowerLevels
 
 		public void ExitState()
 		{
-			m_PlaythroughData.ResumePlayers();
+			m_PlaythroughData.ResumePlayers(this);
 
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(null);
 			m_PlayerControls.DisableAll(this);

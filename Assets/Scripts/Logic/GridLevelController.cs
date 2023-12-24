@@ -19,7 +19,7 @@ namespace TetrisTower.Logic
 		public List<GameGrid> Grids { get; private set; } = new List<GameGrid>();
 		public BlocksGrid Grid => LevelData?.Grid;
 
-		public bool IsPaused { get; private set; } = false;
+		public bool IsPaused => m_PauseRequests.Count > 0;
 
 		public event Action RunningActionsSequenceFinished;
 		public event Action SpawnBlockTypesCountChanged;
@@ -42,6 +42,8 @@ namespace TetrisTower.Logic
 		public float FallingShapeAnalogRotateOffsetBeforeClear { get; private set; } = float.NaN;	// Hacky, I know.
 
 		private float m_FallingSpeedup = 0;
+
+		private HashSet<object> m_PauseRequests = new HashSet<object>();
 
 		public void Init(GridLevelData data, WiseTiming timing)
 		{
@@ -85,7 +87,7 @@ namespace TetrisTower.Logic
 			// Objectives are initialized by the level supervisor after everything is setup.
 
 			// If paused previously, resume (since level may be reused on reload).
-			IsPaused = false;
+			m_PauseRequests.Clear();
 
 			Timing.PreUpdate += LevelUpdate;
 			Timing.PostUpdate += LevelLateUpdate;
@@ -579,14 +581,14 @@ namespace TetrisTower.Logic
 			RunningActionsSequenceFinished?.Invoke();
 		}
 
-		public void PauseLevel()
+		public void PauseLevel(object source)
 		{
-			IsPaused = true;
+			m_PauseRequests.Add(source);
 		}
 
-		public void ResumeLevel()
+		public void ResumeLevel(object source)
 		{
-			IsPaused = false;
+			m_PauseRequests.Remove(source);
 		}
 
 		private void LevelUpdate()

@@ -69,17 +69,17 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_Players[index] = player;
 		}
 
-		public void PausePlayers(IPlayerContext playerWithInputPreserved)
+		public void PausePlayers(IPlayerContext playerWithInputPreserved, object source)
 		{
 			foreach (var player in m_Players) {
-				player.Pause((IPlayerContext)player.PlayerContext != playerWithInputPreserved);
+				player.Pause((IPlayerContext)player.PlayerContext != playerWithInputPreserved, source);
 			}
 		}
 
-		public void ResumePlayers()
+		public void ResumePlayers(object source)
 		{
 			foreach (var player in m_Players) {
-				player.Resume();
+				player.Resume(source);
 			}
 		}
 
