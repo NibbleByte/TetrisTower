@@ -19,14 +19,16 @@ namespace TetrisTower.Game
 		public PlayerControls PlayerControls { get; private set; }
 		public PlayerContextUIRootObject PlayerContext { get; private set;}
 		public Camera Camera { get; private set; }
+		public Canvas[] UICanvases { get; private set; }
 
 		public IInputContext InputContext { get; private set; }
 
 		public GridLevelData LevelData => LevelController.LevelData;
 		public GridLevelController LevelController { get; private set; }
 
+		private PlaythroughPlayer() { }
 
-		public static PlaythroughPlayer Create(GameConfig config, GridLevelController levelController, Camera camera, PlayerContextUIRootObject playerContextRoot)
+		public static PlaythroughPlayer Create(GameConfig config, GridLevelController levelController, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
 		{
 			var gameInputObject = GameObject.Instantiate(config.GameInputPrefab);
 			SceneManager.MoveGameObjectToScene(gameInputObject, camera.gameObject.scene);
@@ -55,21 +57,11 @@ namespace TetrisTower.Game
 
 			player.PlayerContext.SetupPlayer(player.EventSystem, player.InputContext);
 
+			player.UICanvases = uiCanvases;
+
+			player.RenderCanvasesToCamera();
+
 			return player;
-		}
-
-		public void Pause(bool pauseInput, object source)
-		{
-			if (pauseInput) {
-				InputContext.PushOrSetActionsMask(source, new InputAction[0]);
-			}
-			LevelController.PauseLevel(source);
-		}
-
-		public void Resume(object source)
-		{
-			InputContext.PopActionsMask(source);
-			LevelController.ResumeLevel(source);
 		}
 
 		public void Dispose()
@@ -78,6 +70,50 @@ namespace TetrisTower.Game
 			GameObject.Destroy(EventSystem.gameObject);
 			PlayerControls.Disable();
 			PlayerControls.Dispose();
+		}
+
+		public void Pause(bool pauseInput, object source)
+		{
+			if (pauseInput) {
+				InputContext.PushOrSetActionsMask(source, new InputAction[0]);
+				HideCanvases();
+			} else {
+				RenderInputCanvasToScreen();
+			}
+
+			LevelController.PauseLevel(source);
+		}
+
+		public void Resume(object source)
+		{
+			RenderCanvasesToCamera();
+
+			InputContext.PopActionsMask(source);
+			LevelController.ResumeLevel(source);
+		}
+
+		private void RenderInputCanvasToScreen()
+		{
+			foreach (Canvas canvas in UICanvases) {
+				canvas.enabled = canvas.gameObject == EventSystem.playerRoot;
+				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+			}
+		}
+
+		private void RenderCanvasesToCamera()
+		{
+			foreach (Canvas canvas in UICanvases) {
+				canvas.enabled = true;
+				canvas.renderMode = RenderMode.ScreenSpaceCamera;
+				canvas.worldCamera = Camera;
+			}
+		}
+
+		private void HideCanvases()
+		{
+			foreach (Canvas canvas in UICanvases) {
+				canvas.enabled = false;
+			}
 		}
 	}
 }

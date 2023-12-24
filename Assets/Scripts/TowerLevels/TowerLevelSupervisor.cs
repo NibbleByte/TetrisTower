@@ -207,6 +207,7 @@ namespace TetrisTower.TowerLevels
 
 			SetupCamera(camera, playerIndex);
 
+			var uiCanvases = FindObjectsOfType<Canvas>(playerIndex);
 			var uiController = FindObjectOfType<TowerLevelUIController>(playerIndex);
 			if (uiController == null) {
 				GameObject[] uiPrefabs = Platforms.PlatformsUtils.IsMobileOrSimulator
@@ -214,11 +215,16 @@ namespace TetrisTower.TowerLevels
 					: gameContext.GameConfig.UIPrefabs
 					;
 
-				foreach (GameObject prefab in uiPrefabs) {
+				uiCanvases = new Canvas[uiPrefabs.Length];
+
+				for(int i = 0; i < uiPrefabs.Length; ++i) {
+					GameObject prefab = uiPrefabs[i];
 					var instance = GameObject.Instantiate<GameObject>(prefab);
 					instance.name = $"{prefab.name} [{playerIndex}]";
 
 					SceneManager.MoveGameObjectToScene(instance.gameObject, SceneManager.GetSceneAt(playerIndex));
+
+					uiCanvases[i] = instance.GetComponent<Canvas>();
 
 					if (uiController == null) {
 						uiController = instance.GetComponent<TowerLevelUIController>();
@@ -226,7 +232,9 @@ namespace TetrisTower.TowerLevels
 				}
 			}
 
-
+			if (uiCanvases.Length < 2 || uiCanvases.Any(c => c == null)) {
+				Debug.LogError("Parts of the UI are missing!");
+			}
 
 
 			WiseTiming timing;
@@ -262,7 +270,7 @@ namespace TetrisTower.TowerLevels
 			// Setup Player
 			//
 			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
-			var playthroughPlayer = m_PlayersManager.SetupPlayer(gameContext.GameConfig, levelController, levelData, camera, playerContext);
+			var playthroughPlayer = m_PlayersManager.SetupPlayer(gameContext.GameConfig, levelController, levelData, camera, playerContext, uiCanvases);
 			playthroughPlayer.EventSystem.name = $"{gameContext.GameConfig.GameInputPrefab.name} [{playerIndex}]";
 
 			//
