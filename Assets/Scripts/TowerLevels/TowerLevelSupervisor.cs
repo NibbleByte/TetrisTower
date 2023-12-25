@@ -26,6 +26,13 @@ namespace TetrisTower.TowerLevels
 		private int m_PlayersCount = 1;
 		private TowerLevelPlayersManager m_PlayersManager;
 
+		private struct StartData
+		{
+			public PlaythroughPlayer Player;
+			public MonoBehaviour[] Behaviours;
+			public System.Random VisualsRandom;
+		}
+
 		public TowerLevelSupervisor(IPlaythroughData playthroughData, int playersCount = 1)
 		{
 			m_PlaythroughData = playthroughData;
@@ -46,15 +53,25 @@ namespace TetrisTower.TowerLevels
 				MessageBox.Instance.ForceCloseAllMessages();
 			}
 
+			var allPlayersStartData = new List<StartData>();
+
 			// Load levels + scenes per player. Scene index corresponds to the player index.
 			for (int playerIndex = 0; playerIndex < m_PlayersCount; playerIndex++) {
-				await LoadPlayerAsync(gameContext, playerIndex);
+				var startData = await LoadPlayerAsync(gameContext, playerIndex);
+
+				// Error happened - should be already handled. Maybe use exceptions instead?
+				if (startData.Player == null)
+					return;
+
+				// Carry over the found data to the next step so we don't search for them again.
+				allPlayersStartData.Add(startData);
 			}
 
-			await StartLevels();
+			// Finish up levels setup after all scenes were loaded.
+			await StartLevels(allPlayersStartData);
 		}
 
-		public async Task LoadPlayerAsync(GameContext gameContext, int playerIndex)
+		private async Task<StartData> LoadPlayerAsync(GameContext gameContext, int playerIndex)
 		{
 			GridLevelData levelData = playerIndex < m_PlaythroughData.ActiveTowerLevels.Count ? m_PlaythroughData.ActiveTowerLevels[playerIndex] : null;
 
@@ -65,7 +82,7 @@ namespace TetrisTower.TowerLevels
 
 				if (levelData == null) {
 					CriticalError($"No available level.", true);
-					return;
+					return default;
 				}
 
 				if (levelData.BackgroundScene.IsEmpty) {
@@ -77,7 +94,7 @@ namespace TetrisTower.TowerLevels
 					CriticalError($"Current level did not have scene specified. Loading fallback.", !isValidFallback);
 
 					if (!isValidFallback) {
-						return;
+						return default;
 					}
 				}
 
@@ -309,28 +326,36 @@ namespace TetrisTower.TowerLevels
 			// Init before others.
 			levelController.Init(levelData, timing);
 
-			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
-				await listener.OnLevelLoadingAsync(playerContext.StatesStack.Context);
-			}
-
-			// Other visuals depend on this, so init it first.
-			behaviours.OfType<TowerConeVisualsController>().First().Init(playerContext.StatesStack.Context, visualsRandom);
-
-			foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
-				listener.OnLevelLoaded(playerContext.StatesStack.Context);
-			}
-
-			foreach(var objective in levelController.LevelData.Objectives) {
-				objective.OnPostLevelLoaded(playerContext.StatesStack.Context);
-			}
+			return new StartData { Player = playthroughPlayer, Behaviours = behaviours, VisualsRandom = visualsRandom };
 		}
 
-		private async Task StartLevels()
+		private async Task StartLevels(List<StartData> allPlayersStartData)
 		{
 			m_PlayersManager.SetupPlayersInput();
 
 			// After all players have loaded their scenes, start the game.
-			foreach(PlaythroughPlayer player in m_PlaythroughData.ActivePlayers) {
+			foreach(var startData in allPlayersStartData) {
+				PlaythroughPlayer player = startData.Player ;
+				MonoBehaviour[] behaviours = startData.Behaviours;
+
+				//
+				// IMPORTANT: Loading and Loaded listeners should be called after all players were setup.
+				//
+
+				foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
+					await listener.OnLevelLoadingAsync(player.PlayerContext.StatesStack.Context);
+				}
+
+				// Other visuals depend on this, so init it first.
+				behaviours.OfType<TowerConeVisualsController>().First().Init(player.PlayerContext.StatesStack.Context, startData.VisualsRandom);
+
+				foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
+					listener.OnLevelLoaded(player.PlayerContext.StatesStack.Context);
+				}
+
+				foreach (var objective in player.LevelData.Objectives) {
+					objective.OnPostLevelLoaded(player.PlayerContext.StatesStack.Context);
+				}
 
 				var playbackComponent = player.LevelController.GetComponent<LevelReplayPlayback>();
 				var recordComponent = player.LevelController.GetComponent<LevelReplayRecorder>();
