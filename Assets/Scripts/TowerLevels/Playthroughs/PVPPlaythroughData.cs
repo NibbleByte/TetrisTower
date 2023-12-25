@@ -57,12 +57,6 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return levelData;
 		}
 
-		public override void FinishLevel()
-		{
-			base.FinishLevel();
-			// TODO:..
-		}
-
 		public override void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
 		{
 			base.Validate(repo, context);

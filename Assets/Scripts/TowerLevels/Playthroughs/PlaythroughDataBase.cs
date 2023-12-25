@@ -125,7 +125,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public virtual void FinishLevel()
 		{
-			if (m_ActiveTowerLevels.Count == 0 || m_ActiveTowerLevels[0].IsPlaying || !m_ActiveTowerLevels[0].HasWon)
+			var winner = m_ActiveTowerLevels.FirstOrDefault(p => !p.IsPlaying && p.HasWon);
+			if (winner == null)
 				throw new InvalidOperationException($"Trying to finish level while it hasn't been won.");
 
 			// NOTE: This may be done earlier to show the score to the user. In that case, this should do nothing.
@@ -133,8 +134,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				levelData.Score.ConsumeBonusScore();
 			}
 
-			ScoreOnLevelStart += m_ActiveTowerLevels[0].Score.Score;
-			PlayTimeOnLevelStart += m_ActiveTowerLevels[0].PlayTime;
+			ScoreOnLevelStart += winner.Score.Score;
+			PlayTimeOnLevelStart += winner.PlayTime;
 
 			m_ActiveTowerLevels.Clear();
 			DisposePlayers();
