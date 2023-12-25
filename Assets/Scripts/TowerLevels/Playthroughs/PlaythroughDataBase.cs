@@ -25,6 +25,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		protected List<PlaythroughPlayer> m_Players = new List<PlaythroughPlayer>();
 		public IEnumerable<PlaythroughPlayer> ActivePlayers => m_Players.Where(p => p != null);
+		public bool IsSinglePlayer => ActivePlayers.Count() <= 1;
+		public bool IsMultiPlayer => ActivePlayers.Count() > 1;
 
 
 

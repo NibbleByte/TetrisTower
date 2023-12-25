@@ -1,5 +1,7 @@
+using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.MessageBox;
+using System;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
@@ -22,6 +24,8 @@ namespace TetrisTower.TowerLevels
 		{
 			var playthroughPlayer = PlaythroughPlayer.Create(config, levelController, camera, playerContextRoot, uiCanvases);
 			m_PlaythroughData.AssignPlayer(playthroughPlayer, levelData);
+
+			levelController.FinishedLevel += () => OnLevelFinished(playthroughPlayer);
 
 			return playthroughPlayer;
 		}
@@ -133,6 +137,43 @@ namespace TetrisTower.TowerLevels
 					// Do nothing - everybody uses all the devices, if any?
 				}
 			}
+		}
+
+		private void OnLevelFinished(PlaythroughPlayer player)
+		{
+			// Single player is handled by the level itself.
+			if (m_PlaythroughData.ActivePlayers.Count() == 1)
+				return;
+
+			// If player loses - play animation and wait for the rest to finish. (check the TowerFinishedLevelState)
+			// If player wins the level objectives - stop all the player and announce this one as winner.
+			// If only one player is left - win instantly.
+
+
+			if (player.LevelData.HasWon) {
+
+				player.RenderInputCanvasToScreen();
+
+				foreach (var otherPlayer in m_PlaythroughData.ActivePlayers.Where(p => p.LevelData.IsPlaying)) {
+					if (player != otherPlayer) {
+						otherPlayer.Pause(pauseInput: true, this);
+					}
+				}
+
+				return;
+			}
+
+			// Hide UI for lost players.
+			player.Pause(pauseInput: true, this);
+
+			// Let others have a chance.
+			if (m_PlaythroughData.ActivePlayers.Count(p => p.LevelData.IsPlaying) >= 2)
+				return;
+
+			// Only one player left - announce it a winner. It's should be impossible to have no playing player left?
+			PlaythroughPlayer winner = m_PlaythroughData.ActivePlayers.First(p => p.LevelData.IsPlaying);
+			// Should call this same method with the winner player and handle the UI.
+			winner.LevelController.FinishLevel(true);
 		}
 
 		private void SystemPauseLevels()

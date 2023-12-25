@@ -81,6 +81,20 @@ namespace DevLocker.GFrame.Utils
 		}
 
 		/// <summary>
+		/// Checks the Unity UGUI system if there is a layout rebuild pending to happen at the end of the frame for elements under the <paramref name="root"/>.
+		/// </summary>
+		public static bool IsLayoutRebuildPendingUnder(Transform root)
+		{
+			foreach(Component element in GetPendingLayoutRebuildElements().OfType<Component>()) {
+				Transform elementTransform = element.transform;
+				if (elementTransform == root || elementTransform.IsChildOf(root))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Gets the dirty elements that have pending rebuild at the end of the frame.
 		/// </summary>
 		public static IReadOnlyList<ICanvasElement> GetPendingLayoutRebuildElements()

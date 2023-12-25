@@ -263,7 +263,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			if (IsSelectRequested) {
 
-				if (UIUtils.IsLayoutRebuildPending())
+				if (!TrackOnlyChildren && UIUtils.IsLayoutRebuildPending())
+					return;
+
+				if (TrackOnlyChildren && UIUtils.IsLayoutRebuildPendingUnder(transform))
 					return;
 
 				// Call this on update, to avoid errors while switching active object (turn on one, turn off another). In the end, only one should be active.

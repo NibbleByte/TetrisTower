@@ -118,7 +118,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (m_CanvasLayoutIsRebuilding) {
 					RefreshNavigationSelectables();
 
-					if (UIUtils.IsLayoutRebuildPending()) {
+					if (UIUtils.IsLayoutRebuildPendingUnder(transform)) {
 						RefreshNavigationLinkPositions();
 					}
 				}
@@ -140,7 +140,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (m_CanvasLayoutIsRebuilding) {
 					RefreshNavigationSelectables();
 
-					if (UIUtils.IsLayoutRebuildPending()) {
+					if (UIUtils.IsLayoutRebuildPendingUnder(transform)) {
 						RefreshNavigationLinkPositions();
 					}
 				}
@@ -162,7 +162,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (m_CanvasLayoutIsRebuilding) {
 					RefreshNavigationSelectables();
 
-					if (UIUtils.IsLayoutRebuildPending()) {
+					if (UIUtils.IsLayoutRebuildPendingUnder(transform)) {
 						RefreshNavigationLinkPositions();
 					}
 				}
@@ -372,7 +372,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 
 			// If canvas layout rebuild is pending, wait for it to finish, then do the calculations.
-			if (m_CanvasLayoutIsRebuilding && UIUtils.IsLayoutRebuildPending()) {
+			if (m_CanvasLayoutIsRebuilding && UIUtils.IsLayoutRebuildPendingUnder(transform)) {
 				return true;
 
 			} else if (m_CanvasLayoutIsRebuilding) {
@@ -709,7 +709,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			m_LastSelectedObject = GetCurrentlySelectedObject();
 
 			if (AutoScanForSelectables) {
-				if (UIUtils.IsLayoutRebuildPending()) {
+				if (UIUtils.IsLayoutRebuildPendingUnder(transform)) {
 					m_CanvasLayoutIsRebuilding = true;
 				}
 

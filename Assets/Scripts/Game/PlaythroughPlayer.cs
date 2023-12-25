@@ -92,7 +92,7 @@ namespace TetrisTower.Game
 			LevelController.ResumeLevel(source);
 		}
 
-		private void RenderInputCanvasToScreen()
+		public void RenderInputCanvasToScreen()
 		{
 			foreach (Canvas canvas in UICanvases) {
 				canvas.enabled = canvas.gameObject == EventSystem.playerRoot;
@@ -100,7 +100,7 @@ namespace TetrisTower.Game
 			}
 		}
 
-		private void RenderCanvasesToCamera()
+		public void RenderCanvasesToCamera()
 		{
 			foreach (Canvas canvas in UICanvases) {
 				canvas.enabled = true;
@@ -109,7 +109,7 @@ namespace TetrisTower.Game
 			}
 		}
 
-		private void HideCanvases()
+		public void HideCanvases()
 		{
 			foreach (Canvas canvas in UICanvases) {
 				canvas.enabled = false;

@@ -13,6 +13,7 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerLostState : IPlayerState, PlayerControls.ICommonHotkeysActions
 	{
+		private IPlaythroughData m_PlaythroughData;
 		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private GridLevelController m_LevelController;
@@ -27,6 +28,7 @@ namespace TetrisTower.TowerLevels
 
 		public void EnterState(PlayerStatesContext context)
 		{
+			context.SetByType(out m_PlaythroughData);
 			context.SetByType(out m_PlayerContext);
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_UIController);
@@ -34,13 +36,15 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_VisualsGrid);
 			context.SetByType(out m_VisualsController);
 
-
-			m_PlayerControls.Enable(this, m_PlayerControls.UI);
-			m_PlayerControls.Enable(this, m_PlayerControls.CommonHotkeys);
-			m_PlayerControls.CommonHotkeys.SetCallbacks(this);
-			// HACK: Listen for touch-screen tapping as they don't have CommonHotkeys (back button is not ideal).
-			m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
-			m_PlayerControls.Enable(this, m_PlayerControls.TowerLevelPlay.PointerPress);
+			// Only in single player loser can interrupt animation.
+			if (m_PlaythroughData.IsSinglePlayer) {
+				m_PlayerControls.Enable(this, m_PlayerControls.UI);
+				m_PlayerControls.Enable(this, m_PlayerControls.CommonHotkeys);
+				m_PlayerControls.CommonHotkeys.SetCallbacks(this);
+				// HACK: Listen for touch-screen tapping as they don't have CommonHotkeys (back button is not ideal).
+				m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
+				m_PlayerControls.Enable(this, m_PlayerControls.TowerLevelPlay.PointerPress);
+			}
 
 			m_UIController.SwitchState(TowerLevelUIState.Play);
 			m_UIController.SetIsLevelPlaying(m_LevelController.LevelData.IsPlaying);

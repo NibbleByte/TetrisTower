@@ -14,7 +14,6 @@ using TetrisTower.TowerLevels.Replays;
 using TetrisTower.TowerUI;
 using TetrisTower.Visuals;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace TetrisTower.TowerLevels
@@ -264,7 +263,13 @@ namespace TetrisTower.TowerLevels
 				timing = recordComponent.Timing;
 			}
 
-			uiController.SetIsReplayPlaying(playbackComponent != null);
+			if (m_PlayersCount > 1) {
+				uiController.SetPlayMode(TowerLevelUIPlayMode.PVPPlay);
+			} else if (playbackComponent != null) {
+				uiController.SetPlayMode(TowerLevelUIPlayMode.Replay);
+			} else {
+				uiController.SetPlayMode(TowerLevelUIPlayMode.NormalPlay);
+			}
 
 			//
 			// Setup Player

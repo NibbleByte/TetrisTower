@@ -15,6 +15,8 @@ namespace TetrisTower.Game
 		IReadOnlyList<GridLevelData> ActiveTowerLevels { get; }
 
 		IEnumerable<PlaythroughPlayer> ActivePlayers { get; }
+		bool IsSinglePlayer { get; }
+		bool IsMultiPlayer { get; }
 
 		public BlocksSkinSet BlocksSet { get; }
 

@@ -6,6 +6,13 @@ using UnityEngine;
 
 namespace TetrisTower.TowerUI
 {
+	public enum TowerLevelUIPlayMode
+	{
+		NormalPlay,
+		PVPPlay,
+		Replay,
+	}
+
 	public enum TowerLevelUIState
 	{
 		None = 0,
@@ -29,16 +36,17 @@ namespace TetrisTower.TowerUI
 		public TowerLevelUIState CurrentState = TowerLevelUIState.Play;
 
 		public StatePanelBinds[] StatePanels;
+		public StatePanelBinds[] PVPStatePanels;
 		public StatePanelBinds[] ReplayStatePanels;
 
 		[Tooltip("Elements needed only when game is playing (i.e. not won / lost animation).")]
 		public GameObject[] PlayingOnlyElements;
 
-		public bool IsReplayPlaying { get; private set; }
+		public TowerLevelUIPlayMode PlayMode { get; private set; }
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			foreach (var bind in StatePanels.Concat(ReplayStatePanels)) {
+			foreach (var bind in StatePanels.Concat(PVPStatePanels).Concat(ReplayStatePanels)) {
 				bind.Panel.SetActive(false);
 			}
 		}
@@ -66,14 +74,19 @@ namespace TetrisTower.TowerUI
 
 		public GameObject GetPanel(TowerLevelUIState state)
 		{
-			var statePanels = IsReplayPlaying ? ReplayStatePanels : StatePanels;
+			var statePanels = PlayMode switch {
+				TowerLevelUIPlayMode.NormalPlay => this.StatePanels,
+				TowerLevelUIPlayMode.PVPPlay => PVPStatePanels,
+				TowerLevelUIPlayMode.Replay => ReplayStatePanels,
+				_ => throw new NotImplementedException(),
+			};
 
 			foreach (var bind in statePanels) {
 				if (state == bind.State)
 					return bind.Panel;
 			}
 
-			throw new NotImplementedException();
+			throw new NotImplementedException($"Not supported {state} for {PlayMode}");
 		}
 
 
@@ -84,9 +97,9 @@ namespace TetrisTower.TowerUI
 			}
 		}
 
-		public void SetIsReplayPlaying(bool isReplayPlaying)
+		public void SetPlayMode(TowerLevelUIPlayMode playMode)
 		{
-			IsReplayPlaying = isReplayPlaying;
+			PlayMode = playMode;
 		}
 	}
 }
