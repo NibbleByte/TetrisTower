@@ -37,7 +37,7 @@ namespace TetrisTower.TowerLevels
 		{
 			m_PlaythroughData = playthroughData;
 			m_PlayersCount = playersCount;
-			m_PlayersManager = new TowerLevelPlayersManager(m_PlaythroughData);
+			m_PlayersManager = new TowerLevelPlayersManager(m_PlaythroughData, m_PlayersCount);
 		}
 
 		public void SetSceneOverride(SceneReference overrideScene)
@@ -221,8 +221,6 @@ namespace TetrisTower.TowerLevels
 
 			SetupLights(levelController, playerIndex);
 
-			SetupCamera(camera, playerIndex);
-
 			var uiCanvases = FindObjectsOfType<Canvas>(playerIndex);
 			var uiController = FindObjectOfType<TowerLevelUIController>(playerIndex);
 			if (uiController == null) {
@@ -292,7 +290,7 @@ namespace TetrisTower.TowerLevels
 			// Setup Player
 			//
 			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
-			var playthroughPlayer = m_PlayersManager.SetupPlayer(gameContext.GameConfig, levelController, levelData, camera, playerContext, uiCanvases);
+			var playthroughPlayer = m_PlayersManager.SetupPlayer(gameContext.GameConfig, playerIndex, levelController, levelData, camera, playerContext, uiCanvases);
 			playthroughPlayer.EventSystem.name = $"{gameContext.GameConfig.GameInputPrefab.name} [{playerIndex}]";
 
 			//
@@ -468,30 +466,6 @@ namespace TetrisTower.TowerLevels
 					}
 				}
 			}
-		}
-
-		private void SetupCamera(Camera camera, int playerIndex)
-		{
-			// Only one audio listener allowed.
-			if (playerIndex != 0) {
-				GameObject.DestroyImmediate(camera.GetComponentInChildren<AudioListener>(true));
-			}
-
-			Rect rect = m_PlayersCount switch {
-				// Full screen
-				1 => new Rect(0f, 0f, 1f, 1f),
-
-				// Side by side
-				2 => new Rect(playerIndex * (1f / m_PlayersCount), 0f, 1f / m_PlayersCount, 1f),
-				3 => new Rect(playerIndex * (1f / m_PlayersCount), 0f, 1f / m_PlayersCount, 1f),
-
-				// 4 corners
-				4 => new Rect((playerIndex % 2) * (2f / m_PlayersCount), ((3 - playerIndex) / 2) * (2f / m_PlayersCount), 2f / m_PlayersCount, 2f / m_PlayersCount),
-
-				_ => throw new NotSupportedException($"{m_PlayersCount} players not supported."),
-			};
-
-			camera.rect = rect;
 		}
 
 		private void CriticalError(string errorMessage, bool fallbackToHomescreen)

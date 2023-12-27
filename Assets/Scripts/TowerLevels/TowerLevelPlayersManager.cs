@@ -14,18 +14,22 @@ namespace TetrisTower.TowerLevels
 	public class TowerLevelPlayersManager
 	{
 		private IPlaythroughData m_PlaythroughData;
+		private int m_PlayersCount;
 
-		public TowerLevelPlayersManager(IPlaythroughData playthroughData)
+		public TowerLevelPlayersManager(IPlaythroughData playthroughData, int playersCount)
 		{
 			m_PlaythroughData = playthroughData;
+			m_PlayersCount = playersCount;
 		}
 
-		public PlaythroughPlayer SetupPlayer(GameConfig config, GridLevelController levelController, GridLevelData levelData, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
+		public PlaythroughPlayer SetupPlayer(GameConfig config, int playerIndex, GridLevelController levelController, GridLevelData levelData, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
 		{
 			var playthroughPlayer = PlaythroughPlayer.Create(config, levelController, camera, playerContextRoot, uiCanvases);
 			m_PlaythroughData.AssignPlayer(playthroughPlayer, levelData);
 
 			levelController.FinishedLevel += () => OnLevelFinished(playthroughPlayer);
+
+			SetupCamera(camera, playerIndex);
 
 			return playthroughPlayer;
 		}
@@ -43,6 +47,36 @@ namespace TetrisTower.TowerLevels
 			//PlayerContextUIRootObject.GlobalPlayerContext.EventSystem.gameObject.SetActive(true);
 
 			m_PlaythroughData = null;
+		}
+
+		private void SetupCamera(Camera camera, int playerIndex)
+		{
+			// Only one audio listener allowed.
+			if (playerIndex != 0) {
+				GameObject.DestroyImmediate(camera.GetComponentInChildren<AudioListener>(true));
+			}
+
+			switch (m_PlayersCount) {
+				// Full screen
+				case 1:
+					camera.rect = new Rect(0f, 0f, 1f, 1f);
+					break;
+
+				// Side by side
+				case 2:
+				case 3:
+					camera.rect = new Rect(playerIndex * (1f / m_PlayersCount), 0f, 1f / m_PlayersCount, 1f);
+					camera.fieldOfView += m_PlayersCount == 2 ? 5 : 10;
+					break;
+
+				// 4 corners
+				case 4:
+					camera.rect = new Rect((playerIndex % 2) * (2f / m_PlayersCount), ((3 - playerIndex) / 2) * (2f / m_PlayersCount), 2f / m_PlayersCount, 2f / m_PlayersCount);
+					break;
+
+				default:
+					throw new NotSupportedException($"{m_PlayersCount} players not supported.");
+			}
 		}
 
 		public void SetupPlayersInput()
