@@ -29,6 +29,9 @@ namespace TetrisTower.Visuals.Effects
 			// Assembly non-reload may preserve this, no?
 			if (m_PreviewRenderer == null) {
 				m_PreviewRenderer = Instantiate(BlockPreviewPrefab, transform).GetComponent<Renderer>();
+
+				// HACK: Don't have access to the player index here - set it to default, lit by the level. It's transparent effect so we don't care.
+				Game.GameLayers.SetLayerRecursively(m_PreviewRenderer.gameObject, 0);
 			}
 
 			m_PreviewRenderer.transform.position = VisualsGrid.ConeApex;

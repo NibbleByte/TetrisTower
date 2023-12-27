@@ -3,6 +3,7 @@ using DevLocker.GFrame.Timing;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TetrisTower.Game;
 using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -102,11 +103,15 @@ namespace TetrisTower.Visuals
 
 		private Effects.FairyMatchingController m_Fairy;
 
-		public void Init(PlayerStatesContext context, System.Random visualsRandom)
+		private int m_BlocksLayer;
+
+		public void Init(PlayerStatesContext context, System.Random visualsRandom, int blocksLayer)
 		{
 			GridLevelController towerLevel = context.FindByType<GridLevelController>();
 			m_Timing = towerLevel.Timing;
 			VisualsRandom = visualsRandom;
+			m_BlocksLayer = blocksLayer;
+			FallTrailEffectsManager.BlocksLayer = m_BlocksLayer;
 
 			BlocksGrid grid = towerLevel.Grid;
 
@@ -463,6 +468,9 @@ namespace TetrisTower.Visuals
 				reuseVisuals.transform.SetParent(transform);
 			} else {
 				reuseVisuals = GameObject.Instantiate(m_BlocksSkinStack.GetPrefabFor(blockType), transform);
+
+				// Set layer per player so their blocks directional lights don't mix.
+				GameLayers.SetLayerRecursively(reuseVisuals, m_BlocksLayer);
 			}
 
 			reuseVisuals.transform.position = ConeApex;

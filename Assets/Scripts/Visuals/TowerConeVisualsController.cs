@@ -6,6 +6,7 @@ using TetrisTower.Core;
 using System.Linq;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Timing;
+using TetrisTower.Game;
 
 namespace TetrisTower.Visuals
 {
@@ -49,7 +50,9 @@ namespace TetrisTower.Visuals
 		private Tuple<int, int, bool>[] m_RotatingFallingShapeCoordsChange;
 		private float m_RotatingFallingShapeAnalogLastProgress;
 
-		public void Init(PlayerStatesContext context, System.Random visualsRandom)
+		private int m_BlocksLayer;
+
+		public void Init(PlayerStatesContext context, System.Random visualsRandom, int blocksLayer)
 		{
 			if (!isActiveAndEnabled)
 				return;
@@ -65,11 +68,15 @@ namespace TetrisTower.Visuals
 
 			m_Timing.PreUpdate += LevelLateUpdate;
 
+			m_BlocksLayer = blocksLayer;
+			if (FallTrailEffectsManager) FallTrailEffectsManager.BlocksLayer = blocksLayer;
+			if (WonFallTrailEffectsManager) WonFallTrailEffectsManager.BlocksLayer = blocksLayer;
+
 			FallingVisualsContainer.SetParent(transform);
 			FallingVisualsContainer.localPosition = Vector3.zero;
 
 			m_TowerLevel.Grids.Add(VisualsGrid);
-			VisualsGrid.Init(context, visualsRandom);
+			VisualsGrid.Init(context, visualsRandom, blocksLayer);
 
 			DestroyFallingVisuals();
 
@@ -141,6 +148,9 @@ namespace TetrisTower.Visuals
 			foreach (var bind in blocksShape.ShapeCoords) {
 				var visualBlock = GameObject.Instantiate(m_LevelData.BlocksSkinStack.GetPrefabFor(bind.Value), FallingVisualsContainer);
 				visualbinds.Add(GridShape<GameObject>.Bind(bind.Coords, visualBlock));
+
+				// Set layer per player so their blocks directional lights don't mix.
+				GameLayers.SetLayerRecursively(visualBlock, m_BlocksLayer);
 
 				visualBlock.transform.position = VisualsGrid.ConeApex;
 				visualBlock.transform.localRotation = VisualsGrid.GridColumnToRotation(bind.Coords.Column);	 // Set rotation in case of shape with multiple columns.

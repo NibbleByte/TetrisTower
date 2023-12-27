@@ -14,7 +14,6 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerPlayState : IPlayerState, IUpdateListener, PlayerControls.ITowerLevelPlayActions
 	{
-		private IPlaythroughData m_PlaythroughData;
 		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private GameConfig m_GameConfig;
@@ -34,7 +33,6 @@ namespace TetrisTower.TowerLevels
 
 		public void EnterState(PlayerStatesContext context)
 		{
-			context.SetByType(out m_PlaythroughData);
 			context.SetByType(out m_PlayerContext);
 			context.SetByType(out m_PlayerControls);
 			context.SetByType(out m_LevelController);

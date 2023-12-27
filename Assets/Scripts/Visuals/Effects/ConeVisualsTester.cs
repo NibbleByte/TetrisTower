@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TetrisTower.Game;
 
 namespace TetrisTower.Visuals.Effects
 {
@@ -25,6 +26,7 @@ namespace TetrisTower.Visuals.Effects
 			}
 
 			m_FallTrailEffectManager = GetComponentInParent<FallTrailEffectsManager>();
+			m_FallTrailEffectManager.BlocksLayer = GameLayers.BlocksLayer(0);
 		}
 
 		public void HighlightBlocks()

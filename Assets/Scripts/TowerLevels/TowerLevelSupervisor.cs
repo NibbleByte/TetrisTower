@@ -334,7 +334,8 @@ namespace TetrisTower.TowerLevels
 			m_PlayersManager.SetupPlayersInput();
 
 			// After all players have loaded their scenes, start the game.
-			foreach(var startData in allPlayersStartData) {
+			for (int playerIndex = 0; playerIndex < allPlayersStartData.Count; playerIndex++) {
+				StartData startData = allPlayersStartData[playerIndex];
 				PlaythroughPlayer player = startData.Player ;
 				MonoBehaviour[] behaviours = startData.Behaviours;
 
@@ -347,7 +348,7 @@ namespace TetrisTower.TowerLevels
 				}
 
 				// Other visuals depend on this, so init it first.
-				behaviours.OfType<TowerConeVisualsController>().First().Init(player.PlayerContext.StatesStack.Context, startData.VisualsRandom);
+				behaviours.OfType<TowerConeVisualsController>().First().Init(player.PlayerContext.StatesStack.Context, startData.VisualsRandom, GameLayers.BlocksLayer(playerIndex));
 
 				foreach (var listener in behaviours.OfType<ILevelLoadedListener>()) {
 					listener.OnLevelLoaded(player.PlayerContext.StatesStack.Context);
@@ -449,14 +450,15 @@ namespace TetrisTower.TowerLevels
 			var blocksLight = levelController.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
 
 			if (blocksLight) {
-				blocksLight.cullingMask = GameLayers.BlocksMask;
+				// Set layer per player so their blocks directional lights don't mix.
+				blocksLight.cullingMask = GameLayers.BlocksMask(playerIndex);
 
 				var levelLights = FindObjectsOfType<Light>(playerIndex);
 				foreach(Light light in levelLights) {
 					if (light != blocksLight) {
 						light.cullingMask &= light.GetComponentInParent<Visuals.Effects.FairyMatchingController>()
 							? ~0 // Fairy lights up everything
-							: ~GameLayers.BlocksMask // Light environment without the blocks.
+							: ~GameLayers.BlocksMaskAll() // Light environment without the blocks.
 							;
 
 						// Only one directional light allowed.

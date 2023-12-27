@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using TetrisTower.Game;
 using UnityEngine;
 
 namespace TetrisTower.Visuals.Effects
@@ -46,6 +48,9 @@ namespace TetrisTower.Visuals.Effects
 		[Tooltip("Optional - Partical effect to be moved with the bottom falling block of the group.")]
 		public ParticleSystem ParticlesTemplate;
 
+		[NonSerialized]
+		public int BlocksLayer = -1;
+
 		private int m_TopScalePropID;
 		private int m_BottomPropID;
 		private int m_AlphaPropID;
@@ -78,6 +83,9 @@ namespace TetrisTower.Visuals.Effects
 				effectGO.name = $"_{block.name}_Effect";
 				effectGO.transform.localScale = block.transform.localScale + new Vector3(AddSideScale, 0f, 0f);
 				effectGO.transform.position = block.transform.position + block.transform.forward * AddForwardOffset;
+
+				// Set layer per player so their blocks directional lights don't mix.
+				GameLayers.SetLayerRecursively(effectGO, BlocksLayer);
 
 				ConeVisualsBlock effectBlock = effectGO.GetComponent<ConeVisualsBlock>();
 				if (effectBlock == null) {
