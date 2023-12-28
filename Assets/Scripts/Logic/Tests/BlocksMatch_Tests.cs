@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Runtime.CompilerServices;
 using System.Text;
 using DevLocker.GFrame.Input;
@@ -1338,6 +1339,103 @@ namespace TetrisTower.Logic
 			yield return EvaluateGrid(blocks, blocksDone, 1, 6, false);
 
 			Assert.IsTrue(objective.Status == ObjectiveStatus.Completed, $"{nameof(ClearCoordinates_Objective)} did not complete.");
+		}
+
+		#endregion
+
+		#region Push Up Tests
+
+		[UnityTest]
+		public IEnumerator PushUpActions()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ B, N, B, N, N, N, N, N, B, N, B, N, N },
+				{ R, N, R, N, N, N, B, N, R, N, R, N, R },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ N, N, N, N, N, N, N, N, N, N, B, N, N },
+				{ N, N, N, N, N, N, N, N, B, N, R, N, N },
+				{ B, N, B, N, N, N, N, N, R, N, G, N, N },
+				{ R, N, R, N, N, N, B, N, G, N, B, N, R },
+				{ G, N, G, N, G, N, G, N, G, N, G, B, G },
+			};
+
+			var pushBlocks = new List<KeyValuePair<int, BlockType>> {
+				KeyValuePair.Create(0, G),
+				KeyValuePair.Create(2, G),
+				KeyValuePair.Create(4, G),
+				KeyValuePair.Create(6, G),
+				KeyValuePair.Create(8, G),
+				KeyValuePair.Create(8, G),
+				KeyValuePair.Create(10, G),
+				KeyValuePair.Create(10, B),
+				KeyValuePair.Create(10, G),
+				KeyValuePair.Create(11, B),
+				KeyValuePair.Create(12, G),
+			};
+
+			yield return SetupGrid(blocks, DefaultRules, (MatchScoringType)~0);
+			m_SkipGridSetup = true;
+
+			yield return m_Grid.ApplyActions(new GridAction[] { new PushUpCellsAction() { PushBlocks = pushBlocks } });
+
+			yield return EvaluateGrid(blocks, blocksDone, 0, 0, doMirror: false);
+		}
+
+		[UnityTest]
+		public IEnumerator PushUpPinnedActions()
+		{
+			BlockType[,] blocks = new BlockType[,] {
+				{ B, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ R, N, R, N, N, N, N, N, N, N, N, N, N },
+				{ B, N, B, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ R, N, R, N, N, N, N, N, N, N, N, N, N },
+			};
+
+			BlockType[,] blocksDone = new BlockType[,] {
+				{ B, N, N, N, N, N, N, N, N, N, N, N, N },
+				{ N, N, R, N, N, N, N, N, N, N, N, N, N },
+				{ R, N, B, N, N, N, N, N, N, N, N, N, N },
+				{ B, N, R, N, N, N, N, N, N, N, N, N, N },
+				{ R, N, G, N, N, N, N, N, N, N, N, N, N },
+				{ G, N, R, N, N, N, N, N, N, N, N, N, N },
+				{ R, N, G, N, N, N, N, N, N, N, N, N, N },
+				{ G, N, R, N, N, N, N, N, N, N, N, N, N },
+			};
+
+			var pushBlocks = new List<KeyValuePair<int, BlockType>> {
+				KeyValuePair.Create(0, G),
+				KeyValuePair.Create(0, R),
+				KeyValuePair.Create(0, G),
+				KeyValuePair.Create(2, G),
+				KeyValuePair.Create(2, R),
+				KeyValuePair.Create(2, G),
+				KeyValuePair.Create(2, R),
+			};
+
+			GridCoords[] pinned = new GridCoords[] {
+				new GridCoords(2, 0),
+				new GridCoords(3, 0),
+				new GridCoords(7, 0),
+
+				new GridCoords(2, 2),
+			};
+
+
+			var startGrid = new BlocksGrid(MaxRows, MaxColumns);
+			yield return startGrid.ApplyActions(new GridAction[] { SetupPlaceAction(blocks) });
+
+			SetupLevelData(new BlocksGrid(startGrid, MaxRows, MaxColumns, pinned), new ScoreGrid(MaxRows, MaxColumns, DefaultRules), DefaultRules, (MatchScoringType)~0);
+			m_SkipGridSetup = true;
+
+			yield return m_Grid.ApplyActions(new GridAction[] { new PushUpCellsAction() { PushBlocks = pushBlocks } });
+
+			yield return EvaluateGrid(blocks, blocksDone, 0, 0, doMirror: false);
 		}
 
 		#endregion

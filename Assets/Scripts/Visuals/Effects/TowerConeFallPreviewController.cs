@@ -43,6 +43,7 @@ namespace TetrisTower.Visuals.Effects
 
 			m_TowerLevel.FallingColumnChanged += OnFallingColumnChanged;
 			m_TowerLevel.FallingShapeSelected += OnFallingShapeSelected;
+			m_TowerLevel.RunningActionsSequenceFinished += OnRunningActionsSequenceFinished;
 
 			m_PreviewRenderer.gameObject.SetActive(m_LevelData.FallingShape != null);
 
@@ -60,6 +61,7 @@ namespace TetrisTower.Visuals.Effects
 
 			m_TowerLevel.FallingColumnChanged -= OnFallingColumnChanged;
 			m_TowerLevel.FallingShapeSelected -= OnFallingShapeSelected;
+			m_TowerLevel.RunningActionsSequenceFinished -= OnRunningActionsSequenceFinished;
 		}
 
 		private void OnFallingShapeSelected()
@@ -71,6 +73,11 @@ namespace TetrisTower.Visuals.Effects
 		}
 
 		private void OnFallingColumnChanged()
+		{
+			UpdatePreviewPosition();
+		}
+
+		private void OnRunningActionsSequenceFinished()
 		{
 			UpdatePreviewPosition();
 		}
@@ -95,7 +102,7 @@ namespace TetrisTower.Visuals.Effects
 			if (m_LevelData == null || m_PreviewRenderer == null)
 				return;
 
-			if (m_LevelData.FallingShape == null || !m_LevelData.IsPlaying) {
+			if (m_LevelData.FallingShape == null || !m_LevelData.IsPlaying || VisualsGrid.CurrentlyRunningAction is PushUpCellsAction) {
 				if (m_PreviewRenderer.gameObject.activeSelf) {
 					m_PreviewRenderer.gameObject.SetActive(false);
 				}
@@ -103,6 +110,7 @@ namespace TetrisTower.Visuals.Effects
 				return;
 
 			} else if (!m_PreviewRenderer.gameObject.activeSelf) {
+				UpdatePreviewPosition();
 				m_PreviewRenderer.gameObject.SetActive(true);
 			}
 

@@ -70,7 +70,10 @@ namespace TetrisTower.Visuals
 		public int Rows => m_Blocks.GetLength(0);
 		public int Columns => m_Blocks.GetLength(1);
 
-		public ConeVisualsBlock this[int row, int column] => m_Blocks[row, column];
+		public ConeVisualsBlock this[int row, int column] {
+			get => m_Blocks[row, column];
+			private set => m_Blocks[row, column] = value;
+		}
 
 		public ConeVisualsBlock this[GridCoords coords] {
 			get => m_Blocks[coords.Row, coords.Column];
@@ -95,9 +98,10 @@ namespace TetrisTower.Visuals
 		private BlocksSkinStack m_BlocksSkinStack;
 		private GridRules m_Rules;
 		private ScoreGrid m_ScoreGrid = null;
-		private WiseTiming m_Timing;
 
 		public System.Random VisualsRandom { get; private set; }
+
+		public GridAction CurrentlyRunningAction { get; private set; }
 
 		private GridCoords m_PlayableArea;
 
@@ -108,7 +112,6 @@ namespace TetrisTower.Visuals
 		public void Init(PlayerStatesContext context, System.Random visualsRandom, int blocksLayer)
 		{
 			GridLevelController towerLevel = context.FindByType<GridLevelController>();
-			m_Timing = towerLevel.Timing;
 			VisualsRandom = visualsRandom;
 			m_BlocksLayer = blocksLayer;
 			FallTrailEffectsManager.BlocksLayer = m_BlocksLayer;
@@ -279,6 +282,8 @@ namespace TetrisTower.Visuals
 				;
 
 			foreach (var action in MergeActions(actions)) {
+				CurrentlyRunningAction = action;
+
 				switch (action) {
 					case PlaceAction placeAction:
 						yield return PlaceShape(placeAction);
@@ -289,12 +294,17 @@ namespace TetrisTower.Visuals
 					case MoveCellsAction moveAction:
 						yield return MoveCells(moveAction);
 						break;
+					case PushUpCellsAction pushUpAction:
+						yield return PushUpCells(pushUpAction);
+						break;
 					case EvaluationSequenceFinishAction finishAction:
 						ScoreFinished?.Invoke(m_ScoreGrid);
 						m_ScoreGrid = null;
 						break;
 				}
 			}
+
+			CurrentlyRunningAction = null;
 		}
 
 		private IEnumerable<GridAction> MergeActions(IEnumerable<GridAction> actions)
@@ -462,7 +472,120 @@ namespace TetrisTower.Visuals
 			yield break;
 		}
 
-		private void CreateInstanceAt(GridCoords coords, BlockType blockType, GameObject reuseVisuals = null)
+		private IEnumerator PushUpCells(PushUpCellsAction action)
+		{
+			if (Application.isPlaying) {
+
+				ConeVisualsBlock GetBlock(int row, int column, ConeVisualsBlock fallback) => row >= 0 && row < Rows ? this[row, column] : fallback;
+
+
+				// Each column can be pushed multiple times - do one push per column at a time, until there are no more pushes left.
+				// This handles pinned blocks in mid-air.
+				var pushesLeft = action.PushBlocks.ToList();
+				var pushesDoneCount = action.PushBlocks.GroupBy(pair => pair.Key).ToDictionary(group => group.Key, group => 0);
+				var risingBlocks = action.PushBlocks.GroupBy(pair => pair.Key).ToDictionary(group => group.Key, group => (ConeVisualsBlock)null);
+				var columnsProcessedThisFrame = new HashSet<int>();
+
+				float startTime = WiseTiming.Time;
+				bool waitingBlocks = true;
+				while (waitingBlocks) {
+					waitingBlocks = false;
+
+					columnsProcessedThisFrame.Clear();
+
+					float timePassed = WiseTiming.Time - startTime;
+
+					for (int i = 0; i < pushesLeft.Count; i++) {
+						int column = pushesLeft[i].Key;
+
+						if (!columnsProcessedThisFrame.Add(column))
+							continue;
+
+						ConeVisualsBlock risingBlock = risingBlocks[column];
+						if (risingBlock == null) {
+							risingBlock = CreateInstanceAt(new GridCoords(-1, column), pushesLeft[i].Value, placeInGrid: false);
+							risingBlocks[column] = risingBlock;
+						}
+
+						// Pushes are done cell by cell. If same column is pushed twice reflect this in the time needed.
+						float distance = pushesDoneCount[column] + 1;
+						float timeNeeded = distance / BlockMoveSpeed;
+
+						// -1 is the newly added block, outside the grid.
+						int row = -1;
+						while (row < Rows - 1 && GetBlock(row, column, risingBlock) != null) {
+							var startScale = GridToScale(new GridCoords(row, column));
+							var endScale = GridToScale(new GridCoords(row + 1, column));
+
+							// "timePassed / timeNeeded" doesn't work for 2 or more pushes. Treat it as 1 cell distance and use the remainder
+							float t = (timePassed / (1 / BlockMoveSpeed)) % 1;
+
+							var scale = Vector3.Lerp(startScale, endScale, t);
+
+							GetBlock(row, column, risingBlock).transform.localScale = scale;
+
+							row++;
+						}
+
+						if (timePassed < timeNeeded) {
+							waitingBlocks = true;
+						} else {
+							// Can continue with the next push, so animation doesn't skip a frame.
+							columnsProcessedThisFrame.Remove(column);
+
+							// Go up finding the first empty row, as there may be pinned blocks in mid-air.
+							// Pinned blocks will be pushed up by other blocks.
+							row = 0;
+							while (row < Rows - 1 && this[row, column] != null) {
+								row++;
+							}
+
+							// Check if we're pushing blocks outside the grid (should not happen?).
+							var topPlayableRowCoords = new GridCoords(Rows - 1, column);
+							if (row == topPlayableRowCoords.Row) {
+								if (this[topPlayableRowCoords] != null) {
+									Debug.LogError($"Pushing blocks in visuals grid at {column} column, which is full!", this);
+									DestroyInstanceAt(new GridCoords(topPlayableRowCoords));
+								}
+							}
+
+							// Now go down moving up all the rows.
+							for (--row; row >= 0; --row) {
+								GridCoords toRow = new GridCoords(row + 1, column);
+								this[toRow] = this[row, column];
+
+								ConeVisualsBlock visualsBlock = this[toRow];
+								visualsBlock.transform.localScale = GridToScale(toRow);
+
+								if (visualsBlock.IsHighlighted && toRow.Row < m_PlayableArea.Row) {
+									visualsBlock.IsHighlighted = false;
+								} else if (!visualsBlock.IsHighlighted && toRow.Row >= m_PlayableArea.Row) {
+									visualsBlock.IsHighlighted = true;
+								}
+							}
+
+							this[0, column] = risingBlock;
+							this[0, column].transform.localScale = GridToScale(new GridCoords(0, column));
+
+							risingBlocks[column] = null;
+							pushesLeft.RemoveAt(i);
+							pushesDoneCount[column]++;
+							i--;
+
+							if (pushesLeft.Any(pair => pair.Key == column)) {
+								waitingBlocks = true;
+							}
+						}
+					}
+
+					yield return null;
+				}
+			}
+
+			yield break;
+		}
+
+		private ConeVisualsBlock CreateInstanceAt(GridCoords coords, BlockType blockType, GameObject reuseVisuals = null, bool placeInGrid = true)
 		{
 			if (reuseVisuals) {
 				reuseVisuals.transform.SetParent(transform);
@@ -478,10 +601,15 @@ namespace TetrisTower.Visuals
 
 			// Hitting the limit, won't be stored.
 			if (coords.Row < Rows) {
-				Debug.Assert(this[coords] == null);
-
 				var visualsBlock = reuseVisuals.AddComponent<ConeVisualsBlock>();
-				this[coords] = visualsBlock;
+
+				if (placeInGrid) {
+					if (this[coords] != null) {
+						Debug.LogError($"Creating instance at {coords} which is already taken by {this[coords].name}, for {blockType}", this);
+						DestroyInstanceAt(coords);
+					}
+					this[coords] = visualsBlock;
+				}
 
 				reuseVisuals.transform.localScale = GridToScale(coords);
 
@@ -494,8 +622,11 @@ namespace TetrisTower.Visuals
 
 				CreatedVisualsBlock?.Invoke(visualsBlock);
 
+				return visualsBlock;
+
 			} else {
 				GameObject.Destroy(reuseVisuals);
+				return null;
 			}
 		}
 

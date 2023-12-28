@@ -17,7 +17,10 @@ namespace TetrisTower.Logic
 		public int Rows => m_Rows;
 		public int Columns => m_Columns;
 
-		public BlockType this[int row, int column] => m_Blocks[row * Columns + column];
+		public BlockType this[int row, int column] {
+			get => m_Blocks[row * Columns + column];
+			private set => m_Blocks[row * Columns + column] = value;
+		}
 
 		public BlockType this[GridCoords coords] {
 			get => m_Blocks[coords.Row * Columns + coords.Column];
@@ -107,6 +110,9 @@ namespace TetrisTower.Logic
 					case MoveCellsAction moveAction:
 						yield return MoveCells(moveAction);
 						break;
+					case PushUpCellsAction pushUpAction:
+						yield return PushUpCells(pushUpAction);
+						break;
 				}
 			}
 		}
@@ -142,7 +148,9 @@ namespace TetrisTower.Logic
 				if (pair.Coords.Row >= Rows)
 					continue;
 
-				UnityEngine.Debug.Assert(this[pair.Coords] == BlockType.None);
+				if (this[pair.Coords] != BlockType.None) {
+					UnityEngine.Debug.LogError($"Placing block {pair.Value} in grid at {pair.Coords}, which is already taken by {this[pair.Coords]}");
+				}
 
 				this[pair.Coords] = pair.Value;
 			}
@@ -171,6 +179,34 @@ namespace TetrisTower.Logic
 
 				this[movedCell.Value] = this[movedCell.Key];
 				this[movedCell.Key] = BlockType.None;
+			}
+
+			yield break;
+		}
+
+		private IEnumerator PushUpCells(PushUpCellsAction action)
+		{
+			foreach(var pair in action.PushBlocks) {
+				int column = pair.Key;
+
+				// Go up finding the first empty row, as there may be pinned blocks in mid-air.
+				// Pinned blocks will be pushed up by other blocks.
+				int row = 0;
+				while (row < Rows - 1 && this[row, column] != BlockType.None) {
+					row++;
+				}
+
+				if (row == Rows - 1 && this[Rows - 1, column] != BlockType.None) {
+					UnityEngine.Debug.LogError($"Pushing blocks in grid at {column} column, which is full!");
+				}
+
+				// Now go down moving up all the rows.
+				for(--row; row >= 0; --row) {
+					this[row + 1, column] = this[row, column];
+					UnpinCoords(new GridCoords(row, column));
+				}
+
+				this[0, column] = pair.Value;
 			}
 
 			yield break;
