@@ -115,6 +115,7 @@ namespace TetrisTower.Logic
 				m_CurrentClearedBlocksCount += action.Coords.Count;
 			}
 
+			// This happens after score is calculated - can't subscribe to BlocksGrid directly.
 			ClearActionScored?.Invoke(action);
 		}
 

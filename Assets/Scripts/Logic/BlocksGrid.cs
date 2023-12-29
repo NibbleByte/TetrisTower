@@ -27,6 +27,9 @@ namespace TetrisTower.Logic
 			private set => m_Blocks[coords.Row * Columns + coords.Column] = value;
 		}
 
+		public delegate void BlockMovedEventHandler(GridCoords from, GridCoords to);
+		public event BlockMovedEventHandler BlockMoved;
+
 
 		[UnityEngine.SerializeField] private int m_Rows;
 		[UnityEngine.SerializeField] private int m_Columns;
@@ -179,6 +182,8 @@ namespace TetrisTower.Logic
 
 				this[movedCell.Value] = this[movedCell.Key];
 				this[movedCell.Key] = BlockType.None;
+
+				BlockMoved?.Invoke(movedCell.Key, movedCell.Value);
 			}
 
 			yield break;
@@ -204,6 +209,8 @@ namespace TetrisTower.Logic
 				for(--row; row >= 0; --row) {
 					this[row + 1, column] = this[row, column];
 					UnpinCoords(new GridCoords(row, column));
+
+					BlockMoved?.Invoke(new GridCoords(row, column), new GridCoords(row + 1, column));
 				}
 
 				this[0, column] = pair.Value;

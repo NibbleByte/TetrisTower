@@ -9,6 +9,44 @@ namespace TetrisTower.Visuals
 		[NonSerialized]
 		public int MatchHits = 0;
 
+		public bool IsHighlighted {
+			get => m_IsHighlighted;
+			set {
+				m_IsHighlighted = value;
+
+				if (m_IsHighlighted || m_IsObjective) {
+					SetFloat(m_HighlightEnabledId, 1f);
+				} else {
+					ClearProperty(m_HighlightEnabledId);
+				}
+				ApplyProperties();
+			}
+		}
+		private bool m_IsHighlighted;
+
+		public bool IsObjective {
+			get => m_IsObjective;
+			set {
+				m_IsObjective = value;
+
+				if (m_IsHighlighted || m_IsObjective) {
+					SetFloat(m_HighlightEnabledId, 1f);
+				} else {
+					ClearProperty(m_HighlightEnabledId);
+				}
+				ApplyProperties();
+			}
+		}
+		private bool m_IsObjective;
+
+		public void ClearAnyHighlights()
+		{
+			// Don't change the highlight bools state, just clear the visuals.
+			// It may need to be restored at some point? No? Whatever.
+			ClearProperty(m_HighlightEnabledId);
+			ApplyProperties();
+		}
+
 		private Renderer m_Renderer;
 		private Material m_OriginalMaterial;
 
@@ -173,21 +211,5 @@ namespace TetrisTower.Visuals
 		}
 
 		#endregion
-
-		private bool m_IsHighlighted;
-		public bool IsHighlighted {
-			get => m_IsHighlighted;
-			set {
-				if (value) {
-					SetFloat(m_HighlightEnabledId, 1f);
-				} else {
-					ClearProperty(m_HighlightEnabledId);
-				}
-				ApplyProperties();
-
-				m_IsHighlighted = value;
-			}
-		}
-
 	}
 }

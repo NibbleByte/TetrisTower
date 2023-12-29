@@ -20,6 +20,9 @@ namespace TetrisTower.TowerObjectives
 		public List<GridCoords> Coordinates = new List<GridCoords>();
 
 		[JsonIgnore]
+		private BlocksGrid m_BlocksGrid;
+
+		[JsonIgnore]
 		private ScoreGrid m_ScoreGrid;
 
 		[JsonIgnore]
@@ -27,6 +30,9 @@ namespace TetrisTower.TowerObjectives
 
 		public void OnPostLevelLoaded(PlayerStatesContext context)
 		{
+			m_BlocksGrid = context.FindByType<GridLevelData>().Grid;
+			m_BlocksGrid.BlockMoved += OnBlocksMoved;
+
 			m_ScoreGrid = context.FindByType<GridLevelData>().Score;
 			m_ScoreGrid.ClearActionScored += OnClearActionScored;
 
@@ -38,7 +44,17 @@ namespace TetrisTower.TowerObjectives
 		// For unit tests.
 		public void OnPreLevelUnloading()
 		{
+			m_BlocksGrid.BlockMoved -= OnBlocksMoved;
 			m_ScoreGrid.ClearActionScored -= OnClearActionScored;
+		}
+
+		private void OnBlocksMoved(GridCoords from, GridCoords to)
+		{
+			for (int i = 0; i < Coordinates.Count; i++) {
+				if (Coordinates[i] == from) {
+					Coordinates[i] = to;
+				}
+			}
 		}
 
 		private void OnClearActionScored(ClearMatchedAction action)
@@ -68,7 +84,7 @@ namespace TetrisTower.TowerObjectives
 			for (int i = 0; i < Coordinates.Count; ++i) {
 				GridCoords coords = Coordinates[i];
 
-				bool success = m_Presenter.HighlightBlock(coords);
+				bool success = m_Presenter.HighlightAsObjective(coords);
 				if (!success) {
 					Debug.LogWarning($"ClearCoordinates objective needs block at {coords}, but none was found. No block will be highlighted");
 					Coordinates.RemoveAt(i);

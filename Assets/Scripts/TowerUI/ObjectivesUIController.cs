@@ -83,14 +83,14 @@ namespace TetrisTower.TowerUI
 			}
 		}
 
-		public bool HighlightBlock(GridCoords coords)
+		public bool HighlightAsObjective(GridCoords coords)
 		{
 			ConeVisualsBlock block = m_VisualsGrid[coords];
 			if (block == null) {
 				return false;
 			}
 
-			block.IsHighlighted = true;
+			block.IsObjective = true;
 			return true;
 		}
 	}

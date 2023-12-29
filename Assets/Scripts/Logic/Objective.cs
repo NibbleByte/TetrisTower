@@ -36,7 +36,7 @@ namespace TetrisTower.Logic
 		void SetObjectiveText(Objective objective, string text);
 		void ClearObjectiveText(Objective objective);
 
-		bool HighlightBlock(GridCoords coords);
+		bool HighlightAsObjective(GridCoords coords);
 	}
 
 	public class MultiObjectivesPresenter : ObjectivesPresenter
@@ -72,12 +72,12 @@ namespace TetrisTower.Logic
 			}
 		}
 
-		public bool HighlightBlock(GridCoords coords)
+		public bool HighlightAsObjective(GridCoords coords)
 		{
 			bool success = false;
 
 			foreach (var presenter in Presenters) {
-				success = presenter.HighlightBlock(coords) || success;
+				success = presenter.HighlightAsObjective(coords) || success;
 			}
 
 			return success;

@@ -171,6 +171,16 @@ namespace TetrisTower.TowerLevels
 				ToggleMatching();
 			}
 
+#if UNITY_EDITOR
+			if (Keyboard.current.uKey.wasPressedThisFrame) {
+				var pushBlocks = new List<KeyValuePair<int, BlockType>> {
+						KeyValuePair.Create(m_TowerLevel.LevelData.FallingColumn, BlockType.B5),
+						KeyValuePair.Create(m_TowerLevel.LevelData.FallingColumn, BlockType.B6),
+					};
+				m_TowerLevel.StartRunActions(new List<GridAction> { new PushUpCellsAction() { PushBlocks = pushBlocks } } );
+			}
+#endif
+
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {
 				MessageBox.Instance.ShowInput(
 					"Save?",
