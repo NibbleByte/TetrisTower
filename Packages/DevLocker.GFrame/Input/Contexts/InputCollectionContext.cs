@@ -88,7 +88,7 @@ namespace DevLocker.GFrame.Input.Contexts
 			InputSystem.onEvent -= OnInputSystemEvent;
 			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
 
-			InputActionsMaskedStack.ForceClearAllEnableRequests();
+			InputActionsMaskedStack.Dispose();
 
 			if (User.valid) {
 				User.UnpairDevicesAndRemoveUser();

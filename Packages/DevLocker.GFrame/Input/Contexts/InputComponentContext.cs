@@ -125,7 +125,7 @@ namespace DevLocker.GFrame.Input.Contexts
 			InputSystem.onEvent -= OnInputSystemEvent;
 			InputSystem.onDeviceChange -= OnInputSystemDeviceChange;
 
-			InputActionsMaskedStack.ForceClearAllEnableRequests();
+			InputActionsMaskedStack.Dispose();
 		}
 
 		public void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None)

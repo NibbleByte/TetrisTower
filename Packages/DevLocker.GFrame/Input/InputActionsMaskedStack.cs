@@ -54,11 +54,24 @@ namespace DevLocker.GFrame.Input
 
 		private HashSet<InputAction> m_CurrentActionsMask => m_MasksStack.LastOrDefault()?.MaskActions;
 
+		private bool m_Disposed = false;
+
 		public InputActionsMaskedStack(IInputActionCollection2 actions)
 		{
 			foreach(InputAction action in actions) {
 				m_Actions.Add(action, new HashSet<object>(2));
 			}
+		}
+
+		/// <summary>
+		/// Called by the InputContext when you're done with it.
+		/// Once disposed, it will ignore all enable/disable requests.
+		/// This will suppress any input conflict errors for scope elements being destroyed afterwards.
+		/// </summary>
+		public void Dispose()
+		{
+			ForceClearAllEnableRequests();
+			m_Disposed = true;
 		}
 
 		/// <summary>
@@ -69,6 +82,9 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public void Enable(object source, InputAction action)
 		{
+			if (m_Disposed)
+				return;
+
 			if (source == null || action == null)
 				throw new ArgumentNullException();
 
@@ -97,6 +113,9 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public void Disable(object source, InputAction action)
 		{
+			if (m_Disposed)
+				return;
+
 			if (source == null || action == null)
 				throw new ArgumentNullException();
 
@@ -124,6 +143,9 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public void Disable(object source)
 		{
+			if (m_Disposed)
+				return;
+
 			if (source == null)
 				throw new ArgumentNullException();
 
@@ -190,6 +212,9 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public void PushOrSetActionsMask(object source, IEnumerable<InputAction> actionsMask, bool setBackToTop = false)
 		{
+			if (m_Disposed)
+				return;
+
 			if (source == null)
 				throw new ArgumentNullException();
 
@@ -226,6 +251,9 @@ namespace DevLocker.GFrame.Input
 		/// </summary>
 		public void PopActionsMask(object source)
 		{
+			if (m_Disposed)
+				return;
+
 			if (source == null)
 				throw new ArgumentNullException();
 

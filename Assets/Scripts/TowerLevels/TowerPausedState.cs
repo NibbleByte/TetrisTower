@@ -22,7 +22,6 @@ namespace TetrisTower.TowerLevels
 			context.TrySetByType(out m_ReplayRecording);
 
 			m_PlayerControls.Enable(this, m_PlayerControls.UI);
-			m_PlayerControls.Enable(this, m_PlayerControls.TowerLevelPaused);
 			m_PlayerControls.TowerLevelPaused.SetCallbacks(this);
 
 			m_UIController.SwitchState(TowerLevelUIState.Paused);

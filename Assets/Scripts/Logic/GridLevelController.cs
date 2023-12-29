@@ -47,6 +47,16 @@ namespace TetrisTower.Logic
 
 		public void Init(GridLevelData data, WiseTiming timing)
 		{
+			// Since instance can be reused in the editor if the scene doesn't change, clean up any event subscribers that are left.
+			var thisEvents = GetType()
+				.GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+				.Where(x => x.FieldType.BaseType.IsSubclassOf(typeof(Delegate)))
+				;
+			foreach (var eventField in thisEvents) {
+				eventField.SetValue(this, null);
+			}
+
+
 			LevelData = m_DebugLevelData = data;
 			Timing = timing;
 

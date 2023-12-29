@@ -4,7 +4,6 @@ using TetrisTower.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.InputSystem.Utilities;
 using UnityEngine.SceneManagement;
 
 namespace TetrisTower.Game
@@ -66,6 +65,9 @@ namespace TetrisTower.Game
 
 		public void Dispose()
 		{
+			PlayerContext.DisposePlayerStack();
+			InputContext.Dispose();
+
 			// Input & player context will be disposed by the level manager.
 			GameObject.Destroy(EventSystem.gameObject);
 			PlayerControls.Disable();
