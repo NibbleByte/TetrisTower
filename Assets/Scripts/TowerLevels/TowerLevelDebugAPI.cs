@@ -179,6 +179,9 @@ namespace TetrisTower.TowerLevels
 					};
 				m_TowerLevel.StartRunActions(new List<GridAction> { new PushUpCellsAction() { PushBlocks = pushBlocks } } );
 			}
+			if (Keyboard.current.iKey.wasPressedThisFrame) {
+				m_TowerLevel.LevelData.PendingBonusActions.Add(new PushUpLine_BonusAction());
+			}
 #endif
 
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {

@@ -75,6 +75,9 @@ namespace TetrisTower.Logic
 		[SerializeReference]
 		public List<Objective> Objectives = new List<Objective>();
 
+		[SerializeReference]
+		public List<BonusAction> PendingBonusActions = new List<BonusAction>();
+
 		public TowerLevelRunningState RunningState = TowerLevelRunningState.Preparing;
 		public bool IsPlaying => RunningState <= TowerLevelRunningState.Running;
 		public bool HasWon = false;

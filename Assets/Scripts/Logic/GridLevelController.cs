@@ -466,6 +466,13 @@ namespace TetrisTower.Logic
 			if (placedInside) {
 				yield return RunActions(actions);
 
+				while(LevelData.PendingBonusActions.Count > 0) {
+					BonusAction bonusAction = LevelData.PendingBonusActions[0];
+					LevelData.PendingBonusActions.RemoveAt(0);
+
+					yield return RunActions(bonusAction.GenerateActions(LevelData));
+				}
+
 				// Could finish level inside RunActions.
 				if (LevelData.IsPlaying) {
 					LevelData.FallSpeedNormalized += LevelData.FallSpeedupPerAction;
