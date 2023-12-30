@@ -248,7 +248,7 @@ namespace TetrisTower.Logic
 			// 0 means shape starts at the top of the grid and continues above.
 			// Grid is bigger than playable area, able to accommodate shape placed on top of the top-most flashing blocks.
 			// Give 1 block height for the player to react in the worst scenario.
-			LevelData.FallDistanceNormalized = shape.Rows - 1.2f;
+			LevelData.FallDistanceNormalized = shape.Rows - GridLevelData.FallDistanceStartOffset;
 
 			if (!LevelData.Rules.WrapSidesOnMove) {
 				if (LevelData.FallingColumn + LevelData.FallingShape.MaxColumn > Grid.Columns) {

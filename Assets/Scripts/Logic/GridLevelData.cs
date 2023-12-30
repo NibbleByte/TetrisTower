@@ -32,10 +32,11 @@ namespace TetrisTower.Logic
 		[SerializeReference] public BlocksShape FallingShape;
 
 
-		public int FallingColumn;					// The first (leftest) column that the shape is falling at the moment.
+		public int FallingColumn;                   // The first (leftest) column that the shape is falling at the moment.
 		public float FallDistanceNormalized = 0f;	// Normalized distance passed by the lowest block of the shape while falling. 1.0 is one tile distance.
 		public float FallSpeedNormalized = 2f;		// Speed of falling.
 		public float FallSpeedupPerAction = 0.01f;  // Added to the falling speed every placement.
+		public const float FallDistanceStartOffset = 1.2f; // Initial offset of the selected falling blocks. 0 means shape starts at the top of the grid and continues above.
 
 		public float PlayTime = 0;					// In seconds;
 		public float PrepareTime = 0;
@@ -64,6 +65,9 @@ namespace TetrisTower.Logic
 
 		// The valid size where blocks can be placed by the player. It should be smaller than the grid itself.
 		public GridCoords PlayableSize;
+
+		// Rows from the top above which blocks will be automatically destroyed with animation. E.g. blocks pushed up above the playable area (doesn't mean game over).
+		public const int DestroyThreshold = 3;
 
 		[SerializeReference]
 		public ScoreGrid Score;

@@ -30,6 +30,9 @@ namespace TetrisTower.Logic
 		public delegate void BlockMovedEventHandler(GridCoords from, GridCoords to);
 		public event BlockMovedEventHandler BlockMoved;
 
+		public delegate void BlockEventHandler(GridCoords coords);
+		public event BlockEventHandler BlockDestroyed;	// Block was forcefully destroyed for some reason (e.g. pushed up too high). No score is given.
+
 
 		[UnityEngine.SerializeField] private int m_Rows;
 		[UnityEngine.SerializeField] private int m_Columns;
@@ -180,6 +183,15 @@ namespace TetrisTower.Logic
 				UnityEngine.Debug.Assert(this[movedCell.Key] != BlockType.None);
 				UnityEngine.Debug.Assert(this[movedCell.Value] == BlockType.None);
 
+				// Destroy if blocks get too high.
+				if (movedCell.Value.Row >= Rows - GridLevelData.DestroyThreshold) {
+					UnityEngine.Debug.Log($"Block destroyed at {movedCell.Key} as it was moved too high - {movedCell.Value}.");
+
+					this[movedCell.Key] = BlockType.None;
+					BlockDestroyed?.Invoke(movedCell.Key);
+					continue;
+				}
+
 				this[movedCell.Value] = this[movedCell.Key];
 				this[movedCell.Key] = BlockType.None;
 
@@ -207,8 +219,17 @@ namespace TetrisTower.Logic
 
 				// Now go down moving up all the rows.
 				for(--row; row >= 0; --row) {
-					this[row + 1, column] = this[row, column];
+
 					UnpinCoords(new GridCoords(row, column));
+
+					// Destroy if blocks get too high.
+					if (row + 1 >= Rows - GridLevelData.DestroyThreshold) {
+						UnityEngine.Debug.Log($"Block destroyed at {row}, {column} as it was pushed too high.");
+						BlockDestroyed?.Invoke(new GridCoords(row, column));
+						continue;
+					}
+
+					this[row + 1, column] = this[row, column];
 
 					BlockMoved?.Invoke(new GridCoords(row, column), new GridCoords(row + 1, column));
 				}

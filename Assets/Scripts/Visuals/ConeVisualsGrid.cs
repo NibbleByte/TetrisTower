@@ -452,6 +452,11 @@ namespace TetrisTower.Visuals
 				Debug.Assert(this[movedPair.Key] != null);
 				Debug.Assert(this[movedPair.Value] == null);
 
+				if (movedPair.Value.Row >= Rows - GridLevelData.DestroyThreshold) {
+					DestroyInstanceAt(movedPair.Key);
+					continue;
+				}
+
 				ConeVisualsBlock visualsBlock = this[movedPair.Key];
 				this[movedPair.Value] = visualsBlock;
 				this[movedPair.Key] = null;
@@ -552,6 +557,12 @@ namespace TetrisTower.Visuals
 							// Now go down moving up all the rows.
 							for (--row; row >= 0; --row) {
 								GridCoords toRow = new GridCoords(row + 1, column);
+
+								if (toRow.Row >= Rows - GridLevelData.DestroyThreshold) {
+									DestroyInstanceAt(new GridCoords(row, column));
+									continue;
+								}
+
 								this[toRow] = this[row, column];
 
 								ConeVisualsBlock visualsBlock = this[toRow];

@@ -32,6 +32,7 @@ namespace TetrisTower.TowerObjectives
 		{
 			m_BlocksGrid = context.FindByType<GridLevelData>().Grid;
 			m_BlocksGrid.BlockMoved += OnBlocksMoved;
+			m_BlocksGrid.BlockDestroyed += OnBlocksDestroyed;
 
 			m_ScoreGrid = context.FindByType<GridLevelData>().Score;
 			m_ScoreGrid.ClearActionScored += OnClearActionScored;
@@ -45,6 +46,7 @@ namespace TetrisTower.TowerObjectives
 		public void OnPreLevelUnloading()
 		{
 			m_BlocksGrid.BlockMoved -= OnBlocksMoved;
+			m_BlocksGrid.BlockDestroyed -= OnBlocksDestroyed;
 			m_ScoreGrid.ClearActionScored -= OnClearActionScored;
 		}
 
@@ -54,6 +56,14 @@ namespace TetrisTower.TowerObjectives
 				if (Coordinates[i] == from) {
 					Coordinates[i] = to;
 				}
+			}
+		}
+
+		private void OnBlocksDestroyed(GridCoords coords)
+		{
+			if (Coordinates.Contains(coords)) {
+				Debug.Log($"Objective at {coords} got destroyed - fail.");
+				Status = ObjectiveStatus.Failed;
 			}
 		}
 
