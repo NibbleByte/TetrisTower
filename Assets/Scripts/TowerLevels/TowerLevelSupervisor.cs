@@ -301,6 +301,7 @@ namespace TetrisTower.TowerLevels
 			playerContext.CreatePlayerStack(
 				gameContext,
 				gameContext.GameConfig,
+				playthroughPlayer,
 				playthroughPlayer.PlayerControls,
 				gameContext.Options,
 				m_PlaythroughData,
@@ -390,6 +391,8 @@ namespace TetrisTower.TowerLevels
 				var behaviours = FindObjectsOfType<MonoBehaviour>(playerIndex);
 
 				var levelController = behaviours.OfType<GridLevelController>().First();
+
+				levelController.DeInit();
 
 				foreach (Objective objective in levelController.LevelData.Objectives) {
 					objective.OnPreLevelUnloading();

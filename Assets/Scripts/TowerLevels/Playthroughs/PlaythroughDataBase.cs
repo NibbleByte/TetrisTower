@@ -55,7 +55,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public abstract ILevelSupervisor PrepareSupervisor();
 
-		public void AssignPlayer(PlaythroughPlayer player, GridLevelData levelData)
+		public virtual void AssignPlayer(PlaythroughPlayer player, GridLevelData levelData)
 		{
 			int index = m_ActiveTowerLevels.IndexOf(levelData);
 			if (index == -1)
@@ -85,24 +85,24 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			}
 		}
 
-		private void DisposePlayers()
+		protected virtual void DisposeTowerLevels()
 		{
 			foreach(var player in m_Players) {
 				player.Dispose();
 			}
 
 			m_Players.Clear();
+			m_ActiveTowerLevels.Clear();
 		}
 
 		public abstract GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene);
 
 		public void ReplaceCurrentLevel(GridLevelData levelData)
 		{
-			Debug.Log($"Replacing current level with {levelData?.BackgroundScene?.ScenePath}");
-			m_ActiveTowerLevels.Clear();
-			m_ActiveTowerLevels.Add(levelData);
+			DisposeTowerLevels();
 
-			DisposePlayers();
+			Debug.Log($"Replacing current level with {levelData?.BackgroundScene?.ScenePath}");
+			m_ActiveTowerLevels.Add(levelData);
 		}
 
 		public virtual void RetryLevel()
@@ -110,8 +110,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			if (m_ActiveTowerLevels.Count == 0)
 				throw new InvalidOperationException($"Trying to retry a level when no level is in progress.");
 
-			m_ActiveTowerLevels.Clear();
-			DisposePlayers();
+			DisposeTowerLevels();
 		}
 
 		public virtual void QuitLevel()
@@ -119,8 +118,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			if (m_ActiveTowerLevels.Count == 0)
 				throw new InvalidOperationException($"Trying to quit a level when no level is in progress.");
 
-			m_ActiveTowerLevels.Clear();
-			DisposePlayers();
+			DisposeTowerLevels();
 		}
 
 		public virtual void FinishLevel()
@@ -137,8 +135,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			ScoreOnLevelStart += winner.Score.Score;
 			PlayTimeOnLevelStart += winner.PlayTime;
 
-			m_ActiveTowerLevels.Clear();
-			DisposePlayers();
+			DisposeTowerLevels();
 		}
 
 		public void SetupRandomGenerator(int seed = 0, bool resetCurrentLevelRandom = false)

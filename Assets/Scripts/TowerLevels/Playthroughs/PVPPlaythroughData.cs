@@ -21,6 +21,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	public class PVPPlaythroughData : PlaythroughDataBase
 	{
 		public int PlayersCount = 2;
+		public int AttackChargeMax = 40;
 
 		public LevelParamData Level => m_LevelAsset?.LevelParam;
 
@@ -31,6 +32,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override bool IsFinalLevel => true;
 		public override bool HaveFinishedLevels => true;
+
+		private Dictionary<PlaythroughPlayer, int> m_AttacksCharge = new Dictionary<PlaythroughPlayer, int>();
+
+		public float GetAttackChargeNormalized(PlaythroughPlayer player) => Mathf.Clamp01(m_AttacksCharge[player] / (float)AttackChargeMax);
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{
@@ -55,6 +60,55 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_ActiveTowerLevels.Add(levelData);
 
 			return levelData;
+		}
+
+		public override void AssignPlayer(PlaythroughPlayer player, GridLevelData levelData)
+		{
+			base.AssignPlayer(player, levelData);
+
+			if (levelData.Score == null) {
+				levelData.Score = new ScoreGrid(levelData.Grid.Rows, levelData.Grid.Columns, levelData.Rules);
+			}
+
+			// No need to unsubscribe, as instance will be lost on level unload?
+			levelData.Score.ClearActionSequenceFinished += () => OnClearActionSequenceFinished(player);
+
+			m_AttacksCharge.Add(player, 0);
+		}
+
+		protected override void DisposeTowerLevels()
+		{
+			base.DisposeTowerLevels();
+
+			m_AttacksCharge.Clear();
+		}
+
+		private void OnClearActionSequenceFinished(PlaythroughPlayer player)
+		{
+			int charge = m_AttacksCharge[player] + player.LevelData.Score.LastMatchBonus.ResultBonusScore;
+			if (charge < AttackChargeMax) {
+				m_AttacksCharge[player] = charge;
+
+			} else {
+
+				// Pick who to attack.
+				PlaythroughPlayer bestEnemy = null;
+				foreach(PlaythroughPlayer enemy in ActivePlayers) {
+					if (enemy == player)
+						continue;
+
+					if (bestEnemy == null || enemy.LevelData.Score.Score > bestEnemy.LevelData.Score.Score) {
+						bestEnemy = enemy;
+					}
+				}
+
+				// In debug we can run 1 player, so no best enemy would be found?
+				if (bestEnemy != null) {
+					m_AttacksCharge[player] = 0;
+
+					bestEnemy.LevelData.PendingBonusActions.Add(new PushUpLine_BonusAction());
+				}
+			}
 		}
 
 		public override void Validate(Core.AssetsRepository repo, UnityEngine.Object context)

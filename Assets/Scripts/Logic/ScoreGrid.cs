@@ -20,6 +20,7 @@ namespace TetrisTower.Logic
 
 		public delegate void ClearActionScoredEvent(ClearMatchedAction action);
 		public event ClearActionScoredEvent ClearActionScored;
+		public event Action ClearActionSequenceFinished;
 
 		[JsonProperty] public int Rows { get; private set; }
 
@@ -130,6 +131,8 @@ namespace TetrisTower.Logic
 			m_Score += LastMatchBonus.ResultBonusScore;
 			m_CurrentClearedBlocksCount = 0;
 			m_CurrentCascadesCount++;
+
+			ClearActionSequenceFinished?.Invoke();
 		}
 
 		private void EvaluationSequenceFinished(EvaluationSequenceFinishAction action)
