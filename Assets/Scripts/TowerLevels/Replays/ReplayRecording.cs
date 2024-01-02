@@ -29,7 +29,8 @@ namespace TetrisTower.TowerLevels.Replays
 		Pause = 20,
 
 
-		Cheat_EndLevel = 40,
+		Cheat_Generic = 40,
+		Cheat_EndLevel = 44,
 
 		RecordingEnd = 99,
 	}
@@ -76,6 +77,9 @@ namespace TetrisTower.TowerLevels.Replays
 				// Don't pause during playback.
 				// Advance the random sequence in case of pause to prevent easy modifying of the replay. And maybe "cheating".
 				case ReplayActionType.Pause: levelController.LevelData.Random.Next(); break;
+
+				// Similarly to Pause, advance the random sequence, to prevent "cheating".
+				case ReplayActionType.Cheat_Generic: levelController.LevelData.Random.Next(); break;
 
 				case ReplayActionType.Cheat_EndLevel: levelController.FinishLevel(Value != 0); break;
 

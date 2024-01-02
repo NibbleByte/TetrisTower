@@ -120,7 +120,7 @@ namespace TetrisTower.TowerLevels.Replays
 				action.Replay(PlaybackRecording.GridLevelController, PlaybackRecording.Fairy);
 
 				if (action.ExpectedResultValue != expectedValue) {
-					InterruptPlayback(InterruptReason.DesyncDetected, action, m_PlaybackIndex, expectedValue, action.ExpectedResultValue);
+					InterruptPlayback(InterruptReason.DesyncDetected, action, m_PlaybackIndex - 1, expectedValue, action.ExpectedResultValue);
 					return;
 				}
 
@@ -135,16 +135,26 @@ namespace TetrisTower.TowerLevels.Replays
 
 				// If playback finishes before replay end, don't continue, display desync right away.
 				if (!PlaybackRecording.GridLevelController.LevelData.IsPlaying && nextType != ReplayActionType.RecordingEnd) {
-					InterruptPlayback(InterruptReason.LevelEndedBeforeReplay, action, m_PlaybackIndex, expectedValue, action.ExpectedResultValue);
+					InterruptPlayback(InterruptReason.LevelEndedBeforeReplay, action, m_PlaybackIndex - 1, expectedValue, action.ExpectedResultValue);
 					return;
 				}
 
-				if (action.ActionType == ReplayActionType.Pause) {
-					// Don't show if last action (right before ending) - it's probably when the user paused the game to end the replay record.
-					// NOTE: m_PlaybackIndex is the next action at the moment, because of the ++ above.
-					if (m_PlaybackIndex >= PlaybackRecording.Actions.Count || nextType != ReplayActionType.RecordingEnd) {
-						m_FlashMessage.ShowMessage("Pause Skipped");
-					}
+				switch (action.ActionType) {
+					case ReplayActionType.Pause:
+						// Don't show if last action (right before ending) - it's probably when the user paused the game to end the replay record.
+						// NOTE: m_PlaybackIndex is the next action at the moment, because of the ++ above.
+						if (m_PlaybackIndex >= PlaybackRecording.Actions.Count || nextType != ReplayActionType.RecordingEnd) {
+							m_FlashMessage.ShowMessage("Pause Skipped");
+						}
+						break;
+
+					case ReplayActionType.Cheat_Generic:
+						m_FlashMessage.ShowMessage("Cheat Used!");
+						break;
+
+					case ReplayActionType.Cheat_EndLevel:
+						m_FlashMessage.ShowMessage("Cheat End Level!");
+						break;
 				}
 			}
 		}

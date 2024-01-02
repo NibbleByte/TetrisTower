@@ -56,6 +56,8 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Toggle Falling");
 
+			m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 			m_TowerLevel.LevelData.FallFrozen = !m_TowerLevel.LevelData.FallFrozen;
 		}
 
@@ -63,12 +65,16 @@ namespace TetrisTower.TowerLevels
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Toggle Matching");
 
+			m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 			m_TowerLevel.Grid.MatchingFrozen = !m_TowerLevel.Grid.MatchingFrozen;
 		}
 
 		public void ResetLevel()
 		{
 			if (m_FlashMessage) m_FlashMessage.AppendMessage("Retry Level");
+
+			m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
 
 			m_TowerLevelAPI.RetryLevel();
 		}
@@ -173,6 +179,8 @@ namespace TetrisTower.TowerLevels
 
 #if UNITY_EDITOR
 			if (Keyboard.current.uKey.wasPressedThisFrame) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 				var pushBlocks = new List<KeyValuePair<int, BlockType>> {
 						KeyValuePair.Create(m_TowerLevel.LevelData.FallingColumn, BlockType.B5),
 						KeyValuePair.Create(m_TowerLevel.LevelData.FallingColumn, BlockType.B6),
@@ -180,11 +188,15 @@ namespace TetrisTower.TowerLevels
 				m_TowerLevel.StartRunActions(new List<GridAction> { new PushUpCellsAction() { PushBlocks = pushBlocks } } );
 			}
 			if (Keyboard.current.iKey.wasPressedThisFrame) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 				m_TowerLevel.LevelData.PendingBonusActions.Add(new PushUpLine_BonusAction());
 			}
 #endif
 
 			if (Keyboard.current.f5Key.wasPressedThisFrame) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 				MessageBox.Instance.ShowInput(
 					"Save?",
 					"Are you sure you want to save?",
@@ -199,6 +211,8 @@ namespace TetrisTower.TowerLevels
 			}
 
 			if (Keyboard.current.f6Key.wasPressedThisFrame) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 				MessageBox.Instance.ShowSimple(
 					"Load?",
 					"Are you sure you want to load?\nAll current progress will be lost!",
@@ -212,10 +226,14 @@ namespace TetrisTower.TowerLevels
 			}
 
 			if (Keyboard.current.f7Key.wasPressedThisFrame) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 				MessageBox.Instance.ForceConfirmShownMessage();
 			}
 
 			if (Keyboard.current.f8Key.wasPressedThisFrame) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Cheat_Generic);
+
 				MessageBox.Instance.ForceDenyShownMessage();
 			}
 
