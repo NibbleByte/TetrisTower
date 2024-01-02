@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.Logic;
+using TetrisTower.Visuals.Effects;
 using UnityEngine;
 
 namespace TetrisTower.Visuals.LostAnimations
@@ -31,8 +32,8 @@ namespace TetrisTower.Visuals.LostAnimations
 
 			StartCoroutine(OperateCamera(fallingVisualsContainer));
 
-			var camera = fallingVisualsContainer.GetComponentInChildren<Camera>().transform;
-			Vector3 cameraInitialPos = camera.localPosition;
+			var cameraEffects = fallingVisualsContainer.GetComponentInChildren<TowerCameraEffects>();
+			cameraEffects.Shake(this, CameraShakeRange);
 
 			float startTime = Time.time;
 
@@ -40,11 +41,10 @@ namespace TetrisTower.Visuals.LostAnimations
 				if (m_Interrupted)
 					yield break;
 
-				camera.localPosition = cameraInitialPos + new Vector3(Random.Range(CameraShakeRange.x, CameraShakeRange.y), Random.Range(CameraShakeRange.x, CameraShakeRange.y), 0f);
 				yield return null;
 			}
 
-			camera.localPosition = cameraInitialPos;
+			cameraEffects.ClearShake(this);
 
 			var templateRigidbody = GetComponent<Rigidbody>();
 

@@ -65,6 +65,7 @@ namespace TetrisTower.Visuals
 		public ParticleSystem FallHitEffect;
 		public ParticleSystem MatchBlockEffect;
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
+		public Vector2 PushUpWarningShakeRange = new Vector2(-0.1f, 0.1f);
 
 		public delegate void ScoreEventHandler(ScoreGrid scoreGrid);
 		public event ScoreEventHandler ScoreUpdated;
@@ -109,6 +110,7 @@ namespace TetrisTower.Visuals
 		private GridCoords m_PlayableArea;
 
 		private Effects.FairyMatchingController m_Fairy;
+		private Effects.TowerCameraEffects m_CameraEffects;
 
 		private int m_BlocksLayer;
 
@@ -148,6 +150,8 @@ namespace TetrisTower.Visuals
 					}
 				}
 			}
+
+			context.SetByType(out m_CameraEffects);
 
 			if (context.TrySetByType(out m_Fairy)) {
 
@@ -484,6 +488,11 @@ namespace TetrisTower.Visuals
 		{
 			if (Application.isPlaying) {
 
+				m_CameraEffects.Shake(action, PushUpWarningShakeRange);
+
+				// Suspens...
+				yield return new WaitForSeconds(0.02f);
+
 				ConeVisualsBlock GetBlock(int row, int column, ConeVisualsBlock fallback) => row >= 0 && row < Rows ? this[row, column] : fallback;
 
 
@@ -594,6 +603,8 @@ namespace TetrisTower.Visuals
 
 					yield return null;
 				}
+
+				m_CameraEffects.ClearShake(action);
 			}
 
 			yield break;
