@@ -432,7 +432,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameConfig: {fileID: 11400000, guid: afd2790b73a91f8468fb087a28f729ac, type: 2}
-  StartingPlaythroughTemplate: {fileID: 11400000, guid: adeadf70ba489c64ca83e6600a58c20b, type: 2}
+  StartingPlaythroughTemplate: {fileID: 11400000, guid: 292dd2cbcdd45d44e942a7c29b6ac36c, type: 2}
   StartingRandomSeed: 0
   GameContext:
     rid: -2
@@ -507,6 +507,10 @@ PrefabInstance:
     - target: {fileID: 870417702530146135, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 870417702530146135, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: far clip plane
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 870417702530146135, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: near clip plane

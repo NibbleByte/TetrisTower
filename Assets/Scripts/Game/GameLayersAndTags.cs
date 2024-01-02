@@ -1,6 +1,3 @@
-using DevLocker.Utils;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace TetrisTower.Game
@@ -11,6 +8,8 @@ namespace TetrisTower.Game
 		public const string TowerDecors = "TowerDecors";
 		public const string FairyRestPoint = "FairyRestPoint";
 		public const string BlocksLight = "BlocksLight";
+
+		public const string LevelBounds = "LevelBounds";
 	}
 
 	public static class GameLayers
