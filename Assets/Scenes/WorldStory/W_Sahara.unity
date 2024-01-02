@@ -5321,6 +5321,7 @@ MonoBehaviour:
   GridMoveFallTrailEffectsManager: {fileID: 0}
   SelectedShapeFallTrailEffectsManager: {fileID: 0}
   WonFallTrailEffectsManager: {fileID: 0}
+  PushUpWarningEffectsPool: {fileID: 0}
 --- !u!1 &1177382885
 GameObject:
   m_ObjectHideFlags: 0
@@ -5776,6 +5777,10 @@ PrefabInstance:
     - target: {fileID: 870417702530146128, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 870417702530146135, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: far clip plane
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 870417702530146135, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: near clip plane

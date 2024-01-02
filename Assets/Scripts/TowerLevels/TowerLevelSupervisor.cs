@@ -24,6 +24,7 @@ namespace TetrisTower.TowerLevels
 		private SceneReference m_OverrideScene;
 
 		private int m_PlayersCount = 1;
+		private Bounds m_LevelBounds;
 		private TowerLevelPlayersManager m_PlayersManager;
 
 		private struct StartData
@@ -118,8 +119,34 @@ namespace TetrisTower.TowerLevels
 			if (playerIndex != 0) {
 				var roots = SceneManager.GetSceneAt(playerIndex).GetRootGameObjects();
 				foreach (GameObject root in roots) {
-					root.transform.position += Vector3.right * (playerIndex % 2) * 500f + Vector3.forward * (playerIndex / 2) * 500f;
+					root.transform.position += Vector3.right * (playerIndex % 2) * m_LevelBounds.size.x + Vector3.forward * (playerIndex / 2) * m_LevelBounds.size.z;
 				}
+
+			// For more players, calculate level dimensions, so we can offset them.
+			} else if (m_PlayersCount > 1) {
+				var renderers = GameObject.FindObjectsOfType<Renderer>()
+					.Where(r => r is MeshRenderer || r is SkinnedMeshRenderer)	// Skip particles and others.
+					.ToArray();
+
+				// In case the level has offset away from the (0, 0, 0).
+				m_LevelBounds = renderers.FirstOrDefault()?.bounds ?? new Bounds(Vector3.zero, Vector3.one * 20f);
+
+				foreach (var renderer in renderers) {
+					m_LevelBounds.Encapsulate(renderer.bounds);
+				}
+
+				var terrains = GameObject.FindObjectsOfType<Terrain>();
+				foreach (var terrain in terrains) {
+					if (terrain.terrainData == null)
+						continue;
+
+					Bounds terrainWorldBounds = terrain.terrainData.bounds;
+					terrainWorldBounds.center += terrain.transform.position;
+
+					m_LevelBounds.Encapsulate(terrainWorldBounds);
+				}
+
+				m_LevelBounds.size += Vector3.one * 10f;
 			}
 
 			// Find or instantiate the tower.
@@ -457,6 +484,16 @@ namespace TetrisTower.TowerLevels
 				.Where(t => t.CompareTag(tag))
 				.Select(t => t.gameObject)
 				.FirstOrDefault();
+		}
+
+		private static GameObject[] FindGameObjectsWithTag(string tag, int playerIndex)
+		{
+			return SceneManager.GetSceneAt(playerIndex)
+				.GetRootGameObjects()
+				.SelectMany(root => root.EnumerateComponentsInChildren<Transform>(true))
+				.Where(t => t.CompareTag(tag))
+				.Select(t => t.gameObject)
+				.ToArray();
 		}
 
 		private static void SetupLights(GridLevelController levelController, int playerIndex)

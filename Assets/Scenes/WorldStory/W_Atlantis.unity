@@ -23317,6 +23317,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 870417702530146135, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
+      propertyPath: far clip plane
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 870417702530146135, guid: 1848a9ba972ce104b89b830a7041f359, type: 3}
       propertyPath: near clip plane
       value: 0.5
       objectReference: {fileID: 0}
@@ -53756,6 +53760,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1448860199}
+  - component: {fileID: 1448860201}
   - component: {fileID: 1448860200}
   m_Layer: 0
   m_Name: Ocean
@@ -53843,6 +53848,18 @@ MonoBehaviour:
   _uniformTiles: 0
   _disableSkirt: 0
   _verifyOpaqueAndDepthTexturesEnabled: 1
+--- !u!114 &1448860201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1448860198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 793899fef4e8d984a822a73cdfa7f93e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1456560043
 PrefabInstance:
   m_ObjectHideFlags: 0
