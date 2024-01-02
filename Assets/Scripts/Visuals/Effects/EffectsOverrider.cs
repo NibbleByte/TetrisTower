@@ -1,4 +1,5 @@
 using System;
+using TetrisTower.Logic;
 using UnityEngine;
 
 namespace TetrisTower.Visuals.Effects
@@ -12,6 +13,9 @@ namespace TetrisTower.Visuals.Effects
 		[Header(nameof(TowerConeVisualsController))]
 		public FallTrailEffectsManager SelectedShapeFallTrailEffectsManager;
 		public FallTrailEffectsManager WonFallTrailEffectsManager;
+
+		[Header(nameof(BonusActionsVisuals))]
+		public Transform PushUpWarningEffectsPool;
 
 		public void Override(ConeVisualsGrid visualsGrid)
 		{
@@ -32,6 +36,14 @@ namespace TetrisTower.Visuals.Effects
 
 			if (WonFallTrailEffectsManager) {
 				visualsController.WonFallTrailEffectsManager = WonFallTrailEffectsManager;
+			}
+		}
+
+		public void Override(BonusActionsVisuals bonusActionsVisuals)
+		{
+			if (PushUpWarningEffectsPool) {
+				bonusActionsVisuals.PushUpWarningEffectsPool?.gameObject.SetActive(false);
+				bonusActionsVisuals.PushUpWarningEffectsPool = PushUpWarningEffectsPool;
 			}
 		}
 	}

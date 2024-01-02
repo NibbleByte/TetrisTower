@@ -122,102 +122,12 @@ namespace TetrisTower.TowerLevels
 				}
 			}
 
-
-			List<Transform> restPoints;
-			Visuals.Effects.FairyMatchingController fairy;
-			Camera camera;
-
-			var levelController = FindObjectOfType<GridLevelController>(playerIndex);
-			if (levelController == null) {
-				var placeholder = FindGameObjectWithTag(GameTags.TowerPlaceholderTag, playerIndex);
-				if (placeholder == null) {
-					throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load current level.");
-				}
-
-				levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
-				SceneManager.MoveGameObjectToScene(levelController.gameObject, SceneManager.GetSceneAt(playerIndex));
-				levelController.name = $"{gameContext.GameConfig.TowerLevelController.name} [{playerIndex}]";
-
-				Light overrideBlocksLight = placeholder.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
-				if (overrideBlocksLight) {
-					Light blocksLight = levelController.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
-					overrideBlocksLight.transform.SetParent(blocksLight.transform.parent, false);
-					GameObject.DestroyImmediate(blocksLight.gameObject);
-				}
-
-				camera = levelController.GetComponentInChildren<Camera>();
-				var overrideCamera = placeholder.GetComponentInChildren<Camera>();
-				if (overrideCamera) {
-					// Move the parent object, since it's position is updated on changing screen orientation.
-					overrideCamera.transform.parent.SetParent(camera.transform.parent.parent, false);
-					GameObject.DestroyImmediate(camera.transform.parent.gameObject);
-					camera = overrideCamera;
-				}
-
-				Transform[] overrideDecors = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
-				if (overrideDecors.Length != 0) {
-					Transform[] decors = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
-
-					foreach(Transform overrideDecor in overrideDecors) {
-						// Child of tower decors were already moved - don't change their hierarchy.
-						if (overrideDecor.IsChildOf(placeholder.transform)) {
-							overrideDecor.SetParent(levelController.transform, true);
-						}
-					}
-
-					foreach(Transform decor in decors) {
-						GameObject.DestroyImmediate(decor.gameObject);
-					}
-				}
-
-				var overrideEffects = placeholder.GetComponentInChildren<Visuals.Effects.EffectsOverrider>();
-				if (overrideEffects) {
-					// It doesn't replace original objects, but still needs to be rescued from destruction.
-					overrideEffects.transform.SetParent(levelController.transform, false);
-
-					overrideEffects.Override(levelController.GetComponentInChildren<ConeVisualsGrid>());
-					overrideEffects.Override(levelController.GetComponentInChildren<TowerConeVisualsController>());
-				}
-
-
-				restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
-				List<Transform> overrideRestPoints = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
-				if (overrideRestPoints.Count != 0) {
-
-					if (restPoints.Count != 0) {
-						foreach (Transform overrideDecor in overrideRestPoints) {
-							overrideDecor.SetParent(restPoints[0].parent, true); // Assume all have the same parent.
-						}
-
-						foreach (Transform decor in restPoints) {
-							GameObject.DestroyImmediate(decor.gameObject);
-						}
-
-						restPoints = overrideRestPoints;
-
-					} else {
-						Debug.LogError("No rest points found in the instantiated level controller!", levelController);
-					}
-				}
-
-				fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
-				var overrideFairy = placeholder.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
-				if (overrideFairy) {
-					overrideFairy.transform.SetParent(fairy.transform.parent, false);
-					GameObject.DestroyImmediate(fairy.gameObject);
-					fairy = overrideFairy;
-				}
-
-				// Clean any leftovers in the placeholder (for example, temporary camera).
-				placeholder.transform.DestroyChildren(true);
-
-			} else {
-
-				restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
-				fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
-
-				camera = levelController.GetComponentInChildren<Camera>();
-			}
+			// Find or instantiate the tower.
+			SetupTower(gameContext, playerIndex,
+				out GridLevelController levelController,
+				out Camera camera,
+				out Visuals.Effects.FairyMatchingController fairy, out List<Transform> restPoints
+				);
 
 			SetupLights(levelController, playerIndex);
 
@@ -418,6 +328,108 @@ namespace TetrisTower.TowerLevels
 			}
 
 			return Task.CompletedTask;
+		}
+
+		private void SetupTower(GameContext gameContext, int playerIndex, out GridLevelController levelController, out Camera camera, out Visuals.Effects.FairyMatchingController fairy, out List<Transform> restPoints)
+		{
+			levelController = FindObjectOfType<GridLevelController>(playerIndex);
+
+			//
+			// Tower is already in the level, use it.
+			//
+			if (levelController != null) {
+				restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
+				fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
+
+				camera = levelController.GetComponentInChildren<Camera>();
+				return;
+			}
+
+			//
+			// Instantiate tower and check for overrides.
+			//
+			var placeholder = FindGameObjectWithTag(GameTags.TowerPlaceholderTag, playerIndex);
+			if (placeholder == null) {
+				throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load current level.");
+			}
+
+			levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
+			SceneManager.MoveGameObjectToScene(levelController.gameObject, SceneManager.GetSceneAt(playerIndex));
+			levelController.name = $"{gameContext.GameConfig.TowerLevelController.name} [{playerIndex}]";
+
+			Light overrideBlocksLight = placeholder.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
+			if (overrideBlocksLight) {
+				Light blocksLight = levelController.GetComponentsInChildren<Light>().FirstOrDefault(l => l.CompareTag(GameTags.BlocksLight));
+				overrideBlocksLight.transform.SetParent(blocksLight.transform.parent, false);
+				GameObject.DestroyImmediate(blocksLight.gameObject);
+			}
+
+			camera = levelController.GetComponentInChildren<Camera>();
+			var overrideCamera = placeholder.GetComponentInChildren<Camera>();
+			if (overrideCamera) {
+				// Move the parent object, since it's position is updated on changing screen orientation.
+				overrideCamera.transform.parent.SetParent(camera.transform.parent.parent, false);
+				GameObject.DestroyImmediate(camera.transform.parent.gameObject);
+				camera = overrideCamera;
+			}
+
+			Transform[] overrideDecors = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
+			if (overrideDecors.Length != 0) {
+				Transform[] decors = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
+
+				foreach (Transform overrideDecor in overrideDecors) {
+					// Child of tower decors were already moved - don't change their hierarchy.
+					if (overrideDecor.IsChildOf(placeholder.transform)) {
+						overrideDecor.SetParent(levelController.transform, true);
+					}
+				}
+
+				foreach (Transform decor in decors) {
+					GameObject.DestroyImmediate(decor.gameObject);
+				}
+			}
+
+			var overrideEffects = placeholder.GetComponentInChildren<Visuals.Effects.EffectsOverrider>();
+			if (overrideEffects) {
+				// It doesn't replace original objects, but still needs to be rescued from destruction.
+				overrideEffects.transform.SetParent(levelController.transform, false);
+
+				overrideEffects.Override(levelController.GetComponentInChildren<ConeVisualsGrid>());
+				overrideEffects.Override(levelController.GetComponentInChildren<TowerConeVisualsController>());
+				overrideEffects.Override(levelController.GetComponentInChildren<BonusActionsVisuals>());
+			}
+
+
+			restPoints = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
+			List<Transform> overrideRestPoints = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.FairyRestPoint)).ToList();
+			if (overrideRestPoints.Count != 0) {
+
+				if (restPoints.Count != 0) {
+					foreach (Transform overrideDecor in overrideRestPoints) {
+						overrideDecor.SetParent(restPoints[0].parent, true); // Assume all have the same parent.
+					}
+
+					foreach (Transform decor in restPoints) {
+						GameObject.DestroyImmediate(decor.gameObject);
+					}
+
+					restPoints = overrideRestPoints;
+
+				} else {
+					Debug.LogError("No rest points found in the instantiated level controller!", levelController);
+				}
+			}
+
+			fairy = levelController.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
+			var overrideFairy = placeholder.GetComponentInChildren<Visuals.Effects.FairyMatchingController>();
+			if (overrideFairy) {
+				overrideFairy.transform.SetParent(fairy.transform.parent, false);
+				GameObject.DestroyImmediate(fairy.gameObject);
+				fairy = overrideFairy;
+			}
+
+			// Clean any leftovers in the placeholder (for example, temporary camera).
+			placeholder.transform.DestroyChildren(true);
 		}
 
 		private static T FindObjectOfType<T>(int playerIndex) where T : Component

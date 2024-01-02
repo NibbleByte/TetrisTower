@@ -38,6 +38,7 @@ namespace TetrisTower.Visuals
 
 		// Validation value - cone visuals require different visual models for each size.
 		// Supported columns count must be equal to the sides of the cone.
+		[Header("Dimensions")]
 		[Range(Game.LevelParamData.SupportedColumnsCount, Game.LevelParamData.SupportedColumnsCount)]
 		public int SupportedColumnsCount = Game.LevelParamData.SupportedColumnsCount;
 
@@ -54,11 +55,13 @@ namespace TetrisTower.Visuals
 		// The position of this object will be considered the center of the base.
 		public float ConeHeight = 100;
 
+		[Header("Pacing")]
 		public float BlockMoveSpeed = 1f;
 
 		public float MatchBlockDelay = 0.075f;
 		public float MatchActionDelay = 1.2f;
 
+		[Header("Effects")]
 		public ParticleSystem FallHitEffect;
 		public ParticleSystem MatchBlockEffect;
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
@@ -714,6 +717,7 @@ namespace TetrisTower.Visuals
 
 
 #if UNITY_EDITOR
+		[Header("Debug")]
 		private GUIStyle m_GizmoCoordsStyle;
 		[SerializeField]
 		private bool m_GizmoShowGrid = false;
