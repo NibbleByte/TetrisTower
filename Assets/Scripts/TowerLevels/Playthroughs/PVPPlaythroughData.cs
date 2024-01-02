@@ -51,6 +51,12 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			GridLevelData levelData = GenerateTowerLevelData(gameConfig, m_LevelAsset.LevelParam);
 
+			// All levels should start with the same seed.
+			if (m_ActiveTowerLevels.Count > 0) {
+				levelData.RandomInitialLevelSeed = m_ActiveTowerLevels[0].RandomInitialLevelSeed;
+				levelData.Random = new Xoshiro.PRNG32.XoShiRo128starstar(levelData.RandomInitialLevelSeed);
+			}
+
 			if (overrideScene != null) {
 				levelData.BackgroundScene = overrideScene;
 			}

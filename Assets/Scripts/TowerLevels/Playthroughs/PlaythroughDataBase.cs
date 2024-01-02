@@ -149,8 +149,11 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			Random = new Xoshiro.PRNG32.XoShiRo128starstar(RandomInitialSeed);
 
 			if (resetCurrentLevelRandom) {
+				// All levels should start with the same seed.
+				int levelSeed = Random.Next();
+
 				foreach(GridLevelData levelData in m_ActiveTowerLevels) {
-					levelData.RandomInitialLevelSeed = Random.Next();
+					levelData.RandomInitialLevelSeed = levelSeed;
 					levelData.Random = new Xoshiro.PRNG32.XoShiRo128starstar(levelData.RandomInitialLevelSeed);
 				}
 			}
