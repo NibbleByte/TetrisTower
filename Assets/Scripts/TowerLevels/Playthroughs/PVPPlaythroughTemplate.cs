@@ -15,13 +15,17 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override bool HasActiveLevel => m_PlayerData.ActiveTowerLevels.Any();
 
-		public override IPlaythroughData GeneratePlaythroughData(GameConfig config)
+		public override IPlaythroughData GeneratePlaythroughData(GameConfig config, IEnumerable<LevelParamData> overrideParams = null)
 		{
 			m_PlayerData.Validate(config.AssetsRepository, this);
 
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.
 			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
-			return Saves.SavesManager.Clone<IPlaythroughData, PVPPlaythroughData>(m_PlayerData, config);
+			var playthroughData = Saves.SavesManager.Clone<IPlaythroughData, PVPPlaythroughData>(m_PlayerData, config);
+			if (overrideParams != null) {
+				playthroughData.ReplaceLevelParams(overrideParams);
+			}
+			return playthroughData;
 		}
 
 		public override IEnumerable<LevelParamData> GetAllLevels()

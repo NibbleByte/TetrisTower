@@ -1,5 +1,4 @@
-using Newtonsoft.Json;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
@@ -17,8 +16,11 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override bool HasActiveLevel => m_PlayerData.ActiveTowerLevels.Any();
 
-		public override IPlaythroughData GeneratePlaythroughData(GameConfig config)
+		public override IPlaythroughData GeneratePlaythroughData(GameConfig config, IEnumerable<LevelParamData> overrideParams = null)
 		{
+			if (overrideParams != null)
+				throw new NotSupportedException("World playthrough doesn't support override level params as it works with set assets.");
+
 			m_PlayerData.Validate(config.AssetsRepository, this);
 
 			// Clone the instance instead of referring it directly, leaking changes into the scriptable object.

@@ -12,6 +12,9 @@ namespace TetrisTower.HomeScreen
 {
 	public class TowerLocationPickerController : MonoBehaviour, ILevelLoadedListener
 	{
+		// HACK: Because UnityEvents can't have two parameters - put it here.
+		public PlaythroughTemplateBase TargetPlaythroughTemplate;
+
 		public Image LocationPreview;
 		public GameObject HiddenIndicator;
 

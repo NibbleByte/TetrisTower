@@ -30,7 +30,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[JsonProperty]
 		private WorldMapLevelParamAsset m_LevelAsset;
 
-		private LevelParamData m_CurrentLevelParam;
+		private LevelParamData m_OverrideLevelParam;
 
 		public override bool IsFinalLevel => true;
 		public override bool HaveFinishedLevels => true;
@@ -44,20 +44,24 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return new TowerLevelSupervisor(this, PlayersCount);
 		}
 
-		public void SetCurrentLevel(LevelParamData levelParam)
+		public void ReplaceLevelParams(IEnumerable<LevelParamData> overrideParams)
 		{
-			m_CurrentLevelParam = levelParam;
+			if (ActiveTowerLevels.Count > 0 || ActivePlayers.Any())
+				throw new InvalidOperationException("Cannot replace level params when tower level is in progress.");
+
+			// Single level only supported at the moment.
+			m_OverrideLevelParam = overrideParams.First();
 			m_LevelAsset = null;
 		}
 
 		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
-			if (m_LevelAsset == null && m_CurrentLevelParam == null) {
+			if (m_LevelAsset == null && m_OverrideLevelParam == null) {
 				Debug.LogError($"No level asset set. Abort!");
 				return null;
 			}
 
-			GridLevelData levelData = GenerateTowerLevelData(gameConfig, m_CurrentLevelParam ?? m_LevelAsset.LevelParam);
+			GridLevelData levelData = GenerateTowerLevelData(gameConfig, m_OverrideLevelParam ?? m_LevelAsset.LevelParam);
 
 			// All levels should start with the same seed.
 			if (m_ActiveTowerLevels.Count > 0) {
@@ -69,7 +73,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				levelData.BackgroundScene = overrideScene;
 			}
 
-			Debug.Log($"Setup current level {m_CurrentLevelParam?.BackgroundScene?.SceneName ?? m_LevelAsset.name} - \"{levelData.BackgroundScene?.ScenePath}\".");
+			Debug.Log($"Setup current level {m_OverrideLevelParam?.BackgroundScene?.SceneName ?? m_LevelAsset.name} - \"{levelData.BackgroundScene?.ScenePath}\".");
 
 			m_ActiveTowerLevels.Add(levelData);
 
@@ -96,7 +100,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			m_AttacksCharge.Clear();
 
-			m_CurrentLevelParam = null;
+			m_OverrideLevelParam = null;
 		}
 
 		private void OnClearActionSequenceFinished(PlaythroughPlayer player)

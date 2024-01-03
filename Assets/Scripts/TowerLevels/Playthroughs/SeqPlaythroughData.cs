@@ -40,6 +40,15 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return new TowerLevelSupervisor(this);
 		}
 
+		public void ReplaceLevelParams(IEnumerable<LevelParamData> overrideParams)
+		{
+			if (ActiveTowerLevels.Count > 0 || ActivePlayers.Any())
+				throw new InvalidOperationException("Cannot replace level params when tower level is in progress.");
+
+			m_Levels = overrideParams.ToArray();
+			CurrentLevelIndex = 0;
+		}
+
 		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
 			if (CurrentLevelIndex >= Levels.Length) {

@@ -1,4 +1,5 @@
 using TetrisTower.Game;
+using TetrisTower.TowerLevels;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 
@@ -7,8 +8,6 @@ namespace TetrisTower.HomeScreen
 	public class HomeScreenAPI : MonoBehaviour
 	{
 		public HomeScreenController HomeScreenController;
-
-		public PVPPlaythroughTemplate PVPTemplate;
 
 		public void StartNewStory(PlaythroughTemplateBase template)
 		{
@@ -33,14 +32,29 @@ namespace TetrisTower.HomeScreen
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
 		}
 
-		public void StartPVPGame(TowerLocationPickerController locationPicker)
+		public void StartPlayOnLocation(TowerLocationPickerController locationPicker)
 		{
 			var gameContext = GameManager.Instance.GameContext;
 
-			gameContext.SetCurrentPlaythrough(PVPTemplate);
+			var levelParams = new[] { locationPicker.PickedLevelParam };
+			IPlaythroughData playthroughData = locationPicker.TargetPlaythroughTemplate.GeneratePlaythroughData(gameContext.GameConfig, levelParams);
+			gameContext.SetCurrentPlaythrough(playthroughData);
 
-			((PVPPlaythroughData)gameContext.CurrentPlaythrough).SetCurrentLevel(locationPicker.PickedLevelParam);
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
+		}
+
+		public void StartPlayWithSceneOverride(TowerLocationPickerController locationPicker)
+		{
+			var gameContext = GameManager.Instance.GameContext;
+
+			gameContext.SetCurrentPlaythrough(locationPicker.TargetPlaythroughTemplate);
+
+			var supervisor = gameContext.CurrentPlaythrough.PrepareSupervisor();
+			if (supervisor is TowerLevelSupervisor towerSupervisor) {
+				towerSupervisor.SetSceneOverride(locationPicker.PickedLevelParam.GetAppropriateBackgroundScene());
+			}
+
+			GameManager.Instance.SwitchLevelAsync(supervisor);
 		}
 	}
 

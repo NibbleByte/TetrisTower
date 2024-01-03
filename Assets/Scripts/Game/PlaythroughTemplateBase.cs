@@ -46,7 +46,7 @@ namespace TetrisTower.Game
 
 	public abstract class PlaythroughTemplateBase : ScriptableObject
 	{
-		public abstract IPlaythroughData GeneratePlaythroughData(GameConfig config);
+		public abstract IPlaythroughData GeneratePlaythroughData(GameConfig config, IEnumerable<LevelParamData> overrideParams = null);
 
 		public abstract IEnumerable<LevelParamData> GetAllLevels();
 
