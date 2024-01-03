@@ -209,7 +209,7 @@ namespace TetrisTower.TowerLevels
 				gameContext.GameConfig,
 				playthroughPlayer,
 				playthroughPlayer.PlayerControls,
-				gameContext.Options,
+				gameContext.UserPrefs,
 				m_PlaythroughData,
 				levelData,
 				levelController,

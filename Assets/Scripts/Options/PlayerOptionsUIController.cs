@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TetrisTower.Game;
@@ -9,20 +10,26 @@ namespace TetrisTower.Options
 {
 	public class PlayerOptionsUIController : MonoBehaviour
 	{
+		public Toggle DownIsDrop;
 		public Toggle TouchInputType;
+
+		private IUserPreferences m_UserPrefs => GameManager.Instance.GameContext.UserPrefs;
 
 		void Awake()
 		{
+			DownIsDrop.onValueChanged.AddListener(SetDownIsDrop);
 			TouchInputType.onValueChanged.AddListener(SetTouchInputType);
 		}
 
 		void OnEnable()
 		{
-			switch(GameManager.Instance.GameContext.Options.TouchInputControls) {
-				case PlayerOptions.TouchInputControlMethod.Drag:
+			DownIsDrop.SetIsOnWithoutNotify(m_UserPrefs.DownIsDrop);
+
+			switch (m_UserPrefs.TouchInputControls) {
+				case IUserPreferences.TouchInputControlMethod.Drag:
 					TouchInputType.SetIsOnWithoutNotify(true);
 					break;
-				case PlayerOptions.TouchInputControlMethod.Swipes:
+				case IUserPreferences.TouchInputControlMethod.Swipes:
 					TouchInputType.SetIsOnWithoutNotify(false);
 					break;
 			}
@@ -30,10 +37,20 @@ namespace TetrisTower.Options
 
 		private void SetTouchInputType(bool drag)
 		{
-			GameManager.Instance.GameContext.Options.TouchInputControls = drag
-				? PlayerOptions.TouchInputControlMethod.Drag
-				: PlayerOptions.TouchInputControlMethod.Swipes
-				;
+			using (var userPrefs = GameManager.Instance.GameContext.EditPreferences()) {
+				userPrefs.TouchInputControls = drag
+					? IUserPreferences.TouchInputControlMethod.Drag
+					: IUserPreferences.TouchInputControlMethod.Swipes
+					;
+			}
 		}
+
+		private void SetDownIsDrop(bool isOn)
+		{
+			using (var userPrefs = GameManager.Instance.GameContext.EditPreferences()) {
+				userPrefs.DownIsDrop = isOn;
+			}
+		}
+
 	}
 }

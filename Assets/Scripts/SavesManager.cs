@@ -8,7 +8,6 @@ using TetrisTower.SystemUI;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Playthroughs;
 using TetrisTower.TowerLevels.Replays;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace TetrisTower.Saves
@@ -25,11 +24,10 @@ namespace TetrisTower.Saves
 
 		private const string ReplaysFolder = "Replays/";
 		private const string PlaythroughsFolder = "Saves/";
-		private const string PreferencesFolder = "Preferences/";
 
 		private const string ReplayExtension = ".trep";
 		private const string PlaythroughsExtension = ".wsav";
-		private const string PreferencesExtension = ".pref";
+		private const string PreferencesFilename = "Preferences.json";
 
 		#region Serialization
 
@@ -53,13 +51,13 @@ namespace TetrisTower.Saves
 			return Deserialize<TReturn>(serialized, config);
 		}
 
-		public static string Serialize<TData>(object data, GameConfig config)
+		public static string Serialize<TData>(object data, GameConfig config, bool formatted = false)
 		{
 			// Specify the interface type so it writes down the root type name. Check out TypeNameHandling.Auto documentation
 			return JsonConvert.SerializeObject(data, typeof(TData), new JsonSerializerSettings() {
 				Converters = GetConverters(config),
 				TypeNameHandling = TypeNameHandling.Auto,
-				//Formatting = Formatting.Indented,
+				Formatting = formatted ? Formatting.Indented : Formatting.None,
 			});
 		}
 
@@ -143,6 +141,49 @@ namespace TetrisTower.Saves
 		{
 			string content = await Platforms.PlatformsStorage.ReadZipFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"));
 			return Deserialize<ReplayRecording>(content, config);
+		}
+
+		#endregion
+
+		#region Preferences
+
+		public static async void SavePreferences(Game.Implementation.UserPreferences userPrefs, GameConfig config)
+		{
+			try {
+				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Block(userPrefs);
+
+				string content = Serialize<Game.Implementation.UserPreferences>(userPrefs, config, formatted: true);
+				await Platforms.PlatformsStorage.WriteFileAsync(PreferencesFilename, content);
+
+				GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Preferences Saved!");
+
+			} catch (Exception ex) {
+
+				UnityEngine.Debug.LogException(ex);
+
+				MessageBox.Instance.ShowSimple("Save Failed", $"Preferences failed to save!", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
+
+			} finally {
+
+				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Unblock(userPrefs);
+			}
+		}
+
+		public static async Task<Game.Implementation.UserPreferences> LoadPreferences(GameConfig config)
+		{
+			if (!Platforms.PlatformsStorage.FileExists(PreferencesFilename))
+				return new Game.Implementation.UserPreferences();
+
+			try {
+				string content = await Platforms.PlatformsStorage.ReadFileAsync(PreferencesFilename);
+				return Deserialize<Game.Implementation.UserPreferences>(content, config);
+
+			} catch (Exception ex) {
+
+				UnityEngine.Debug.LogException(ex);
+
+				return new Game.Implementation.UserPreferences();
+			}
 		}
 
 		#endregion

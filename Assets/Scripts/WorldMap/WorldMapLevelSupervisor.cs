@@ -56,7 +56,7 @@ namespace TetrisTower.WorldMap
 				gameContext,
 				gameContext.GameConfig,
 				gameContext.GlobalControls,
-				gameContext.Options,
+				gameContext.UserPrefs,
 				m_PlaythroughData,
 				levelController,
 				uiController

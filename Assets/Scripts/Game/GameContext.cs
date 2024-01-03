@@ -82,7 +82,7 @@ namespace TetrisTower.Game
 
 		public readonly GameConfig GameConfig;
 
-		public readonly PlayerOptions Options = new PlayerOptions();
+		public IUserPreferences UserPrefs { get; private set; } = new Implementation.UserPreferences();
 
 		public readonly PlayerControls GlobalControls;
 
@@ -105,6 +105,11 @@ namespace TetrisTower.Game
 		public void ClearCurrentPlaythrough()
 		{
 			CurrentPlaythrough = m_DebugPlaythroughData = null;
+		}
+
+		public Implementation.UserPreferences EditPreferences()
+		{
+			return ((Implementation.UserPreferences)UserPrefs);
 		}
 	}
 }

@@ -45,7 +45,7 @@ namespace TetrisTower.HomeScreen
 			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext,
 				gameContext.GameConfig,
-				gameContext.Options,
+				gameContext.UserPrefs,
 				gameContext.GlobalControls,
 				levelController
 				);

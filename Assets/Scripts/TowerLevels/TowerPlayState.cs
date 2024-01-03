@@ -17,7 +17,7 @@ namespace TetrisTower.TowerLevels
 		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private GameConfig m_GameConfig;
-		private PlayerOptions m_Options;
+		private IUserPreferences m_UserPrefs;
 		private GridLevelController m_LevelController;
 		private TowerLevelUIController m_UIController;
 		private ReplayRecording m_ReplayRecording;
@@ -38,7 +38,7 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_UIController);
 			context.SetByType(out m_GameConfig);
-			context.SetByType(out m_Options);
+			context.SetByType(out m_UserPrefs);
 			context.SetByType(out m_ReplayRecording);
 
 			m_PlayerControls.Enable(this, m_PlayerControls.UI);
@@ -83,7 +83,11 @@ namespace TetrisTower.TowerLevels
 		public void OnRotateShapeDown(InputAction.CallbackContext context)
 		{
 			if (context.phase == InputActionPhase.Performed) {
-				m_ReplayRecording.AddAndRun(ReplayActionType.Rotate, -1);
+				if (m_UserPrefs.DownIsDrop) {
+					OnFallSpeedUp(context);
+				} else {
+					m_ReplayRecording.AddAndRun(ReplayActionType.Rotate, -1);
+				}
 			}
 		}
 
@@ -149,7 +153,7 @@ namespace TetrisTower.TowerLevels
 					var pressDuration = Time.time - m_PointerPressedTime;
 					var pressDistance = Pointer.current.position.ReadValue() - m_PointerPressedStartPosition;
 
-					if (m_Options.TouchInputControls == PlayerOptions.TouchInputControlMethod.Drag) {
+					if (m_UserPrefs.TouchInputControls == IUserPreferences.TouchInputControlMethod.Drag) {
 						break;
 					}
 
@@ -206,7 +210,7 @@ namespace TetrisTower.TowerLevels
 			if (Pointer.current == null)
 				return;
 
-			if (m_PointerPressed && m_Options.TouchInputControls == PlayerOptions.TouchInputControlMethod.Drag) {
+			if (m_PointerPressed && m_UserPrefs.TouchInputControls == IUserPreferences.TouchInputControlMethod.Drag) {
 
 				var currentPosition = Pointer.current.position.ReadValue();
 				var dragLastDistance = currentPosition - m_PointerPressedLastPosition;

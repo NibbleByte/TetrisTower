@@ -79,8 +79,15 @@ namespace TetrisTower.GameStarter
 			}
 		}
 
-		void Start()
+		async void Start()
 		{
+			var loadedPrefs = await Saves.SavesManager.LoadPreferences(GameConfig);
+			GameContext.EditPreferences().ApplyFrom(loadedPrefs);
+
+			// Auto-save prefs every time they change. Find a better place for this someday?
+			// If dragging sound bar too quickly will file writes fail? No as it runs on the main thread, no files writtern in parallel?
+			GameContext.UserPrefs.Changed += () => Saves.SavesManager.SavePreferences(GameContext.EditPreferences(), GameConfig);
+
 			if (GameObject.FindObjectOfType<WorldMapController>()) {
 				var playthroughData = (WorldPlaythroughData) StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
 
