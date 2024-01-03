@@ -1,10 +1,11 @@
+using DevLocker.GFrame;
+using DevLocker.GFrame.Input;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace TetrisTower.HomeScreen
 {
-	public class HomeScreenController : MonoBehaviour
+	public class HomeScreenController : MonoBehaviour, ILevelLoadedListener
 	{
 		[Serializable]
 		public struct StatePanelBinds
@@ -17,9 +18,9 @@ namespace TetrisTower.HomeScreen
 
 		public StatePanelBinds[] StatePanels;
 
-		void Awake()
+		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			foreach(var bind in StatePanels) {
+			foreach (var bind in StatePanels) {
 				bind.Panel.SetActive(false);
 			}
 
@@ -27,6 +28,13 @@ namespace TetrisTower.HomeScreen
 			CurrentState = null;
 
 			SwitchState(nextState);
+		}
+
+		public void OnLevelUnloading()
+		{
+			// HACK: As we don't use states stack we can't use UIDisableCanvasGroupOnStatesChanging.
+			//		 Manually clear the screen from any UI state, as scopes & hotkeys continue working while level is changing.
+			ClearState();
 		}
 
 		public void SwitchState(HomeScreenState state)

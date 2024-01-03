@@ -1208,6 +1208,24 @@ namespace TetrisTower.Game
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PickerNext"",
+                    ""type"": ""Button"",
+                    ""id"": ""4eccd0ff-b7a8-4640-ab21-160db0ef0b22"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PickerPrev"",
+                    ""type"": ""Button"",
+                    ""id"": ""84055c8f-853b-4919-9759-b3dbb9ff8bfa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1320,6 +1338,94 @@ namespace TetrisTower.Game
                     ""action"": ""PrevSection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3a2a6814-4ef5-41b1-8af3-940af308987d"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""PickerNext"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bd64676c-7f72-4296-8d84-ec2929974cd0"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""PickerNext"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fe5a4b85-e571-4c34-ab66-3b000252d463"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""PickerNext"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5c1b6ea1-9604-4b3c-a676-db78303eaa1e"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""PickerNext"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""27a656f6-9cd1-42c8-ad85-6e91b3f7b443"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""PickerPrev"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9bb8e6da-910a-4aa0-b7da-77159acc050f"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""PickerPrev"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7b9ee5fe-7685-4292-aee8-a75fdd113808"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""PickerPrev"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9cab4c78-57c5-4130-b611-570e9d66edc9"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""PickerPrev"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1405,6 +1511,8 @@ namespace TetrisTower.Game
             m_CommonHotkeys_Confirm = m_CommonHotkeys.FindAction("Confirm", throwIfNotFound: true);
             m_CommonHotkeys_NextSection = m_CommonHotkeys.FindAction("NextSection", throwIfNotFound: true);
             m_CommonHotkeys_PrevSection = m_CommonHotkeys.FindAction("PrevSection", throwIfNotFound: true);
+            m_CommonHotkeys_PickerNext = m_CommonHotkeys.FindAction("PickerNext", throwIfNotFound: true);
+            m_CommonHotkeys_PickerPrev = m_CommonHotkeys.FindAction("PickerPrev", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -1794,6 +1902,8 @@ namespace TetrisTower.Game
         private readonly InputAction m_CommonHotkeys_Confirm;
         private readonly InputAction m_CommonHotkeys_NextSection;
         private readonly InputAction m_CommonHotkeys_PrevSection;
+        private readonly InputAction m_CommonHotkeys_PickerNext;
+        private readonly InputAction m_CommonHotkeys_PickerPrev;
         public struct CommonHotkeysActions
         {
             private @PlayerControls m_Wrapper;
@@ -1802,6 +1912,8 @@ namespace TetrisTower.Game
             public InputAction @Confirm => m_Wrapper.m_CommonHotkeys_Confirm;
             public InputAction @NextSection => m_Wrapper.m_CommonHotkeys_NextSection;
             public InputAction @PrevSection => m_Wrapper.m_CommonHotkeys_PrevSection;
+            public InputAction @PickerNext => m_Wrapper.m_CommonHotkeys_PickerNext;
+            public InputAction @PickerPrev => m_Wrapper.m_CommonHotkeys_PickerPrev;
             public InputActionMap Get() { return m_Wrapper.m_CommonHotkeys; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1823,6 +1935,12 @@ namespace TetrisTower.Game
                     @PrevSection.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevSection;
                     @PrevSection.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevSection;
                     @PrevSection.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPrevSection;
+                    @PickerNext.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPickerNext;
+                    @PickerNext.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPickerNext;
+                    @PickerNext.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPickerNext;
+                    @PickerPrev.started -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPickerPrev;
+                    @PickerPrev.performed -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPickerPrev;
+                    @PickerPrev.canceled -= m_Wrapper.m_CommonHotkeysActionsCallbackInterface.OnPickerPrev;
                 }
                 m_Wrapper.m_CommonHotkeysActionsCallbackInterface = instance;
                 if (instance != null)
@@ -1839,6 +1957,12 @@ namespace TetrisTower.Game
                     @PrevSection.started += instance.OnPrevSection;
                     @PrevSection.performed += instance.OnPrevSection;
                     @PrevSection.canceled += instance.OnPrevSection;
+                    @PickerNext.started += instance.OnPickerNext;
+                    @PickerNext.performed += instance.OnPickerNext;
+                    @PickerNext.canceled += instance.OnPickerNext;
+                    @PickerPrev.started += instance.OnPickerPrev;
+                    @PickerPrev.performed += instance.OnPickerPrev;
+                    @PickerPrev.canceled += instance.OnPickerPrev;
                 }
             }
         }
@@ -1916,6 +2040,8 @@ namespace TetrisTower.Game
             void OnConfirm(InputAction.CallbackContext context);
             void OnNextSection(InputAction.CallbackContext context);
             void OnPrevSection(InputAction.CallbackContext context);
+            void OnPickerNext(InputAction.CallbackContext context);
+            void OnPickerPrev(InputAction.CallbackContext context);
         }
     }
 }

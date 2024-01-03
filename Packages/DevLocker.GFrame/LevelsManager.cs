@@ -163,11 +163,11 @@ namespace DevLocker.GFrame
 
 				if (LevelSupervisor != null) {
 
-					await UnloadingSupervisorAsync();
-
 					if (ShowLoadingScreenBeforeLevelStates && LevelLoadingScreen != null) {
 						await LevelLoadingScreen.ShowAsync();
 					}
+
+					await UnloadingSupervisorAsync();
 
 					foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
 

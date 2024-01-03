@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
-	public class TowerLostState : IPlayerState, PlayerControls.ICommonHotkeysActions
+	public class TowerLostState : IPlayerState
 	{
 		private IPlaythroughData m_PlaythroughData;
 		private IPlayerContext m_PlayerContext;
@@ -39,10 +39,15 @@ namespace TetrisTower.TowerLevels
 			// Only in single player loser can interrupt animation.
 			if (m_PlaythroughData.IsSinglePlayer) {
 				m_PlayerControls.Enable(this, m_PlayerControls.UI);
-				m_PlayerControls.Enable(this, m_PlayerControls.CommonHotkeys);
-				m_PlayerControls.CommonHotkeys.SetCallbacks(this);
+
+				m_PlayerControls.CommonHotkeys.Back.performed += OnInterruptAnimation;
+				m_PlayerControls.CommonHotkeys.Confirm.performed += OnInterruptAnimation;
+				m_PlayerControls.Enable(this, m_PlayerControls.CommonHotkeys.Back);
+				m_PlayerControls.Enable(this, m_PlayerControls.CommonHotkeys.Confirm);
+
+
 				// HACK: Listen for touch-screen tapping as they don't have CommonHotkeys (back button is not ideal).
-				m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnPointerPressed;
+				m_PlayerControls.TowerLevelPlay.PointerPress.performed += OnInterruptAnimation;
 				m_PlayerControls.Enable(this, m_PlayerControls.TowerLevelPlay.PointerPress);
 			}
 
@@ -72,8 +77,10 @@ namespace TetrisTower.TowerLevels
 
 		public void ExitState()
 		{
-			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnPointerPressed;
-			m_PlayerControls.CommonHotkeys.SetCallbacks(null);
+			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnInterruptAnimation;
+			m_PlayerControls.CommonHotkeys.Back.performed -= OnInterruptAnimation;
+			m_PlayerControls.CommonHotkeys.Confirm.performed -= OnInterruptAnimation;
+
 			m_PlayerControls.DisableAll(this);
 
 			if (!m_Interrupted) {
@@ -119,27 +126,9 @@ namespace TetrisTower.TowerLevels
 			m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 		}
 
-		public void OnBack(InputAction.CallbackContext context)
+		public void OnInterruptAnimation(InputAction.CallbackContext context)
 		{
 			RequestFinishUpState();
-		}
-
-		public void OnConfirm(InputAction.CallbackContext context)
-		{
-			RequestFinishUpState();
-		}
-
-		private void OnPointerPressed(InputAction.CallbackContext obj)
-		{
-			RequestFinishUpState();
-		}
-
-		public void OnNextSection(InputAction.CallbackContext context)
-		{
-		}
-
-		public void OnPrevSection(InputAction.CallbackContext context)
-		{
 		}
 	}
 }

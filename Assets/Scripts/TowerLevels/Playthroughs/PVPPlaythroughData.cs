@@ -30,6 +30,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[JsonProperty]
 		private WorldMapLevelParamAsset m_LevelAsset;
 
+		private LevelParamData m_CurrentLevelParam;
+
 		public override bool IsFinalLevel => true;
 		public override bool HaveFinishedLevels => true;
 
@@ -42,14 +44,20 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return new TowerLevelSupervisor(this, PlayersCount);
 		}
 
+		public void SetCurrentLevel(LevelParamData levelParam)
+		{
+			m_CurrentLevelParam = levelParam;
+			m_LevelAsset = null;
+		}
+
 		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
-			if (m_LevelAsset == null) {
+			if (m_LevelAsset == null && m_CurrentLevelParam == null) {
 				Debug.LogError($"No level asset set. Abort!");
 				return null;
 			}
 
-			GridLevelData levelData = GenerateTowerLevelData(gameConfig, m_LevelAsset.LevelParam);
+			GridLevelData levelData = GenerateTowerLevelData(gameConfig, m_CurrentLevelParam ?? m_LevelAsset.LevelParam);
 
 			// All levels should start with the same seed.
 			if (m_ActiveTowerLevels.Count > 0) {
@@ -61,7 +69,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				levelData.BackgroundScene = overrideScene;
 			}
 
-			Debug.Log($"Setup current level {m_LevelAsset.name} - \"{levelData.BackgroundScene?.ScenePath}\".");
+			Debug.Log($"Setup current level {m_CurrentLevelParam?.BackgroundScene?.SceneName ?? m_LevelAsset.name} - \"{levelData.BackgroundScene?.ScenePath}\".");
 
 			m_ActiveTowerLevels.Add(levelData);
 
@@ -87,6 +95,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			base.DisposeTowerLevels();
 
 			m_AttacksCharge.Clear();
+
+			m_CurrentLevelParam = null;
 		}
 
 		private void OnClearActionSequenceFinished(PlaythroughPlayer player)
@@ -114,15 +124,6 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 					bestEnemy.LevelData.PendingBonusActions.Add(new PushUpLine_BonusAction());
 				}
-			}
-		}
-
-		public override void Validate(Core.AssetsRepository repo, UnityEngine.Object context)
-		{
-			base.Validate(repo, context);
-
-			if (m_LevelAsset == null) {
-				Debug.LogError($"{context} has no level asset specified.", context);
 			}
 		}
 	}

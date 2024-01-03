@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d15a3266bec40ee48beedae9708e973f, type: 3}
-  m_Name: ShowcasePVP_PVPPlaythroughTemplate
+  m_Name: PVP_PVPPlaythroughTemplate
   m_EditorClassIdentifier: 
   m_PlayerData:
     m_ActiveTowerLevels: []
@@ -20,7 +20,8 @@ MonoBehaviour:
     ScoreOnLevelStart: 0
     PlayTimeOnLevelStart: 0
     PlayersCount: 2
-    m_LevelAsset: {fileID: 1554497649489288964, guid: 4627b4debeed84d4681b87d1edc51827, type: 2}
+    AttackChargeMax: 40
+    m_LevelAsset: {fileID: 0}
   references:
     version: 2
     RefIds: []

@@ -1,10 +1,15 @@
 using TetrisTower.Game;
+using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 
 namespace TetrisTower.HomeScreen
 {
-	public class HomeScreenNewGamePanel : MonoBehaviour
+	public class HomeScreenAPI : MonoBehaviour
 	{
+		public HomeScreenController HomeScreenController;
+
+		public PVPPlaythroughTemplate PVPTemplate;
+
 		public void StartNewStory(PlaythroughTemplateBase template)
 		{
 			var gameContext = GameManager.Instance.GameContext;
@@ -17,13 +22,6 @@ namespace TetrisTower.HomeScreen
 			}
 
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
-
-			// HACK: As we don't use states stack we can't use UIDisableCanvasGroupOnStatesChanging.
-			//		 Manually clear the screen from any UI state, as scopes & hotkeys continue working while level is changing.
-			var levelController = GameObject.FindObjectOfType<HomeScreenController>();
-			if (levelController) {
-				levelController.ClearState();
-			}
 		}
 
 		public void StartNewGame(PlaythroughTemplateBase template)
@@ -33,13 +31,16 @@ namespace TetrisTower.HomeScreen
 			gameContext.SetCurrentPlaythrough(template);
 
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
+		}
 
-			// HACK: As we don't use states stack we can't use UIDisableCanvasGroupOnStatesChanging.
-			//		 Manually clear the screen from any UI state, as scopes & hotkeys continue working while level is changing.
-			var levelController = GameObject.FindObjectOfType<HomeScreenController>();
-			if (levelController) {
-				levelController.ClearState();
-			}
+		public void StartPVPGame(TowerLocationPickerController locationPicker)
+		{
+			var gameContext = GameManager.Instance.GameContext;
+
+			gameContext.SetCurrentPlaythrough(PVPTemplate);
+
+			((PVPPlaythroughData)gameContext.CurrentPlaythrough).SetCurrentLevel(locationPicker.PickedLevelParam);
+			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
 		}
 	}
 
