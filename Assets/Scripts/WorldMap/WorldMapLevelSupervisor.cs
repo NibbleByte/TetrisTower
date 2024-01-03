@@ -43,6 +43,9 @@ namespace TetrisTower.WorldMap
 				while (!loadOp.isDone) await Task.Yield();
 			}
 
+			if (m_PlaythroughData == gameContext.StoryInProgress) {
+				await Saves.SavesManager.SavePlaythrough(Saves.SavesManager.DefaultStorySlot, m_PlaythroughData, gameContext.GameConfig);
+			}
 
 			var levelController = GameObject.FindObjectOfType<WorldMapController>();
 
@@ -74,8 +77,14 @@ namespace TetrisTower.WorldMap
 			PlayerContextUIRootObject.GlobalPlayerContext.StatesStack.SetState(new WorldMapPlayState());
 		}
 
-		public Task UnloadAsync()
+		public async Task UnloadAsync()
 		{
+			GameContext gameContext = GameManager.Instance.GameContext;
+
+			if (m_PlaythroughData == gameContext.StoryInProgress) {
+				await Saves.SavesManager.SavePlaythrough(Saves.SavesManager.DefaultStorySlot, m_PlaythroughData, gameContext.GameConfig);
+			}
+
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 
 			foreach (var behaviour in behaviours) {
@@ -90,8 +99,6 @@ namespace TetrisTower.WorldMap
 					behaviour.StopAllCoroutines();
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private void CriticalError(string errorMessage, bool fallbackToHomescreen)

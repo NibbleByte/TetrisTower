@@ -1,6 +1,7 @@
 using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.UIUtils;
 using System.Linq;
+using System.Threading.Tasks;
 using TetrisTower.Game;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
@@ -81,12 +82,7 @@ namespace TetrisTower.GameStarter
 
 		async void Start()
 		{
-			var loadedPrefs = await Saves.SavesManager.LoadPreferences(GameConfig);
-			GameContext.EditPreferences().ApplyFrom(loadedPrefs);
-
-			// Auto-save prefs every time they change. Find a better place for this someday?
-			// If dragging sound bar too quickly will file writes fail? No as it runs on the main thread, no files writtern in parallel?
-			GameContext.UserPrefs.Changed += () => Saves.SavesManager.SavePreferences(GameContext.EditPreferences(), GameConfig);
+			await LoadPreferences();
 
 			if (GameObject.FindObjectOfType<WorldMapController>()) {
 				var playthroughData = (WorldPlaythroughData) StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
@@ -95,7 +91,7 @@ namespace TetrisTower.GameStarter
 
 				GameContext.SetCurrentPlaythrough(playthroughData);
 
-				var supervisor = GameContext.CurrentPlaythrough.PrepareSupervisor();
+				var supervisor = playthroughData.PrepareSupervisor();
 
 				GameManager.Instance.SwitchLevelAsync(supervisor);
 
@@ -177,6 +173,16 @@ namespace TetrisTower.GameStarter
 			if (m_Instance == this) {
 				m_Instance = null;
 			}
+		}
+
+		private async Task LoadPreferences()
+		{
+			var loadedPrefs = await Saves.SavesManager.LoadPreferences(GameConfig);
+			GameContext.EditPreferences().ApplyFrom(loadedPrefs);
+
+			// Auto-save prefs every time they change. Find a better place for this someday?
+			// If dragging sound bar too quickly will file writes fail? No as it runs on the main thread, no files writtern in parallel?
+			GameContext.UserPrefs.Changed += () => Saves.SavesManager.SavePreferences(GameContext.EditPreferences(), GameConfig);
 		}
 
 		private void LateUpdate()

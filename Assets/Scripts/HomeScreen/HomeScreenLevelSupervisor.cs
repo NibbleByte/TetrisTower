@@ -35,7 +35,14 @@ namespace TetrisTower.HomeScreen
 
 			TowerLevels.TowerLevelDebugAPI.__DebugInitialTowerLevel = string.Empty;
 
-			gameContext.SetCurrentPlaythrough((IPlaythroughData) null);
+			gameContext.ClearCurrentPlaythrough();
+
+			var storyPlaythrough = await Saves.SavesManager.LoadPlaythrough(Saves.SavesManager.DefaultStorySlot, gameContext.GameConfig);
+			// On switching to tower level, the world is saved with pending current level.
+			// If player doesn't go back to the world map, next time they start the story, the current level will start a tower.
+			// Clear it so player goes in the world.
+			storyPlaythrough.TryCancelCurrentLevel();
+			gameContext.SetStoryInProgress(storyPlaythrough);
 
 			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
 

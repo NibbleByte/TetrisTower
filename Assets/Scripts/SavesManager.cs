@@ -115,7 +115,9 @@ namespace TetrisTower.Saves
 
 		#region Playthroughs
 
-		public static async void SavePlaythrough(int slot, WorldPlaythroughData playthroughData, GameConfig config)
+		public const int DefaultStorySlot = 0;
+
+		public static async Task SavePlaythrough(int slot, WorldPlaythroughData playthroughData, GameConfig config)
 		{
 			try {
 				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Block(playthroughData);
@@ -123,13 +125,13 @@ namespace TetrisTower.Saves
 				string content = Serialize<WorldPlaythroughData>(playthroughData, config);
 				await Platforms.PlatformsStorage.WriteZipFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"), content);
 
-				GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Replay Saved!");
+				GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Story Saved!");
 
 			} catch (Exception ex) {
 
 				UnityEngine.Debug.LogException(ex);
 
-				MessageBox.Instance.ShowSimple("Save Failed", $"Replay failed to save!", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
+				MessageBox.Instance.ShowSimple("Save Failed", $"Story failed to save!", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
 
 			} finally {
 
@@ -137,10 +139,24 @@ namespace TetrisTower.Saves
 			}
 		}
 
-		public static async Task<ReplayRecording> LoadPlaythrough(int slot, GameConfig config)
+		public static async Task<WorldPlaythroughData> LoadPlaythrough(int slot, GameConfig config)
 		{
-			string content = await Platforms.PlatformsStorage.ReadZipFileAsync(Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}"));
-			return Deserialize<ReplayRecording>(content, config);
+			string filePath = Path.Combine(PlaythroughsFolder, $"Story_{slot}{PlaythroughsExtension}");
+			if (!Platforms.PlatformsStorage.FileExists(filePath))
+				return null;
+
+			try {
+				string content = await Platforms.PlatformsStorage.ReadZipFileAsync(filePath);
+				return Deserialize<WorldPlaythroughData>(content, config);
+
+			} catch(Exception ex) {
+
+				UnityEngine.Debug.LogException(ex);
+
+				MessageBox.Instance.ShowSimple("Load Failed", $"Failed to load the story in progress!\n{filePath}", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
+
+				return null;
+			}
 		}
 
 		#endregion

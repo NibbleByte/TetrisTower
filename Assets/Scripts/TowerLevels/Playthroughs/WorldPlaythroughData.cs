@@ -119,6 +119,19 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			Debug.Log($"Setting current level to {m_CurrentLevelID}");
 		}
 
+		public void TryCancelCurrentLevel()
+		{
+			if (!string.IsNullOrEmpty(m_CurrentLevelID)) {
+				Debug.Log($"Cancelling current level {m_CurrentLevelID}");
+			}
+
+			if (m_ActiveTowerLevels.Count == 0) {
+				m_CurrentLevelID = "";
+			} else {
+				QuitLevel();
+			}
+		}
+
 		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
 			if (string.IsNullOrWhiteSpace(m_CurrentLevelID) || m_LevelsSet.GetLevelData(m_CurrentLevelID) == null) {

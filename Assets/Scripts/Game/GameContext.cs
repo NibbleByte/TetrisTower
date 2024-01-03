@@ -86,10 +86,17 @@ namespace TetrisTower.Game
 
 		public readonly PlayerControls GlobalControls;
 
+		public IPlaythroughData StoryInProgress { get; private set; }
+
 		public IPlaythroughData CurrentPlaythrough { get; private set; }
 		[SerializeReference] private IPlaythroughData m_DebugPlaythroughData;
 
 		public readonly IInputContext GlobalInputContext;
+
+		public void SetStoryInProgress(IPlaythroughData playthrough)
+		{
+			StoryInProgress = playthrough;
+		}
 
 		public void SetCurrentPlaythrough(PlaythroughTemplateBase playthroughTemplate)
 		{
