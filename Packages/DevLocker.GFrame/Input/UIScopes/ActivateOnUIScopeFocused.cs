@@ -38,6 +38,11 @@ namespace DevLocker.GFrame.Input.UIScope
 			? OnScopesFocused.Any(s => s && s.isActiveAndEnabled)
 			: OnScopeFocused && OnScopeFocused.isActiveAndEnabled;
 
+		void Reset()
+		{
+			OnScopeFocused = GetComponentInParent<UIScope>(true);
+		}
+
 		void Awake()
 		{
 			if (!MultipleObjects && OnScopeFocused == null) {
