@@ -367,7 +367,7 @@ namespace TetrisTower.Visuals
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
 
 				if (lowestRows[coords.Column] == coords.Row) {
-					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(coords));
+					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(coords), withSound: true);
 				}
 			}
 
@@ -395,7 +395,7 @@ namespace TetrisTower.Visuals
 					frontCenter += (frontCenter - new Vector3(transform.position.x, frontCenter.y, transform.position.z)).normalized * 0.1f;
 					yield return m_Fairy.ChaseTo(frontCenter);
 
-					EmitParticlesAt(MatchBlockEffect, GridToWorldCenter(coord));
+					EmitParticlesAt(MatchBlockEffect, GridToWorldCenter(coord), withSound: true);
 				}
 
 				var visualsBlock = this[coord];
@@ -471,7 +471,7 @@ namespace TetrisTower.Visuals
 				visualsBlock.transform.localScale = GridToScale(movedPair.Value);
 
 				if (lowestRows[movedPair.Value.Column] == movedPair.Value.Row) {
-					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(movedPair.Value));
+					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(movedPair.Value), withSound: false);
 				}
 
 				if (visualsBlock.IsHighlighted && movedPair.Value.Row < m_PlayableArea.Row) {
@@ -687,7 +687,7 @@ namespace TetrisTower.Visuals
 			m_PlacedShapeToBeReused = shape;
 		}
 
-		private void EmitParticlesAt(ParticleSystem particleSystem, Vector3 worldPosition)
+		private void EmitParticlesAt(ParticleSystem particleSystem, Vector3 worldPosition, bool withSound)
 		{
 			if (particleSystem == null)
 				return;
@@ -705,6 +705,13 @@ namespace TetrisTower.Visuals
 			}
 
 			particleSystem.Emit(count);
+
+			if (withSound) {
+				var audioSource = particleSystem.GetComponent<AudioSource>();
+				if (audioSource) {
+					audioSource.PlayOneShot(audioSource.clip);
+				}
+			}
 		}
 
 		// Gather the lowest found rows so we can spawn particles underneath.

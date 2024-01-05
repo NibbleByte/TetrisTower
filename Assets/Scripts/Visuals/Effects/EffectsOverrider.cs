@@ -8,6 +8,7 @@ namespace TetrisTower.Visuals.Effects
 	{
 		[Header(nameof(ConeVisualsGrid))]
 		public ParticleSystem FallHitEffect;
+		public ParticleSystem MatchBlockEffect;
 		public FallTrailEffectsManager GridMoveFallTrailEffectsManager;
 
 		[Header(nameof(TowerConeVisualsController))]
@@ -21,6 +22,10 @@ namespace TetrisTower.Visuals.Effects
 		{
 			if (FallHitEffect) {
 				visualsGrid.FallHitEffect = FallHitEffect;
+			}
+
+			if (MatchBlockEffect) {
+				visualsGrid.MatchBlockEffect = MatchBlockEffect;
 			}
 
 			if (GridMoveFallTrailEffectsManager) {

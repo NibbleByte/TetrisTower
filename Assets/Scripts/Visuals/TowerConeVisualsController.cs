@@ -30,6 +30,9 @@ namespace TetrisTower.Visuals
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 		public Effects.FallTrailEffectsManager WonFallTrailEffectsManager;
 
+		public AudioSource RotateSoundSound;
+		public AudioSource FallSpeedUpSoundSound;
+
 		public VisualsShape FallingVisualsShape { get; private set; }
 
 		// For debug to be displayed by the Inspector!
@@ -104,6 +107,8 @@ namespace TetrisTower.Visuals
 
 		private void OnFallingShapeSpeedUp()
 		{
+			FallSpeedUpSoundSound?.PlayOneShot(FallSpeedUpSoundSound?.clip);
+
 			if (m_LevelData.HasWon) {
 				// Rotation happens for the next block, so shouldn't affect the last one.
 				if (WonFallTrailEffectsManager) {
@@ -237,6 +242,8 @@ namespace TetrisTower.Visuals
 				return;
 
 			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == m_LevelData.FallingShape.ShapeCoords.Length);
+
+			RotateSoundSound?.PlayOneShot(RotateSoundSound?.clip);
 
 			m_RotatingFallingShape = true;
 			m_RotatingFallingShapeStarted = m_Timing.TimeElapsed;

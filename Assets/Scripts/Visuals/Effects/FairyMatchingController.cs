@@ -18,6 +18,8 @@ namespace TetrisTower.Visuals.Effects
 		public float ChaseRotation = 16;
 		public float ChaseEndDelay = 0.2f;
 
+		public AudioSource StartChaseSound;
+
 		public Transform[] RestPoints { get; private set; }
 
 		// Used for debugging fairy position during replays.
@@ -89,6 +91,8 @@ namespace TetrisTower.Visuals.Effects
 
 		public IEnumerator ChaseTo(Vector3 chasePos)
 		{
+			StartChaseSound?.PlayOneShot(StartChaseSound?.clip);
+
 			m_ChasePos = chasePos;
 			m_ChaseEndDuration = 0f;
 
