@@ -44,6 +44,12 @@ namespace TetrisTower.SystemUI
 
 		public void ShowNotification(string message)
 		{
+			if (string.IsNullOrWhiteSpace(message))
+				return;
+
+			if (message == m_Entries.LastOrDefault()?.Message)
+				return;
+
 			RectTransform elementTransform = EntryPool.Get(transform);
 
 			var entry = new ElementEntry() {

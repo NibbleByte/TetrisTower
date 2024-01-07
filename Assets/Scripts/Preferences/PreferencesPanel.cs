@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TetrisTower.Options
+namespace TetrisTower.UserPreferences
 {
-	public class OptionsPanel : MonoBehaviour
+	public class PreferencesPanel : MonoBehaviour
 	{
 		[Header("Video")]
 		public Toggle FullScreenToggle;

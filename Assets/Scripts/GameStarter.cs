@@ -3,6 +3,7 @@ using DevLocker.GFrame.UIUtils;
 using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
+using TetrisTower.Game.Preferences;
 using TetrisTower.HomeScreen;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels;
@@ -66,6 +67,7 @@ namespace TetrisTower.GameStarter
 				systemOverlay.GetComponentInChildren<SystemUI.ToastNotificationsController>(),
 				systemOverlay.GetComponentInChildren<SystemUI.BlockingOperationOverlayController>(true)
 				);
+
 
 
 			if (Platforms.PlatformsUtils.IsMobile) {
@@ -183,6 +185,11 @@ namespace TetrisTower.GameStarter
 			// Auto-save prefs every time they change. Find a better place for this someday?
 			// If dragging sound bar too quickly will file writes fail? No as it runs on the main thread, no files writtern in parallel?
 			GameContext.UserPrefs.Changed += () => Saves.SavesManager.SavePreferences(GameContext.EditPreferences(), GameConfig);
+
+			var preferencesManager = Instantiate(GameConfig.PreferenceManagerPrefab, transform);
+			foreach (var manager in preferencesManager.GetComponentsInChildren<IPreferencesManager>(true)) {
+				manager.Init(GameContext);
+			}
 		}
 
 		private void LateUpdate()

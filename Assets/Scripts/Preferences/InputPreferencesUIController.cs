@@ -1,14 +1,11 @@
-using DevLocker.GFrame;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TetrisTower.Game;
+using TetrisTower.Game.Preferences;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TetrisTower.Options
+namespace TetrisTower.UserPreferences
 {
-	public class PlayerOptionsUIController : MonoBehaviour
+	public class InputPreferencesUIController : MonoBehaviour
 	{
 		public Toggle DownIsDrop;
 		public Toggle TouchInputType;

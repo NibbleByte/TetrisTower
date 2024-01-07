@@ -2,6 +2,7 @@ using DevLocker.GFrame.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TetrisTower.Game.Preferences;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
@@ -82,7 +83,7 @@ namespace TetrisTower.Game
 
 		public readonly GameConfig GameConfig;
 
-		public IUserPreferences UserPrefs { get; private set; } = new Implementation.UserPreferences();
+		public IUserPreferences UserPrefs { get; private set; } = new Preferences.Implementation.UserPreferences();
 
 		public readonly PlayerControls GlobalControls;
 
@@ -114,9 +115,9 @@ namespace TetrisTower.Game
 			CurrentPlaythrough = m_DebugPlaythroughData = null;
 		}
 
-		public Implementation.UserPreferences EditPreferences()
+		public Preferences.Implementation.UserPreferences EditPreferences()
 		{
-			return ((Implementation.UserPreferences)UserPrefs);
+			return ((Preferences.Implementation.UserPreferences)UserPrefs);
 		}
 	}
 }

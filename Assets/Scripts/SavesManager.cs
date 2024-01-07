@@ -163,12 +163,12 @@ namespace TetrisTower.Saves
 
 		#region Preferences
 
-		public static async void SavePreferences(Game.Implementation.UserPreferences userPrefs, GameConfig config)
+		public static async void SavePreferences(Game.Preferences.Implementation.UserPreferences userPrefs, GameConfig config)
 		{
 			try {
 				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Block(userPrefs);
 
-				string content = Serialize<Game.Implementation.UserPreferences>(userPrefs, config, formatted: true);
+				string content = Serialize<Game.Preferences.Implementation.UserPreferences>(userPrefs, config, formatted: true);
 				await Platforms.PlatformsStorage.WriteFileAsync(PreferencesFilename, content);
 
 				GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Preferences Saved!");
@@ -185,20 +185,20 @@ namespace TetrisTower.Saves
 			}
 		}
 
-		public static async Task<Game.Implementation.UserPreferences> LoadPreferences(GameConfig config)
+		public static async Task<Game.Preferences.Implementation.UserPreferences> LoadPreferences(GameConfig config)
 		{
 			if (!Platforms.PlatformsStorage.FileExists(PreferencesFilename))
-				return new Game.Implementation.UserPreferences();
+				return new Game.Preferences.Implementation.UserPreferences();
 
 			try {
 				string content = await Platforms.PlatformsStorage.ReadFileAsync(PreferencesFilename);
-				return Deserialize<Game.Implementation.UserPreferences>(content, config);
+				return Deserialize<Game.Preferences.Implementation.UserPreferences>(content, config);
 
 			} catch (Exception ex) {
 
 				UnityEngine.Debug.LogException(ex);
 
-				return new Game.Implementation.UserPreferences();
+				return new Game.Preferences.Implementation.UserPreferences();
 			}
 		}
 
