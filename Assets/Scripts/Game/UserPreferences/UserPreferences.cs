@@ -59,7 +59,7 @@ namespace TetrisTower.Game.Preferences
 			public bool MusicMute { get; set; } = false;
 
 			[field: JsonProperty(nameof(MusicVolume))]
-			public float MusicVolume { get; set; } = 0.75f;
+			public float MusicVolume { get; set; } = 1f;
 
 
 
@@ -67,10 +67,10 @@ namespace TetrisTower.Game.Preferences
 			public bool SoundsMute { get; set; } = false;
 
 			[field: JsonProperty(nameof(SoundsVolume))]
-			public float SoundsVolume { get; set; } = 0.8f;
+			public float SoundsVolume { get; set; } = 1f;
 
 			[field: JsonProperty(nameof(AmbienceVolume))]
-			public float AmbienceVolume { get; set; } = 0.8f;
+			public float AmbienceVolume { get; set; } = 1f;
 
 			#endregion
 
