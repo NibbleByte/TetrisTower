@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6837942234520228760}
   - component: {fileID: 9129153724284904671}
   - component: {fileID: 7296526018038906625}
+  - component: {fileID: 7133525482244872928}
   - component: {fileID: 4113805487830582639}
   m_Layer: 1
   m_Name: Fairy
@@ -165,6 +166,18 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
+--- !u!114 &7133525482244872928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2262138912469880334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2d8c61140f63ff47af27ba898a150a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!82 &4113805487830582639
 AudioSource:
   m_ObjectHideFlags: 0

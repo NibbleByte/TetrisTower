@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4060481939114612}
   - component: {fileID: 5558382899175781264}
   - component: {fileID: 8088966854869879571}
+  - component: {fileID: 9018463469079133440}
   - component: {fileID: 2612862758664835624}
   m_Layer: 0
   m_Name: VFX_Blocks_Fall_Impact_Dust
@@ -4883,6 +4884,18 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!114 &9018463469079133440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876081050882714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2d8c61140f63ff47af27ba898a150a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!82 &2612862758664835624
 AudioSource:
   m_ObjectHideFlags: 0

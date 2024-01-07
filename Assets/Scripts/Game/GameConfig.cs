@@ -34,9 +34,11 @@ namespace TetrisTower.Game
 		public GameObject[] UIPrefabs;
 		public GameObject[] UIPrefabsMobile;
 
-		public InputBindingDisplayAsset[] BindingDisplayAssets;
-
+		[Header("Gameplay")]
 		public float FallSpeedup = 40f;
+
+		[Header("Input")]
+		public InputBindingDisplayAsset[] BindingDisplayAssets;
 
 		public float SwipeMaxTime = 0.5f;
 		public float SwipeMinDistance = 100f;
@@ -46,6 +48,10 @@ namespace TetrisTower.Game
 		[Range(0f, 1f)]
 		public float SwipeConformity = 0.9f;
 
+		[Header("Audio")]
+		public float MultiplayerSpatialBlend = 0.4f;
+
+		[Header("Templates")]
 		public PlaythroughTemplateBase DevDefaultPlaythgrough;
 
 		void OnValidate()

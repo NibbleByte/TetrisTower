@@ -14,6 +14,9 @@ namespace TetrisTower.TowerLevels
 	{
 		private IPlaythroughData m_PlaythroughData;
 		private int m_PlayersCount;
+		private Bounds m_FirstPlayerBounds;
+
+		public void SetFirstPlayerBounds(Bounds bounds) => m_FirstPlayerBounds = bounds;
 
 		public TowerLevelPlayersManager(IPlaythroughData playthroughData, int playersCount)
 		{
@@ -50,9 +53,25 @@ namespace TetrisTower.TowerLevels
 
 		private void SetupCamera(Camera camera, int playerIndex)
 		{
-			// Only one audio listener allowed.
 			if (playerIndex != 0) {
+				// Only one audio listener allowed.
 				GameObject.DestroyImmediate(camera.GetComponentInChildren<AudioListener>(true));
+
+			} else if (m_PlayersCount > 1) {
+				// For split-screen, create an artifitial listener somewhere between the players,
+				// so left player hears sounds from the left speaker, right one from the right speaker.
+				// Also see TowerPlayerSound.
+				GameObject.DestroyImmediate(camera.GetComponentInChildren<AudioListener>(true));
+
+				// This should be synched with SetupOffset().
+				// This supports for up to 4 players.
+				Vector3 listenerPos;
+				listenerPos.x = m_FirstPlayerBounds.max.x;
+				listenerPos.y = camera.transform.position.y;
+				listenerPos.z = m_PlayersCount == 2 ? m_FirstPlayerBounds.center.z : m_FirstPlayerBounds.min.z;
+
+				var audioListener = new GameObject("AudioListener").AddComponent<AudioListener>();
+				audioListener.transform.position = listenerPos;
 			}
 
 			switch (m_PlayersCount) {
@@ -75,6 +94,36 @@ namespace TetrisTower.TowerLevels
 
 				default:
 					throw new NotSupportedException($"{m_PlayersCount} players not supported.");
+			}
+		}
+
+		public void SetupOffset(int playerIndex, GameObject[] sceneRoots)
+		{
+			if (playerIndex == 0)
+				return;
+
+			// Translate each player objects so they don't collide. First player remains in place.
+			foreach (GameObject root in sceneRoots) {
+				// NOTE: the positioning matters for the audio-listener that will be placed in the center between the players.
+				//		 Check SetupCamera()
+
+				// Since 3 players are displayed side by side in 3 columns, we do a special case so the audio makes some sense:
+				// 1st player on the left, 3rd player on the right, 2nd player in the middle back.
+				if (m_PlayersCount == 3) {
+					if (playerIndex == 1) {
+						// 2nd player
+						root.transform.position += Vector3.right * (m_FirstPlayerBounds.center.x + m_FirstPlayerBounds.extents.x)
+													- Vector3.forward * (m_FirstPlayerBounds.center.z + m_FirstPlayerBounds.size.z);
+					} else {
+						// 3rd player
+						root.transform.position += Vector3.right * (m_FirstPlayerBounds.center.x + m_FirstPlayerBounds.size.x);
+					}
+
+				} else {
+					root.transform.position += Vector3.right * (playerIndex % 2) * (m_FirstPlayerBounds.center.x + m_FirstPlayerBounds.size.x)
+												- Vector3.forward * (playerIndex / 2) * (m_FirstPlayerBounds.size.z + m_FirstPlayerBounds.center.z);
+				}
+
 			}
 		}
 

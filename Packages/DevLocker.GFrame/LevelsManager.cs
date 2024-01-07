@@ -30,8 +30,9 @@ namespace DevLocker.GFrame
 
 		/// <summary>
 		/// Is level currently changing. Can't start another change while this is true.
+		/// Initially set to true as there is no level loaded and it is expected to load.
 		/// </summary>
-		public bool ChangingLevel { get; private set; }
+		public bool ChangingLevel { get; private set; } = true;
 
 		// Listen for supervisor change.
 		// NOTE: avoid using events with more complex logic as it will blow up in your face.
@@ -148,7 +149,7 @@ namespace DevLocker.GFrame
 
 		public async void SwitchLevelAsync(ILevelSupervisor nextLevel)
 		{
-			if (ChangingLevel) {
+			if (ChangingLevel && LevelSupervisor != null) {
 				throw new InvalidOperationException($"Level is already changing. Can't switch to {nextLevel} while change is in progress.");
 			}
 
@@ -287,7 +288,7 @@ namespace DevLocker.GFrame
 
 		public IEnumerator SwitchLevelCrt(ILevelSupervisor nextLevel)
 		{
-			if (ChangingLevel) {
+			if (ChangingLevel && LevelSupervisor != null) {
 				throw new InvalidOperationException($"Level is already changing. Can't switch to {nextLevel} while change is in progress.");
 			}
 
