@@ -42,6 +42,8 @@ namespace TetrisTower.TowerUI
 
 		void Update()
 		{
+			if (m_PlaythroughData.HaveFinishedLevels)
+				return;
 
 			float attackCharge = m_PlaythroughData.GetAttackChargeNormalized(m_PlaythroughPlayer);
 			if (ProgressBar.value == attackCharge)

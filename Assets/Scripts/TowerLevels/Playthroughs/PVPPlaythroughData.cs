@@ -30,6 +30,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[JsonProperty]
 		private WorldMapLevelParamAsset m_LevelAsset;
 
+		// This somehow remains set, even after assembly reload. Ignore serialization in any way.
+		[JsonIgnore]
+		[NonSerialized]
 		private LevelParamData m_OverrideLevelParam;
 
 		public override bool IsFinalLevel => true;
