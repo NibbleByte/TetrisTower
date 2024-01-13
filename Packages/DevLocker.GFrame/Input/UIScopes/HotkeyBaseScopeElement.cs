@@ -263,14 +263,15 @@ namespace DevLocker.GFrame.Input.UIScope
 	{
 		private bool m_WasChanged = false;
 
-		public override void OnInspectorGUI()
+		protected void DrawScriptProperty()
 		{
-			serializedObject.Update();
-
 			EditorGUI.BeginDisabledGroup(true);
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
 			EditorGUI.EndDisabledGroup();
+		}
 
+		protected void DrawHotkeyBaseProperties()
+		{
 			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(HotkeyBaseScopeElement.SkipHotkey)));
@@ -307,12 +308,21 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				EditorGUILayout.EndHorizontal();
 			}
+		}
+
+		public override void OnInspectorGUI()
+		{
+			serializedObject.Update();
+
+			DrawScriptProperty();
+
+			DrawHotkeyBaseProperties();
 
 			EditorGUILayout.Space();
 
-
 			EditorGUI.BeginChangeCheck();
 
+			// Will draw any child properties without [HideInInspector] attribute.
 			DrawPropertiesExcluding(serializedObject, "m_Script");
 
 			if (EditorGUI.EndChangeCheck()) {
