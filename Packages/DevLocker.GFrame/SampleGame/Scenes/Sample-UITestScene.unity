@@ -973,8 +973,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -3140,7 +3139,7 @@ GameObject:
   - component: {fileID: 133684601}
   - component: {fileID: 133684600}
   m_Layer: 5
-  m_Name: RootsPanel
+  m_Name: FocusLayersPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3184,8 +3183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -4531,8 +4529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -5075,8 +5072,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -5611,8 +5607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -6025,7 +6020,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Root Scopes
+  m_text: Focus Layers
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6531,21 +6526,18 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Focusing a UIScope activates it and all its'' parent scopes, enabling
-    the controlled IScopeElement components. This sometimes may be an undesired effect.
-
-    Example:
+  m_text: "Focusing a UIScope activates it and all its' parent scopes, enabling the
+    controlled IScopeElement components. This sometimes may be an undesired effect.\n\nExample:
     main top-level screen has scopes with hotkeys that open child panels - the children
-    should override the hotkeys of the main screen. In such cases you can set the
-    child top-level scope as "Root". This will limit the focused scope activations
-    up to that one or top is reached.
-
-
-    Scopes can also be set as "ModalRoot".
-    These will push an actions mask to the input stack with all child elements, suppressing
-    any hotkeys outside the scope (e.g. player states input). Useful for modal dialogs.
-    Normal scopes can''t steal focus on enable from such instances. Press F5 for
-    a demo.'
+    should override the hotkeys of the main screen. \nTo handle this, set the children
+    to a different \"Focus Layer\". This will limit the focused scope to activate
+    only ones with the same layer.\n\nExample 2: error message box pops on top of
+    the game UI - even if other windows open in the background, the input should
+    remain with the error dialog.\nFocus layers have priority definition. Scopes
+    with lower layer priority can't \"steal\" the focus from ones with higher priority
+    (i.e. modal dialog). Additionally, you can specify if the gameplay input should
+    be supressed (pushing an actions mask to the input stack).\nPress F5 for a system
+    pop-up."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7084,8 +7076,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -8368,8 +8359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -8562,8 +8552,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -10186,8 +10175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -11843,7 +11831,7 @@ GameObject:
   - component: {fileID: 505401025}
   - component: {fileID: 505401026}
   m_Layer: 5
-  m_Name: Tab-Roots
+  m_Name: Tab-FocusLayers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12472,8 +12460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 20
   OnDisableBehaviour: 5
@@ -13095,8 +13082,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -13235,8 +13221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -15298,8 +15283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -15715,8 +15699,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -17268,8 +17251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -19176,8 +19158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -19698,8 +19679,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -20710,8 +20690,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -22485,8 +22464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -24135,8 +24113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 2
   OnDisableBehaviour: 0
@@ -24632,8 +24609,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 1
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 11400000, guid: dab23213193f48447ab7d5e86200aef4, type: 2}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -25229,8 +25205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 20
   OnDisableBehaviour: 0
@@ -27702,8 +27677,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -29991,8 +29965,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -30139,8 +30112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -30317,8 +30289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -33364,7 +33335,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Roots
+  m_text: Layers
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -34093,8 +34064,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -40398,8 +40368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -40935,7 +40904,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -420
+      value: -620
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -41234,8 +41203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -43560,8 +43528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -43929,7 +43896,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 150}
+  m_AnchoredPosition: {x: 0, y: 100}
   m_SizeDelta: {x: 500, y: 200}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1947659954
@@ -43982,8 +43949,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 1
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 11400000, guid: dab23213193f48447ab7d5e86200aef4, type: 2}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0
@@ -46661,7 +46627,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -420
+      value: -620
       objectReference: {fileID: 0}
     - target: {fileID: 5394036698972749555, guid: 504071ccb1c836441a5189a8697819a8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -47645,8 +47611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b0e81aeda70ea47bcd7ebeeb8e1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
-  IncludeUIActions: 1
+  FocusLayer: {fileID: 0}
   AutomaticFocus: 1
   OnEnableBehaviour: 0
   OnDisableBehaviour: 0

@@ -307,7 +307,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			UIScope scope = transform.GetComponent<UIScope>();
 			if (scope) {
-				if (scope.Type >= UIScope.ScopeType.Root) {
+				if (element.Scope != null && scope.FocusLayer > element.Scope.FocusLayer) {
 					element = root;
 				}
 

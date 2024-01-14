@@ -1,9 +1,13 @@
 using DevLocker.GFrame.Input.Contexts;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 
 namespace DevLocker.GFrame.Input.UIScope
 {
@@ -45,6 +49,7 @@ namespace DevLocker.GFrame.Input.UIScope
 	///		  For more info check <see cref="PlayerContextUIRootObject"/>.
 	/// </summary>
 	[SelectionBase]
+	[DisallowMultipleComponent]
 	public class UIScope : MonoBehaviour
 	{
 		public enum FocusPolicy
@@ -65,13 +70,6 @@ namespace DevLocker.GFrame.Input.UIScope
 			EmptyFocus = 20,
 		}
 
-		public enum ScopeType
-		{
-			Normal = 0,
-			Root = 1,
-			ModalRoot = 4,
-		}
-
 		/// <summary>
 		/// Contains all scopes used by certain player,
 		/// since every player needs to have their own active & focused scopes.
@@ -88,12 +86,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			public Queue<KeyValuePair<UIScope, bool>> PendingScopeChanges = new Queue<KeyValuePair<UIScope, bool>>();
 		}
 
-		[Tooltip("Focusing a scope will activate all parent scopes up till the first root or the top one is reached (parent scopes of closest root will remain inactive).\n\nModal root scopes will push an actions mask to the input stack with all child elements, suppressing any hotkeys outside the scope (e.g. player states input). Useful for modal dialogs. Normal scopes can't steal focus on enable from such instances.")]
-		[UnityEngine.Serialization.FormerlySerializedAs("IsRoot")]
-		public ScopeType Type = ScopeType.Normal;
-
-		[Tooltip("Enable the UI actions with the scope ones, after pushing the new input state.")]
-		public bool IncludeUIActions = true;
+		[Tooltip("Focusing a scope will activate all parent scopes up till the first one with different layer or the top one is reached.\n\nModal root scopes can push an actions mask to the input stack with all child elements, suppressing any hotkeys outside the scope (e.g. player states input). Useful for modal dialogs. Normal or lower priority scopes can't steal focus on enable.")]
+		public UIScopeFocusLayer FocusLayer = null;
 
 		[Tooltip("If on, you can choose OnEnable and OnDisable automatic focus behaviour.\n\nIf off, this scope will always be active when enabled and vice versa. You'll have to manually handle this and it will be excluded from any focus schemes (i.e. it can be active while another scope is focused + parents). You'll be responsible for managing conflicts.")]
 		public bool AutomaticFocus = true;
@@ -193,7 +187,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			get
 			{
-				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
+				if ((!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) || !Application.isPlaying) {
 					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 				}
 
@@ -207,7 +201,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		public IReadOnlyList<UIScope> DirectChildScopes
 		{
 			get {
-				if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
+				if ((!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) || !Application.isPlaying) {
 					ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 				}
 
@@ -252,6 +246,31 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
+		/// <summary>
+		/// Fetch the parent scope if one is available.
+		/// This is not cached!
+		/// </summary>
+		public UIScope GetParent()
+		{
+			return transform.parent?.GetComponentInParent<UIScope>(true);
+		}
+
+		/// <summary>
+		/// Fetch the focus layer root (traverse parents until different layer is found or the top is reached).
+		/// This is not cached!
+		/// </summary>
+		public UIScope GetFocusLayerRoot()
+		{
+			UIScope scope = this;
+			UIScope parent = GetParent();
+
+			while(parent != null && parent.FocusLayer == FocusLayer) {
+				scope = parent;
+				parent = parent.GetParent();
+			}
+
+			return scope;
+		}
 
 		private List<IScopeElement> m_ScopeElements = new List<IScopeElement>();
 		private List<UIScope> m_DirectChildScopes = new List<UIScope>();
@@ -268,6 +287,14 @@ namespace DevLocker.GFrame.Input.UIScope
 		private static void ClearStaticsCache()
 		{
 			s_PlayerSets.Clear();
+		}
+
+		protected virtual void Reset()
+		{
+			var parent = GetParent();
+			if (parent) {
+				FocusLayer = parent.FocusLayer;
+			}
 		}
 
 		protected virtual void Awake()
@@ -298,6 +325,24 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public virtual void OnValidate()
 		{
+			var parent = GetParent();
+			if (parent) {
+				if (FocusLayer == null && parent.FocusLayer != null) {
+					Debug.LogWarning($"\"{name}\" scope has no focus layer, but the parent \"{parent.name}\" has. Assigning focus layer \"{parent.FocusLayer.name}\".", this);
+					FocusLayer = parent.FocusLayer;
+#if UNITY_EDITOR
+					EditorUtility.SetDirty(this);
+#endif
+
+				} else if (parent.FocusLayer > FocusLayer) {
+					Debug.LogWarning($"\"{name}\" scope has parent \"{parent.name}\" with higher {nameof(FocusLayer)} {parent.FocusLayer.name}. Parents should always have lower or equal layer. Assigning focus layer.", this);
+					FocusLayer = parent.FocusLayer;
+#if UNITY_EDITOR
+					EditorUtility.SetDirty(this);
+#endif
+				}
+			}
+
 			// Copy-Paste components have list null.
 			if (OnDisableScopes != null) {
 				for (int i = 0; i < OnDisableScopes.Count; ++i) {
@@ -389,9 +434,8 @@ namespace DevLocker.GFrame.Input.UIScope
 					}
 				}
 
-				// Normal scopes can't steal focus from ModalRoots.
-				UIScope modalActiveScope = m_PlayerSet.ActiveScopes.FirstOrDefault(s => s.Type == ScopeType.ModalRoot);
-				if (Type != ScopeType.ModalRoot && modalActiveScope && !transform.IsChildOf(modalActiveScope.transform))
+				// Don't steal focus if active ones are higher focus layer. Check the first one only, as the rest should be the same layer.
+				if (FocusLayer < m_PlayerSet.ActiveScopes.FirstOrDefault()?.FocusLayer)
 					return;
 
 				UIScope lastActive = m_PlayerSet.ActiveScopes.LastOrDefault();
@@ -476,61 +520,62 @@ namespace DevLocker.GFrame.Input.UIScope
 					return;
 				}
 
-				// Focus on any opened modal roots first. Last one should be the most recent one, right?
-				UIScope fallbackFrameScope =
-					m_PlayerSet.RegisteredScopes.LastOrDefault(s => s.Type == ScopeType.ModalRoot && s.AutomaticFocus && s.OnEnableBehaviour == FocusPolicy.FocusWithFramePriority)
-					?? m_PlayerSet.RegisteredScopes.LastOrDefault(s => s.Type == ScopeType.ModalRoot && s.AutomaticFocus);
-
+				// Focus on any opened modal roots first. Last one should be the most recent one, right? Take frame priority into account first.
+				UIScope fallbackFrameScope = m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer().LastOrDefault(s => s.AutomaticFocus && s.OnEnableBehaviour == FocusPolicy.FocusWithFramePriority);
 				if (fallbackFrameScope) {
 					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(fallbackFrameScope));
 					return;
 				}
 
+				fallbackFrameScope = m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer().LastOrDefault(s => s.AutomaticFocus);
+				if (fallbackFrameScope && fallbackFrameScope.FocusLayer > FocusLayer) {
+					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(fallbackFrameScope));
+					return;
+				}
+
 				// Something else just activated, use that if appropriate.
-				foreach(UIScope scope in m_PlayerSet.RegisteredScopes) {
+				foreach(UIScope scope in m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer(s => s.m_FrameEnabled == Time.frameCount)) {
 
-					if (scope.m_FrameEnabled == Time.frameCount) {
-						// A bit of copy-paste from OnEnable(). Sad.
-						switch (scope.OnEnableBehaviour) {
-							case FocusPolicy.Focus:
-								// Skip activation if this frame another scope was activated with higher priority.
-								if (!m_PlayerSet.RegisteredScopes.Any(s => s.m_FrameEnabled == m_FrameEnabled && s.OnEnableBehaviour == FocusPolicy.FocusWithFramePriority)) {
-									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
-									return;
-								}
-
-								fallbackFrameScope = fallbackFrameScope ?? scope;
-								break;
-
-							case FocusPolicy.FocusWithFramePriority:
+					// A bit of copy-paste from OnEnable(). Sad.
+					switch (scope.OnEnableBehaviour) {
+						case FocusPolicy.Focus:
+							// Skip activation if this frame another scope was activated with higher priority.
+							if (!m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer(s => s.m_FrameEnabled == m_FrameEnabled).Any(s => s.OnEnableBehaviour == FocusPolicy.FocusWithFramePriority)) {
 								SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
 								return;
+							}
 
-							case FocusPolicy.FocusIfCurrentIsLowerDepth:
-								if (m_ScopeDepth < scope.m_ScopeDepth) {
-									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
-									return;
-								}
+							fallbackFrameScope = fallbackFrameScope ?? scope;
+							break;
 
-								fallbackFrameScope = fallbackFrameScope ?? scope;
-								break;
+						case FocusPolicy.FocusWithFramePriority:
+							SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
+							return;
 
-							case FocusPolicy.FocusIfCurrentIsLowerOrEqualDepth:
-								if (m_ScopeDepth <= scope.m_ScopeDepth) {
-									SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
-									return;
-								}
+						case FocusPolicy.FocusIfCurrentIsLowerDepth:
+							if (m_ScopeDepth < scope.m_ScopeDepth) {
+								SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
+								return;
+							}
 
-								fallbackFrameScope = fallbackFrameScope ?? scope;
-								break;
+							fallbackFrameScope = fallbackFrameScope ?? scope;
+							break;
 
-							case FocusPolicy.DontFocus:
-								// Enabled this frame, but didn't want to focus, so don't do it.
-								break;
+						case FocusPolicy.FocusIfCurrentIsLowerOrEqualDepth:
+							if (m_ScopeDepth <= scope.m_ScopeDepth) {
+								SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(scope));
+								return;
+							}
 
-							default:
-								throw new NotSupportedException(scope.OnEnableBehaviour.ToString());
-						}
+							fallbackFrameScope = fallbackFrameScope ?? scope;
+							break;
+
+						case FocusPolicy.DontFocus:
+							// Enabled this frame, but didn't want to focus, so don't do it.
+							break;
+
+						default:
+							throw new NotSupportedException(scope.OnEnableBehaviour.ToString());
 					}
 				}
 
@@ -560,7 +605,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				// HACK: If modal root gets closed, clear last reference to avoid memory leaks.
 				//		 (in case this is a DontDestroyOnLoad persistent object, like MessageBox)
-				if (m_LastFocusedScope && Type == ScopeType.ModalRoot) {
+				if (m_LastFocusedScope && FocusLayer != null) {
 					m_LastFocusedScope = null;
 				}
 			}
@@ -724,8 +769,8 @@ namespace DevLocker.GFrame.Input.UIScope
 					break;
 
 				case UnfocusPolicy.FocusScopeWithHighestDepth:
-					nextScope = m_PlayerSet.RegisteredScopes.FirstOrDefault();
-					foreach (UIScope scope in m_PlayerSet.RegisteredScopes) {
+					nextScope = m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer().FirstOrDefault();
+					foreach (UIScope scope in m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer()) {
 						if (nextScope.m_ScopeDepth < scope.m_ScopeDepth && scope.isActiveAndEnabled) {
 							nextScope = scope;
 						}
@@ -865,7 +910,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public bool Owns(IScopeElement scopeElement)
 		{
-			if (!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) {
+			if ((!m_HasInitialized && m_ScopeElements.Count == 0 && m_DirectChildScopes.Count == 0) || !Application.isPlaying) {
 				ScanForOwnedScopeElements(this, transform, m_ScopeElements, m_DirectChildScopes);
 			}
 
@@ -934,10 +979,11 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 
-		protected static UIScope[] CollectScopes(Component target)
+		protected static UIScope[] CollectScopes(UIScope target)
 		{
 			return target
 				.GetComponentsInParent<UIScope>(true)	// Collect all so they get deactivated properly later on.
+				.Where(s => s.FocusLayer == target.FocusLayer)	// Only from my layer. This will affect the depth calculation.
 				.Reverse()
 				.Where(s => s.enabled && s.AutomaticFocus)
 				.ToArray();
@@ -945,13 +991,6 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		protected static void SwitchActiveScopes(PlayerScopeSet playerSet, ref UIScope[] prevScopes, UIScope[] nextScopes)
 		{
-			// Find if there is a root scope and trim the parents.
-			// Do it now, at the last moment, instead of CollectScopes(), so correct depth can be set.
-			int rootIndex = Array.FindLastIndex(nextScopes, s => s.Type >= ScopeType.Root);
-			if (rootIndex > 0) {
-				nextScopes = new ArraySegment<UIScope>(nextScopes, rootIndex, nextScopes.Length - rootIndex).ToArray();
-			}
-
 			// Switching scopes may trigger user code that may switch scopes indirectly, while already doing so.
 			// Any such change will be pushed to a queue and applied later on.
 			// TODO: This was never really tested.
@@ -1060,7 +1099,10 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			if (active) {
 
-				if (Type == ScopeType.ModalRoot) {
+				// Compare operator handles null.
+				bool isLayerRoot = FocusLayer > GetParent()?.FocusLayer;
+
+				if (FocusLayer != null && isLayerRoot && FocusLayer.InputBehaviour != UIScopeFocusLayer.InputBehaviourType.PreserveInput) {
 
 					// Prepare a mask so child scope elements can enable actions normally, suppressing the previously active ones.
 					var actionsMask = GetAllChildScopeElements()
@@ -1069,7 +1111,7 @@ namespace DevLocker.GFrame.Input.UIScope
 						.ToHashSet()
 						;
 
-					if (IncludeUIActions) {
+					if (FocusLayer.InputBehaviour == UIScopeFocusLayer.InputBehaviourType.IsolateScopeElementsAndUIInput) {
 						foreach (var action in context.GetUIActions()) {
 							actionsMask.Add(action);
 							context.Enable(this, action);
@@ -1092,9 +1134,11 @@ namespace DevLocker.GFrame.Input.UIScope
 				return;
 
 			if (!active) {
-				if (Type == ScopeType.ModalRoot) {
 
-					if (IncludeUIActions) {
+				// If this was not the layer root, nothing would happen, this did not change the input.
+				if (FocusLayer != null && FocusLayer.InputBehaviour != UIScopeFocusLayer.InputBehaviourType.PreserveInput) {
+
+					if (FocusLayer.InputBehaviour == UIScopeFocusLayer.InputBehaviourType.IsolateScopeElementsAndUIInput) {
 						foreach (var action in context.GetUIActions()) {
 							context.Disable(this, action);
 						}
@@ -1105,12 +1149,42 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 #endif
 		}
+
+	}
+
+	public static class UIScopeExtensions
+	{
+		/// <summary>
+		/// Filter only scopes with the highest priority available focus layer.
+		/// </summary>
+		public static IEnumerable<UIScope> FilterMaxFocusLayer(this IEnumerable<UIScope> scopes)
+		{
+			UIScopeFocusLayer maxLayer = scopes.Max(s => s.FocusLayer);
+
+			foreach (var scope in scopes) {
+				if (maxLayer == scope.FocusLayer)
+					yield return scope;
+			}
+		}
+
+		/// <summary>
+		/// Filter only scopes with the highest priority available focus layer.
+		/// </summary>
+		public static IEnumerable<UIScope> FilterMaxFocusLayer(this IEnumerable<UIScope> scopes, Func<UIScope, bool> predicate)
+		{
+			UIScopeFocusLayer maxLayer = scopes.Max(s => s.FocusLayer);
+
+			foreach (var scope in scopes) {
+				if (maxLayer == scope.FocusLayer && predicate(scope))
+					yield return scope;
+			}
+		}
 	}
 
 #if UNITY_EDITOR
-	[UnityEditor.CustomEditor(typeof(UIScope), true)]
-	[UnityEditor.CanEditMultipleObjects]
-	internal class UIScopeEditor : UnityEditor.Editor
+	[CustomEditor(typeof(UIScope), true)]
+	[CanEditMultipleObjects]
+	internal class UIScopeEditor : Editor
 	{
 		private static bool m_InfoFoldOut = false;
 
@@ -1118,30 +1192,60 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			serializedObject.Update();
 
-			UnityEditor.EditorGUI.BeginDisabledGroup(true);
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
-			UnityEditor.EditorGUI.EndDisabledGroup();
+			EditorGUI.BeginDisabledGroup(true);
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
+			EditorGUI.EndDisabledGroup();
+
+			var automaticFocusProp = serializedObject.FindProperty(nameof(UIScope.AutomaticFocus));
+			EditorGUILayout.PropertyField(automaticFocusProp);
 
 			var uiScope = (UIScope)target;
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.Type)));
-			if (uiScope.Type == UIScope.ScopeType.ModalRoot) {
-				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.IncludeUIActions)));
-			}
+			var focusLayerProp = serializedObject.FindProperty(nameof(UIScope.FocusLayer));
 
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.AutomaticFocus)));
+			if (automaticFocusProp.boolValue) {
+				var layerValuePrev = focusLayerProp.objectReferenceValue;
 
-			if (uiScope.AutomaticFocus) {
-				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnEnableBehaviour)));
-				UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableBehaviour)));
+				EditorGUI.BeginChangeCheck();
+				EditorGUILayout.PropertyField(focusLayerProp);
+
+				// If chagned, apply to all children with lower layer.
+				if (EditorGUI.EndChangeCheck()) {
+					serializedObject.ApplyModifiedProperties();
+
+					var layerValue = focusLayerProp.objectReferenceValue as UIScopeFocusLayer;
+					UIScope parent = uiScope.GetParent();
+
+					// Parents can't have higher layer priority than their children.
+					if (parent && parent.FocusLayer > layerValue) {
+						// Skip the rest, OnValidate() will revert the value.
+						GUIUtility.ExitGUI();
+					}
+
+					foreach(var childScope in targets.OfType<UIScope>().SelectMany(s => s.GetComponentsInChildren<UIScope>(true))) {
+						if (targets.Contains(childScope))
+							continue;
+
+						if (childScope.FocusLayer < layerValue || childScope.FocusLayer == layerValuePrev) {
+							childScope.FocusLayer = layerValue;
+							EditorUtility.SetDirty(childScope);
+						}
+					}
+				}
+
+				EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnEnableBehaviour)));
+				EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableBehaviour)));
 
 				if (uiScope.OnDisableBehaviour == UIScope.UnfocusPolicy.FocusFirstEnabledScopeFromList) {
-					UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableScopes)));
+					EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.OnDisableScopes)));
 				}
+
+			} else if (focusLayerProp.objectReferenceValue != null){
+				focusLayerProp.objectReferenceValue = null;
 			}
 
 #if USE_INPUT_SYSTEM
-			UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.ResetAllActionsOnEnable)));
+			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(UIScope.ResetAllActionsOnEnable)));
 #endif
 
 			serializedObject.ApplyModifiedProperties();
@@ -1152,19 +1256,19 @@ namespace DevLocker.GFrame.Input.UIScope
 			UIScope.ScanForOwnedScopeElements(uiScope, uiScope.transform, scopeElements, directChildScopes);
 
 
-			UnityEditor.EditorGUILayout.Space();
+			EditorGUILayout.Space();
 
 
-			UnityEditor.EditorGUILayout.BeginHorizontal();
-			m_InfoFoldOut = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(m_InfoFoldOut, "Info");
-			if (GUILayout.Button("Open Scopes Debugger", UnityEditor.EditorStyles.miniButton, GUILayout.ExpandWidth(false))) {
+			EditorGUILayout.BeginHorizontal();
+			m_InfoFoldOut = EditorGUILayout.BeginFoldoutHeaderGroup(m_InfoFoldOut, "Info");
+			if (GUILayout.Button("Open Scopes Debugger", EditorStyles.miniButton, GUILayout.ExpandWidth(false))) {
 				UIScopesDebugger.Init();
 			}
-			UnityEditor.EditorGUILayout.EndHorizontal();
+			EditorGUILayout.EndHorizontal();
 
 			if (m_InfoFoldOut) {
 
-				UnityEditor.EditorGUILayout.BeginVertical(UnityEditor.EditorStyles.helpBox);
+				EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
 				string scopeState = "Inactive";
 				Color scopeStateColor = Color.red;
@@ -1179,18 +1283,18 @@ namespace DevLocker.GFrame.Input.UIScope
 
 				var prevColor = GUI.color;
 
-				UnityEditor.EditorGUILayout.BeginHorizontal();
-				UnityEditor.EditorGUILayout.LabelField("Scope State:", UnityEditor.EditorStyles.boldLabel, GUILayout.Width(UnityEditor.EditorGUIUtility.labelWidth));
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.LabelField("Scope State:", EditorStyles.boldLabel, GUILayout.Width(EditorGUIUtility.labelWidth));
 				GUI.color = scopeStateColor;
-				UnityEditor.EditorGUILayout.LabelField(scopeState, UnityEditor.EditorStyles.boldLabel);
+				EditorGUILayout.LabelField(scopeState, EditorStyles.boldLabel);
 				GUI.color = prevColor;
-				UnityEditor.EditorGUILayout.EndHorizontal();
+				EditorGUILayout.EndHorizontal();
 
-				UnityEditor.EditorGUILayout.LabelField("Controlled Elements:", UnityEditor.EditorStyles.boldLabel);
+				EditorGUILayout.LabelField("Controlled Elements:", EditorStyles.boldLabel);
 
 				foreach (var element in scopeElements) {
-					UnityEditor.EditorGUILayout.BeginHorizontal();
-					UnityEditor.EditorGUILayout.ObjectField(element as UnityEngine.Object, typeof(IScopeElement), true);
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.ObjectField(element as UnityEngine.Object, typeof(IScopeElement), true);
 
 #if USE_INPUT_SYSTEM
 					if (element is IHotkeysWithInputActions hotkeyElement) {
@@ -1208,14 +1312,14 @@ namespace DevLocker.GFrame.Input.UIScope
 						GUI.color = prevColor;
 					}
 #endif
-					UnityEditor.EditorGUILayout.EndHorizontal();
+					EditorGUILayout.EndHorizontal();
 				}
 
-				UnityEditor.EditorGUILayout.EndVertical();
+				EditorGUILayout.EndVertical();
 
 			}
 
-			UnityEditor.EditorGUILayout.EndFoldoutHeaderGroup();
+			EditorGUILayout.EndFoldoutHeaderGroup();
 
 		}
 	}
