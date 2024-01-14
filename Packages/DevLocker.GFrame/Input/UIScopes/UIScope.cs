@@ -325,6 +325,8 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		public virtual void OnValidate()
 		{
+			Utils.Validation.ValidateMissingObject(this, FocusLayer, nameof(FocusLayer));
+
 			var parent = GetParent();
 			if (parent) {
 				if (FocusLayer == null && parent.FocusLayer != null) {
