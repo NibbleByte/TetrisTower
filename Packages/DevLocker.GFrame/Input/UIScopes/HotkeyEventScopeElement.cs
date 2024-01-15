@@ -113,6 +113,7 @@ namespace DevLocker.GFrame.Input.UIScope
 		}
 	}
 
+#if UNITY_EDITOR
 	[CustomEditor(typeof(HotkeyEventScopeElement), true)]
 	[CanEditMultipleObjects]
 	internal class HotkeyEventScopeElementEditor : HotkeyBaseScopeElementEditor
@@ -170,6 +171,8 @@ namespace DevLocker.GFrame.Input.UIScope
 			}
 		}
 	}
+#endif
+	
 }
 
 #endif
