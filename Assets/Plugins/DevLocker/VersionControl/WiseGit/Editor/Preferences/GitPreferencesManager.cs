@@ -19,9 +19,9 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			Disabled = 8,
 		}
 
-		private const string LEGACY_PERSONAL_PREFERENCES_KEY = "WiseSVN";
-		private const string PERSONAL_PREFERENCES_PATH = "UserSettings/WiseSVN.prefs";
-		private const string PROJECT_PREFERENCES_PATH = "ProjectSettings/WiseSVN.prefs";
+		private const string LEGACY_PERSONAL_PREFERENCES_KEY = "WiseGit";
+		private const string PERSONAL_PREFERENCES_PATH = "UserSettings/WiseGit.prefs";
+		private const string PROJECT_PREFERENCES_PATH = "ProjectSettings/WiseGit.prefs";
 
 		// Icons are stored in the database so we don't reload them every time.
 		[SerializeField] private GUIContent[] FileStatusIcons = new GUIContent[0];
@@ -33,13 +33,13 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		[Serializable]
 		internal class PersonalPreferences
 		{
-			public bool EnableCoreIntegration = true;		// Sync file operations with SVN
+			public bool EnableCoreIntegration = true;		// Sync file operations with git
 			public bool PopulateStatusesDatabase = true;    // For overlay icons etc.
-			public bool PopulateIgnoresDatabase = true;    // For svn-ignored icons etc.
+			public bool PopulateIgnoresDatabase = true;    // For git-ignored icons etc.
 			public bool ShowNormalStatusOverlayIcon = false;
 			public bool ShowExcludedStatusOverlayIcon = true;
 
-			public string SvnCLIPath = string.Empty;
+			public string GitCLIPath = string.Empty;
 
 			// When populating the database, should it check for server changes as well (locks & modified files).
 			public BoolPreference DownloadRepositoryChanges = BoolPreference.SameAsProjectPreference;
@@ -71,16 +71,16 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		{
 			public bool DownloadRepositoryChanges = true;
 
-			// Use PlatformSvnCLIPath instead as it is platform independent.
-			public string SvnCLIPath = string.Empty;
-			public string SvnCLIPathMacOS = string.Empty;
+			// Use PlatformGitCLIPath instead as it is platform independent.
+			public string GitCLIPath = string.Empty;
+			public string GitCLIPathMacOS = string.Empty;
 
 #if UNITY_EDITOR_WIN
-			public string PlatformSvnCLIPath => SvnCLIPath;
+			public string PlatformGitCLIPath => GitCLIPath;
 #else
-			public string PlatformSvnCLIPath => SvnCLIPathMacOS;
+			public string PlatformGitCLIPath => GitCLIPathMacOS;
 #endif
-			public SVNMoveBehaviour MoveBehaviour = SVNMoveBehaviour.NormalSVNMove;
+			public GitMoveBehaviour MoveBehaviour = GitMoveBehaviour.NormalGitMove;
 
 			// Enable lock prompts on asset modify.
 			public bool EnableLockPrompt = false;
@@ -198,7 +198,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 				Debug.Log($"Loaded WiseSVN Preferences. WiseSVN is turned {(PersonalPrefs.EnableCoreIntegration ? "on" : "off")}.");
 
 				if (PersonalPrefs.EnableCoreIntegration) {
-					CheckSVNSupport();
+					CheckGitSupport();
 				}
 			}
 
@@ -239,7 +239,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 #if UNITY_EDITOR_WIN
 				PersonalPrefs.ContextMenusClient = ContextMenusClient.TortoiseGit;
 #elif UNITY_EDITOR_OSX
-				PersonalPrefs.ContextMenusClient = ContextMenusClient.SnailSVN;
+				PersonalPrefs.ContextMenusClient = ContextMenusClient.SnailGit;
 #else
 				PersonalPrefs.ContextMenusClient = ContextMenusClient.CLI;
 #endif
@@ -257,23 +257,23 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		private void LoadTextures()
 		{
 			FileStatusIcons = new GUIContent[Enum.GetValues(typeof(VCFileStatus)).Length];
-			FileStatusIcons[(int)VCFileStatus.Normal] = LoadTexture("Editor/SVNOverlayIcons/SVNNormalIcon");
-			FileStatusIcons[(int)VCFileStatus.Added] = LoadTexture("Editor/SVNOverlayIcons/SVNAddedIcon");
-			FileStatusIcons[(int)VCFileStatus.Modified] = LoadTexture("Editor/SVNOverlayIcons/SVNModifiedIcon");
-			FileStatusIcons[(int)VCFileStatus.Replaced] = LoadTexture("Editor/SVNOverlayIcons/SVNModifiedIcon");
-			FileStatusIcons[(int)VCFileStatus.Deleted] = LoadTexture("Editor/SVNOverlayIcons/SVNDeletedIcon");
-			FileStatusIcons[(int)VCFileStatus.Conflicted] = LoadTexture("Editor/SVNOverlayIcons/SVNConflictIcon");
-			FileStatusIcons[(int)VCFileStatus.Ignored] = LoadTexture("Editor/SVNOverlayIcons/SVNIgnoredIcon", "This item is in a svn-ignore list. It is not tracked by SVN.");
-			FileStatusIcons[(int)VCFileStatus.Unversioned] = LoadTexture("Editor/SVNOverlayIcons/SVNUnversionedIcon");
-			FileStatusIcons[(int)VCFileStatus.Excluded] = LoadTexture("Editor/SVNOverlayIcons/SVNReadOnlyIcon", "This item is excluded from monitoring by WiseSVN, but it may still be tracked by SVN. Check the WiseSVN preferences - Excludes setting.");
+			FileStatusIcons[(int)VCFileStatus.Normal] = LoadTexture("Editor/GitOverlayIcons/SVNNormalIcon");
+			FileStatusIcons[(int)VCFileStatus.Added] = LoadTexture("Editor/GitOverlayIcons/SVNAddedIcon");
+			FileStatusIcons[(int)VCFileStatus.Modified] = LoadTexture("Editor/GitOverlayIcons/SVNModifiedIcon");
+			FileStatusIcons[(int)VCFileStatus.Replaced] = LoadTexture("Editor/GitOverlayIcons/SVNModifiedIcon");
+			FileStatusIcons[(int)VCFileStatus.Deleted] = LoadTexture("Editor/GitOverlayIcons/SVNDeletedIcon");
+			FileStatusIcons[(int)VCFileStatus.Conflicted] = LoadTexture("Editor/GitOverlayIcons/SVNConflictIcon");
+			FileStatusIcons[(int)VCFileStatus.Ignored] = LoadTexture("Editor/GitOverlayIcons/SVNIgnoredIcon", "This item is in a svn-ignore list. It is not tracked by SVN.");
+			FileStatusIcons[(int)VCFileStatus.Unversioned] = LoadTexture("Editor/GitOverlayIcons/SVNUnversionedIcon");
+			FileStatusIcons[(int)VCFileStatus.Excluded] = LoadTexture("Editor/GitOverlayIcons/SVNReadOnlyIcon", "This item is excluded from monitoring by WiseSVN, but it may still be tracked by SVN. Check the WiseSVN preferences - Excludes setting.");
 
 			LockStatusIcons = new GUIContent[Enum.GetValues(typeof(VCLockStatus)).Length];
-			LockStatusIcons[(int)VCLockStatus.LockedHere] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedHereIcon", "You have locked this file.\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.BrokenLock] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon", "You have a lock that is no longer valid (someone else stole it and released it).\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.LockedOther] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon", "Someone else locked this file.\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.LockedButStolen] = LoadTexture("Editor/SVNOverlayIcons/Locks/SVNLockedOtherIcon", "Your lock was stolen by someone else.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedHere] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedHereIcon", "You have locked this file.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.BrokenLock] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedOtherIcon", "You have a lock that is no longer valid (someone else stole it and released it).\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedOther] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedOtherIcon", "Someone else locked this file.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedButStolen] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedOtherIcon", "Your lock was stolen by someone else.\nClick for more details.");
 
-			RemoteStatusIcons = LoadTexture("Editor/SVNOverlayIcons/Others/SVNRemoteChangesIcon", "Asset is out of date. Update to avoid conflicts.");
+			RemoteStatusIcons = LoadTexture("Editor/GitOverlayIcons/Others/SVNRemoteChangesIcon", "Asset is out of date. Update to avoid conflicts.");
 		}
 
 		public static GUIContent LoadTexture(string path, string tooltip = null)
@@ -347,81 +347,81 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 				;
 		}
 
-		public void CheckSVNSupport()
+		public void CheckGitSupport()
 		{
-			string svnError;
+			string gitError;
 			try {
-				svnError = WiseGitIntegration.CheckForSVNErrors();
+				gitError = WiseGitIntegration.CheckForGitErrors();
 
 			}
 			catch (Exception ex) {
-				svnError = ex.ToString();
+				gitError = ex.ToString();
 			}
 
-			if (string.IsNullOrEmpty(svnError)) {
+			if (string.IsNullOrEmpty(gitError)) {
 				if (DownloadRepositoryChanges || ProjectPrefs.EnableLockPrompt) {
-					WiseGitIntegration.CheckForSVNAuthErrors().Completed += CheckForSVNAuthErrorsResponse;
+					WiseGitIntegration.CheckForGitAuthErrors().Completed += CheckForGitAuthErrorsResponse;
 				}
 				return;
 			}
 
 			PersonalPrefs.EnableCoreIntegration = false;
 
-			// NOTE: check for SVN binaries first, as it tries to recover and may get other errors!
+			// NOTE: check for Git binaries first, as it tries to recover and may get other errors!
 
 			// System.ComponentModel.Win32Exception (0x80004005): ApplicationName='...', CommandLine='...', Native error= The system cannot find the file specified.
-			// Could not find the command executable. The user hasn't installed their CLI (Command Line Interface) so we're missing an "svn.exe" in the PATH environment.
+			// Could not find the command executable. The user hasn't installed their CLI (Command Line Interface) so we're missing an "git.exe" in the PATH environment.
 			// This is allowed only if there isn't ProjectPreference specified CLI path.
-			if (svnError.Contains("0x80004005") || svnError.Contains("IOException")) {
+			if (gitError.Contains("0x80004005") || gitError.Contains("IOException")) {
 
 #if UNITY_EDITOR_OSX
-				// For some reason OSX doesn't have the svn binaries set to the PATH environment by default.
+				// For some reason OSX doesn't have the git binaries set to the PATH environment by default.
 				// If that is the case and we find them at the usual place, just set it as a personal preference.
-				if (string.IsNullOrWhiteSpace(PersonalPrefs.SvnCLIPath)) {
+				if (string.IsNullOrWhiteSpace(PersonalPrefs.GitCLIPath)) {
 
-					// Just shooting in the dark where SVN could be installed.
+					// Just shooting in the dark where git could be installed.
 					string[] osxDefaultBinariesPaths = new string[] {
-						"/usr/local/bin/svn",
-						"/usr/bin/svn",
-						"/Applications/Xcode.app/Contents/Developer/usr/bin/svn",
-						"/opt/subversion/bin/svn",
-						"/opt/local/bin/svn",
+						"/usr/local/bin/git",
+						"/usr/bin/git",
+						"/Applications/Xcode.app/Contents/Developer/usr/bin/git",
+						"/opt/subversion/bin/git",
+						"/opt/local/bin/git",
 
 						//
-						// SnailSVN comes with bundled up svn binaries. Use those if needed, starting with the higher version. Premium and free.
+						// SnailGit comes with bundled up git binaries. Use those if needed, starting with the higher version. Premium and free.
 						//
 
 						// Arm64
-						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/arm64/1.14.x/svn",
-						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/arm64/1.14.x/svn",
+						"/Applications/SnailGit.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/arm64/1.14.x/git",
+						"/Applications/SnailGitLite.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/arm64/1.14.x/git",
 
 						// Intel x64
-						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.14.x/svn",
-						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.11.x/svn",
-						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.10.x/svn",
-						"/Applications/SnailSVN.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.9.x/svn",
+						"/Applications/SnailGit.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.14.x/git",
+						"/Applications/SnailGit.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.11.x/git",
+						"/Applications/SnailGit.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.10.x/git",
+						"/Applications/SnailGit.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.9.x/git",
 
 
-						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.14.x/svn",
-						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.11.x/svn",
-						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.10.x/svn",
-						"/Applications/SnailSVNLite.app/Contents/PlugIns/SnailSVNExtension.appex/Contents/XPCServices/SnailSVNCache.xpc/Contents/Resources/subversion/x86_64/1.9.x/svn",
+						"/Applications/SnailGitLite.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.14.x/git",
+						"/Applications/SnailGitLite.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.11.x/git",
+						"/Applications/SnailGitLite.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.10.x/git",
+						"/Applications/SnailGitLite.app/Contents/PlugIns/SnailGitExtension.appex/Contents/XPCServices/SnailGitCache.xpc/Contents/Resources/subversion/x86_64/1.9.x/git",
 					};
 
 					foreach(string osxPath in osxDefaultBinariesPaths) {
 						if (!File.Exists(osxPath))
 							continue;
 
-						PersonalPrefs.SvnCLIPath = osxPath;
+						PersonalPrefs.GitCLIPath = osxPath;
 
 						try {
-							string secondSvnError = WiseSVNIntegration.CheckForSVNErrors();
-							if (!string.IsNullOrEmpty(secondSvnError))
+							string secondGitError = WiseGitIntegration.CheckForGitErrors();
+							if (!string.IsNullOrEmpty(secondGitError))
 								continue;
 
 							PersonalPrefs.EnableCoreIntegration = true;	// Save this enabled!
 							SavePreferences(PersonalPrefs, ProjectPrefs);
-							Debug.Log($"SVN binaries missing in PATH environment variable. Found them at \"{osxPath}\". Setting this as personal preference.\n\n{svnError}");
+							Debug.Log($"Git binaries missing in PATH environment variable. Found them at \"{osxPath}\". Setting this as personal preference.\n\n{gitError}");
 							return;
 
 						} catch(Exception) {
@@ -429,34 +429,34 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 					}
 
 					// Failed to find binaries.
-					PersonalPrefs.SvnCLIPath = string.Empty;
+					PersonalPrefs.GitCLIPath = string.Empty;
 				}
 #endif
 
-				WiseGitIntegration.LogStatusErrorHint(StatusOperationResult.ExecutableNotFound, $"\nTemporarily disabling WiseSVN integration. Please fix the error and restart Unity.\n\n{svnError}");
+				WiseGitIntegration.LogStatusErrorHint(StatusOperationResult.ExecutableNotFound, $"\nTemporarily disabling WiseGit integration. Please fix the error and restart Unity.\n\n{gitError}");
 #if UNITY_EDITOR_OSX
-				Debug.LogError($"If you installed SVN via Homebrew or similar, you may need to add \"/usr/local/bin\" (or wherever svn binaries can be found) to your PATH environment variable and restart. Example:\nsudo launchctl config user path /usr/local/bin\nAlternatively, you may add SVN CLI path in your WiseSVN preferences at:\n{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}");
+				Debug.LogError($"If you installed Git via Homebrew or similar, you may need to add \"/usr/local/bin\" (or wherever git binaries can be found) to your PATH environment variable and restart. Example:\nsudo launchctl config user path /usr/local/bin\nAlternatively, you may add git CLI path in your WiseGit preferences at:\n{GitPreferencesWindow.PROJECT_PREFERENCES_MENU}");
 #endif
 				return;
 			}
 
 			// svn: warning: W155007: '...' is not a working copy!
 			// This can be returned when project is not a valid svn checkout. (Probably)
-			if (svnError.Contains("W155007")) {
-				Debug.LogError($"This project is NOT under version control (not a proper SVN checkout). Temporarily disabling WiseSVN integration.\n\n{svnError}");
+			if (gitError.Contains("W155007")) {
+				Debug.LogError($"This project is NOT under version control (not a proper SVN checkout). Temporarily disabling WiseSVN integration.\n\n{gitError}");
 				return;
 			}
 
 			// Any other error.
-			if (!string.IsNullOrEmpty(svnError)) {
-				Debug.LogError($"Calling SVN CLI (Command Line Interface) caused fatal error!\nTemporarily disabling WiseSVN integration. Please fix the error and restart Unity.\n{svnError}\n\n");
+			if (!string.IsNullOrEmpty(gitError)) {
+				Debug.LogError($"Calling git CLI (Command Line Interface) caused fatal error!\nTemporarily disabling WiseSVN integration. Please fix the error and restart Unity.\n{gitError}\n\n");
 			} else {
 				// Recovered from error, enable back integration.
 				PersonalPrefs.EnableCoreIntegration = true;
 			}
 		}
 
-		private void CheckForSVNAuthErrorsResponse(GitAsyncOperation<StatusOperationResult> operation)
+		private void CheckForGitAuthErrorsResponse(GitAsyncOperation<StatusOperationResult> operation)
 		{
 			if (operation.Result == StatusOperationResult.AuthenticationFailed) {
 				NeedsToAuthenticate = true;
@@ -480,7 +480,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 				NeedsToAuthenticate = false;
 
-				WiseGitIntegration.CheckForSVNAuthErrors().Completed += CheckForSVNAuthErrorsResponse;
+				WiseGitIntegration.CheckForGitAuthErrors().Completed += CheckForGitAuthErrorsResponse;
 			}
 		}
 	}

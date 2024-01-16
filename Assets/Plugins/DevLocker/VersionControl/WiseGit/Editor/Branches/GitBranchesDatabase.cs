@@ -32,7 +32,7 @@ namespace DevLocker.VersionControl.WiseGit.Branches
 #if UNITY_2018_1_OR_NEWER
 		public override bool TemporaryDisabled => WiseGitIntegration.TemporaryDisabled || Application.isBatchMode || UnityEditor.BuildPipeline.isBuildingPlayer;
 #else
-		public override bool TemporaryDisabled => WiseSVNIntegration.TemporaryDisabled || UnityEditorInternal.InternalEditorUtility.inBatchMode || UnityEditor.BuildPipeline.isBuildingPlayer;
+		public override bool TemporaryDisabled => WiseGitIntegration.TemporaryDisabled || UnityEditorInternal.InternalEditorUtility.inBatchMode || UnityEditor.BuildPipeline.isBuildingPlayer;
 #endif
 		public override bool DoTraceLogs => (m_PersonalPrefs.TraceLogs & GitTraceLogs.DatabaseUpdates) != 0;
 

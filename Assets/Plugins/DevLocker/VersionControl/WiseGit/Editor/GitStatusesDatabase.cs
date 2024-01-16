@@ -40,7 +40,7 @@ namespace DevLocker.VersionControl.WiseGit
 	/// Status extraction happens in another thread so overhead should be minimal.
 	///
 	/// NOTE: Keep in mind that this cache can be out of date.
-	///		 If you want up to date information, use the WiseSVNIntegration API for direct SVN queries.
+	///		 If you want up to date information, use the WiseGitIntegration API for direct SVN queries.
 	/// </summary>
 	public class GitStatusesDatabase : Utils.DatabasePersistentSingleton<GitStatusesDatabase, GuidStatusDatasBind>
 	{
@@ -78,7 +78,7 @@ namespace DevLocker.VersionControl.WiseGit
 #if UNITY_2018_1_OR_NEWER
 		public override bool TemporaryDisabled => WiseGitIntegration.TemporaryDisabled || Application.isBatchMode || BuildPipeline.isBuildingPlayer;
 #else
-		public override bool TemporaryDisabled => WiseSVNIntegration.TemporaryDisabled || UnityEditorInternal.InternalEditorUtility.inBatchMode || BuildPipeline.isBuildingPlayer;
+		public override bool TemporaryDisabled => WiseGitIntegration.TemporaryDisabled || UnityEditorInternal.InternalEditorUtility.inBatchMode || BuildPipeline.isBuildingPlayer;
 #endif
 		public override bool DoTraceLogs => (m_PersonalCachedPrefs.TraceLogs & GitTraceLogs.DatabaseUpdates) != 0;
 

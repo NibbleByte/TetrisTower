@@ -126,7 +126,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 						GitBranchesDatabase.Instance.InvalidateDatabase();
 						GitLockPromptDatabaseStarter.TryStartIfNeeded();
 
-						GitPreferencesManager.Instance.CheckSVNSupport();
+						GitPreferencesManager.Instance.CheckGitSupport();
 					}
 				}
 				GUI.backgroundColor = prevColor;
@@ -163,18 +163,18 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 		private void SanitizeBeforeSave()
 		{
-			m_PersonalPrefs.SvnCLIPath = GitPreferencesManager.SanitizeUnityPath(m_PersonalPrefs.SvnCLIPath);
+			m_PersonalPrefs.GitCLIPath = GitPreferencesManager.SanitizeUnityPath(m_PersonalPrefs.GitCLIPath);
 			m_PersonalPrefs.Exclude = SanitizePathsList(m_PersonalPrefs.Exclude);
 
-			m_ProjectPrefs.SvnCLIPath = GitPreferencesManager.SanitizeUnityPath(m_ProjectPrefs.SvnCLIPath);
-			m_ProjectPrefs.SvnCLIPathMacOS = GitPreferencesManager.SanitizeUnityPath(m_ProjectPrefs.SvnCLIPathMacOS);
+			m_ProjectPrefs.GitCLIPath = GitPreferencesManager.SanitizeUnityPath(m_ProjectPrefs.GitCLIPath);
+			m_ProjectPrefs.GitCLIPathMacOS = GitPreferencesManager.SanitizeUnityPath(m_ProjectPrefs.GitCLIPathMacOS);
 			m_ProjectPrefs.Exclude = SanitizePathsList(m_ProjectPrefs.Exclude);
 
 
-			string userPath = m_PersonalPrefs.SvnCLIPath;
+			string userPath = m_PersonalPrefs.GitCLIPath;
 
 			if (string.IsNullOrWhiteSpace(userPath)) {
-				userPath = m_ProjectPrefs.PlatformSvnCLIPath;
+				userPath = m_ProjectPrefs.PlatformGitCLIPath;
 			}
 
 			if (!string.IsNullOrWhiteSpace(userPath) && !File.Exists(userPath)) {
@@ -287,7 +287,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			m_PersonalPrefs.AskOnMovingFolders = EditorGUILayout.Toggle(new GUIContent("Ask On Moving Folders", "Ask for confirmation when moving folders inside Unity."), m_PersonalPrefs.AskOnMovingFolders);
 
-			m_PersonalPrefs.SvnCLIPath = EditorGUILayout.TextField(new GUIContent("SVN CLI Path", "Specify SVN CLI (svn.exe) binary path to use or leave empty for the defaults.\n\nNOTE: this will override the project preference. Coordinate this with your team."), m_PersonalPrefs.SvnCLIPath);
+			m_PersonalPrefs.GitCLIPath = EditorGUILayout.TextField(new GUIContent("SVN CLI Path", "Specify SVN CLI (svn.exe) binary path to use or leave empty for the defaults.\n\nNOTE: this will override the project preference. Coordinate this with your team."), m_PersonalPrefs.GitCLIPath);
 
 			m_PersonalPrefs.ContextMenusClient = (ContextMenusClient)EditorGUILayout.EnumPopup(new GUIContent("Context menus client", "Select what client should be used with the context menus."), m_PersonalPrefs.ContextMenusClient);
 			if (GUI.changed) {
@@ -312,10 +312,10 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			m_ProjectPrefs.DownloadRepositoryChanges = EditorGUILayout.Toggle(new GUIContent("Check for repository changes", m_DownloadRepositoryChangesHint), m_ProjectPrefs.DownloadRepositoryChanges);
 
-			m_ProjectPrefs.SvnCLIPath = EditorGUILayout.TextField(new GUIContent("SVN CLI Path", "Specify SVN CLI (svn.exe) binary path to use or leave empty for the defaults."), m_ProjectPrefs.SvnCLIPath);
-			m_ProjectPrefs.SvnCLIPathMacOS = EditorGUILayout.TextField(new GUIContent("SVN CLI Path MacOS", "Same as above, but for MacOS."), m_ProjectPrefs.SvnCLIPathMacOS);
+			m_ProjectPrefs.GitCLIPath = EditorGUILayout.TextField(new GUIContent("SVN CLI Path", "Specify SVN CLI (svn.exe) binary path to use or leave empty for the defaults."), m_ProjectPrefs.GitCLIPath);
+			m_ProjectPrefs.GitCLIPathMacOS = EditorGUILayout.TextField(new GUIContent("SVN CLI Path MacOS", "Same as above, but for MacOS."), m_ProjectPrefs.GitCLIPathMacOS);
 
-			m_ProjectPrefs.MoveBehaviour = (SVNMoveBehaviour)EditorGUILayout.EnumPopup(new GUIContent("Assets move behaviour", "Depending on your SVN repository, sometimes you may need to execute move commands as simple add and remove operations, loosing their history. Use with caution.\n(I'm looking at you github that emulates svn)."), m_ProjectPrefs.MoveBehaviour);
+			m_ProjectPrefs.MoveBehaviour = (GitMoveBehaviour)EditorGUILayout.EnumPopup(new GUIContent("Assets move behaviour", "Depending on your SVN repository, sometimes you may need to execute move commands as simple add and remove operations, loosing their history. Use with caution.\n(I'm looking at you github that emulates svn)."), m_ProjectPrefs.MoveBehaviour);
 
 			if (!m_PersonalPrefs.PopulateStatusesDatabase) {
 				EditorGUILayout.HelpBox("Lock prompts require enabled overlay icons support from the Personal preferences!", MessageType.Warning);

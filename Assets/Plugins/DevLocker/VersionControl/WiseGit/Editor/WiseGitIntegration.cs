@@ -32,16 +32,20 @@ namespace DevLocker.VersionControl.WiseGit
 		private static readonly Dictionary<char, VCFileStatus> m_FileStatusMap = new Dictionary<char, VCFileStatus>
 		{
 			{' ', VCFileStatus.Normal},
+			{'U', VCFileStatus.Normal},	  // TODO: Updated but not merged? Do we care?
 			{'A', VCFileStatus.Added},
-			{'C', VCFileStatus.Conflicted},
+			{'R', VCFileStatus.Added},	  // TODO: Renamed status? Do we care?
+			{'C', VCFileStatus.Added},	  // TODO: Copied status? Do we care?
+			//{'C', VCFileStatus.Conflicted},
 			{'D', VCFileStatus.Deleted},
-			{'I', VCFileStatus.Ignored},
+			//{'I', VCFileStatus.Ignored},
 			{'M', VCFileStatus.Modified},
-			{'R', VCFileStatus.Replaced},
+			{'T', VCFileStatus.Modified}, // TODO: Type change status? Do we care?
+			//{'R', VCFileStatus.Replaced},
 			{'?', VCFileStatus.Unversioned},
-			{'!', VCFileStatus.Missing},
-			{'X', VCFileStatus.External},
-			{'~', VCFileStatus.Obstructed},
+			//{'!', VCFileStatus.Missing},
+			//{'X', VCFileStatus.External},
+			//{'~', VCFileStatus.Obstructed},
 		};
 
 		private static readonly Dictionary<char, VCSwitchedExternal> m_SwitchedExternalStatusMap = new Dictionary<char, VCSwitchedExternal>
@@ -141,10 +145,10 @@ namespace DevLocker.VersionControl.WiseGit
 
 		private static string Git_Command {
 			get {
-				string userPath = m_PersonalPrefs.SvnCLIPath;
+				string userPath = m_PersonalPrefs.GitCLIPath;
 
 				if (string.IsNullOrWhiteSpace(userPath)) {
-					userPath = m_ProjectPrefs.PlatformSvnCLIPath;
+					userPath = m_ProjectPrefs.PlatformGitCLIPath;
 				}
 
 				if (string.IsNullOrWhiteSpace(userPath))
@@ -351,10 +355,16 @@ namespace DevLocker.VersionControl.WiseGit
 			var depth = recursive ? "infinity" : "empty";
 			var offlineArg = offline ? string.Empty : "-u";
 
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"status --depth={depth} {offlineArg} \"{GitFormatPath(path)}\"", timeout, shellMonitor);
+			// TODO: No depth? Handle offlineArg? Probably needs "git remote update"
+			//var result = ShellUtils.ExecuteCommand(Git_Command, $"status --depth={depth} {offlineArg} \"{GitFormatPath(path)}\"", timeout, shellMonitor);
+			// https://git-scm.com/docs/git-status
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"status --porcelain -z \"{GitFormatPath(path)}\"", timeout, shellMonitor);
 
 			if (!string.IsNullOrEmpty(result.Error)) {
 
+				// TODO: Error checks?
+
+				/*
 				// svn: warning: W155010: The node '...' was not found.
 				// This can be returned when path is under unversioned directory. In that case we consider it is unversioned as well.
 				if (result.Error.Contains("W155010")) {
@@ -389,17 +399,19 @@ namespace DevLocker.VersionControl.WiseGit
 				// Operation took too long, shell utils time out kicked in.
 				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
 					return StatusOperationResult.Timeout;
+				*/
 
 				return StatusOperationResult.UnknownError;
 			}
 
 			// If -u is used, additional line is added at the end:
 			// Status against revision:     14
-			bool emptyOutput = (offline && string.IsNullOrWhiteSpace(result.Output)) ||
-							   (!offline && result.Output.StartsWith("Status", StringComparison.Ordinal));
+			//bool emptyOutput = (offline && string.IsNullOrWhiteSpace(result.Output)) ||
+			//				   (!offline && result.Output.StartsWith("Status", StringComparison.Ordinal));
+			bool emptyOutput = string.IsNullOrWhiteSpace(result.Output);
 
 			// Empty result could also mean: file doesn't exist.
-			// Note: svn-deleted files still have svn status, so always check for status before files on disk.
+			// Note: git-deleted files still have git status, so always check for status before files on disk.
 			if (emptyOutput) {
 				if (!File.Exists(path) && !Directory.Exists(path))
 					return StatusOperationResult.TargetPathNotFound;
@@ -1820,9 +1832,9 @@ namespace DevLocker.VersionControl.WiseGit
 		/// Checks if SVN CLI is setup and working properly.
 		/// Returns string containing the SVN errors if any.
 		/// </summary>
-		public static string CheckForSVNErrors()
+		public static string CheckForGitErrors()
 		{
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"status --depth=empty \"{GitFormatPath(ProjectRootNative)}\"", COMMAND_TIMEOUT);
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"status --porcelain -z \"{GitFormatPath(ProjectRootNative)}\"", COMMAND_TIMEOUT);
 
 			return result.Error;
 		}
@@ -1831,7 +1843,7 @@ namespace DevLocker.VersionControl.WiseGit
 		/// Checks if SVN can authenticate properly.
 		/// This is asynchronous operation as it may take some time. Wait for the result.
 		/// </summary>
-		public static GitAsyncOperation<StatusOperationResult> CheckForSVNAuthErrors()
+		public static GitAsyncOperation<StatusOperationResult> CheckForGitAuthErrors()
 		{
 			return GetStatusesAsync(ProjectRootNative, false, false, new List<GitStatusData>(), false, ONLINE_COMMAND_TIMEOUT * 2);
 		}
@@ -2056,8 +2068,8 @@ namespace DevLocker.VersionControl.WiseGit
 					return AssetMoveResult.FailedMove;
 
 
-				if (m_ProjectPrefs.MoveBehaviour == SVNMoveBehaviour.UseAddAndDeleteForAllAssets ||
-					m_ProjectPrefs.MoveBehaviour == SVNMoveBehaviour.UseAddAndDeleteForFolders && isFolder
+				if (m_ProjectPrefs.MoveBehaviour == GitMoveBehaviour.UseAddAndDeleteForAllAssets ||
+					m_ProjectPrefs.MoveBehaviour == GitMoveBehaviour.UseAddAndDeleteForFolders && isFolder
 					) {
 
 					return MoveAssetByAddDeleteOperations(oldPath, newPath, reporter)
@@ -2222,10 +2234,10 @@ namespace DevLocker.VersionControl.WiseGit
 					break;
 
 				case StatusOperationResult.ExecutableNotFound:
-					string userPath = m_PersonalPrefs.SvnCLIPath;
+					string userPath = m_PersonalPrefs.GitCLIPath;
 
 					if (string.IsNullOrWhiteSpace(userPath)) {
-						userPath = m_ProjectPrefs.PlatformSvnCLIPath;
+						userPath = m_ProjectPrefs.PlatformGitCLIPath;
 					}
 
 					if (string.IsNullOrEmpty(userPath)) {
@@ -2253,102 +2265,67 @@ namespace DevLocker.VersionControl.WiseGit
 
 		private static IEnumerable<GitStatusData> ExtractStatuses(string output, bool recursive, bool offline, bool fetchLockDetails, int timeout, IShellMonitor shellMonitor = null)
 		{
-			using (var sr = new StringReader(output)) {
-				string line = string.Empty;
-				string nextLine = sr.ReadLine();
+			var lines = output.TrimEnd().Split('\0', StringSplitOptions.RemoveEmptyEntries);
 
-				while (true) {
-					line = nextLine;
-					if (line == null)	// End of reader reached.
-						break;
+			for(int lineIndex = 0; lineIndex < lines.Length; ++lineIndex) {
+				string line = lines[lineIndex];
 
-					nextLine = sr.ReadLine();
+				// TODO: Test with submodules
+				// All externals append separate sections with their statuses:
+				// Performing status on external item at '...':
+				//if (line.StartsWith("Performing status", StringComparison.Ordinal))
+				//	continue;
 
-					var lineLen = line.Length;
+				// TODO: Handle ignore-on-commit
+				// If user has files in the "ignore-on-commit" list, this is added at the end plus empty line:
+				// ---Changelist 'ignore-on-commit': ...
+				//if (string.IsNullOrWhiteSpace(line))
+				//	continue;
+				//if (line.StartsWith("---", StringComparison.Ordinal))
+				//	break;
 
-					// Last status was deleted / added+, so this is telling us where it moved to / from. Skip it.
-					if (lineLen > 8 && line[8] == '>')
-						continue;
+				// Rules are described in "git status -h".
+				var statusData = new GitStatusData();
+				// 1st is staging/index, 2nd char is working tree/files. Prefer the working status always.
+				char statusChar = line[1] == ' ' ? line[0] : line[1];
+				statusData.Status = m_FileStatusMap[statusChar];
+				// TODO: Handle merge status.
+				// TODO: Handle other statuses?
+				//statusData.PropertiesStatus = m_PropertyStatusMap[line[1]];
+				//statusData.SwitchedExternalStatus = m_SwitchedExternalStatusMap[line[4]];
+				//statusData.LockStatus = m_LockStatusMap[line[5]];
+				//statusData.TreeConflictStatus = m_ConflictStatusMap[line[6]];
+				statusData.LockDetails = LockDetails.Empty;
 
-					// Tree conflict "local dir edit, incoming dir delete or move upon switch / update" or similar.
-					if (lineLen > 6 && line[6] == '>')
-						continue;
-
-					// If there are any conflicts, the report will have two additional lines like this:
-					// Summary of conflicts:
-					// Text conflicts: 1
-					if (line.StartsWith("Summary", StringComparison.Ordinal))
-						break;
-
-					// If -u is used, additional line is added at the end:
-					// Status against revision:     14
-					if (line.StartsWith("Status", StringComparison.Ordinal))
-						continue;
-
-					// All externals append separate sections with their statuses:
-					// Performing status on external item at '...':
-					if (line.StartsWith("Performing status", StringComparison.Ordinal))
-						continue;
-
-					// If user has files in the "ignore-on-commit" list, this is added at the end plus empty line:
-					// ---Changelist 'ignore-on-commit': ...
-					if (string.IsNullOrWhiteSpace(line))
-						continue;
-					if (line.StartsWith("---", StringComparison.Ordinal))
-						break;
-
-					// Rules are described in "svn help status".
-					var statusData = new GitStatusData();
-					statusData.Status = m_FileStatusMap[line[0]];
-					statusData.PropertiesStatus = m_PropertyStatusMap[line[1]];
-					statusData.SwitchedExternalStatus = m_SwitchedExternalStatusMap[line[4]];
-					statusData.LockStatus = m_LockStatusMap[line[5]];
-					statusData.TreeConflictStatus = m_ConflictStatusMap[line[6]];
-					statusData.LockDetails = LockDetails.Empty;
-
-					// Last status was deleted / added+, so this is telling us where it moved to / from.
-					if (nextLine != null && nextLine.Length > 8 && nextLine[8] == '>') {
-
-						if (statusData.Status == VCFileStatus.Deleted) {
-							int movedPathStartIndex = "        > moved to ".Length;
-							statusData.MovedTo = nextLine.Substring(movedPathStartIndex).Replace('\\', '/');
-						}
-						if (statusData.Status == VCFileStatus.Added) {
-							int movedPathStartIndex = "        > moved from ".Length;
-							statusData.MovedFrom = nextLine.Substring(movedPathStartIndex).Replace('\\', '/');
-						}
-					}
-
-					// 7 columns statuses + space;
-					int pathStart = 7 + 1;
-
-					if (!offline) {
-						// + remote status + revision
-						pathStart += 13;
-						statusData.RemoteStatus = m_RemoteStatusMap[line[8]];
-					}
-
-					statusData.Path = line.Substring(pathStart).Replace('\\', '/');
-
-					// NOTE: If you pass absolute path to svn, the output will be with absolute path -> always pass relative path and we'll be good.
-					// If path is not relative, make it.
-					//if (!statusData.Path.StartsWith("Assets", StringComparison.Ordinal)) {
-					//	// Length+1 to skip '/'
-					//	statusData.Path = statusData.Path.Remove(0, ProjectRoot.Length + 1);
-					//}
-
-					if (IsHiddenPath(statusData.Path))
-						continue;
-
-
-					if (!offline && fetchLockDetails) {
-						if (statusData.LockStatus != VCLockStatus.NoLock && statusData.LockStatus != VCLockStatus.BrokenLock) {
-							statusData.LockDetails = FetchLockDetails(statusData.Path, timeout, shellMonitor);
-						}
-					}
-
-					yield return statusData;
+				// Status is renamed - next line tells us from where.
+				if (statusChar == 'R') {
+					statusData.MovedFrom = lines[lineIndex + 1];
+					lineIndex++;
 				}
+
+				// TODO: Remote Status
+				// 7 columns statuses + space;
+				//int pathStart = 7 + 1;
+				//
+				//if (!offline) {
+				//	// + remote status + revision
+				//	pathStart += 13;
+				//	statusData.RemoteStatus = m_RemoteStatusMap[line[8]];
+				//}
+
+				statusData.Path = line.Substring(3);
+
+				if (IsHiddenPath(statusData.Path))
+					continue;
+
+				// TODO: Fetch lock details.
+				//if (!offline && fetchLockDetails) {
+				//	if (statusData.LockStatus != VCLockStatus.NoLock && statusData.LockStatus != VCLockStatus.BrokenLock) {
+				//		statusData.LockDetails = FetchLockDetails(statusData.Path, timeout, shellMonitor);
+				//	}
+				//}
+
+				yield return statusData;
 			}
 		}
 
@@ -2376,9 +2353,7 @@ namespace DevLocker.VersionControl.WiseGit
 
 		private static string GitFormatPath(string path)
 		{
-			// NOTE: @ is added at the end of path, to avoid problems when file name contains @, and SVN mistakes that as "At revision" syntax".
-			//		https://stackoverflow.com/questions/757435/how-to-escape-characters-in-subversion-managed-file-names
-			return path + "@";
+			return path;
 		}
 
 		private static IEnumerable<string> Enumerate(string str)

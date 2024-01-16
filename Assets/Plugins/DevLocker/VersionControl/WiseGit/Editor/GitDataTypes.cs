@@ -71,9 +71,9 @@ namespace DevLocker.VersionControl.WiseGit
 		All = ~0,
 	}
 
-	public enum SVNMoveBehaviour
+	public enum GitMoveBehaviour
 	{
-		NormalSVNMove = 0,
+		NormalGitMove = 0,
 		UseAddAndDeleteForFolders = 2,
 		UseAddAndDeleteForAllAssets = 4,
 	}

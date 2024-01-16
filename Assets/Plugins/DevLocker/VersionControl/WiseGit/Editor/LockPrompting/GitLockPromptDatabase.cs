@@ -427,12 +427,12 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 
 			// Auto-locking has been removed. User needs to explicitly select what to lock and what not.
 			/*
-			var lockMessage = SVNPreferencesManager.Instance.ProjectPrefs.AutoLockMessage;
+			var lockMessage = GitPreferencesManager.Instance.ProjectPrefs.AutoLockMessage;
 
 			if (shouldLock.Count > 0) {
 
 				var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-				EnqueueOperation(op => WiseSVNIntegration.LockFiles(shouldLock.Select(sd => sd.Path), false, lockMessage, "", targetsFileToUse))
+				EnqueueOperation(op => WiseGitIntegration.LockFiles(shouldLock.Select(sd => sd.Path), false, lockMessage, "", targetsFileToUse))
 				.Completed += (op) => {
 					if (op.Result == LockOperationResult.RemoteHasChanges) {
 						foreach (var failedStatusData in shouldLock) {
