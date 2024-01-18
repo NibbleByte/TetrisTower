@@ -288,8 +288,8 @@ namespace DevLocker.VersionControl.WiseGit.Shell
 				// ShellUtils.ExecuteCommand()
 				// WiseGitIntegration.GetStatuses()
 				// WiseGitIntegration.GetStatus()
-				// SVNStatusesDatabase.PostProcessAssets()
-				// SVNStatusesDatabaseAssetPostprocessor.OnPostprocessAllAssets()
+				// GitStatusesDatabase.PostProcessAssets()
+				// GitStatusesDatabaseAssetPostprocessor.OnPostprocessAllAssets()
 				// ...
 				// VisualEffectAssetModificationProcessor.OnWillSaveAssets()
 				// ...

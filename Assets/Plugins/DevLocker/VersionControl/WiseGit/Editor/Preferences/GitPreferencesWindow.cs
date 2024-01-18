@@ -1,7 +1,6 @@
 // MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
 
 using DevLocker.VersionControl.WiseGit.LockPrompting;
-using DevLocker.VersionControl.WiseGit.Branches;
 using DevLocker.VersionControl.WiseGit.ContextMenus;
 using System;
 using System.Collections.Generic;
@@ -123,7 +122,6 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 						WiseGitIntegration.ClearLastDisplayedError();
 						GitStatusesDatabase.Instance.m_GlobalIgnoresCollected = false;
 						GitStatusesDatabase.Instance.InvalidateDatabase();
-						GitBranchesDatabase.Instance.InvalidateDatabase();
 						GitLockPromptDatabaseStarter.TryStartIfNeeded();
 
 						GitPreferencesManager.Instance.CheckGitSupport();
