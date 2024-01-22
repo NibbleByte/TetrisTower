@@ -6536,7 +6536,7 @@ MonoBehaviour:
     remain with the error dialog.\nFocus layers have priority definition. Scopes
     with lower layer priority can't \"steal\" the focus from ones with higher priority
     (i.e. modal dialog). Additionally, you can specify if the gameplay input should
-    be supressed (pushing an actions mask to the input stack).\nPress F5 for a system
+    be suppressed (pushing an actions mask to the input stack).\nPress F5 for a system
     pop-up."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -45515,15 +45515,11 @@ MonoBehaviour:
     If multiple scopes are enabled at the same time, you can prioritize one of them
     to get focused in the end.
 
-    - Scopes set as ModalRoot will persist their
-    focus and suppress input hotkeys not managed by them (example - press F5).
 
+    Dig in the hierarchy and check all UIScope components.
 
-    Dig
-    in the hierarchy and check all UIScope components.
-
-    Try deactivate and reactivate
-    scopes and see what happens.'
+    Try
+    deactivate and reactivate scopes and see what happens.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

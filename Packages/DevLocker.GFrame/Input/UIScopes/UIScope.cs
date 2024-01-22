@@ -529,7 +529,7 @@ namespace DevLocker.GFrame.Input.UIScope
 					return;
 				}
 
-				fallbackFrameScope = m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer().LastOrDefault(s => s.AutomaticFocus);
+				fallbackFrameScope = m_PlayerSet.RegisteredScopes.FilterMaxFocusLayer().LastOrDefault(s => s.AutomaticFocus && s.OnEnableBehaviour != FocusPolicy.DontFocus);
 				if (fallbackFrameScope && fallbackFrameScope.FocusLayer > FocusLayer) {
 					SwitchActiveScopes(m_PlayerSet, ref m_PlayerSet.ActiveScopes, CollectScopes(fallbackFrameScope));
 					return;
