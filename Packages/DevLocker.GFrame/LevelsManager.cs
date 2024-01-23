@@ -279,7 +279,14 @@ namespace DevLocker.GFrame
 		/// <summary>
 		/// If coroutines fail, use this to reset the changing level flag so you can switch again. For example switch to fall-back level.
 		/// </summary>
-		public void RestartChangingLevelFlag() => ChangingLevel = false;
+		public void RestartChangingLevelFlag()
+		{
+			ChangingLevel = false;
+
+			foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+				playerContext.IsLevelLoading = false;
+			}
+		}
 
 		public void SwitchLevel(ILevelSupervisor nextLevel)
 		{
@@ -346,6 +353,10 @@ namespace DevLocker.GFrame
 			yield return LoadedSupervisorCrt();
 
 			ChangingLevel = false;
+
+			foreach (PlayerContextUIRootObject playerContext in PlayerContextUIRootObject.AllPlayerUIRoots) {
+				playerContext.IsLevelLoading = false;
+			}
 		}
 
 		/// <summary>
