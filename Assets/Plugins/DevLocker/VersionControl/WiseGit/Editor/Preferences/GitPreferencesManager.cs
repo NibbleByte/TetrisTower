@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.ContextMenus;
 using System;
@@ -35,19 +35,19 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		{
 			public bool EnableCoreIntegration = true;		// Sync file operations with git
 			public bool PopulateStatusesDatabase = true;    // For overlay icons etc.
-			public bool PopulateIgnoresDatabase = true;    // For git-ignored icons etc.
+			public bool PopulateIgnoresDatabase = true;     // For git-ignored icons etc.
 			public bool ShowNormalStatusOverlayIcon = false;
 			public bool ShowExcludedStatusOverlayIcon = true;
 
 			public string GitCLIPath = string.Empty;
 
 			// When populating the database, should it check for server changes as well (locks & modified files).
-			public BoolPreference DownloadRepositoryChanges = BoolPreference.SameAsProjectPreference;
+			public BoolPreference FetchRemoteChanges = BoolPreference.SameAsProjectPreference;
 			public bool AutoLockOnModified = false;
 			public bool WarnForPotentialConflicts = true;
 			public bool AskOnMovingFolders = true;
 
-			public int AutoRefreshDatabaseInterval = 60;    // seconds; Less than 0 will disable it.
+			public int AutoRefreshDatabaseInterval = 120;    // seconds; Less than 0 will disable it.
 			public ContextMenusClient ContextMenusClient = ContextMenusClient.TortoiseGit;
 			public GitTraceLogs TraceLogs = GitTraceLogs.GitOperations;
 
@@ -69,7 +69,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		[Serializable]
 		internal class ProjectPreferences
 		{
-			public bool DownloadRepositoryChanges = true;
+			public bool FetchRemoteChanges = true;
 
 			// Use PlatformGitCLIPath instead as it is platform independent.
 			public string GitCLIPath = string.Empty;
@@ -80,14 +80,8 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 #else
 			public string PlatformGitCLIPath => GitCLIPathMacOS;
 #endif
-			public GitMoveBehaviour MoveBehaviour = GitMoveBehaviour.NormalGitMove;
-
 			// Enable lock prompts on asset modify.
 			public bool EnableLockPrompt = false;
-
-			public const string LockMessageHint = "Message used when locked after prompting the user.";
-			[Tooltip(LockMessageHint)]
-			public string LockPromptMessage = "Auto-locked.";
 
 			[Tooltip("Automatically unlock if asset becomes unmodified (i.e. you reverted the asset).")]
 			public bool AutoUnlockIfUnmodified = false;
@@ -98,16 +92,6 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 #endif
 			// Lock prompt parameters for when asset is modified.
 			public List<LockPromptParameters> LockPromptParameters = new List<LockPromptParameters>();
-
-
-			// Enable svn branches database.
-			public bool EnableBranchesDatabase;
-
-#if UNITY_2020_2_OR_NEWER
-			[NonReorderable]
-#endif
-			// SVN parameters used for scanning branches in the SVN repo.
-			public List<BranchScanParameters> BranchesDatabaseScanParameters = new List<BranchScanParameters>();
 
 #if UNITY_2020_2_OR_NEWER
 			[NonReorderable]
@@ -125,7 +109,6 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 				var clone = (ProjectPreferences) MemberwiseClone();
 
 				clone.LockPromptParameters = new List<LockPromptParameters>(LockPromptParameters);
-				clone.BranchesDatabaseScanParameters = new List<BranchScanParameters>(BranchesDatabaseScanParameters);
 				clone.PinnedBranches = new List<string>(PinnedBranches);
 				clone.Exclude = new List<string>(Exclude);
 
@@ -145,10 +128,10 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 		public bool NeedsToAuthenticate { get; internal set; }
 
-		public bool DownloadRepositoryChanges =>
-			PersonalPrefs.DownloadRepositoryChanges == BoolPreference.SameAsProjectPreference
-			? ProjectPrefs.DownloadRepositoryChanges
-			: PersonalPrefs.DownloadRepositoryChanges == BoolPreference.Enabled;
+		public bool FetchRemoteChanges =>
+			PersonalPrefs.FetchRemoteChanges == BoolPreference.SameAsProjectPreference
+			? ProjectPrefs.FetchRemoteChanges
+			: PersonalPrefs.FetchRemoteChanges == BoolPreference.Enabled;
 
 
 		public override void Initialize(bool freshlyCreated)
@@ -175,7 +158,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 				m_RetryTextures = false;
 
-				// If WiseSVN was just added to the project, Unity won't manage to load the textures the first time. Try again next frame.
+				// If WiseGit was just added to the project, Unity won't manage to load the textures the first time. Try again next frame.
 				if (FileStatusIcons[(int)VCFileStatus.Modified].image == null) {
 
 					// We're using a flag as assembly reload may happen and update callback will be lost.
@@ -188,14 +171,14 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 						EditorApplication.update -= reloadTextures;
 
 						if (FileStatusIcons[(int)VCFileStatus.Modified].image == null) {
-							Debug.LogWarning("SVN overlay icons are missing.");
+							Debug.LogWarning("Git overlay icons are missing.");
 						}
 					};
 
 					EditorApplication.update += reloadTextures;
 				}
 
-				Debug.Log($"Loaded WiseSVN Preferences. WiseSVN is turned {(PersonalPrefs.EnableCoreIntegration ? "on" : "off")}.");
+				Debug.Log($"Loaded WiseGit Preferences. WiseGit is turned {(PersonalPrefs.EnableCoreIntegration ? "on" : "off")}.");
 
 				if (PersonalPrefs.EnableCoreIntegration) {
 					CheckGitSupport();
@@ -257,23 +240,23 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		private void LoadTextures()
 		{
 			FileStatusIcons = new GUIContent[Enum.GetValues(typeof(VCFileStatus)).Length];
-			FileStatusIcons[(int)VCFileStatus.Normal] = LoadTexture("Editor/GitOverlayIcons/SVNNormalIcon");
-			FileStatusIcons[(int)VCFileStatus.Added] = LoadTexture("Editor/GitOverlayIcons/SVNAddedIcon");
-			FileStatusIcons[(int)VCFileStatus.Modified] = LoadTexture("Editor/GitOverlayIcons/SVNModifiedIcon");
-			FileStatusIcons[(int)VCFileStatus.Replaced] = LoadTexture("Editor/GitOverlayIcons/SVNModifiedIcon");
-			FileStatusIcons[(int)VCFileStatus.Deleted] = LoadTexture("Editor/GitOverlayIcons/SVNDeletedIcon");
-			FileStatusIcons[(int)VCFileStatus.Conflicted] = LoadTexture("Editor/GitOverlayIcons/SVNConflictIcon");
-			FileStatusIcons[(int)VCFileStatus.Ignored] = LoadTexture("Editor/GitOverlayIcons/SVNIgnoredIcon", "This item is in a svn-ignore list. It is not tracked by SVN.");
-			FileStatusIcons[(int)VCFileStatus.Unversioned] = LoadTexture("Editor/GitOverlayIcons/SVNUnversionedIcon");
-			FileStatusIcons[(int)VCFileStatus.Excluded] = LoadTexture("Editor/GitOverlayIcons/SVNReadOnlyIcon", "This item is excluded from monitoring by WiseSVN, but it may still be tracked by SVN. Check the WiseSVN preferences - Excludes setting.");
+			FileStatusIcons[(int)VCFileStatus.Normal] = LoadTexture("Editor/GitOverlayIcons/Git_Normal_Icon");
+			FileStatusIcons[(int)VCFileStatus.Added] = LoadTexture("Editor/GitOverlayIcons/Git_Added_Icon");
+			FileStatusIcons[(int)VCFileStatus.Modified] = LoadTexture("Editor/GitOverlayIcons/Git_Modified_Icon");
+			FileStatusIcons[(int)VCFileStatus.Replaced] = LoadTexture("Editor/GitOverlayIcons/Git_Modified_Icon");
+			FileStatusIcons[(int)VCFileStatus.Deleted] = LoadTexture("Editor/GitOverlayIcons/Git_Deleted_Icon");
+			FileStatusIcons[(int)VCFileStatus.Conflicted] = LoadTexture("Editor/GitOverlayIcons/Git_Conflict_Icon");
+			FileStatusIcons[(int)VCFileStatus.Ignored] = LoadTexture("Editor/GitOverlayIcons/Git_Ignored_Icon", "This item is in a git-ignore list. It is not tracked by git.");
+			FileStatusIcons[(int)VCFileStatus.Unversioned] = LoadTexture("Editor/GitOverlayIcons/Git_Unversioned_Icon");
+			FileStatusIcons[(int)VCFileStatus.Excluded] = LoadTexture("Editor/GitOverlayIcons/Git_ReadOnly_Icon", "This item is excluded from monitoring by WiseGit, but it may still be tracked by git. Check the WiseGit preferences - Excludes setting.");
 
 			LockStatusIcons = new GUIContent[Enum.GetValues(typeof(VCLockStatus)).Length];
-			LockStatusIcons[(int)VCLockStatus.LockedHere] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedHereIcon", "You have locked this file.\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.BrokenLock] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedOtherIcon", "You have a lock that is no longer valid (someone else stole it and released it).\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.LockedOther] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedOtherIcon", "Someone else locked this file.\nClick for more details.");
-			LockStatusIcons[(int)VCLockStatus.LockedButStolen] = LoadTexture("Editor/GitOverlayIcons/Locks/SVNLockedOtherIcon", "Your lock was stolen by someone else.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedHere] = LoadTexture("Editor/GitOverlayIcons/Locks/Git_LockedHere_Icon", "You have locked this file.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.BrokenLock] = LoadTexture("Editor/GitOverlayIcons/Locks/Git_LockedOther_Icon", "You have a lock that is no longer valid (someone else stole it and released it).\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedOther] = LoadTexture("Editor/GitOverlayIcons/Locks/Git_LockedOther_Icon", "Someone else locked this file.\nClick for more details.");
+			LockStatusIcons[(int)VCLockStatus.LockedButStolen] = LoadTexture("Editor/GitOverlayIcons/Locks/Git_LockedOther_Icon", "Your lock was stolen by someone else.\nClick for more details.");
 
-			RemoteStatusIcons = LoadTexture("Editor/GitOverlayIcons/Others/SVNRemoteChangesIcon", "Asset is out of date. Update to avoid conflicts.");
+			RemoteStatusIcons = LoadTexture("Editor/GitOverlayIcons/Others/Git_RemoteChanges_Icon", "Asset is out of date. Update to avoid conflicts.");
 		}
 
 		public static GUIContent LoadTexture(string path, string tooltip = null)
@@ -359,7 +342,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			}
 
 			if (string.IsNullOrEmpty(gitError)) {
-				if (DownloadRepositoryChanges || ProjectPrefs.EnableLockPrompt) {
+				if (FetchRemoteChanges || ProjectPrefs.EnableLockPrompt) {
 					WiseGitIntegration.CheckForGitAuthErrors().Completed += CheckForGitAuthErrorsResponse;
 				}
 				return;
@@ -440,16 +423,16 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 				return;
 			}
 
-			// svn: warning: W155007: '...' is not a working copy!
-			// This can be returned when project is not a valid svn checkout. (Probably)
-			if (gitError.Contains("W155007")) {
-				Debug.LogError($"This project is NOT under version control (not a proper SVN checkout). Temporarily disabling WiseSVN integration.\n\n{gitError}");
+			// fatal: not a git repository (or any of the parent directories): .git
+			// This can be returned when project is not a valid git checkout. (Probably)
+			if (gitError.Contains("fatal: not a git repository")) {
+				Debug.LogError($"This project is NOT under version control (not a proper git clone). Temporarily disabling WiseGit integration.\n\n{gitError}");
 				return;
 			}
 
 			// Any other error.
 			if (!string.IsNullOrEmpty(gitError)) {
-				Debug.LogError($"Calling git CLI (Command Line Interface) caused fatal error!\nTemporarily disabling WiseSVN integration. Please fix the error and restart Unity.\n{gitError}\n\n");
+				Debug.LogError($"Calling git CLI (Command Line Interface) caused fatal error!\nTemporarily disabling WiseGit integration. Please fix the error and restart Unity.\n{gitError}\n\n");
 			} else {
 				// Recovered from error, enable back integration.
 				PersonalPrefs.EnableCoreIntegration = true;
@@ -467,16 +450,12 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 		internal void TryToAuthenticate()
 		{
-			if (EditorUtility.DisplayDialog("SVN Authenticate",
-				"This process will open a terminal window and start an online request to your SVN repository. It will ask you to authenticate.\n\nThis is part of the SVN CLI process. WiseSVN doesn't know or store your username and password.",
+			if (EditorUtility.DisplayDialog("Git Authenticate",
+				"This process will open a terminal window and start a git remote server request. It will ask you to authenticate.\n\nThis is part of the git CLI process. WiseGit doesn't know or store your username and password.",
 				"Proceed",
 				"Cancel")) {
 
 				WiseGitIntegration.PromptForAuth(WiseGitIntegration.ProjectRootNative);
-
-				foreach(string repositoryPath in GitStatusesDatabase.Instance.NestedRepositories) {
-					WiseGitIntegration.PromptForAuth(Path.Combine(WiseGitIntegration.ProjectRootNative, repositoryPath));
-				}
 
 				NeedsToAuthenticate = false;
 

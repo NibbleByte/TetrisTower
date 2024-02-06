@@ -1,7 +1,7 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
-using DevLocker.VersionControl.WiseGit.Shell;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -36,19 +36,24 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			CLIContextWindow.Show($"diff \n{pathsArg}", true);
 		}
 
-		public override void Update(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
+		public override void Pull(bool wait = false)
 		{
-			if (!assetPaths.Any())
-				return;
+			CLIContextWindow.Show($"pull", false);
+		}
 
-			// NOTE: @ is added at the end of path, to avoid problems when file name contains @, and SVN mistakes that as "At revision" syntax".
-			//		https://stackoverflow.com/questions/757435/how-to-escape-characters-in-subversion-managed-file-names
+		public override void Merge(bool wait = false)
+		{
+			CLIContextWindow.Show($"merge", false);
+		}
 
-			string pathsArg = AssetPathsToContextPaths(assetPaths, includeMeta);
-			if (string.IsNullOrEmpty(pathsArg))
-				return;
+		public override void Fetch(bool wait = false)
+		{
+			CLIContextWindow.Show($"fetch", true);
+		}
 
-			CLIContextWindow.Show($"update --depth infinity --accept postpone\n{pathsArg}", true);
+		public override void Push(bool wait = false)
+		{
+			CLIContextWindow.Show($"push", true);
 		}
 
 		public override void Commit(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
@@ -56,11 +61,16 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			if (!assetPaths.Any())
 				return;
 
+			if (assetPaths.All(p => Directory.Exists(p))) {
+				CLIContextWindow.Show($"commit --message \"\"", false);
+				return;
+			}
+
 			string pathsArg = AssetPathsToContextPaths(assetPaths, includeMeta);
 			if (string.IsNullOrEmpty(pathsArg))
 				return;
 
-			CLIContextWindow.Show($"commit --depth infinity -m \"\"\n{pathsArg}", false);
+			CLIContextWindow.Show($"commit --message \"\"\n{pathsArg}", false);
 		}
 
 
@@ -75,17 +85,15 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 					return;
 			}
 
-			// Don't give versioned metas, as tortoiseSVN doesn't like it.
 			var metas = assetPaths
 				.Select(path => path + ".meta")
-				.Where(path => WiseGitIntegration.GetStatus(path).Status == VCFileStatus.Unversioned)
 				;
 
 			string pathsArg = AssetPathsToContextPaths(includeMeta ? assetPaths.Concat(metas) : assetPaths, false);
 			if (string.IsNullOrEmpty(pathsArg))
 				return;
 
-			CLIContextWindow.Show($"add --depth infinity\n{pathsArg}", true);
+			CLIContextWindow.Show($"add\n{pathsArg}", true);
 		}
 
 		public override void Revert(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
@@ -97,14 +105,14 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			if (string.IsNullOrEmpty(pathsArg))
 				return;
 
-			CLIContextWindow.Show($"revert --depth infinity\n{pathsArg}", false);
+			CLIContextWindow.Show($"checkout --\n{pathsArg}", false);
 		}
 
 
 
 		public override void ResolveAll(bool wait = false)
 		{
-			CLIContextWindow.Show($"resolve --depth infinity --accept TYPE_IN_OPTION\n", false);
+			CLIContextWindow.Show($"diff\n", false);
 		}
 
 		public override void Resolve(string assetPath, bool wait = false)
@@ -123,7 +131,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			if (string.IsNullOrEmpty(pathsArg))
 				return;
 
-			CLIContextWindow.Show($"lock -m \"\"\n{pathsArg}", false);
+			CLIContextWindow.Show($"lfs lock\n{pathsArg}", true);
 		}
 
 		public override void ReleaseLocks(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
@@ -135,7 +143,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			if (string.IsNullOrEmpty(pathsArg))
 				return;
 
-			CLIContextWindow.Show($"unlock\n{pathsArg}", true);
+			CLIContextWindow.Show($"lfs unlock\n{pathsArg}", true);
 		}
 
 		public override void ShowLog(string assetPath, bool wait = false)
@@ -172,21 +180,17 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 		}
 
 
-		public override void RepoBrowser(string url, bool wait = false)
+		public override void RepoBrowser(string path, string remoteBranch, bool wait = false)
 		{
-			if (string.IsNullOrEmpty(url))
+			if (string.IsNullOrEmpty(path))
 				return;
 
-			CLIContextWindow.Show($"list\n\"{url}\"", true);
+			CLIContextWindow.Show($"ls-tree --full-name --name-only -r {remoteBranch}", true);
 		}
 
-		public override void Switch(string localPath, string url, bool wait = false)
+		public override void Switch(bool wait = false)
 		{
-			if (string.IsNullOrEmpty(localPath) || string.IsNullOrEmpty(url))
-				return;
-
-			// TODO: Test?
-			CLIContextWindow.Show($"switch\n\"{url}\"\n\"{localPath}\"", false);
+			CLIContextWindow.Show($"switch", false);
 		}
 	}
 }

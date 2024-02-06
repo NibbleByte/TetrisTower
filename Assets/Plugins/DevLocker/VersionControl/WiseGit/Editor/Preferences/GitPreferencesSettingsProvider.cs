@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using System;
 using UnityEditor;
@@ -7,14 +7,14 @@ using UnityEngine;
 namespace DevLocker.VersionControl.WiseGit.Preferences
 {
 #if !UNITY_2017
-	// Provide Unity Preferences / Project Settings entry for the WiseSVN.
+	// Provide Unity Preferences / Project Settings entry for the WiseGit.
 	// It is really a big button that redirects to the original preferences window.
 	// Tried to draw the full window, but failed, because I need a SerializedObject() to use and didn't care too much about it.
 	[Serializable]
 	internal class WiseGitProjectPreferencesSettingsProvider : SettingsProvider
 	{
-		private const string m_SettingsProviderName = "WiseSVN";
-		private readonly static string[] m_Keywords = new[] { "Wise", "SVN", "TortoiseSVM", "SnailSVN" };
+		private const string m_SettingsProviderName = "WiseGit";
+		private readonly static string[] m_Keywords = new[] { "Wise", "Git", "TortoiseGit", "SnailGit" };
 
 		private WiseGitProjectPreferencesSettingsProvider(string path, SettingsScope scope)
 			: base(path, scope)
@@ -44,7 +44,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		{
 			base.OnGUI(searchContext);
 
-			if (GUILayout.Button("Open WiseSVN preferences", GUILayout.ExpandWidth(false), GUILayout.Height(30f))) {
+			if (GUILayout.Button("Open WiseGit preferences", GUILayout.ExpandWidth(false), GUILayout.Height(30f))) {
 				GitPreferencesWindow.ShowProjectPreferences();
 			}
 

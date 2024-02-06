@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 #if UNITY_2020_2_OR_NEWER || UNITY_2019_4_OR_NEWER || (UNITY_2018_4_OR_NEWER && !UNITY_2018_4_19 && !UNITY_2018_4_18 && !UNITY_2018_4_17 && !UNITY_2018_4_16 && !UNITY_2018_4_15)
 #define CAN_DISABLE_REFRESH
@@ -13,7 +13,7 @@ using UnityEditor;
 namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 {
 	/// <summary>
-	/// Window to display SVN command that is about to be executed. User can tweak it.
+	/// Window to display git command that is about to be executed. User can tweak it.
 	/// </summary>
 	public class CLIContextWindow : EditorWindow
 	{
@@ -26,10 +26,10 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 		private Color m_StateColor = Color.white;
 		private Vector2 m_OutputScroll;
 
-		private bool m_IsWorking => m_SVNOperation != null && !m_SVNOperation.HasFinished;
+		private bool m_IsWorking => m_GitOperation != null && !m_GitOperation.HasFinished;
 
 
-		private GitAsyncOperation<ShellUtils.ShellResult> m_SVNOperation;
+		private GitAsyncOperation<ShellUtils.ShellResult> m_GitOperation;
 
 		public static void Show(string commandArgs, bool autoRun)
 		{
@@ -37,7 +37,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 
 			window.position = new Rect(window.position.xMin + 100f, window.position.yMin + 100f, 700f, 600f);
 			window.minSize = new Vector2(700f, 400f);
-			window.titleContent = new GUIContent("SVN CLI Window");
+			window.titleContent = new GUIContent("Git CLI Window");
 
 			window.m_CommandArgs = commandArgs;
 			window.m_AutoRun = autoRun;
@@ -62,7 +62,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 		void OnDestroy()
 		{
 			if (m_IsWorking) {
-				m_SVNOperation.Abort(true);
+				m_GitOperation.Abort(true);
 			}
 		}
 
@@ -74,7 +74,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 
 			EditorGUI.BeginDisabledGroup(true);
 			{
-				EditorGUILayout.TextField("Command", "svn");
+				EditorGUILayout.TextField("Command", "git");
 			}
 			EditorGUI.EndDisabledGroup();
 
@@ -101,7 +101,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 				EditorGUI.BeginDisabledGroup(!m_IsWorking);
 
 				if (GUILayout.Button("Abort")) {
-					m_SVNOperation.Abort(false);
+					m_GitOperation.Abort(false);
 					m_CombinedOutput += "Aborting...\n";
 					m_StateLabel = "Aborting...";
 					m_StateColor = Color.red;
@@ -109,7 +109,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 				}
 
 				if (GUILayout.Button("Kill")) {
-					m_SVNOperation.Abort(true);
+					m_GitOperation.Abort(true);
 					m_CombinedOutput += "Killing...\n";
 					m_StateLabel = "Killing...";
 					m_StateColor = Color.red;
@@ -152,11 +152,11 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 					m_AutoRun = false;
 					GUI.FocusControl("");
 					m_CommandArgs = m_CommandArgs.Trim();
-					m_SVNOperation = GitAsyncOperation<ShellUtils.ShellResult>.Start(
-						op => ShellUtils.ExecuteCommand("svn", m_CommandArgs.Replace("\n", " "), op)
+					m_GitOperation = GitAsyncOperation<ShellUtils.ShellResult>.Start(
+						op => ShellUtils.ExecuteCommand("git", m_CommandArgs.Replace("\n", " "), op)
 						);
 
-					m_SVNOperation.AnyOutput += (line) => {
+					m_GitOperation.AnyOutput += (line) => {
 						m_CombinedOutput += line + "\n";
 
 						// In case window got closed.
@@ -165,7 +165,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 						}
 					};
 
-					m_SVNOperation.Completed += (op) => {
+					m_GitOperation.Completed += (op) => {
 						if (op.Result.HasErrors) {
 							m_StateLabel = "Failed!";
 							m_StateColor = Color.red;
@@ -174,7 +174,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 							m_StateColor = op.AbortRequested ? Color.red : Color.green;
 						}
 
-						m_SVNOperation = null;
+						m_GitOperation = null;
 						m_CombinedOutput += "\n";
 
 						// In case window got closed.

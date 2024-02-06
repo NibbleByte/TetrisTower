@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using System.Collections.Generic;
 using System.IO;
@@ -13,10 +13,13 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 		protected abstract string FileArgumentsSeparator { get; }
 		protected abstract bool FileArgumentsSurroundQuotes { get; }
 
-		// Most methods ask for list of asset paths, should the method add meta files and should it wait for the SVN client window to close.
+		// Most methods ask for list of asset paths, should the method add meta files and should it wait for the git client window to close.
 		public abstract void CheckChanges(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false);
 		public abstract void DiffChanges(string assetPath, bool wait = false);
-		public abstract void Update(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false);
+		public abstract void Pull(bool wait = false);
+		public abstract void Merge(bool wait = false);
+		public abstract void Fetch(bool wait = false);
+		public abstract void Push(bool wait = false);
 		public abstract void Commit(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false);
 		public abstract void Add(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false);
 		public abstract void Revert(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false);
@@ -26,9 +29,9 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 
 		public abstract void ShowLog(string assetPath, bool wait = false);
 
-		public abstract void RepoBrowser(string url, bool wait = false);
+		public abstract void RepoBrowser(string path, string remoteBranch, bool wait = false);
 
-		public abstract void Switch(string localPath, string url, bool wait = false);
+		public abstract void Switch(bool wait = false);
 
 		public abstract void ResolveAll(bool wait = false);
 		public abstract void Resolve(string assetPath, bool wait = false);
@@ -47,10 +50,11 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 
 		protected string AssetPathToContextPaths(string assetPath, bool includeMeta)
 		{
-			if (string.IsNullOrEmpty(assetPath))
+			if (string.IsNullOrEmpty(assetPath) || assetPath == ".")
 				return PreparePathArg(Path.GetDirectoryName(Application.dataPath));
 
-			// Because svn doesn't like it when you pass ignored files to some operations, like commit.
+			// TODO: Is this true? Legacy from WiseSVN
+			// Because git doesn't like it when you pass ignored files to some operations, like commit.
 			string paths = "";
 			if (WiseGitIntegration.GetStatus(assetPath).Status != VCFileStatus.Ignored) {
 				paths = PreparePathArg(assetPath);

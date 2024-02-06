@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.Shell;
 using System.Collections.Generic;
@@ -45,16 +45,33 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			}
 		}
 
-		public override void Update(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
+		public override void Pull(bool wait = false)
 		{
-			if (!assetPaths.Any())
-				return;
+			var result = ShellUtils.ExecuteCommand(ClientCommand, $"pull {WiseGitIntegration.ProjectRootNative}", wait);
+			if (MayHaveRabbitVCSError(result.Error)) {
+				Debug.LogError($"Git Error: {result.Error}");
+			}
+		}
 
-			string pathsArg = AssetPathsToContextPaths(assetPaths, includeMeta);
-			if (string.IsNullOrEmpty(pathsArg))
-				return;
+		public override void Merge(bool wait = false)
+		{
+			var result = ShellUtils.ExecuteCommand(ClientCommand, $"merge {WiseGitIntegration.ProjectRootNative}", wait);
+			if (MayHaveRabbitVCSError(result.Error)) {
+				Debug.LogError($"Git Error: {result.Error}");
+			}
+		}
 
-			var result = ShellUtils.ExecuteCommand(ClientCommand, $"update {pathsArg}", wait);
+		public override void Fetch(bool wait = false)
+		{
+			var result = ShellUtils.ExecuteCommand(ClientCommand, $"fetch {WiseGitIntegration.ProjectRootNative}", wait);
+			if (MayHaveRabbitVCSError(result.Error)) {
+				Debug.LogError($"Git Error: {result.Error}");
+			}
+		}
+
+		public override void Push(bool wait = false)
+		{
+			var result = ShellUtils.ExecuteCommand(ClientCommand, $"push {WiseGitIntegration.ProjectRootNative}", wait);
 			if (MayHaveRabbitVCSError(result.Error)) {
 				Debug.LogError($"Git Error: {result.Error}");
 			}
@@ -183,23 +200,20 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			}
 		}
 
-		public override void RepoBrowser(string url, bool wait = false)
+		public override void RepoBrowser(string path, string remoteBranch, bool wait = false)
 		{
-			if (string.IsNullOrEmpty(url))
+			if (string.IsNullOrEmpty(path))
 				return;
 
-			var result = ShellUtils.ExecuteCommand(ClientCommand, $"browser \"{url}\"", wait);
+			var result = ShellUtils.ExecuteCommand(ClientCommand, $"browser \"{remoteBranch}\" \"{path}\"", wait);
 			if (MayHaveRabbitVCSError(result.Error)) {
 				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
-		public override void Switch(string localPath, string url, bool wait = false)
+		public override void Switch(bool wait = false)
 		{
-			if (string.IsNullOrEmpty(url))
-				return;
-
-			var result = ShellUtils.ExecuteCommand(ClientCommand, $"switch \"{url}\"", wait);
+			var result = ShellUtils.ExecuteCommand(ClientCommand, $"switch", wait);
 			if (MayHaveRabbitVCSError(result.Error)) {
 				Debug.LogError($"Git Error: {result.Error}");
 			}

@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.ContextMenus.Implementation;
 using System;
@@ -41,9 +41,6 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 
 			WiseGitIntegration.ShowChangesUI -= CheckChangesAll;
 			WiseGitIntegration.ShowChangesUI += CheckChangesAll;
-
-			WiseGitIntegration.RunUpdateUI -= UpdateAll;
-			WiseGitIntegration.RunUpdateUI += UpdateAll;
 		}
 
 		private static GitContextMenusBase TryCreateContextMenusIntegration(ContextMenusClient client, out string errorMsg)
@@ -184,7 +181,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 		public static void CheckChangesAll()
 		{
 			// TortoiseGit handles nested repositories gracefully. SnailGit - not so much. :(
-			m_Integration?.CheckChanges(GetRootAssetPath().Concat(GitStatusesDatabase.Instance.NestedRepositories), false);
+			m_Integration?.CheckChanges(GetRootAssetPath(), false);
 		}
 
 		[MenuItem("Assets/Git/\U0001F50D  Check Changes", false, MenuItemPriorityStart + 6)]
@@ -212,14 +209,13 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 				&& statusData.Status != VCFileStatus.Unversioned
 				&& statusData.Status != VCFileStatus.Conflicted
 				;
-			isModified |= statusData.PropertiesStatus == VCPropertiesStatus.Modified;
 
 			if (isModified) {
 				m_Integration?.DiffChanges(assetPath, false);
 				return true;
 			}
 
-			if (statusData.Status == VCFileStatus.Conflicted || statusData.PropertiesStatus == VCPropertiesStatus.Conflicted) {
+			if (statusData.Status == VCFileStatus.Conflicted) {
 				m_Integration?.Resolve(assetPath, false);
 				return true;
 			}
@@ -234,40 +230,52 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 
 
 
-		[MenuItem("Assets/Git/\u2935  Pull", false, MenuItemPriorityStart + 20)]
-		public static void UpdateAll()
+		// It is recommended to freeze Unity while updating.
+		// DANGER: git updating while editor is crunching assets IS DANGEROUS! It WILL corrupt your asset guids. Use with caution!!!
+		//		   This is the reason why this method freezes your editor and waits for the update to finish.
+		[MenuItem("Assets/Git/\u2935  Pull All", false, MenuItemPriorityStart + 20)]
+		public static void PullAll()
 		{
 			// It is recommended to freeze Unity while updating.
 			// If Git downloads files while Unity is crunching assets, GUID database may get corrupted.
 			// TortoiseGit handles nested repositories gracefully and updates them one after another. SnailGit - not so much. :(
-			m_Integration?.Update(GetRootAssetPath().Concat(GitStatusesDatabase.Instance.NestedRepositories), false, wait: true);
+			m_Integration?.Pull(wait: true);
 		}
 
 		// It is recommended to freeze Unity while updating.
 		// DANGER: Git updating while editor is crunching assets IS DANGEROUS! It WILL corrupt your asset guids. Use with caution!!!
-		//		   This is the reason why this method freezes your editor and waits for the update to finish.
-		public static void Update(IEnumerable<string> assetPaths, bool includeMeta)
+		public static void PullAllAndDontWaitDANGER()
 		{
-			m_Integration?.Update(assetPaths, includeMeta, wait: true);
+			m_Integration?.Pull(wait: false);
 		}
 
-		// It is recommended to freeze Unity while updating.
-		// DANGER: Git updating while editor is crunching assets IS DANGEROUS! It WILL corrupt your asset guids. Use with caution!!!
-		public static void UpdateAndDontWaitDANGER(IEnumerable<string> assetPaths, bool includeMeta)
+		[MenuItem("Assets/Git/\u2935  Merge All", false, MenuItemPriorityStart + 22)]
+		public static void MergeAll()
 		{
-			m_Integration?.Update(assetPaths, includeMeta, wait: false);
+			m_Integration?.Merge(wait: true);
+		}
+
+		[MenuItem("Assets/Git/\u2935  Fetch All", false, MenuItemPriorityStart + 24)]
+		public static void FetchAll()
+		{
+			m_Integration?.Fetch(wait: true);
+		}
+
+		[MenuItem("Assets/Git/\u2197  Push All", false, MenuItemPriorityStart + 28)]
+		public static void PushAll()
+		{
+			m_Integration?.Push(wait: true);
 		}
 
 
 
-		[MenuItem("Assets/Git/\u2197  Commit All", false, MenuItemPriorityStart + 40)]
+		[MenuItem("Assets/Git/\u2197  Commit All", false, MenuItemPriorityStart + 42)]
 		public static void CommitAll()
 		{
-			// TortoiseGit handles nested repositories gracefully. SnailGit - not so much. :(
-			m_Integration?.Commit(GetRootAssetPath().Concat(GitStatusesDatabase.Instance.NestedRepositories), false);
+			m_Integration?.Commit(GetRootAssetPath(), false);
 		}
 
-		[MenuItem("Assets/Git/\u2197  Commit", false, MenuItemPriorityStart + 41)]
+		[MenuItem("Assets/Git/\u2197  Commit", false, MenuItemPriorityStart + 43)]
 		public static void CommitSelected()
 		{
 			var paths = GetSelectedAssetPaths().ToList();
@@ -298,7 +306,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 
 
 
-		[MenuItem("Assets/Git/\u271A  Add", false, MenuItemPriorityStart + 45)]
+		[MenuItem("Assets/Git/\u271A  Add", false, MenuItemPriorityStart + 46)]
 		public static void AddSelected()
 		{
 			m_Integration?.Add(GetSelectedAssetPaths(), true);
@@ -315,7 +323,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 		public static void RevertAll()
 		{
 			// TortoiseGit handles nested repositories gracefully. SnailGit - not so much. :(
-			m_Integration?.Revert(GetRootAssetPath().Concat(GitStatusesDatabase.Instance.NestedRepositories), false, true);
+			m_Integration?.Revert(GetRootAssetPath(), false, true);
 		}
 
 		[MenuItem("Assets/Git/\u21A9  Revert", false, MenuItemPriorityStart + 61)]
@@ -338,7 +346,7 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 						m_Integration?.Revert(paths, false);
 					} else {
 						if (EditorUtility.DisplayDialog("Revert File?", $"Are you sure you want to revert this file and it's meta?\n\"{paths[0]}\"", "Yes", "No", DialogOptOutDecisionType.ForThisSession, "WiseGit.RevertConfirm")) {
-							WiseGitIntegration.Revert(paths, false, true, false);
+							WiseGitIntegration.Revert(paths, false, true);
 							AssetDatabase.Refresh();
 						}
 					}
@@ -413,42 +421,38 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 			return false;
 		}
 
-		// TODO: Git doesn't have locks. There are LFS locks that work a bit differently:
-		// https://tortoisegit.org/docs/tortoisegit/tgit-dug-lfslocking.html
-		//[MenuItem("Assets/Git/\U0001F512  Get Locks", false, MenuItemPriorityStart + 80)]
-		//public static void GetLocksSelected()
-		//{
-		//	if (m_Integration != null) {
-		//		if (!TryShowLockDialog(GetSelectedAssetPaths().ToList(), m_Integration.GetLocks, false)) {
-		//
-		//			// This will include the meta which is rarely what you want.
-		//			m_Integration.GetLocks(GetSelectedAssetPaths(), true, false);
-		//		}
-		//	}
-		//}
+		[MenuItem("Assets/Git/\U0001F512  Get Locks", false, MenuItemPriorityStart + 80)]
+		public static void GetLocksSelected()
+		{
+			if (m_Integration != null) {
+				if (!TryShowLockDialog(GetSelectedAssetPaths().ToList(), m_Integration.GetLocks, false)) {
 
-		//public static void GetLocks(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
-		//{
-		//	m_Integration?.GetLocks(assetPaths, includeMeta, wait);
-		//}
+					// This will include the meta which is rarely what you want.
+					m_Integration.GetLocks(GetSelectedAssetPaths(), true, false);
+				}
+			}
+		}
+
+		public static void GetLocks(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
+		{
+			m_Integration?.GetLocks(assetPaths, includeMeta, wait);
+		}
 
 
-		// TODO: Git doesn't have locks. There are LFS locks that work a bit differently:
-		// https://tortoisegit.org/docs/tortoisegit/tgit-dug-lfslocking.html
-		//[MenuItem("Assets/Git/\U0001F513  Release Locks", false, MenuItemPriorityStart + 85)]
-		//public static void ReleaseLocksSelected()
-		//{
-		//	if (m_Integration != null) {
-		//		if (!TryShowLockDialog(GetSelectedAssetPaths().ToList(), m_Integration.ReleaseLocks, true)) {
-		//			// No locked assets, show nothing.
-		//		}
-		//	}
-		//}
+		[MenuItem("Assets/Git/\U0001F513  Release Locks", false, MenuItemPriorityStart + 85)]
+		public static void ReleaseLocksSelected()
+		{
+			if (m_Integration != null) {
+				if (!TryShowLockDialog(GetSelectedAssetPaths().ToList(), m_Integration.ReleaseLocks, true)) {
+					// No locked assets, show nothing.
+				}
+			}
+		}
 
-		//public static void ReleaseLocks(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
-		//{
-		//	m_Integration?.ReleaseLocks(assetPaths, includeMeta, wait);
-		//}
+		public static void ReleaseLocks(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
+		{
+			m_Integration?.ReleaseLocks(assetPaths, includeMeta, wait);
+		}
 
 
 
@@ -472,15 +476,15 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 		[MenuItem("Assets/Git/\U0001F4C1  Repo Browser", false, MenuItemPriorityStart + 104)]
 		public static void RepoBrowserSelected()
 		{
-			m_Integration?.RepoBrowser(GetSelectedAssetPaths().Select(WiseGitIntegration.AssetPathToURL).FirstOrDefault());
+			m_Integration?.RepoBrowser(GetSelectedAssetPaths().FirstOrDefault(), WiseGitIntegration.GetTrackedRemoteBranch());
 		}
 
 		/// <summary>
-		/// Open Repo-Browser at url location. You can get url from local working copy by using WiseGitIntegration.AssetPathToURL(path);
+		/// Open Repo-Browser at the remote location.
 		/// </summary>
-		public static void RepoBrowser(string url, bool wait = false)
+		public static void RepoBrowser(string path, string remoteBranch, bool wait = false)
 		{
-			m_Integration?.RepoBrowser(url, wait);
+			m_Integration?.RepoBrowser(path, remoteBranch, wait);
 		}
 
 
@@ -494,91 +498,6 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 		{
 			m_Integration?.Blame(assetPath, wait);
 		}
-
-		// Feature is working, but menu is commented out so it doesn't clutter the interface.
-		// Uncomment next line if you really want to do svn ignores in Unity.
-		//[MenuItem("Assets/Git/\u26D4  Ignore Toggle", false, MenuItemPriorityStart + 108)]
-		public static void IgnoreToggleSelected()
-		{
-			IgnoreToggle(GetSelectedAssetPaths().FirstOrDefault());
-		}
-
-		/// <summary>
-		/// Toggles "svn:ignore" for provided asset.
-		/// NOTE: This doesn't account for "svn:global-ignores".
-		/// </summary>
-		public static void IgnoreToggle(string assetPath)
-		{
-			if (string.IsNullOrEmpty(assetPath))
-				return;
-
-			string parentDirectory = Path.GetDirectoryName(assetPath);
-			string fileName = Path.GetFileName(assetPath);
-
-			List<PropgetEntry> propgetEntries = new List<PropgetEntry>();
-
-			using (var reporter = WiseGitIntegration.CreateReporter()) {
-				PropOperationResult result = WiseGitIntegration.Propget(parentDirectory, "svn:ignore", false, propgetEntries, WiseGitIntegration.COMMAND_TIMEOUT, reporter);
-				if (result != PropOperationResult.Success)
-					return;
-
-				// If prop doesn't exist, error is reported, but success is returned. Ignore the error flag if successful.
-				reporter.ResetErrorFlag();
-
-				List<string> lines = (propgetEntries.FirstOrDefault().Value ?? "")
-					.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-					.Select(l => l.Trim()).ToList();
-
-				if (lines.Contains(fileName) || lines.Contains(fileName + ".meta")) {
-					lines.Remove(fileName);
-					lines.Remove(fileName + ".meta");
-
-				} else {
-
-					var statusData = WiseGitIntegration.GetStatus(assetPath);
-					var statusDataMeta = WiseGitIntegration.GetStatus(assetPath + ".meta");
-
-					bool isVersioned = statusData.Status != VCFileStatus.Unversioned && statusData.Status != VCFileStatus.Deleted;
-					isVersioned |= statusDataMeta.Status != VCFileStatus.Unversioned && statusDataMeta.Status != VCFileStatus.Deleted;
-
-					if (isVersioned) {
-						int choice = EditorUtility.DisplayDialogComplex("Ignore Versioned File",
-							$"Only unversioned files can be ignored, but selected file is versioned (committed). You can:\n" +
-							$"1. Add it to \"ignore-on-commit\" changelist. TortoiseGit will ignore it by default on commit.\n" +
-							$"2. Mark the file as deleted in git (without removing it from disk) and ignore it for everybody. You need to commit resulting changes.\n" +
-							$"\n\"{assetPath}\"",
-							"Add to \"ignore-on-commit\"", "Cancel", "Mark file for deletion && ignore"
-							);
-
-						switch(choice) {
-							case 0:
-								WiseGitIntegration.ChangelistAdd(assetPath, "ignore-on-commit", recursive: false, reporter);
-								return;
-							case 1:
-								return;
-							case 2:
-								if (!WiseGitIntegration.Delete(assetPath, statusDataMeta.Status != VCFileStatus.Unversioned, keepLocal: true, reporter))
-									return;
-								break;
-						}
-					}
-
-					lines.Add(fileName);
-					lines.Add(fileName + ".meta");
-				}
-
-				string propValue = string.Join('\n', lines);
-
-				result = WiseGitIntegration.Propset(parentDirectory, "svn:ignore", propValue, false, WiseGitIntegration.COMMAND_TIMEOUT, reporter);
-
-				if (result != PropOperationResult.Success)
-					return;
-
-				GitStatusesDatabase.Instance.InvalidateDatabase();
-			}
-		}
-
-
 
 		[MenuItem("Assets/Git/\U0001F9F9  Cleanup", false, MenuItemPriorityStart + 110)]
 		public static void Cleanup()
@@ -596,9 +515,9 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus
 		/// Open Switch dialog. localPath specifies the target directory and url the URL to switch to.
 		/// Most likely you want the root of the working copy (checkout), not just the Unity project. To get it use WiseGitIntegration.WorkingCopyRootPath();
 		/// </summary>
-		public static void Switch(string localPath, string url, bool wait = false)
+		public static void Switch(bool wait = false)
 		{
-			m_Integration?.Switch(localPath, url, wait);
+			m_Integration?.Switch(wait);
 		}
 	}
 }

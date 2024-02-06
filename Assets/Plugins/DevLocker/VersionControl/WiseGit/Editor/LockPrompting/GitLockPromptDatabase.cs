@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.Preferences;
 using System;
@@ -289,31 +289,25 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 		public void LockEntries(IEnumerable<GitStatusData> entries, bool forceLock)
 		{
 			var shouldLog = GitPreferencesManager.Instance.PersonalPrefs.TraceLogs.HasFlag(GitTraceLogs.GitOperations);
-			var lockMessage = GitPreferencesManager.Instance.ProjectPrefs.LockPromptMessage;
 
 			var entriesList = entries.ToList();
 			if (entriesList.Count == 0)
 				return;
 
-			var reporter = new WiseGitIntegration.ResultConsoleReporter(true, WiseGitIntegration.Silent, "SVNLockPromptDatabase Operations:");
+			var reporter = new WiseGitIntegration.ResultConsoleReporter(true, WiseGitIntegration.Silent, "GitLockPromptDatabase Operations:");
 
-			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-			EnqueueOperation(op => WiseGitIntegration.LockFiles(entriesList.Select(sd => sd.Path), forceLock, lockMessage, "", targetsFileToUse, WiseGitIntegration.ONLINE_COMMAND_TIMEOUT, reporter))
+			EnqueueOperation(op => WiseGitIntegration.LockFiles(entriesList.Select(sd => sd.Path), forceLock, WiseGitIntegration.ONLINE_COMMAND_TIMEOUT, reporter))
 			.Completed += (op) => {
-				if (op.Result == LockOperationResult.NotSupported) {
-					Debug.LogError($"Locking failed, because server repository doesn't support locking. Assets failed to lock:\n{string.Join("\n", entriesList.Select(sd => sd.Path))}");
-					EditorUtility.DisplayDialog("SVN Lock Prompt", "Lock failed. Check the logs for more info.", "I will!");
-
-				} else if (op.Result == LockOperationResult.RemoteHasChanges) {
+				if (op.Result == LockOperationResult.RemoteHasChanges) {
 					foreach (var failedStatusData in entriesList) {
 						RemoveKnownStatusData(failedStatusData);
 					}
 					Debug.LogWarning($"Locking failed because server repository has newer changes. Please update first. Assets failed to lock:\n{string.Join("\n", entriesList.Select(sd => sd.Path))}");
-					EditorUtility.DisplayDialog("SVN Lock Prompt", "Lock failed. Check the logs for more info.", "I will!");
+					EditorUtility.DisplayDialog("Git Lock Prompt", "Lock failed. Check the logs for more info.", "I will!");
 
 				} else if (op.Result != LockOperationResult.Success) {
 					Debug.LogError($"Locking failed with result {op.Result} for assets:\n{string.Join("\n", entriesList.Select(sd => sd.Path))}.");
-					//EditorUtility.DisplayDialog("SVN Lock Prompt", "Stealing lock failed. Check the logs for more info.", "I will!");
+					//EditorUtility.DisplayDialog("Git Lock Prompt", "Stealing lock failed. Check the logs for more info.", "I will!");
 					reporter.Dispose();	// The reporter will pop up an error message.
 
 				} else if (shouldLog) {
@@ -354,7 +348,7 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 			// Check for new assets to lock.
 			foreach(var statusData in newEntries) {
 
-				// NOTE: Deleted status never occurs as it is not provided by the SVNStatusesDatabase. :(
+				// NOTE: Deleted status never occurs as it is not provided by the GitStatusesDatabase. :(
 				if (statusData.Status != VCFileStatus.Modified && statusData.Status != VCFileStatus.Deleted && statusData.Status != VCFileStatus.Replaced)
 					continue;
 
@@ -449,13 +443,12 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 			*/
 
 			if (shouldUnlock.Count > 0) {
-				var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-				EnqueueOperation(op => WiseGitIntegration.UnlockFiles(shouldUnlock.Select(sd => sd.Path), false, targetsFileToUse))
+				EnqueueOperation(op => WiseGitIntegration.UnlockFiles(shouldUnlock.Select(sd => sd.Path), false))
 				.Completed += (op) => {
 
 					// If lock was stolen or broken, there is no good way to release it without causing error.
 					// In that case the lock will be cleared from the local cache, so ignore the error.
-					if (op.Result != LockOperationResult.Success && op.Result != LockOperationResult.LockedByOther) {
+					if (op.Result != LockOperationResult.Success && op.Result != LockOperationResult.LockAlreadyExists) {
 						Debug.LogError($"Auto-unlocking failed with result {op.Result} for assets:\n{string.Join("\n", shouldUnlock.Select(sd => sd.Path))}");
 					} else if (shouldLog) {
 						Debug.Log($"Auto-unlocked assets:\n{string.Join("\n", shouldUnlock.Select(sd => sd.Path))}");

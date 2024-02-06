@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.ContextMenus;
 using DevLocker.VersionControl.WiseGit.Preferences;
@@ -76,7 +76,7 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 			if (GitPreferencesManager.Instance.PersonalPrefs.AutoLockOnModified) {
 				GitLockPromptDatabase.Instance.LockEntries(shouldLockEntries, false);
 
-				string notificationMessage = $"Auto-Locking {shouldLockEntries.Count()} Assets in SVN";
+				string notificationMessage = $"Auto-Locking {shouldLockEntries.Count()} Assets in git";
 
 				if (focusedWindow && !(focusedWindow is SceneView)) {
 					focusedWindow.ShowNotification(new GUIContent(notificationMessage));
@@ -93,7 +93,7 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 				}
 			}
 
-			var window = GetWindow<GitLockPromptWindow>(true, "SVN Lock Modified Assets");
+			var window = GetWindow<GitLockPromptWindow>(true, "Git Lock Modified Assets");
 			window.minSize = new Vector2(600f, 500f);
 			var center = new Vector2(Screen.currentResolution.width, Screen.currentResolution.height) / 2f;
 			window.position = new Rect(center - window.position.size / 2, window.position.size);
@@ -120,10 +120,10 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 
 		private void InitializeStyles()
 		{
-			m_RevertContent = GitPreferencesManager.LoadTexture("Editor/BranchesIcons/SVN-Revert", "Revert asset");
-			m_DiffContent = GitPreferencesManager.LoadTexture("Editor/BranchesIcons/SVN-ConflictsScan-Pending", "Check changes");
+			m_RevertContent = GitPreferencesManager.LoadTexture("Editor/BranchesIcons/Git-Revert", "Revert asset");
+			m_DiffContent = GitPreferencesManager.LoadTexture("Editor/BranchesIcons/Git-ConflictsScan-Pending", "Check changes");
 
-			// Copied from SVNBranchSelectorWindow.
+			// Copied from GitBranchSelectorWindow.
 			MiniIconButtonlessStyle = new GUIStyle(GUI.skin.button);
 			MiniIconButtonlessStyle.hover.background = MiniIconButtonlessStyle.normal.background;
 			MiniIconButtonlessStyle.hover.scaledBackgrounds = MiniIconButtonlessStyle.normal.scaledBackgrounds;
@@ -189,7 +189,7 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 				}
 			}
 
-			bool autoLock = EditorGUILayout.Toggle(new GUIContent("Auto lock when possible", GitPreferencesManager.PersonalPreferences.AutoLockOnModifiedHint + "\n\nCan be changed in the SVN Preferences window."), m_PersonalPrefs.AutoLockOnModified);
+			bool autoLock = EditorGUILayout.Toggle(new GUIContent("Auto lock when possible", GitPreferencesManager.PersonalPreferences.AutoLockOnModifiedHint + "\n\nCan be changed in the git Preferences window."), m_PersonalPrefs.AutoLockOnModified);
 			if (m_PersonalPrefs.AutoLockOnModified != autoLock) {
 				m_PersonalPrefs.AutoLockOnModified = autoLock;
 				GitPreferencesManager.Instance.SavePreferences(m_PersonalPrefs, m_ProjectPrefs);
@@ -319,11 +319,11 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 								GUIUtility.ExitGUI();
 							}
 						}
-						WiseGitIntegration.Revert(new string[] { statusData.Path }, false, true, false, "", -1, reporter);
+						WiseGitIntegration.Revert(new string[] { statusData.Path }, false, true, -1, reporter);
 					}
 
 					AssetDatabase.Refresh();
-					//SVNStatusesDatabase.Instance.InvalidateDatabase();	// Change will trigger this automatically.
+					//GitStatusesDatabase.Instance.InvalidateDatabase();	// Change will trigger this automatically.
 
 					m_LockEntries.Remove(lockEntry);
 
@@ -405,8 +405,8 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 			var prevBackgroundColor = GUI.backgroundColor;
 
 			GUI.backgroundColor = Color.yellow;
-			if (needsUpdate && GUILayout.Button("Update All")) {
-				GitContextMenusManager.UpdateAll();
+			if (needsUpdate && GUILayout.Button("Pull All")) {
+				GitContextMenusManager.PullAll();
 				GitLockPromptDatabase.Instance.ClearKnowledge();
 				Close();
 			}
@@ -416,7 +416,7 @@ namespace DevLocker.VersionControl.WiseGit.LockPrompting
 			if (GUILayout.Button("Revert All Window")) {
 				GitContextMenusManager.RevertAll();
 				AssetDatabase.Refresh();
-				//SVNStatusesDatabase.Instance.InvalidateDatabase();	// Change will trigger this automatically.
+				//GitStatusesDatabase.Instance.InvalidateDatabase();	// Change will trigger this automatically.
 				GitLockPromptDatabase.Instance.ClearKnowledge();
 				Close();
 			}

@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using System;
 using System.Collections.Generic;
@@ -55,7 +55,7 @@ namespace DevLocker.VersionControl.WiseGit.Utils
 		// Is update pending?
 		// If last update didn't make it, this flag will still be true.
 		// Useful if assembly reload happens and stops the work of the database update.
-		[SerializeField] private bool m_PendingUpdate = false;
+		[SerializeField] private volatile bool m_PendingUpdate = false;
 
 		// Indicates that while update was happening, another one was requested, hinting that newer data is available,
 		// so discard the currently collected one and repeat the gather process.

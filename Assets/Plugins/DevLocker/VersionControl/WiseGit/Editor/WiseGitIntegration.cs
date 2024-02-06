@@ -1,14 +1,10 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
-
-#if UNITY_2020_2_OR_NEWER || UNITY_2019_4_OR_NEWER || (UNITY_2018_4_OR_NEWER && !UNITY_2018_4_19 && !UNITY_2018_4_18 && !UNITY_2018_4_17 && !UNITY_2018_4_16 && !UNITY_2018_4_15)
-#define CAN_DISABLE_REFRESH
-#endif
-
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 using DevLocker.VersionControl.WiseGit.Preferences;
 using DevLocker.VersionControl.WiseGit.Shell;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,10 +28,10 @@ namespace DevLocker.VersionControl.WiseGit
 		private static readonly Dictionary<char, VCFileStatus> m_FileStatusMap = new Dictionary<char, VCFileStatus>
 		{
 			{' ', VCFileStatus.Normal},
-			{'U', VCFileStatus.Normal},	  // TODO: Updated but not merged? Do we care?
 			{'A', VCFileStatus.Added},
-			{'R', VCFileStatus.Added},	  // TODO: Renamed status? Do we care?
+			{'R', VCFileStatus.Added},
 			{'C', VCFileStatus.Added},	  // TODO: Copied status? Do we care?
+			{'U', VCFileStatus.Conflicted}, // Updated but not merged
 			//{'C', VCFileStatus.Conflicted},
 			{'D', VCFileStatus.Deleted},
 			//{'I', VCFileStatus.Ignored},
@@ -48,70 +44,12 @@ namespace DevLocker.VersionControl.WiseGit
 			//{'~', VCFileStatus.Obstructed},
 		};
 
-		private static readonly Dictionary<char, VCSwitchedExternal> m_SwitchedExternalStatusMap = new Dictionary<char, VCSwitchedExternal>
-		{
-			{' ', VCSwitchedExternal.Normal},
-			{'S', VCSwitchedExternal.Switched},
-			{'X', VCSwitchedExternal.External},
-		};
-
-		private static readonly Dictionary<char, VCLockStatus> m_LockStatusMap = new Dictionary<char, VCLockStatus>
-		{
-			{' ', VCLockStatus.NoLock},
-			{'K', VCLockStatus.LockedHere},
-			{'O', VCLockStatus.LockedOther},
-			{'T', VCLockStatus.LockedButStolen},
-			{'B', VCLockStatus.BrokenLock},
-		};
-
-		private static readonly Dictionary<char, VCPropertiesStatus> m_PropertyStatusMap = new Dictionary<char, VCPropertiesStatus>
-		{
-			{' ', VCPropertiesStatus.Normal},
-			{'C', VCPropertiesStatus.Conflicted},
-			{'M', VCPropertiesStatus.Modified},
-		};
-
-		private static readonly Dictionary<char, VCTreeConflictStatus> m_ConflictStatusMap = new Dictionary<char, VCTreeConflictStatus>
-		{
-			{' ', VCTreeConflictStatus.Normal},
-			{'C', VCTreeConflictStatus.TreeConflict},
-		};
-
-		private static readonly Dictionary<char, VCRemoteFileStatus> m_RemoteStatusMap = new Dictionary<char, VCRemoteFileStatus>
-		{
-			{' ', VCRemoteFileStatus.None},
-			{'*', VCRemoteFileStatus.Modified},
-		};
-
-
-		private static readonly Dictionary<UpdateResolveConflicts, string> m_UpdateResolveConflictsMap = new Dictionary<UpdateResolveConflicts, string>
-		{
-			{UpdateResolveConflicts.Postpone, "postpone"},
-			{UpdateResolveConflicts.Working, "working"},
-			{UpdateResolveConflicts.Base, "base"},
-			{UpdateResolveConflicts.MineConflict, "mine-conflict"},
-			{UpdateResolveConflicts.TheirsConflict, "theirs-conflict"},
-			{UpdateResolveConflicts.MineFull, "mine-full"},
-			{UpdateResolveConflicts.TheirsFull, "theirs-full"},
-			{UpdateResolveConflicts.Edit, "edit"},
-			{UpdateResolveConflicts.Launch, "launch"},
-		};
-
-		private static readonly Dictionary<char, LogPathChange> m_LogPathChangesMap = new Dictionary<char, LogPathChange>
-		{
-			{'A', LogPathChange.Added},
-			{'D', LogPathChange.Deleted},
-			{'R', LogPathChange.Replaced},
-			{'M', LogPathChange.Modified},
-		};
-
 		#endregion
 
 		public static readonly string ProjectRootNative;
 		public static readonly string ProjectRootUnity;
 
 		public static event Action ShowChangesUI;
-		public static event Action RunUpdateUI;
 
 		/// <summary>
 		/// Is the integration enabled.
@@ -141,9 +79,75 @@ namespace DevLocker.VersionControl.WiseGit
 		private static GitPreferencesManager.PersonalPreferences m_PersonalPrefs => GitPreferencesManager.Instance.PersonalPrefs;
 		private static GitPreferencesManager.ProjectPreferences m_ProjectPrefs => GitPreferencesManager.Instance.ProjectPrefs;
 
+		// DTOs used to deserialize json output from "git lfs locks --json" command.
+		[Serializable]
+		private struct LocksJSONEntry
+		{
+			public List<LockJSONEntry> ours;
+			public List<LockJSONEntry> theirs;
 
+			[Serializable]
+			public struct LockJSONEntry
+			{
+				public int id;
+				public string path;
+				public OwnerJSONEntry owner;
+				public string locked_at;
 
-		private static string Git_Command {
+				[Serializable]
+				public struct OwnerJSONEntry
+				{
+					public string name;
+				}
+
+				public LockDetails ToLockDetails() => new LockDetails {
+					Owner = owner.name,
+					Date = locked_at,
+				};
+			}
+
+			public void ExcludeOutsidePaths(string path)
+			{
+				ours?.RemoveAll(entry => !entry.path.StartsWith(path, StringComparison.OrdinalIgnoreCase));
+				theirs?.RemoveAll(entry => !entry.path.StartsWith(path, StringComparison.OrdinalIgnoreCase));
+			}
+
+			public void ApplyAndForgetStatus(string path, out VCLockStatus lockStatus, out LockDetails lockDetails)
+			{
+				lockStatus = VCLockStatus.NoLock;
+				lockDetails = LockDetails.Empty;
+
+				if (ours != null) {
+					for (int i = 0; i < ours.Count; i++) {
+						LockJSONEntry entry = ours[i];
+
+						// git lfs locks doesn't respect the capital letters :(
+						if (path.Equals(entry.path, StringComparison.OrdinalIgnoreCase)) {
+							lockDetails = entry.ToLockDetails();
+							lockStatus = VCLockStatus.LockedHere;
+							ours.RemoveAt(i);
+							return;
+						}
+					}
+				}
+
+				if (theirs != null) {
+					for (int i = 0; i < theirs.Count; i++) {
+						LockJSONEntry entry = theirs[i];
+
+						// git lfs locks doesn't respect the capital letters :(
+						if (path.Equals(entry.path, StringComparison.OrdinalIgnoreCase)) {
+							lockDetails = entry.ToLockDetails();
+							lockStatus = VCLockStatus.LockedOther;
+							theirs.RemoveAt(i);
+							return;
+						}
+					}
+				}
+			}
+		}
+
+		internal static string Git_Command {
 			get {
 				string userPath = m_PersonalPrefs.GitCLIPath;
 
@@ -340,74 +344,56 @@ namespace DevLocker.VersionControl.WiseGit
 
 		/// <summary>
 		/// Get statuses of files based on the options you provide.
-		/// NOTE: data is returned ONLY for folders / files that has something to show (has changes, locks or remote changes).
-		///		 If used with non-recursive option it will return single data with normal status (if non).
+		/// NOTE: data is returned ONLY for files that has something to show (has changes, locks or remote changes).
+		///		  Target folders will always return child files recursively.
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		///
+		/// https://git-scm.com/docs/git-status
 		/// </summary>
 		///
-		/// <param name="recursive">Should it get status for this entry only or all children recursively.</param>
-		/// <param name="offline">If false it will query the repository for additional data (like locks), hence it is slower.</param>
+		/// <param name="offline">If false it will check for changes in the FETCHED remote repository and will ask the LFS for any locks. If remote was not fetched, no change would be detected (locks are still fetched every time).</param>
 		/// <param name="resultEntries">List of result statuses</param>
-		/// <param name="fetchLockDetails">If file is locked and this is true, another query (per locked file) will be made to the repository to find out the owner's user name.
-		///								   I.e. will execute "git info [url]". Works only in <b>online</b> mode.</param>
-		public static StatusOperationResult GetStatuses(string path, bool recursive, bool offline, List<GitStatusData> resultEntries, bool fetchLockDetails = false, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static StatusOperationResult GetStatuses(string path, bool offline, List<GitStatusData> resultEntries, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
 		{
-			var depth = recursive ? "infinity" : "empty";
-			var offlineArg = offline ? string.Empty : "-u";
+			path = path.Replace('\\', '/');	// Used for locks filtering.
 
-			// TODO: No depth? Handle offlineArg? Probably needs "git remote update"
-			//var result = ShellUtils.ExecuteCommand(Git_Command, $"status --depth={depth} {offlineArg} \"{GitFormatPath(path)}\"", timeout, shellMonitor);
-			// https://git-scm.com/docs/git-status
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"status --porcelain -z \"{GitFormatPath(path)}\"", timeout, shellMonitor);
+			ShellUtils.ShellResult result;
+			LocksJSONEntry locksJSONEntry = new LocksJSONEntry() { ours = new(), theirs = new() };
 
-			if (!string.IsNullOrEmpty(result.Error)) {
+			var remoteChanges = new HashSet<string>();
+			if (!offline) {
+				// Check what changed after our branch diverged from the remote one, only files.
+				// This works only if remote branch was fetched (downloaded) locally.
+				result = ShellUtils.ExecuteCommand(Git_Command, $"diff {GetWorkingBranchDivergingCommit()}..{GetTrackedRemoteBranch()} --name-only {path}", timeout, shellMonitor);
 
-				// TODO: Error checks?
-
-				/*
-				// svn: warning: W155010: The node '...' was not found.
-				// This can be returned when path is under unversioned directory. In that case we consider it is unversioned as well.
-				if (result.Error.Contains("W155010")) {
-					resultEntries.Add(new GitStatusData() { Path = path, Status = VCFileStatus.Unversioned, LockDetails = LockDetails.Empty });
-					return StatusOperationResult.Success;
+				// Skip errors checks - nothing to do about them.
+				if (!result.HasErrors) {
+					foreach (string changePath in result.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries)) {
+						if (!string.IsNullOrEmpty(changePath)) {
+							remoteChanges.Add(changePath);
+						}
+					}
 				}
 
-				// svn: warning: W155007: '...' is not a working copy!
-				// This can be returned when project is not a valid svn checkout. (Probably)
-				if (result.Error.Contains("W155007"))
-					return StatusOperationResult.NotWorkingCopy;
+				// NOTES ON LOCKS:
+				// - Locks doesn't distinguish between multiple clones of the same user. --verify doesn't help.
+				// - Parameter --path="filepath" can be used, but it doesn't return if it is ours or not - provides username but we have to look it up. Works only for files, not folders.
+				result = ShellUtils.ExecuteCommand(Git_Command, $"lfs locks --verify --json", timeout, shellMonitor);
 
-				// System.ComponentModel.Win32Exception (0x80004005): ApplicationName='...', CommandLine='...', Native error= The system cannot find the file specified.
-				// Could not find the command executable. The user hasn't installed their CLI (Command Line Interface) so we're missing an "svn.exe" in the PATH environment.
-				if (result.Error.Contains("0x80004005"))
-					return StatusOperationResult.ExecutableNotFound;
+				if (result.HasErrors) {
+					return ParseCommonStatusError(result.Error);
+				}
 
-				// User needs to log in using normal SVN client and save their authentication.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-				// svn: E215004: No more credentials or we tried too many times.
-				// Authentication failed
-				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
-					return StatusOperationResult.AuthenticationFailed;
-
-				// Unable to connect to repository indicating some network or server problems.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E731001: No such host is known.
-				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
-					return StatusOperationResult.UnableToConnectError;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return StatusOperationResult.Timeout;
-				*/
-
-				return StatusOperationResult.UnknownError;
+				locksJSONEntry = JsonUtility.FromJson<LocksJSONEntry>(result.Output);
+				locksJSONEntry.ExcludeOutsidePaths(path);
 			}
 
-			// If -u is used, additional line is added at the end:
-			// Status against revision:     14
-			//bool emptyOutput = (offline && string.IsNullOrWhiteSpace(result.Output)) ||
-			//				   (!offline && result.Output.StartsWith("Status", StringComparison.Ordinal));
+			result = ShellUtils.ExecuteCommand(Git_Command, $"status --porcelain -z \"{GitFormatPath(path)}\"", timeout, shellMonitor);
+
+			if (result.HasErrors) {
+				return ParseCommonStatusError(result.Error);
+			}
+
 			bool emptyOutput = string.IsNullOrWhiteSpace(result.Output);
 
 			// Empty result could also mean: file doesn't exist.
@@ -418,30 +404,92 @@ namespace DevLocker.VersionControl.WiseGit
 			}
 
 			// If no info is returned for path, the status is normal. Reflect this when searching for Empty depth.
-			if (!recursive && emptyOutput) {
-				resultEntries.Add(new GitStatusData() { Status = VCFileStatus.Normal, Path = path, LockDetails = LockDetails.Empty });
+			if (emptyOutput) {
+				var statusData = new GitStatusData() { Status = VCFileStatus.Normal, Path = path };
+				locksJSONEntry.ApplyAndForgetStatus(path, out statusData.LockStatus, out statusData.LockDetails);
+
+				resultEntries.Add(statusData);
 				return StatusOperationResult.Success;
 			}
 
-			resultEntries.AddRange(ExtractStatuses(result.Output, recursive, offline, fetchLockDetails, timeout, shellMonitor));
+			resultEntries.AddRange(ExtractStatuses(result.Output));
+
+			for(int i = 0; i < resultEntries.Count; ++i) {
+				GitStatusData statusData = resultEntries[i];
+
+				if (remoteChanges.Contains(statusData.Path, StringComparer.OrdinalIgnoreCase)) {
+					statusData.RemoteStatus = VCRemoteFileStatus.Modified;
+					remoteChanges.Remove(statusData.Path);
+				}
+
+				locksJSONEntry.ApplyAndForgetStatus(statusData.Path, out statusData.LockStatus, out statusData.LockDetails);
+
+				resultEntries[i] = statusData;
+			}
+
+			foreach(string remoteChange in remoteChanges) {
+				if (IsHiddenPath(remoteChange))
+					continue;
+
+				GitStatusData statusData = new GitStatusData {
+					Path = remoteChange,
+					Status = VCFileStatus.Normal,
+					RemoteStatus = VCRemoteFileStatus.Modified,
+					LockDetails = LockDetails.Empty,
+				};
+
+				locksJSONEntry.ApplyAndForgetStatus(statusData.Path, out statusData.LockStatus, out statusData.LockDetails);
+
+				resultEntries.Add(statusData);
+			}
+
+
+			foreach(var lockJSONEntry in locksJSONEntry.ours) {
+				if (IsHiddenPath(lockJSONEntry.path) || !lockJSONEntry.path.StartsWith(path))
+					continue;
+
+				var statusData = new GitStatusData() {
+					Path = lockJSONEntry.path,
+					Status = VCFileStatus.Normal,
+					LockStatus = VCLockStatus.LockedHere,
+					LockDetails = lockJSONEntry.ToLockDetails()
+				};
+
+				resultEntries.Add(statusData);
+			}
+
+			foreach(var lockJSONEntry in locksJSONEntry.theirs) {
+				if (IsHiddenPath(lockJSONEntry.path) || !lockJSONEntry.path.StartsWith(path))
+					continue;
+
+				var statusData = new GitStatusData() {
+					Path = lockJSONEntry.path,
+					Status = VCFileStatus.Normal,
+					LockStatus = VCLockStatus.LockedOther,
+					LockDetails = lockJSONEntry.ToLockDetails()
+				};
+
+				resultEntries.Add(statusData);
+			}
+
+
 			return StatusOperationResult.Success;
 		}
 
 		/// <summary>
 		/// Get statuses of files based on the options you provide.
-		/// NOTE: data is returned ONLY for folders / files that has something to show (has changes, locks or remote changes).
-		///		 If used with non-recursive option it will return single data with normal status (if non).
+		/// NOTE: data is returned ONLY for files that has something to show (has changes, locks or remote changes).
+		///		  Target folders will always return child files recursively.
+		///
+		/// https://git-scm.com/docs/git-status
 		/// </summary>
 		///
-		/// <param name="recursive">Should it get status for this entry only or all children recursively.</param>
-		/// <param name="offline">If false it will query the repository for additional data (like locks), hence it is slower.</param>
+		/// <param name="offline">If false it will check for changes in the FETCHED remote repository and will ask the LFS for any locks. If remote was not fetched, no change would be detected (locks are still fetched every time).</param>
 		/// <param name="resultEntries">List of result statuses</param>
-		/// <param name="fetchLockDetails">If file is locked and this is true, another query (per locked file) will be made to the repository to find out the owner's user name.
-		///								   I.e. will execute "svn info [url]". Works only in <b>online</b> mode.</param>
-		public static GitAsyncOperation<StatusOperationResult> GetStatusesAsync(string path, bool recursive, bool offline, List<GitStatusData> resultEntries, bool fetchLockDetails = false, int timeout = -1)
+		public static GitAsyncOperation<StatusOperationResult> GetStatusesAsync(string path, bool offline, List<GitStatusData> resultEntries, int timeout = -1)
 		{
 			var threadResults = new List<GitStatusData>();
-			var operation = GitAsyncOperation<StatusOperationResult>.Start(op => GetStatuses(path, recursive, offline, resultEntries, fetchLockDetails, timeout, op));
+			var operation = GitAsyncOperation<StatusOperationResult>.Start(op => GetStatuses(path, offline, resultEntries, timeout, op));
 			operation.Completed += (op) => {
 				resultEntries.AddRange(threadResults);
 			};
@@ -451,24 +499,29 @@ namespace DevLocker.VersionControl.WiseGit
 
 
 		/// <summary>
-		/// Get offline status for a single file (non recursive). This won't make requests to the repository (so it shouldn't be that slow).
+		/// Get offline status for a single file (non recursive). This won't check the fetched remote for changes.
 		/// Will return valid status even if the file has nothing to show (has no changes).
 		/// If error happened, invalid status data will be returned (check statusData.IsValid).
+		/// Since git doesn't know about folders, use the folder meta status instead for them.
 		/// </summary>
 		public static GitStatusData GetStatus(string path, bool logErrorHint = true, IShellMonitor shellMonitor = null)
 		{
+			string originalPath = path;
+
+			if (Directory.Exists(path)) {
+				// git doesn't know about folders - use the folder meta status instead.
+				path += ".meta";
+			}
 
 			List<GitStatusData> resultEntries = new List<GitStatusData>();
-
-			// Optimization: empty depth will return nothing if status is normal.
-			// If path is modified, added, deleted, unversioned, it will return proper value.
-			StatusOperationResult result = GetStatuses(path, false, true, resultEntries, false, COMMAND_TIMEOUT, shellMonitor);
+			StatusOperationResult result = GetStatuses(path, true, resultEntries, COMMAND_TIMEOUT, shellMonitor);
 
 			if (logErrorHint) {
 				LogStatusErrorHint(result);
 			}
 
 			GitStatusData statusData = resultEntries.FirstOrDefault();
+			statusData.Path = originalPath;	// Restore original path in case of folder.
 
 			// If no path was found, error happened.
 			if (!statusData.IsValid || result != StatusOperationResult.Success) {
@@ -483,21 +536,28 @@ namespace DevLocker.VersionControl.WiseGit
 		/// Get status for a single file (non recursive).
 		/// Will return valid status even if the file has nothing to show (has no changes).
 		/// If error happened, invalid status data will be returned (check statusData.IsValid).
+		/// Folders will always return normal status, as git doesn't care about them.
 		/// </summary>
-		public static GitAsyncOperation<GitStatusData> GetStatusAsync(string path, bool offline, bool fetchLockDetails = false, bool logErrorHint = true, int timeout = -1)
+		public static GitAsyncOperation<GitStatusData> GetStatusAsync(string path, bool offline, bool logErrorHint = true, int timeout = -1)
 		{
 			return GitAsyncOperation<GitStatusData>.Start(op => {
 
-				List<GitStatusData> resultEntries = new List<GitStatusData>();
+				string originalPath = path;
 
-				// If offline, fetchLockDetails is ignored.
-				StatusOperationResult result = GetStatuses(path, false, offline, resultEntries, fetchLockDetails, timeout, op);
+				if (Directory.Exists(path)) {
+					// git doesn't know about folders - use the folder meta status instead.
+					path += ".meta";
+				}
+
+				List<GitStatusData> resultEntries = new List<GitStatusData>();
+				StatusOperationResult result = GetStatuses(path, offline, resultEntries, timeout, op);
 
 				if (logErrorHint) {
 					LogStatusErrorHint(result);
 				}
 
 				var statusData = resultEntries.FirstOrDefault();
+				statusData.Path = originalPath; // Restore original path in case of folder.
 
 				// If no path was found, error happened.
 				if (!statusData.IsValid || result != StatusOperationResult.Success) {
@@ -509,575 +569,550 @@ namespace DevLocker.VersionControl.WiseGit
 			});
 		}
 
-
-		/// <summary>
-		/// Ask the repository server for lock details of the specified file.
-		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
-		/// </summary>
-		public static LockDetails FetchLockDetails(string path, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		internal static StatusOperationResult ParseCommonStatusError(string error)
 		{
-			string url;
-			LockDetails lockDetails = LockDetails.Empty;
+			// fatal: not a git repository (or any of the parent directories): .git
+			// This can be returned when project is not a valid git checkout. (Probably)
+			if (error.Contains("fatal: not a git repository"))
+				return StatusOperationResult.NotWorkingCopy;
 
-			path = path.Replace('\\', '/');
+			// System.ComponentModel.Win32Exception (0x80004005): ApplicationName='...', CommandLine='...', Native error= The system cannot find the file specified.
+			// Could not find the command executable. The user hasn't installed their CLI (Command Line Interface) so we're missing an "git.exe" in the PATH environment.
+			if (error.Contains("0x80004005"))
+				return StatusOperationResult.ExecutableNotFound;
 
-			// Only files can be locked.
-			// If repository is out of date it may receive entries for existing files on the server that are not present locally yet.
-			if (!File.Exists(path)) {
-				lockDetails.Path = path;
-				lockDetails.OperationResult = StatusOperationResult.TargetPathNotFound;
-				return lockDetails;
-			}
+			// User needs to log in using normal git client and save their authentication. This or they have multiple accounts.
+			// fatal: User cancelled dialog.
+			// fatal: could not read Username for '...': No such file or directory
+			// Authentication failed
+			if (error.Contains("fatal: User cancelled dialog.") || error.Contains("fatal: could not read Username for"))
+				return StatusOperationResult.AuthenticationFailed;
 
-			//
-			// Find the repository url of the path.
-			// We need to call "svn info [repo-url]" in order to get up to date repository information.
-			// NOTE: Project url can be cached and prepended to path, but externals may have different base url.
-			//
-			{
-				var result = ShellUtils.ExecuteCommand(Git_Command, $"info \"{GitFormatPath(path)}\"", timeout, shellMonitor);
+			// Unable to connect to repository indicating some network or server problems.
+			// fatal: unable to access '...': Could not resolve host: ...
+			if (error.Contains("fatal: unable to access") || error.Contains("No such device or address"))
+				return StatusOperationResult.UnableToConnectError;
 
-				url = ExtractLineValue("URL:", result.Output);
+			// Git lfs is not installed properly or using an old version?
+			// Error while retrieving locks: missing protocol: ""
+			if (error.Contains("missing protocol"))
+				return StatusOperationResult.BadLFSSupport;
 
-				if (!string.IsNullOrEmpty(result.Error) || string.IsNullOrEmpty(url)) {
+			// Operation took too long, shell utils time out kicked in.
+			if (error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+				return StatusOperationResult.Timeout;
 
-					// svn: warning: W155010: The node '...' was not found.
-					// This can be returned when path is under unversioned directory. In that case we consider it is unversioned as well.
-					if (result.Error.Contains("W155010")) {
-						lockDetails.Path = path;    // LockDetails is still valid, just no lock.
-						return lockDetails;
-					}
-
-					// svn: warning: W155007: '...' is not a working copy!
-					// This can be returned when project is not a valid svn checkout. (Probably)
-					if (result.Error.Contains("W155007")) {
-						lockDetails.OperationResult = StatusOperationResult.NotWorkingCopy;
-						return lockDetails;
-					}
-
-					// System.ComponentModel.Win32Exception (0x80004005): ApplicationName='...', CommandLine='...', Native error= The system cannot find the file specified.
-					// Could not find the command executable. The user hasn't installed their CLI (Command Line Interface) so we're missing an "svn.exe" in the PATH environment.
-					if (result.Error.Contains("0x80004005")) {
-						lockDetails.OperationResult = StatusOperationResult.ExecutableNotFound;
-						return lockDetails;
-					}
-
-					// Operation took too long, shell utils time out kicked in.
-					if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN)) {
-						lockDetails.OperationResult = StatusOperationResult.Timeout;
-						return lockDetails;
-					}
-
-					lockDetails.OperationResult = StatusOperationResult.UnknownError;
-					return lockDetails;
-				}
-			}
-
-			//
-			// Get the actual owner from the repository (using the url).
-			//
-			{
-				var result = ShellUtils.ExecuteCommand(Git_Command, $"info \"{GitFormatPath(url)}\"", timeout, shellMonitor);
-
-				lockDetails.Owner = ExtractLineValue("Lock Owner:", result.Output);
-
-				if (!string.IsNullOrEmpty(result.Error) || string.IsNullOrEmpty(lockDetails.Owner)) {
-
-					// Owner will be missing if there is no lock. If true, just find something familiar to confirm it was not an error.
-					if (result.Output.IndexOf("URL:", StringComparison.OrdinalIgnoreCase) != -1) {
-						lockDetails.Path = path;	// LockDetails is still valid, just no lock.
-						return lockDetails;
-					}
-
-					// User needs to log in using normal SVN client and save their authentication.
-					// svn: E170013: Unable to connect to a repository at URL '...'
-					// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-					// svn: E215004: No more credentials or we tried too many times.
-					// Authentication failed
-					if (result.Error.Contains("E230001") || result.Error.Contains("E215004")) {
-						lockDetails.OperationResult = StatusOperationResult.AuthenticationFailed;
-						return lockDetails;
-					}
-
-					// Unable to connect to repository indicating some network or server problems.
-					// svn: E170013: Unable to connect to a repository at URL '...'
-					// svn: E731001: No such host is known.
-					if (result.Error.Contains("E170013") || result.Error.Contains("E731001")) {
-						lockDetails.OperationResult = StatusOperationResult.UnableToConnectError;
-						return lockDetails;
-					}
-
-					// Operation took too long, shell utils time out kicked in.
-					if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN)) {
-						lockDetails.OperationResult = StatusOperationResult.Timeout;
-						return lockDetails;
-					}
-
-					lockDetails.OperationResult = StatusOperationResult.UnknownError;
-					return lockDetails;
-				}
-
-				lockDetails.Path = path;
-				lockDetails.Date = ExtractLineValue("Lock Created:", result.Output);
-
-				// Locked message looks like this:
-				// Lock Comment (4 lines):
-				// Foo
-				// Bar
-				// ...
-				// The number of lines is arbitrary. If there is no comment, this section is omitted.
-				var lockMessageLineIndex = result.Output.IndexOf("Lock Comment", StringComparison.OrdinalIgnoreCase);
-				if (lockMessageLineIndex != -1) {
-					var lockMessageStart = result.Output.IndexOf("\n", lockMessageLineIndex, StringComparison.OrdinalIgnoreCase) + 1;
-					lockDetails.Message = result.Output.Substring(lockMessageStart).Replace("\r", "");
-					// Fuck '\r'
-				}
-			}
-
-			return lockDetails;
+			return StatusOperationResult.UnknownError;
 		}
 
 		/// <summary>
-		/// Ask the repository server for lock details of the specified file.
-		/// NOTE: If assembly reload happens, request will be lost, complete handler won't be called.
+		/// Get all ignored paths in the repository.
 		/// </summary>
-		public static GitAsyncOperation<LockDetails> FetchLockDetailsAsync(string path, int timeout = -1)
+		/// <param name="skipFilesInIgnoredDirectories">If true, when whole directory is ignored, return just the directory, without the files in it.</param>
+		public static string[] GetIgnoredPaths(string path, bool skipFilesInIgnoredDirectories)
 		{
-			return GitAsyncOperation<LockDetails>.Start(op => FetchLockDetails(path, timeout, op));
+			string directoryArg = skipFilesInIgnoredDirectories ? "--directory" : "";
+
+			return ShellUtils.ExecuteCommand(Git_Command, $"ls-files -i -o --exclude-standard {directoryArg} -z {path}", COMMAND_TIMEOUT)
+				.Output.Split('\0', StringSplitOptions.RemoveEmptyEntries);
 		}
 
-
 		/// <summary>
-		/// Lock a file on the repository server.
+		/// Lock a file on the remote LFS server.
 		/// Use force to steal a lock from another user or working copy.
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static LockOperationResult LockFile(string path, bool force, string message = "", string encoding = "", string targetsFileToUse = "", int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static LockOperationResult LockFile(string path, bool force, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
 		{
-			return LockFiles(Enumerate(path), force, message, encoding, targetsFileToUse, timeout, shellMonitor);
+			return LockFiles(Enumerate(path), force, timeout, shellMonitor);
 		}
 
 		/// <summary>
-		/// Lock a file on the repository server.
+		/// Lock a file on the remote LFS server.
 		/// Use force to steal a lock from another user or working copy.
 		/// NOTE: If assembly reload happens, task will be lost, complete handler won't be called.
 		/// </summary>
-		public static GitAsyncOperation<LockOperationResult> LockFileAsync(string path, bool force, string message = "", string encoding = "", int timeout = -1)
+		public static GitAsyncOperation<LockOperationResult> LockFileAsync(string path, bool force, int timeout = -1)
 		{
-			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-			return GitAsyncOperation<LockOperationResult>.Start(op => LockFile(path, force, message, encoding, targetsFileToUse, timeout, op));
+			return GitAsyncOperation<LockOperationResult>.Start(op => LockFile(path, force, timeout, op));
 		}
 
 		/// <summary>
-		/// Lock files on the repository server.
+		/// Lock files on the remote LFS server.
 		/// Use force to steal a lock from another user or working copy.
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static LockOperationResult LockFiles(IEnumerable<string> paths, bool force, string message = "", string encoding = "", string targetsFileToUse = "", int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static LockOperationResult LockFiles(IEnumerable<string> paths, bool force, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
 		{
-			var messageArg = string.IsNullOrEmpty(message) ? string.Empty : $"--message \"{message}\"";
-			var encodingArg = string.IsNullOrEmpty(encoding) ? string.Empty : $"--encoding \"{encoding}\"";
-			var forceArg = force ? "--force" : string.Empty;
-
-			targetsFileToUse = string.IsNullOrEmpty(targetsFileToUse) ? FileUtil.GetUniqueTempPathInProject() : targetsFileToUse;
-			File.WriteAllLines(targetsFileToUse, paths.Select(GitFormatPath));
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"lock {forceArg} {messageArg} {encodingArg} --targets \"{targetsFileToUse}\"", timeout, shellMonitor);
-
-			// svn: warning: W160035: Path '...' is already locked by user '...'
-			// File is already locked by another working copy (can be the same user). Use force to re-lock it.
-			// This happens even if this working copy got the lock.
-			if (result.Error.Contains("W160035"))
-				return LockOperationResult.LockedByOther;
-
-			if (!string.IsNullOrEmpty(result.Error)) {
-
-				// User needs to log in using normal SVN client and save their authentication.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-				// svn: E215004: No more credentials or we tried too many times.
-				// Authentication failed
-				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
-					return LockOperationResult.AuthenticationFailed;
-
-				// Unable to connect to repository indicating some network or server problems.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E731001: No such host is known.
-				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
-					return LockOperationResult.UnableToConnectError;
-
-				// Locking is not supported by the repository (for example, it is a github emulated svn).
-				// svn: warning: W160042: Path 'package.json' doesn't exist in HEAD revision (405 Method Not Allowed)
-				// svn: E200009: One or more locks could not be obtained
-				if (result.Error.Contains("405 Method Not Allowed"))
-					return LockOperationResult.NotSupported;
-
-				// Unable to connect to repository indicating some network or server problems.
-				//svn: warning: W160042: Lock failed: newer version of '...' exists
-				if (result.Error.Contains("W160042"))
-					return LockOperationResult.RemoteHasChanges;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return LockOperationResult.Timeout;
-
-				return LockOperationResult.UnknownError;
+			// Locking for non-existing or unversion files works, which is confusing. Don't allow that.
+			if (paths.Any(p => GetStatus(p, logErrorHint: false).Status == VCFileStatus.Unversioned)) {
+				shellMonitor?.AppendErrorLine("Cannot lock unversioned files.");
+				return LockOperationResult.TargetPathNotFound;
 			}
 
-			// '... some file ...' locked by user '...'.
-			if (result.Output.Contains("locked by user"))
-				return LockOperationResult.Success;
+			// Lock doesn't have force argument :(
+			if (force) {
+				LockOperationResult opResult = UnlockFiles(paths, true, timeout, shellMonitor);
+				if (opResult != LockOperationResult.Success)
+					return opResult;
+			}
 
-			return LockOperationResult.UnknownError;
+			// Not sure if paths are truely pathspec with wildcards etc. But it does support list of paths.
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"lfs lock {GitPathspecs(paths)}", timeout, shellMonitor);
+
+			if (result.HasErrors) {
+
+				// Locking ... failed: Lock exists
+				// File is already locked by THIS or another working copy (can be the same user).
+				// This happens even if this working copy got the lock.
+				// NOTE: to check if lock is ours or not, we need to parse the user that owns it, which is too much hassle for now.
+				if (result.Error.Contains("failed: Lock exists"))
+					return LockOperationResult.LockAlreadyExists;
+
+				// Sadly, lfs doesn't care if remote has changes for this file.
+				//if (result.Error.Contains("???"))
+				//	return LockOperationResult.RemoteHasChanges;
+
+				return (LockOperationResult) ParseCommonStatusError(result.Error);
+			}
+
+			return LockOperationResult.Success;
 		}
 
 		/// <summary>
-		/// Lock a file on the repository server.
+		/// Lock files on the remote LFS server.
 		/// Use force to steal a lock from another user or working copy.
 		/// NOTE: If assembly reload happens, task will be lost, complete handler won't be called.
 		/// </summary>
-		public static GitAsyncOperation<LockOperationResult> LockFilesAsync(IEnumerable<string> paths, bool force, string message = "", string encoding = "", int timeout = -1)
+		public static GitAsyncOperation<LockOperationResult> LockFilesAsync(IEnumerable<string> paths, bool force, int timeout = -1)
 		{
-			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-			return GitAsyncOperation<LockOperationResult>.Start(op => LockFiles(paths, force, message, encoding, targetsFileToUse, timeout, op));
+			return GitAsyncOperation<LockOperationResult>.Start(op => LockFiles(paths, force, timeout, op));
 		}
 
 		/// <summary>
-		/// Unlock a file on the repository server.
+		/// Unlock a file on the remote LFS server.
 		/// Use force to break a lock held by another user or working copy.
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static LockOperationResult UnlockFile(string path, bool force, string targetsFileToUse = "", int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static LockOperationResult UnlockFile(string path, bool force, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
 		{
-			return UnlockFiles(Enumerate(path), force, targetsFileToUse, timeout, shellMonitor);
+			return UnlockFiles(Enumerate(path), force, timeout, shellMonitor);
 		}
 
 		/// <summary>
-		/// Unlock a file on the repository server.
+		/// Unlock a file on the remote LFS server.
 		/// Use force to break a lock held by another user or working copy.
 		/// NOTE: If assembly reload happens, task will be lost, complete handler won't be called.
 		/// </summary>
 		public static GitAsyncOperation<LockOperationResult> UnlockFileAsync(string path, bool force, int timeout = -1)
 		{
-			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-			return GitAsyncOperation<LockOperationResult>.Start(op => UnlockFile(path, force, targetsFileToUse, timeout, op));
+			return GitAsyncOperation<LockOperationResult>.Start(op => UnlockFile(path, force, timeout, op));
 		}
 
 		/// <summary>
-		/// Unlock a file on the repository server.
+		/// Unlock files on the remote LFS server.
 		/// Use force to break a lock held by another user or working copy.
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static LockOperationResult UnlockFiles(IEnumerable<string> paths, bool force, string targetsFileToUse = "", int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static LockOperationResult UnlockFiles(IEnumerable<string> paths, bool force, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
 		{
+			// Locking for non-existing or unversion files works, which is confusing. Don't allow that.
+			if (paths.Any(p => GetStatus(p, logErrorHint: false).Status == VCFileStatus.Unversioned)) {
+				shellMonitor?.AppendErrorLine("Cannot unlock unversioned files.");
+				return LockOperationResult.TargetPathNotFound;
+			}
+
 			var forceArg = force ? "--force" : string.Empty;
 
-			targetsFileToUse = string.IsNullOrEmpty(targetsFileToUse) ? FileUtil.GetUniqueTempPathInProject() : targetsFileToUse;
-			File.WriteAllLines(targetsFileToUse, paths.Select(GitFormatPath));
+			// Not sure if paths are truely pathspec with wildcards etc. But it does support list of paths.
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"lfs unlock {forceArg} {GitPathspecs(paths)}", timeout, shellMonitor);
 
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"unlock {forceArg} --targets \"{targetsFileToUse}\"", timeout, shellMonitor);
+			result.Error = FilterOutLines(result.Error,
+				// unable to get lock ID: no matching locks found
+				// No one has locked this file. Consider this as success.
+				"unable to get lock ID: no matching locks found",
 
-			// svn: E195013: '...' is not locked in this working copy
-			// This working copy doesn't own a lock to this file (when used without force flag, offline check).
-			if (result.Error.Contains("E195013"))
-				return LockOperationResult.Success;
+				// warning: unlocking with uncommitted changes because --force
+				// It will make file read-only, although it has changes. Fine.
+				"unlocking with uncommitted changes because --force"
+				);
 
-			// svn: warning: W170007: '...' is not locked in the repository
-			// File is already unlocked (when used with force flag).
-			if (result.Error.Contains("W170007"))
-				return LockOperationResult.Success;
+			if (result.HasErrors) {
 
-			// svn: warning: W160040: No lock on path '...' (400 Bad Request)
-			// This working copy owned the lock, but it got stolen or broken (when used without force flag).
-			// After this operation, this working copy will destroy its lock, so this message will show up only once.
-			if (result.Error.Contains("W160040"))
-				return LockOperationResult.LockedByOther;
+				// ... is locked by ...
+				// File is locked by another user.
+				if (result.Error.Contains("is locked by"))
+					return LockOperationResult.LockAlreadyExists;
 
-			if (!string.IsNullOrEmpty(result.Error)) {
+				// Cannot unlock file with uncommitted changes
+				// Unlocking will make the file read-only which may be confusing for the users. Use force to bypass this.
+				if (result.Error.Contains("Cannot unlock file with uncommitted changes"))
+					return LockOperationResult.BlockedByUncommittedChanges;
 
-				// User needs to log in using normal SVN client and save their authentication.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-				// svn: E215004: No more credentials or we tried too many times.
-				// Authentication failed
-				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
-					return LockOperationResult.AuthenticationFailed;
+				// "You must have admin access to force delete a lock" on github LFS (may be server specific?).
+				// Example: github collabolators can't steal locks, only repo owners can.
+				if (result.Error.Contains("You must have admin access"))
+					return LockOperationResult.InsufficientPrivileges;
 
-				// Unable to connect to repository indicating some network or server problems.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E731001: No such host is known.
-				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
-					return LockOperationResult.UnableToConnectError;
+				// CreateFile ...: The system cannot find the file specified.
+				// Unversioned file was locked, then moved. Unlocking the old location produces this error.
+				if (result.Error.Contains("The system cannot find the file specified"))
+					return LockOperationResult.TargetPathNotFound;
 
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return LockOperationResult.Timeout;
-
-				return LockOperationResult.UnknownError;
+				return (LockOperationResult) ParseCommonStatusError(result.Error);
 			}
 
-			// '...' unlocked.
-			if (result.Output.Contains("unlocked"))
-				return LockOperationResult.Success;
-
-			if (!Silent) {
-				Debug.LogError($"Failed to lock \"{string.Join(",", paths)}\".\n\n{result.Output} ");
-			}
-
-			return LockOperationResult.UnknownError;
+			return LockOperationResult.Success;
 		}
 
 		/// <summary>
-		/// Unlock a file on the repository server.
+		/// Unlock files on the remote LFS server.
 		/// Use force to break a lock held by another user or working copy.
 		/// NOTE: If assembly reload happens, task will be lost, complete handler won't be called.
 		/// </summary>
 		public static GitAsyncOperation<LockOperationResult> UnlockFilesAsync(IEnumerable<string> paths, bool force, int timeout = -1)
 		{
-			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-			return GitAsyncOperation<LockOperationResult>.Start(op => UnlockFiles(paths, force, targetsFileToUse, timeout, op));
+			return GitAsyncOperation<LockOperationResult>.Start(op => UnlockFiles(paths, force, timeout, op));
 		}
 
 		/// <summary>
-		/// Update file or folder in SVN directly (without GUI).
-		/// The force param will auto-resolve tree conflicts occurring on incoming new files (add) over existing unversioned files in the working copy.
+		/// Fetch specified remote repository changes to the local one (without GUI). If remote is left empty, all remotes will be fetched.
+		/// This will NOT make any changes in your working folder - call merge to do this.
+		/// Pass "--all" for remote to fetch all of them.
+		/// https://git-scm.com/docs/git-fetch
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static UpdateOperationResult Update(
-			string path,
-			UpdateResolveConflicts resolveConflicts = UpdateResolveConflicts.Postpone,
-			bool force = false,
-			int revision = -1,
-			int timeout = -1,
-			IShellMonitor shellMonitor = null
-			)
+		public static PullOperationResult FetchRemote(string remote = "", string branch = "", bool atomic = false, int timeout = -1, IShellMonitor shellMonitor = null)
 		{
+			var atomicArg = atomic ? $"--atomic" : "";
 
-			var depth = "infinity"; // Recursive whether it is a file or a folder. Keep it simple for now.
-			string acceptArg = $"--accept {m_UpdateResolveConflictsMap[resolveConflicts]}";
-			var forceArg = force ? $"--force" : "";
-			var revisionArg = revision > 0 ? $"--revision {revision}" : "";
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"fetch {atomicArg} --porcelain {remote} {branch}", timeout, shellMonitor);
 
-#if CAN_DISABLE_REFRESH
-			AssetDatabase.DisallowAutoRefresh();
-#endif
+			if (result.HasErrors) {
+
+				// error: cannot lock ref '...': is at ... but expected ...
+				// This means another fetch was in progress when this one started. The fetch was done, but ours got error. Continue normally.
+				if (result.Error.Contains("error: cannot lock ref"))
+					return PullOperationResult.Success;
+
+				// fatal: '...' does not appear to be a git repository
+				// fatal: Could not read from remote repository.
+				// Remote repository not found..
+				if (result.Error.Contains("does not appear to be a git repository"))
+					return PullOperationResult.RemoteNotFound;
+
+				// fatal: couldn't find remote ref ...
+				// Remote branch not found.
+				if (result.Error.Contains("couldn't find remote ref"))
+					return PullOperationResult.BranchNotFound;
+
+				return (PullOperationResult) ParseCommonStatusError(result.Error);
+			}
+
+			return PullOperationResult.Success;
+		}
+
+		/// <summary>
+		/// Fetch specified remote repository changes to the local one (without GUI). If remote is left empty, all remotes will be fetched.
+		/// This will NOT make any changes in your working folder - call merge to do this.
+		/// Pass "--all" for remote to fetch all of them.
+		/// https://git-scm.com/docs/git-fetch
+		/// </summary>
+		public static GitAsyncOperation<PullOperationResult> FetchRemoteAsync(string remote = "", string branch = "", bool atomic = false, int timeout = -1)
+		{
+			return GitAsyncOperation<PullOperationResult>.Start(op => FetchRemote(remote, branch, atomic, timeout, op));
+		}
+
+		/// <summary>
+		/// Perform "git merge" - incorporates changes from fetched remotes to the current branch (without GUI).
+		/// Use <see cref="HasAnyConflicts(string, int, IShellMonitor)"/> to see if the merge produced some conflicts.
+		/// https://git-scm.com/docs/git-merge
+		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		/// </summary>
+		public static PullOperationResult Merge(string branch = "", string mergeStrategy = "", int timeout = -1, IShellMonitor shellMonitor = null)
+		{
 			ShellUtils.ShellResult result;
 			try {
-				result = ShellUtils.ExecuteCommand(Git_Command, $"update --depth {depth} {acceptArg} {forceArg} {revisionArg} \"{GitFormatPath(path)}\"", timeout, shellMonitor);
+
+				AssetDatabase.DisallowAutoRefresh();
+				result = ShellUtils.ExecuteCommand(Git_Command, $"merge {branch} {mergeStrategy}", timeout, shellMonitor);
+			} finally {
+				AssetDatabase.AllowAutoRefresh();
+			}
+
+			if (result.HasErrors) {
+				// error: Your local changes to the following files would be overwritten by merge:
+				// Please commit your changes or stash them before you merge.
+				if (result.Error.Contains("Your local changes to the following files would be overwritten by merge"))
+					return PullOperationResult.LocalChangesFound;
+
+				// merge: ... - not something we can merge
+				// Branch not found.
+				if (result.Error.Contains("not something we can merge"))
+					return PullOperationResult.BranchNotFound;
+
+				return (PullOperationResult)ParseCommonStatusError(result.Error);
+			}
+
+			// CONFLICT (content): Merge conflict in Assets/Readme.txt
+			// Automatic merge failed; fix conflicts and then commit the result.
+			// Conflicts happened.
+			if (result.Output.Contains("Automatic merge failed;"))
+				return PullOperationResult.SuccessWithConflicts;
+
+			return PullOperationResult.Success;
+		}
+
+		/// <summary>
+		/// Perform "git merge" - incorporates changes from fetched remotes to the current branch (without GUI).
+		/// Use <see cref="HasAnyConflicts(string, int, IShellMonitor)"/> to see if the merge produced some conflicts.
+		/// https://git-scm.com/docs/git-merge
+		/// DANGER: git updating while editor is crunching assets IS DANGEROUS! This Merge method will disable unity auto-refresh feature until it has finished.
+		/// </summary>
+		public static GitAsyncOperation<PullOperationResult> MergeAsync(string branch = "", string mergeStrategy = "", int timeout = -1)
+		{
+			return GitAsyncOperation<PullOperationResult>.Start(op => Merge(branch, mergeStrategy, timeout, op));
+		}
+
+		/// <summary>
+		/// Perform "git pull" (i.e. fetch and merge) (without GUI).
+		/// Use <see cref="HasAnyConflicts(string, int, IShellMonitor)"/> to see if the merge produced some conflicts.
+		/// Pass "--all" for remote to fetch all of them.
+		/// https://git-scm.com/docs/git-pull
+		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		/// </summary>
+		public static PullOperationResult Pull(string remote = "", string branch = "", string mergeStrategy = "", bool atomic = false, int timeout = -1, IShellMonitor shellMonitor = null)
+		{
+			var atomicArg = atomic ? $"--atomic" : "";
+
+			ShellUtils.ShellResult result;
+			try {
+
+				AssetDatabase.DisallowAutoRefresh();
+				result = ShellUtils.ExecuteCommand(Git_Command, $"pull {atomicArg} --porcelain {remote} {branch} {mergeStrategy}", timeout, shellMonitor);
 			}
 			finally {
-
-#if CAN_DISABLE_REFRESH
-			AssetDatabase.AllowAutoRefresh();
-#endif
+				AssetDatabase.AllowAutoRefresh();
 			}
 
 			if (result.HasErrors) {
+				//
+				// Fetch errors
+				//
 
-				// Tree conflicts limit the auto-resolve capabilities. In that case "Summary of conflicts" is not shown.
-				// svn: E155027: Tree conflict can only be resolved to 'working' state; '...' not resolved
-				if (result.Error.Contains("E155027"))
-					return UpdateOperationResult.SuccessWithConflicts;
+				// fatal: '...' does not appear to be a git repository
+				// fatal: Could not read from remote repository.
+				// Remote repository not found..
+				if (result.Error.Contains("does not appear to be a git repository"))
+					return PullOperationResult.RemoteNotFound;
 
-				// User needs to log in using normal SVN client and save their authentication.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-				// svn: E215004: No more credentials or we tried too many times.
-				// Authentication failed
-				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
-					return UpdateOperationResult.AuthenticationFailed;
+				// fatal: couldn't find remote ref ...
+				// Remote branch not found.
+				if (result.Error.Contains("couldn't find remote ref"))
+					return PullOperationResult.BranchNotFound;
 
-				// Unable to connect to repository indicating some network or server problems.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E731001: No such host is known.
-				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
-					return UpdateOperationResult.UnableToConnectError;
+				//
+				// Merge errors
+				//
 
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return UpdateOperationResult.Timeout;
+				// error: Your local changes to the following files would be overwritten by merge:
+				// Please commit your changes or stash them before you merge.
+				if (result.Error.Contains("Your local changes to the following files would be overwritten by merge"))
+					return PullOperationResult.LocalChangesFound;
 
-				return UpdateOperationResult.UnknownError;
+				// merge: ... - not something we can merge
+				// Branch not found.
+				if (result.Error.Contains("not something we can merge"))
+					return PullOperationResult.BranchNotFound;
+
+
+				return (PullOperationResult) ParseCommonStatusError(result.Error);
 			}
 
+			// CONFLICT (content): Merge conflict in Assets/Readme.txt
+			// Automatic merge failed; fix conflicts and then commit the result.
+			// Conflicts happened.
+			if (result.Output.Contains("Automatic merge failed;"))
+				return PullOperationResult.SuccessWithConflicts;
 
-			// Update was successful, but some folders/files have conflicts. Some of them might get auto-resolved (depending on the resolveConflicts param)
-			// Summary of conflicts:
-			//  Text conflicts: 1
-			//  Tree conflicts: 2
-			// -- OR --
-			//  Text conflicts: 0 remaining (and 1 already resolved)
-			//  Tree conflicts: 0 remaining (and 1 already resolved)
-			if (result.Output.Contains("Summary of conflicts:")) {
-				// Depending on the resolveConflicts param, conflicts may auto-resolve. Check if they did.
-				var TEXT_CONFLICTS = "Text conflicts: ";    // Space at the end is important.
-				var TREE_CONFLICTS = "Tree conflicts: ";
-				var textConflictsIndex = result.Output.IndexOf(TEXT_CONFLICTS);
-				var treeConflictsIndex = result.Output.IndexOf(TREE_CONFLICTS);
-				var noTextConflicts = textConflictsIndex == -1 || result.Output[textConflictsIndex + 1] == '0';
-				var noTreeConflicts = treeConflictsIndex == -1 || result.Output[treeConflictsIndex + 1] == '0';
+			return PullOperationResult.Success;
+		}
 
-				return noTextConflicts && noTreeConflicts ? UpdateOperationResult.Success : UpdateOperationResult.SuccessWithConflicts;
+		/// <summary>
+		/// Perform "git pull" (i.e. fetch and merge) (without GUI).
+		/// Use <see cref="HasAnyConflicts(string, int, IShellMonitor)"/> to see if the merge produced some conflicts.
+		/// Pass "--all" for remote to fetch all of them.
+		/// https://git-scm.com/docs/git-pull
+		/// DANGER: git updating while editor is crunching assets IS DANGEROUS! This Pull method will disable unity auto-refresh feature until it has finished.
+		/// </summary>
+		public static GitAsyncOperation<PullOperationResult> PullAsync(string remote = "", string branch = "", string mergeStrategy = "", bool atomic = false, int timeout = -1)
+		{
+			return GitAsyncOperation<PullOperationResult>.Start(op => Pull(remote, branch, mergeStrategy, atomic, timeout, op));
+		}
+
+		/// <summary>
+		/// Perform "git merge --abort" - to cancel the merge in progress (without GUI).
+		/// Returns true if successful.
+		/// https://git-scm.com/docs/git-merge
+		/// </summary>
+		public static bool MergeAbort(int timeout = -1, IShellMonitor shellMonitor = null)
+		{
+			ShellUtils.ShellResult result;
+			try {
+				AssetDatabase.DisallowAutoRefresh();
+				result = ShellUtils.ExecuteCommand(Git_Command, $"merge --abort", timeout, shellMonitor);
+			} finally {
+				AssetDatabase.AllowAutoRefresh();
 			}
 
-			return UpdateOperationResult.Success;
+			return !result.HasErrors;
 		}
 
-#if CAN_DISABLE_REFRESH
 		/// <summary>
-		/// Update file or folder in SVN directly (without GUI).
-		/// The force param will auto-resolve tree conflicts occurring on incoming new files (add) over existing unversioned files in the working copy.
-		/// DANGER: SVN updating while editor is crunching assets IS DANGEROUS! This Update method will disable unity auto-refresh feature until it has finished.
-		/// </summary>
-		public static GitAsyncOperation<UpdateOperationResult> UpdateAsync(
-			string path,
-			UpdateResolveConflicts resolveConflicts = UpdateResolveConflicts.Postpone,
-			bool force = false,
-			int revision = -1,
-			int timeout = -1
-			)
-		{
-			return GitAsyncOperation<UpdateOperationResult>.Start(op => Update(path, resolveConflicts, force, revision, timeout, op));
-		}
-#else
-		/// <summary>
-		/// Update file or folder in SVN directly (without GUI).
-		/// The force param will auto-resolve tree conflicts occurring on incoming new files (add) over existing unversioned files in the working copy.
-		/// DANGER: SVN updating while editor is crunching assets IS DANGEROUS! It WILL corrupt your asset guids. Use with caution!!!
-		/// </summary>
-		public static SVNAsyncOperation<UpdateOperationResult> UpdateAsyncDANGER(
-			string path,
-			UpdateResolveConflicts resolveConflicts = UpdateResolveConflicts.Postpone,
-			bool force = false,
-			int revision = -1,
-			int timeout = -1
-			)
-		{
-			return SVNAsyncOperation<UpdateOperationResult>.Start(op => Update(path, resolveConflicts, force, revision, timeout, op));
-		}
-#endif
-
-		/// <summary>
-		/// Commit files to SVN directly (without GUI).
-		/// On commit all included locks will be unlocked unless specified not to by the keepLocks param.
+		/// Commit files to git directly (without GUI).
+		/// Files MUST be versioned!
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static CommitOperationResult Commit(
-			IEnumerable<string> assetPaths,
-			bool includeMeta,
-			bool recursive,
-			string message,
-			string encoding = "",
-			bool keepLocks = false,
-			string targetsFileToUse = "",
-			int timeout = -1,
-			IShellMonitor shellMonitor = null
-			)
+		private static PushOperationResult Commit([AllowNull] IEnumerable<string> assetPaths, bool includeMeta, bool autoStageModified, string message, int timeout = -1, IShellMonitor shellMonitor = null)
 		{
-			targetsFileToUse = string.IsNullOrEmpty(targetsFileToUse) ? FileUtil.GetUniqueTempPathInProject() : targetsFileToUse;
-			if (includeMeta) {
+			if (string.IsNullOrWhiteSpace(message))
+				return PushOperationResult.MessageIsEmpty;
+
+			if (includeMeta && assetPaths != null) {
 				assetPaths = assetPaths.Select(path => path + ".meta").Concat(assetPaths);
 			}
-			File.WriteAllLines(targetsFileToUse, assetPaths.Select(GitFormatPath));
 
+			// NOTE: paths and --all are mutually exclusive!
+			var autoStageArg = autoStageModified ? "--all" : "";
+			string pathspecs = assetPaths != null ? GitPathspecs(assetPaths) : string.Empty;
 
-			var depth = recursive ? "infinity" : "empty";
-			var encodingArg = string.IsNullOrEmpty(encoding) ? "" : $"--encoding {encoding}";
-			var keepLocksArg = keepLocks ? "--no-unlock" : "";
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"commit --targets \"{targetsFileToUse}\" --depth {depth} --message \"{message}\" {encodingArg} {keepLocksArg}", timeout, shellMonitor);
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"commit --message=\"{message}\" {autoStageArg} {pathspecs}", timeout, shellMonitor);
 			if (result.HasErrors) {
 
-				// Some folders/files have pending changes in the repository. Update them before trying to commit.
-				// svn: E155011: File '...' is out of date
-				// svn: E160024: resource out of date; try updating
-				if (result.Error.Contains("E160024"))
-					return CommitOperationResult.OutOfDateError;
+				// no changes added to commit (use "git add" and/or "git commit -a")
+				if (result.ErrorCode == -1 && result.Output.Contains("no changes added to commit"))
+					return PushOperationResult.NoChangesToCommit;
 
-				// Some folders/files have conflicts. Clear them before trying to commit.
-				// svn: E155015: Aborting commit: '...' remains in conflict
-				if (result.Error.Contains("E155015"))
-					return CommitOperationResult.ConflictsError;
+				// Some files have conflicts. Clear them before trying to commit.
+				// error: Committing is not possible because you have unmerged files.
+				// fatal: Exiting because of an unresolved conflict.
+				if (result.Error.Contains("you have unmerged files") || result.Error.Contains("unresolved conflict"))
+					return PushOperationResult.ConflictsError;
+
+				// Cannot do partial commits during merge. Do the special merge commit with staged changes first.
+				// fatal: cannot do a partial commit during a merge.
+				if (result.Error.Contains("cannot do a partial commit during a merge"))
+					return PushOperationResult.NoPartialCommitsInMerge;
 
 				// Can't commit unversioned files directly. Add them before trying to commit. Recursive skips unversioned files.
-				// svn: E200009: '...' is not under version control
-				if (result.Error.Contains("E200009"))
-					return CommitOperationResult.UnversionedError;
+				// error: pathspec '...' did not match any file(s) known to git
+				if (result.Error.Contains("did not match any file(s) known to git"))
+					return PushOperationResult.UnversionedError;
 
-				// Precommit hook denied the commit on the server side. Talk with your administrator about your commit company policies. Example: always commit with a valid message.
-				// svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output: ...
-				if (result.Error.Contains("E165001"))
-					return CommitOperationResult.PrecommitHookError;
-
-				// User needs to log in using normal SVN client and save their authentication.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-				// svn: E215004: No more credentials or we tried too many times.
-				// Authentication failed
-				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
-					return CommitOperationResult.AuthenticationFailed;
-
-				// Unable to connect to repository indicating some network or server problems.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E731001: No such host is known.
-				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
-					return CommitOperationResult.UnableToConnectError;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return CommitOperationResult.Timeout;
-
-				return CommitOperationResult.UnknownError;
+				return (PushOperationResult) ParseCommonStatusError(result.Error);
 			}
 
-			return CommitOperationResult.Success;
+			return PushOperationResult.Success;
 		}
 
 		/// <summary>
-		/// Commit files to SVN directly (without GUI).
-		/// On commit all included locks will be unlocked unless specified not to by the keepLocks param.
-		/// </summary>
-		public static GitAsyncOperation<CommitOperationResult> CommitAsync(
-			IEnumerable<string> assetPaths,
-			bool includeMeta, bool recursive,
-			string message,
-			string encoding = "",
-			bool keepLocks = false,
-			int timeout = -1
-			)
-		{
-			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();	// Not thread safe - call in main thread only.
-			return GitAsyncOperation<CommitOperationResult>.Start(op => Commit(assetPaths, includeMeta, recursive, message, encoding, keepLocks, targetsFileToUse, timeout, op));
-		}
-
-		/// <summary>
-		/// Revert files to SVN directly (without GUI).
-		/// This is an offline operation, but it still can take time, since it will copy from the original files.
-		/// RemoveAdded will remove added files from disk.
-		/// Recursive won't restore deleted files. You have to specify them manually. Weird.
+		/// Commit files to git directly (without GUI).
+		/// Files MUST be versioned!
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static RevertOperationResult Revert(
-			IEnumerable<string> assetPaths,
-			bool includeMeta,
-			bool recursive,
-			bool removeAdded,
-			string targetsFileToUse = "",
-			int timeout = -1,
-			IShellMonitor shellMonitor = null
-			)
+		public static PushOperationResult Commit(IEnumerable<string> assetPaths, bool includeMeta, string message, int timeout = -1, IShellMonitor shellMonitor = null)
 		{
-			targetsFileToUse = string.IsNullOrEmpty(targetsFileToUse) ? FileUtil.GetUniqueTempPathInProject() : targetsFileToUse;
-			if (includeMeta) {
-				assetPaths = assetPaths.Select(path => path + ".meta").Concat(assetPaths);
+			return Commit(assetPaths, includeMeta, autoStageModified: false, message, timeout, shellMonitor);
+		}
+
+		/// <summary>
+		/// Commit files to git directly (without GUI).
+		/// Files MUST be versioned!
+		/// </summary>
+		public static GitAsyncOperation<PushOperationResult> CommitAsync(IEnumerable<string> assetPaths, bool includeMeta, string message, int timeout = -1)
+		{
+			return GitAsyncOperation<PushOperationResult>.Start(op => Commit(assetPaths, includeMeta, autoStageModified: false, message, timeout, op));
+		}
+
+		/// <summary>
+		/// Commit staged files to git directly (without GUI).
+		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		/// </summary>
+		/// <param name="autoStageModified">Tell the command to automatically stage files that have been modified and deleted, but new files you have not told Git about are not affected. NOTE: this will commit files that still have conflicts!</param>
+		public static PushOperationResult Commit(string message, bool autoStageModified, int timeout = -1, IShellMonitor shellMonitor = null)
+		{
+			return Commit(null, includeMeta: false, autoStageModified, message, timeout, shellMonitor);
+		}
+
+		/// <summary>
+		/// Commit staged files to git directly (without GUI).
+		/// </summary>
+		/// <param name="autoStageModified">Tell the command to automatically stage files that have been modified and deleted, but new files you have not told Git about are not affected. NOTE: this will commit files that still have conflicts!</param>
+		public static GitAsyncOperation<PushOperationResult> CommitAsync(string message, bool autoStageModified, int timeout = -1)
+		{
+			return GitAsyncOperation<PushOperationResult>.Start(op => Commit(null, includeMeta: false, autoStageModified, message, timeout, op));
+		}
+
+		/// <summary>
+		/// Perform "git push" to upload your working repository to the remote (without GUI).
+		/// https://git-scm.com/docs/git-push
+		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		/// </summary>
+		public static PushOperationResult Push(string remote = "", string branch = "", bool atomic = false, int timeout = -1, IShellMonitor shellMonitor = null)
+		{
+			var atomicArg = atomic ? $"--atomic" : "";
+
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"pull {atomicArg} --porcelain {remote} {branch}", timeout, shellMonitor);
+			if (result.HasErrors) {
+
+				// error: failed to push some refs to '...'
+				// Remote has changes. You need to pull first.
+				if (result.Error.Contains("failed to push some refs to"))
+					return PushOperationResult.RejectedByRemote;
+
+				// fatal: '...' does not appear to be a git repository
+				// fatal: Could not read from remote repository.
+				// Remote repository not found..
+				if (result.Error.Contains("does not appear to be a git repository"))
+					return PushOperationResult.RemoteNotFound;
+
+				// error: src refspec ... does not match any
+				// error: failed to push some refs to '...'
+				// Remote branch not found.
+				if (result.Error.Contains("does not match any"))
+					return PushOperationResult.BranchNotFound;
+
+				return (PushOperationResult) ParseCommonStatusError(result.Error);
 			}
-			File.WriteAllLines(targetsFileToUse, assetPaths.Select(GitFormatPath));
 
+			return PushOperationResult.Success;
+		}
 
-			var depth = recursive ? "infinity" : "empty";
-			var removeAddedArg = removeAdded ? "--remove-added" : "";
+		/// <summary>
+		/// Perform "git push" to upload your working repository to the remote (without GUI).
+		/// https://git-scm.com/docs/git-push
+		/// </summary>
+		public static GitAsyncOperation<PushOperationResult> PushAsync(string remote = "", string branch = "", bool atomic = false, int timeout = -1)
+		{
+			return GitAsyncOperation<PushOperationResult>.Start(op => Push(remote, branch, atomic, timeout, op));
+		}
 
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"revert --targets \"{targetsFileToUse}\" --depth {depth} {removeAddedArg}", timeout, shellMonitor);
+		/// <summary>
+		/// Revert files to git directly (without GUI).
+		/// Pathspecs support wildcards and more. Read here: https://css-tricks.com/git-pathspecs-and-how-to-use-them/
+		/// This is an offline operation, but it still can take time, since it will copy from the original files.
+		/// checkoutAfterReset will restore files in the working tree after it resets them in the index.
+		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		/// </summary>
+		public static RevertOperationResult Revert(IEnumerable<string> assetPathspecs, bool includeMeta, bool checkoutAfterReset, int timeout = -1, IShellMonitor shellMonitor = null)
+		{
+			if (includeMeta) {
+				assetPathspecs = assetPathspecs.Select(path => path + ".meta").Concat(assetPathspecs);
+			}
+
+			string pathspec = GitPathspecs(assetPathspecs);
+
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"reset -q -- {pathspec}", timeout, shellMonitor);
 			if (result.HasErrors) {
 
 				// Operation took too long, shell utils time out kicked in.
@@ -1087,31 +1122,42 @@ namespace DevLocker.VersionControl.WiseGit
 				return RevertOperationResult.UnknownError;
 			}
 
+			if (checkoutAfterReset) {
+				result = ShellUtils.ExecuteCommand(Git_Command, $"checkout -q -- {pathspec}", timeout, shellMonitor);
+				if (result.HasErrors) {
+
+					//error: pathspec '...' did not match any file(s) known to git
+					// File is actually unversioned/untracked, which is valid case after reset of an added file. Nothing to do.
+					if (result.Error.Contains("did not match any file(s) known to git"))
+						return RevertOperationResult.Success;
+
+					// Operation took too long, shell utils time out kicked in.
+					if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
+						return RevertOperationResult.Timeout;
+
+					return RevertOperationResult.UnknownError;
+				}
+			}
+
 			return RevertOperationResult.Success;
 		}
 
 		/// <summary>
-		/// Revert files to SVN directly (without GUI).
+		/// Revert files to git directly (without GUI).
+		/// Pathspecs support wildcards and more. Read here: https://css-tricks.com/git-pathspecs-and-how-to-use-them/
 		/// This is an offline operation, but it still can take time, since it will copy from the original files.
-		/// RemoveAdded will remove added files from disk.
-		/// Recursive won't restore deleted files. You have to specify them manually. Weird.
+		/// checkoutAfterReset will restore files in the working tree after it resets them in the index.
 		/// </summary>
-		public static GitAsyncOperation<RevertOperationResult> RevertAsync(
-			IEnumerable<string> assetPaths,
-			bool includeMeta, bool recursive,
-			bool removeAdded,
-			int timeout = -1
-			)
+		public static GitAsyncOperation<RevertOperationResult> RevertAsync(IEnumerable<string> assetPaths, bool includeMeta, bool checkoutAfterReset, int timeout = -1)
 		{
-			var targetsFileToUse = FileUtil.GetUniqueTempPathInProject();   // Not thread safe - call in main thread only.
-			return GitAsyncOperation<RevertOperationResult>.Start(op => Revert(assetPaths, includeMeta, recursive, removeAdded, targetsFileToUse, timeout, op));
+			return GitAsyncOperation<RevertOperationResult>.Start(op => Revert(assetPaths, includeMeta, checkoutAfterReset, timeout, op));
 		}
 
 
 		/// <summary>
-		/// Add files to SVN directly (without GUI).
+		/// Add files to git directly (without GUI).
 		/// </summary>
-		public static bool Add(string path, bool includeMeta, bool recursive, IShellMonitor shellMonitor = null)
+		public static bool Add(string path, bool includeMeta, IShellMonitor shellMonitor = null)
 		{
 			if (string.IsNullOrEmpty(path))
 				return true;
@@ -1121,13 +1167,23 @@ namespace DevLocker.VersionControl.WiseGit
 			if (success == false)
 				return false;
 
-			var depth = recursive ? "infinity" : "empty";
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"add --depth {depth} --force \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, shellMonitor);
+			// "git add" overrides the conflicted status which is not nice.
+			var statusData = GetStatus(path);
+			if (statusData.IsConflicted)
+				return false;
+
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"add --force \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, shellMonitor);
 			if (result.HasErrors)
 				return false;
 
 			if (includeMeta) {
-				result = ShellUtils.ExecuteCommand(Git_Command, $"add --depth {depth} --force \"{GitFormatPath(path + ".meta")}\"", COMMAND_TIMEOUT, shellMonitor);
+
+				// "git add" overrides the conflicted status which is not nice.
+				statusData = GetStatus(path + ".meta");
+				if (statusData.IsConflicted)
+					return false;
+
+				result = ShellUtils.ExecuteCommand(Git_Command, $"add --force \"{GitFormatPath(path + ".meta")}\"", COMMAND_TIMEOUT, shellMonitor);
 				if (result.HasErrors)
 					return false;
 			}
@@ -1136,7 +1192,7 @@ namespace DevLocker.VersionControl.WiseGit
 		}
 
 		/// <summary>
-		/// Adds all parent unversioned folders AND THEIR META FILES!
+		/// Adds all parent unversioned folder META FILES (as git doesn't know about folders themselves)!
 		/// If this is needed it will ask the user for permission if promptUser is true.
 		/// </summary>
 		public static bool CheckAndAddParentFolderIfNeeded(string path, bool promptUser)
@@ -1147,7 +1203,7 @@ namespace DevLocker.VersionControl.WiseGit
 		}
 
 		/// <summary>
-		/// Adds all parent unversioned folders AND THEIR META FILES!
+		/// Adds all parent unversioned folder META FILES (as git doesn't know about folders themselves)!
 		/// If this is needed it will ask the user for permission if promptUser is true.
 		/// </summary>
 		public static bool CheckAndAddParentFolderIfNeeded(string path, bool promptUser, IShellMonitor shellMonitor = null)
@@ -1155,34 +1211,24 @@ namespace DevLocker.VersionControl.WiseGit
 			var directory = Path.GetDirectoryName(path);
 
 			// Special case - Root folders like Assets, ProjectSettings, etc...
-			if (string.IsNullOrEmpty(directory)) {
-				directory = ".";
+			// They don't have metas and git doesn't care about directories.
+			if (string.IsNullOrEmpty(directory) || directory.IndexOfAny(new[] { '/', '\\' }) == -1) {
+				return true;
 			}
 
-			var newDirectoryStatusData = GetStatus(directory);
-			if (newDirectoryStatusData.IsConflicted) {
-				if (!Silent && promptUser && EditorUtility.DisplayDialog(
-					"Conflicted files",
-					$"Failed to move the files to \n\"{directory}\"\nbecause it has conflicts. Resolve them first!",
-					"Check changes",
-					"Cancel"
-					)) {
-					ShowChangesUI?.Invoke();
-				}
+			// Git doesn't know about directories - check the meta instead.
+			var newDirectoryStatusData = GetStatus(directory + ".meta");
 
-				return false;
-			}
-
-			// Moving to unversioned folder -> add it to svn.
+			// Moving to unversioned folder -> add it to git.
 			if (newDirectoryStatusData.Status == VCFileStatus.Unversioned) {
 
 				if (!Silent && promptUser && !EditorUtility.DisplayDialog(
 					"Unversioned directory",
-					$"The target directory:\n\"{directory}\"\nis not under SVN control. Should it be added?",
+					$"The target directory (the meta):\n\"{directory}\"\nis not under git control. Should it be added?",
 					"Add it!",
 					"Cancel"
 #if UNITY_2019_4_OR_NEWER
-					, DialogOptOutDecisionType.ForThisSession, "WiseSVN.AddUnversionedFolder"
+					, DialogOptOutDecisionType.ForThisSession, "WiseGit.AddUnversionedFolder"
 				))
 #else
 				))
@@ -1198,15 +1244,10 @@ namespace DevLocker.VersionControl.WiseGit
 		}
 
 		/// <summary>
-		/// Adds all parent unversioned folders AND THEIR META FILES!
+		/// Adds all parent unversioned folders META FILES!
 		/// </summary>
 		public static bool AddParentFolders(string newDirectory, IShellMonitor shellMonitor = null)
 		{
-			// --parents will add all unversioned parent directories as well.
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"add --parents --depth empty \"{GitFormatPath(newDirectory)}\"", COMMAND_TIMEOUT, shellMonitor);
-			if (result.HasErrors)
-				return false;
-
 			// If working outside Assets folder, don't consider metas.
 			if (!newDirectory.StartsWith("Assets", StringComparison.OrdinalIgnoreCase))
 				return true;
@@ -1216,7 +1257,8 @@ namespace DevLocker.VersionControl.WiseGit
 			var directoryMetaStatus = GetStatus(directoryMeta).Status; // Will be unversioned.
 			while (directoryMetaStatus == VCFileStatus.Unversioned) {
 
-				result = ShellUtils.ExecuteCommand(Git_Command, $"add \"{GitFormatPath(directoryMeta)}\"", COMMAND_TIMEOUT, shellMonitor);
+				// Don't use the Add() method, as it calls this one.
+				var result = ShellUtils.ExecuteCommand(Git_Command, $"add --force \"{GitFormatPath(directoryMeta)}\"", COMMAND_TIMEOUT, shellMonitor);
 				if (result.HasErrors)
 					return false;
 
@@ -1233,22 +1275,22 @@ namespace DevLocker.VersionControl.WiseGit
 		}
 
 		/// <summary>
-		/// Delete file in SVN directly (without GUI).
+		/// Delete file in git directly (without GUI).
 		/// </summary>
-		/// <param name="keepLocal">Will mark files for deletion, without removing them from disk</param>
+		/// <param name="keepLocal">Will mark files for deletion, without removing them from the working tree</param>
 		public static bool Delete(string path, bool includeMeta, bool keepLocal, IShellMonitor shellMonitor = null)
 		{
 			if (string.IsNullOrEmpty(path))
 				return true;
 
-			var keepLocalArg = keepLocal ? "--keep-local" : "";
+			var keepLocalArg = keepLocal ? "--cached" : "";
 
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"delete --force {keepLocalArg} \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, shellMonitor);
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"rm --force -r {keepLocalArg} \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, shellMonitor);
 			if (result.HasErrors)
 				return false;
 
 			if (includeMeta) {
-				result = ShellUtils.ExecuteCommand(Git_Command, $"delete --force {keepLocalArg} \"{GitFormatPath(path + ".meta")}\"", COMMAND_TIMEOUT, shellMonitor);
+				result = ShellUtils.ExecuteCommand(Git_Command, $"rm --force -r {keepLocalArg} \"{GitFormatPath(path + ".meta")}\"", COMMAND_TIMEOUT, shellMonitor);
 				if (result.HasErrors)
 					return false;
 			}
@@ -1261,63 +1303,35 @@ namespace DevLocker.VersionControl.WiseGit
 		/// </summary>
 		public static bool HasAnyConflicts(string path, int timeout = COMMAND_TIMEOUT * 4, IShellMonitor shellMonitor = null)
 		{
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"status --depth=infinity \"{GitFormatPath(path)}\"", timeout, shellMonitor);
+			List<GitStatusData> resultEntries = new List<GitStatusData>();
+			StatusOperationResult result = GetStatuses(path, offline: true, resultEntries, timeout, shellMonitor);
 
-			if (!string.IsNullOrEmpty(result.Error)) {
+			if (result != StatusOperationResult.Success)
+				throw new IOException($"Trying to get conflict status for file {path} caused error:\n{result}!");
 
-				// svn: warning: W155010: The node '...' was not found.
-				// This can be returned when path is under unversioned directory. In that case we consider it is unversioned as well.
-				if (result.Error.Contains("W155010")) {
-					return false;
-				}
-
-				throw new IOException($"Trying to get status for file {path} caused error:\n{result.Error}!");
-			}
-
-			return result.Output.Contains("Summary of conflicts:");
+			return resultEntries.Any(status => status.IsConflicted);
 		}
 
 		/// <summary>
-		/// List files and folders in specified url directory.
-		/// Results will be appended to resultPaths. Paths will be relative to the url.
-		/// If entry is a folder, it will end with a '/' character.
+		/// List files and folders in specified remote branch directory.
+		/// Results will be appended to resultPaths. Paths will be relative to the specified directory.
+		/// Example: "origin/master", "Assets/Art"
 		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
 		/// </summary>
-		public static ListOperationResult ListURL(string url, bool recursive, List<string> resultPaths, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static ListOperationResult ListRemote(string remoteBranch, string remoteDirectory, bool recursive, List<string> resultPaths, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
 		{
-			var depth = recursive ? "infinity" : "immediates";
+			string recursiveArg = recursive ? "-r" : "";
 
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"list --depth {depth} \"{GitFormatPath(url)}\"", timeout, shellMonitor);
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"ls-tree --full-name --name-only {recursiveArg} {remoteBranch}:{remoteDirectory}", timeout, shellMonitor);
 
 			if (!string.IsNullOrEmpty(result.Error)) {
 
-				// User needs to log in using normal SVN client and save their authentication.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-				// svn: E215004: No more credentials or we tried too many times.
-				// Authentication failed
-				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
-					return ListOperationResult.AuthenticationFailed;
-
-				// Unable to connect to repository indicating some network or server problems.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E731001: No such host is known.
-				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
-					return ListOperationResult.UnableToConnectError;
-
-				// URL or local path not found (or invalid working copy path).
-				// svn: warning: W155010: The node '...' was not found.
-				// svn: E155007: '...' is not a working copy
-				// svn: warning: W160013: URL 'https://...' non-existent in revision 59280
-				// svn: E200009: Could not list all targets because some targets don't exist
-				if (result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009"))
+				// Remote directory not found.
+				// fatal: Not a valid object name origin/master:sadasda
+				if (result.Error.Contains("Not a valid object name"))
 					return ListOperationResult.NotFound;
 
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return ListOperationResult.Timeout;
-
-				return ListOperationResult.UnknownError;
+				return (ListOperationResult) ParseCommonStatusError(result.Error);
 			}
 
 			var output = result.Output.Replace("\r", "");
@@ -1332,10 +1346,10 @@ namespace DevLocker.VersionControl.WiseGit
 		/// If entry is a folder, it will end with a '/' character.
 		/// NOTE: If assembly reload happens, task will be lost, complete handler won't be called.
 		/// </summary>
-		public static GitAsyncOperation<ListOperationResult> ListURLAsync(string url, bool recursive, List<string> resultPaths, int timeout = -1)
+		public static GitAsyncOperation<ListOperationResult> ListRemoteAsync(string remoteBranch, string remoteDirectory, bool recursive, List<string> resultPaths, int timeout = -1)
 		{
 			var threadResults = new List<string>();
-			var operation = GitAsyncOperation<ListOperationResult>.Start(op => ListURL(url, recursive, threadResults, timeout, op));
+			var operation = GitAsyncOperation<ListOperationResult>.Start(op => ListRemote(remoteBranch, remoteDirectory, recursive, threadResults, timeout, op));
 			operation.Completed += (op) => {
 				resultPaths.AddRange(threadResults);
 			};
@@ -1343,494 +1357,45 @@ namespace DevLocker.VersionControl.WiseGit
 			return operation;
 		}
 
+
 		/// <summary>
-		/// Performs show log operation based on the provided parameters. The less data it needs to fetch the faster it will go.
-		/// Returned paths are absolute: /trunk/YourProject/Foo.cs
-		/// "StopOnCopy = false" may result in entries that do not match requested path (since they were moved but are part of its history).
-		/// In that case you may end up with empty AffectedPaths array.
-		/// Search query may have additional "--search" or "--search-and" options. Check the SVN documentation.
-		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
+		/// Retrieve working branch name that is checked out.
+		/// E.g. master
 		/// </summary>
-		public static LogOperationResult Log(string assetPathOrUrl, LogParams logParams, List<LogEntry> resultEntries, int timeout = ONLINE_COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static string GetWorkingBranch(string workingDirectory = "")
 		{
-			var fetchAffectedPathsStr = logParams.FetchAffectedPaths ? "-v" : "";
-			var fetchCommitMessagesStr = logParams.FetchCommitMessages ? "" : "-q";
-			var stopOnCopyStr = logParams.StopOnCopy ? "--stop-on-copy" : "";
-			var limitStr = logParams.Limit > 0 ? "-l " + logParams.Limit : "";
-			var searchStr = string.IsNullOrEmpty(logParams.SearchQuery) ? "" : "--search " + logParams.SearchQuery;
-
-			var rangeStr = logParams.RangeEnd;
-			bool hasRangeStart = !string.IsNullOrWhiteSpace(logParams.RangeStart);
-			bool hasRangeEnd = !string.IsNullOrWhiteSpace(logParams.RangeEnd);
-			if (hasRangeStart) {
-				rangeStr = logParams.RangeStart + (hasRangeEnd ? $":{logParams.RangeEnd}" : "");
-			}
-
-			if (!string.IsNullOrWhiteSpace(rangeStr)) {
-				rangeStr = "-r " + rangeStr;
-			}
-
-			var args = $"{fetchAffectedPathsStr} {fetchCommitMessagesStr} {stopOnCopyStr} {limitStr} {searchStr} {rangeStr}";
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"log {args} \"{GitFormatPath(assetPathOrUrl)}\"", timeout, shellMonitor);
-
-			var relativeURL = AssetPathToRelativeURL(assetPathOrUrl);
-
-			if (!string.IsNullOrEmpty(result.Error)) {
-
-				// User needs to log in using normal SVN client and save their authentication.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E230001: Server SSL certificate verification failed: issuer is not trusted
-				// svn: E215004: No more credentials or we tried too many times.
-				// Authentication failed
-				if (result.Error.Contains("E230001") || result.Error.Contains("E215004"))
-					return LogOperationResult.AuthenticationFailed;
-
-				// Unable to connect to repository indicating some network or server problems.
-				// svn: E170013: Unable to connect to a repository at URL '...'
-				// svn: E731001: No such host is known.
-				if (result.Error.Contains("E170013") || result.Error.Contains("E731001"))
-					return LogOperationResult.UnableToConnectError;
-
-				// URL is local path that is not a proper SVN working copy.
-				// svn: E155010: The node '...' was not found.
-				// svn: E155007: '...' is not a working copy
-				// svn: E160013: '...' path not found
-				// svn: E200009: Could not list all targets because some targets don't exist
-				if (result.Error.Contains("E155010") || result.Error.Contains("E155007") || result.Error.Contains("E160013") || result.Error.Contains("E200009"))
-					return LogOperationResult.NotFound;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return LogOperationResult.Timeout;
-
-				return LogOperationResult.UnknownError;
-			}
-
-			try {
-
-				// Each entry is separated by that many dashes.
-				const string entriesSeparator = "------------------------------------------------------------------------";
-				var outputEntries = result.Output
-					.Replace("\r", "")
-					.Split(new string[] { entriesSeparator }, StringSplitOptions.RemoveEmptyEntries)
-					.Select(line => line.Trim())
-					;
-
-				foreach (var outputEntry in outputEntries) {
-
-					// Last line is empty.
-					if (string.IsNullOrEmpty(outputEntry))
-						break;
-
-					var lines = outputEntry.Split('\n');    // Empty lines are valid
-					int lineIndex = 0;
-
-					var logEntry = new LogEntry();
-
-					// First line always exists and contains basic info (last one is the commit message number of lines, optional):
-					// r59162 | nikola | 2020-06-24 14:21:35 +0300 (ср, 24 юни 2020)
-					// r59162 | nikola | 2020-06-24 14:21:35 +0300 (ср, 24 юни 2020) | 2 lines
-					var basicInfos = lines[lineIndex].Split('|');
-
-					logEntry.Revision = int.Parse(basicInfos[0].TrimStart('r'));
-					logEntry.Author = basicInfos[1].Trim();
-					logEntry.Date = basicInfos[2].Trim();
-					lineIndex++;
-
-					if (logParams.FetchAffectedPaths) {
-						// Skip this line.
-						Debug.Assert(lines[lineIndex] == "Changed paths:", "Invalid log format!");
-						lineIndex++;
-
-						var logPaths = new List<LogPath>(lines.Length);
-
-						// Affected paths are printed ending with an empty line (or run out of lines).
-						for(; lineIndex < lines.Length && !string.IsNullOrWhiteSpace(lines[lineIndex]); ++lineIndex) {
-							var line = lines[lineIndex];
-							var logPath = new LogPath();
-
-							// Example paths:
-							//    M /branches/YourBranch/SomeFolder
-							//    A /branches/YourBranch/SomeFile.cs (from /branches/YourBranch/OldFileName.cs:58540)
-
-							const string changeOpening = "   A ";
-
-							logPath.Change = m_LogPathChangesMap[line[changeOpening.Length - 2]];
-
-							bool wasMoved = logPath.Added && line[line.Length - 1] == ')';
-
-							if (wasMoved) { // Maybe was moved
-
-								const string copyFromOpening = "(from ";
-								var openBracketIndex = line.IndexOf(copyFromOpening);
-
-								if (openBracketIndex != -1) {
-									var from = line.Substring(openBracketIndex + copyFromOpening.Length, line.Length - 1 - openBracketIndex - copyFromOpening.Length);
-
-									var revisionColon = from.LastIndexOf(':');
-
-									if (revisionColon != -1) {
-										logPath.CopiedFrom = from.Substring(0, revisionColon);
-										bool success = int.TryParse(from.Substring(revisionColon + 1), out logPath.CopiedFromRevision);
-
-										if (success) {
-											logPath.Path = line.Substring(changeOpening.Length, openBracketIndex - changeOpening.Length - 1); // -1 is for the space before the bracket
-										} else {
-											wasMoved = false;	// Oh well...
-										}
-									} else {
-										// Probably folder that contains special elements: "Memories (from my childhood)".
-										wasMoved = false;
-									}
-
-								} else {
-									// Probably a folder ending with ')'
-									wasMoved = false;
-								}
-							}
-
-							if (!wasMoved) {
-								logPath.CopiedFrom = string.Empty;
-								logPath.Path = line.Substring(changeOpening.Length);
-							}
-
-							logPaths.Add(logPath);
-						}
-
-						logEntry.AllPaths = logPaths.ToArray();
-						logEntry.AffectedPaths = logPaths
-							.Where(lp => lp.Path.Contains(relativeURL) || lp.CopiedFrom.Contains(relativeURL))
-							.ToArray()
-							;
-
-					} else {
-						logEntry.AffectedPaths = new LogPath[0];
-						logEntry.AllPaths = new LogPath[0];
-					}
-
-
-					logEntry.Message = logParams.FetchCommitMessages
-						? string.Join("\n", lines.Skip(lineIndex)).Trim()
-						: ""
-						;
-
-					resultEntries.Add(logEntry);
-				}
-
-			} catch (System.Threading.ThreadAbortException) {
-				// Thread was aborted.
-				resultEntries.Clear();
-				return LogOperationResult.UnknownError;
-			} catch (Exception ex) {
-				// Parsing failed... unsupported format?
-				Debug.LogException(ex);
-				resultEntries.Clear();
-				return LogOperationResult.UnknownError;
-			}
-
-			return LogOperationResult.Success;
+			return ShellUtils.ExecuteCommand(Git_Command, "rev-parse --abbrev-ref HEAD", workingDirectory, COMMAND_TIMEOUT).Output;
 		}
 
 		/// <summary>
-		/// Performs show log operation based on the provided parameters. The less data it needs to fetch the faster it will go.
-		/// Returned paths are absolute: /trunk/YourProject/Foo.cs
-		/// "StopOnCopy = false" may result in entries that do not match requested path (since they were moved but are part of its history).
-		/// In that case you may end up with empty AffectedPaths array.
-		/// Search query may have additional "--search" or "--search-and" options. Check the SVN documentation.
-		/// NOTE: If assembly reload happens, task will be lost, complete handler won't be called.
+		/// Retrieve tracked remote branch of the working directory one.
+		/// E.g. origin/master
 		/// </summary>
-		public static GitAsyncOperation<LogOperationResult> LogAsync(string assetPathOrUrl, LogParams logParams, List<LogEntry> resultEntries, int timeout = -1)
+		public static string GetTrackedRemoteBranch(string workingDirectory = "")
 		{
-			var threadResults = new List<LogEntry>();
-			var operation = GitAsyncOperation<LogOperationResult>.Start(op => Log(assetPathOrUrl, logParams, resultEntries, timeout, op));
-			operation.Completed += (op) => {
-				resultEntries.AddRange(threadResults);
-			};
-
-			return operation;
-		}
-
-
-		/// <summary>
-		/// Performs propget operation based on the provided parameters.
-		/// Example property names: "svn:ignore", "svn:mergeinfo", "tsvn:logminsize"
-		/// NOTE: This is synchronous operation. Better use the Async method version to avoid editor slow down.
-		/// </summary>
-		public static PropOperationResult Propget(string assetPath, string property, bool recursive, List<PropgetEntry> resultEntries, int timeout = COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
-		{
-			var depth = recursive ? "infinity" : "empty";
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"propget \"{property}\" --depth={depth} -v \"{GitFormatPath(assetPath)}\"", timeout, shellMonitor);
-
-			if (!string.IsNullOrEmpty(result.Error)) {
-
-				// URL or local path not found (or invalid working copy path).
-				// svn: E200005: '...' is not under version control
-				// svn: warning: W155010: The node '...' was not found.
-				// svn: E155007: '...' is not a working copy
-				// svn: warning: W160013: URL 'https://...' non-existent in revision 59280
-				// svn: E200009: Could not list all targets because some targets don't exist
-				if (result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009") || result.Error.Contains("E200005"))
-					return PropOperationResult.NotFound;
-
-				// Property doesn't exist (yet). Just return empty list.
-				// svn: warning: W200017: Property 'svn:ignore' not found on '...'
-				if (result.Error.Contains("W200017"))
-					return PropOperationResult.Success;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return PropOperationResult.Timeout;
-
-				return PropOperationResult.UnknownError;
-			}
-
-			/* Example output format:
-				Properties on '.':
-				  svn:ignore
-					.vs
-					Assembly-CSharp-Editor.csproj
-					Assembly-CSharp.csproj
-					DevLocker.VersionControl.WiseSVN.csproj
-
-				Properties on 'Assets':
-				  svn:ignore
-					AssetStoreTools
-					AssetStoreTools.meta
-
-				Properties on 'Foo - Bar':
-				  svn:ignore
-					Food - Bar.txt
-					Food2.txt
-
-			*/
-
-			if (string.IsNullOrWhiteSpace(result.Output))
-				return PropOperationResult.Success;
-
-			var outputLines = result.Output.Trim().Split('\n');
-
-			var entry = new PropgetEntry();
-			var value = new StringBuilder();
-
-			for(int i = 0; i < outputLines.Length; ++i) {
-				var line = outputLines[i].Trim();
-
-				if (line.StartsWith("Properties on ", StringComparison.OrdinalIgnoreCase)) {
-					int pathStartIndex = line.IndexOf('\'') + 1;
-					entry.Path = line.Substring(pathStartIndex, line.LastIndexOf('\'') - pathStartIndex);
-
-					++i;	// Skip the next line as well - it's the name of the property.
-					continue;
-				}
-
-				value.AppendLine(line);	// It will be trimmed if empty, no worry.
-
-				if (i + 1 >= outputLines.Length || (line.Length == 0 && outputLines[i + 1].StartsWith("Properties on ", StringComparison.OrdinalIgnoreCase))) {
-					entry.Value = value.ToString().Replace("\r", "").Trim(); // Because StringBuilder inserts \r :(
-					resultEntries.Add(entry);
-
-					entry = new PropgetEntry();
-					value.Clear();
-					continue;
-				}
-			}
-
-			return PropOperationResult.Success;
+			return ShellUtils.ExecuteCommand(Git_Command, "rev-parse --abbrev-ref --symbolic-full-name @{u}", workingDirectory, COMMAND_TIMEOUT).Output;
 		}
 
 		/// <summary>
-		/// Performs propget operation based on the provided parameters.
-		/// Example property names: "svn:ignore", "svn:mergeinfo", "tsvn:logminsize"
+		/// Retrieve tracked remote.
+		/// E.g. origin
 		/// </summary>
-		public static GitAsyncOperation<PropOperationResult> PropgetAsync(string assetPath, string property, bool recursive, List<PropgetEntry> resultEntries, int timeout = -1)
+		public static string GetTrackedRemote(string workingDirectory = "")
 		{
-			var threadResults = new List<PropgetEntry>();
-			var operation = GitAsyncOperation<PropOperationResult>.Start(op => Propget(assetPath, property, recursive, resultEntries, timeout, op));
-			operation.Completed += (op) => {
-				resultEntries.AddRange(threadResults);
-			};
-
-			return operation;
+			return ShellUtils.ExecuteCommand(Git_Command, "rev-parse --abbrev-ref --symbolic-full-name @{u}", workingDirectory, COMMAND_TIMEOUT).Output.Split('/').FirstOrDefault();
 		}
 
 		/// <summary>
-		/// Performs propset operation based on the provided parameters. Old prop value will be overridden.
-		/// Example property names: "svn:ignore", "svn:mergeinfo", "tsvn:logminsize"
+		/// Retrieve the commit (SHA) where current working branch diverged from the remote one.
 		/// </summary>
-		public static PropOperationResult Propset(string assetPath, string property, string valueOverride, bool recursive = false, int timeout = COMMAND_TIMEOUT, IShellMonitor shellMonitor = null)
+		public static string GetWorkingBranchDivergingCommit(string workingDirectory = "")
 		{
-			var depth = recursive ? "infinity" : "empty";
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"propset \"{property}\" \"{valueOverride}\" --depth={depth} \"{GitFormatPath(assetPath)}\"", timeout, shellMonitor);
-
-			if (!string.IsNullOrEmpty(result.Error)) {
-
-				// URL or local path not found (or invalid working copy path).
-				// svn: E200005: '...' is not under version control
-				// svn: warning: W155010: The node '...' was not found.
-				// svn: E155007: '...' is not a working copy
-				// svn: warning: W160013: URL 'https://...' non-existent in revision 59280
-				// svn: E200009: Could not list all targets because some targets don't exist
-				// svn: E155010: The node '...' was not found.
-				if (result.Error.Contains("E155010") || result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009") || result.Error.Contains("E200005"))
-					return PropOperationResult.NotFound;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return PropOperationResult.Timeout;
-
-				return PropOperationResult.UnknownError;
-			}
-
-			// Output should be something like this:
-			// property 'svn:ignore' set on 'Assets'
-
-			// But we don't really need to check it.
-
-			return PropOperationResult.Success;
+			return ShellUtils.ExecuteCommand(Git_Command, $"merge-base --fork-point {GetTrackedRemoteBranch()}", workingDirectory, COMMAND_TIMEOUT).Output;
 		}
 
 		/// <summary>
-		/// Associate changelist <paramref name="changelistName"/> with the <paramref name="assetPath"/>.
-		/// </summary>
-		public static ChangelistOperationResult ChangelistAdd(string assetPath, string changelistName, bool recursive = false, IShellMonitor shellMonitor = null)
-		{
-			var depth = recursive ? "infinity" : "empty";
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"changelist \"{changelistName}\" --depth={depth} \"{GitFormatPath(assetPath)}\"", COMMAND_TIMEOUT, shellMonitor);
-
-			if (!string.IsNullOrEmpty(result.Error)) {
-
-				// URL or local path not found (or invalid working copy path).
-				// svn: E200005: '...' is not under version control
-				// svn: warning: W155010: The node '...' was not found.
-				// svn: E155007: '...' is not a working copy
-				// svn: warning: W160013: URL 'https://...' non-existent in revision 59280
-				// svn: E200009: Could not list all targets because some targets don't exist
-				// svn: E155010: The node '...' was not found.
-				if (result.Error.Contains("E155010") || result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009") || result.Error.Contains("E200005"))
-					return ChangelistOperationResult.NotFound;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return ChangelistOperationResult.Timeout;
-
-				return ChangelistOperationResult.UnknownError;
-			}
-
-			return ChangelistOperationResult.Success;
-		}
-
-		/// <summary>
-		/// Remove <paramref name="assetPath"/> from the changelist it belongs to.
-		/// </summary>
-		public static ChangelistOperationResult ChangelistRemove(string assetPath, bool recursive = false, IShellMonitor shellMonitor = null)
-		{
-			var depth = recursive ? "infinity" : "empty";
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"changelist --remove --depth={depth} \"{GitFormatPath(assetPath)}\"", COMMAND_TIMEOUT, shellMonitor);
-
-			if (!string.IsNullOrEmpty(result.Error)) {
-
-				// URL or local path not found (or invalid working copy path).
-				// svn: E200005: '...' is not under version control
-				// svn: warning: W155010: The node '...' was not found.
-				// svn: E155007: '...' is not a working copy
-				// svn: warning: W160013: URL 'https://...' non-existent in revision 59280
-				// svn: E200009: Could not list all targets because some targets don't exist
-				// svn: E155010: The node '...' was not found.
-				if (result.Error.Contains("E155010") || result.Error.Contains("W155010") || result.Error.Contains("E155007") || result.Error.Contains("W160013") || result.Error.Contains("E200009") || result.Error.Contains("E200005"))
-					return ChangelistOperationResult.NotFound;
-
-				// Operation took too long, shell utils time out kicked in.
-				if (result.Error.Contains(ShellUtils.TIME_OUT_ERROR_TOKEN))
-					return ChangelistOperationResult.Timeout;
-
-				return ChangelistOperationResult.UnknownError;
-			}
-
-			return ChangelistOperationResult.Success;
-		}
-
-
-
-		/// <summary>
-		/// Convert Unity asset path to svn URL. Works with files and folders.
-		/// Example: https://yourcompany.com/svn/trunk/YourProject/Assets/Foo.cs
-		/// </summary>
-		public static string AssetPathToURL(string assetPath)
-		{
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"info \"{GitFormatPath(assetPath)}\"", COMMAND_TIMEOUT);
-
-			if (result.HasErrors)
-				return string.Empty;
-
-			return ExtractLineValue("URL:", result.Output);
-		}
-
-		/// <summary>
-		/// Convert Unity asset path to relative repo URL. Works with files and folders.
-		/// Example: /trunk/YourProject/Assets/Foo.cs
-		/// </summary>
-		public static string AssetPathToRelativeURL(string assetPathOrUrl)
-		{
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"info \"{GitFormatPath(assetPathOrUrl)}\"", COMMAND_TIMEOUT);
-
-			if (result.HasErrors)
-				return string.Empty;
-
-			return ExtractLineValue("Relative URL:", result.Output).TrimStart('^');
-		}
-
-		/// <summary>
-		/// Get working copy root path on disk (the root of your checkout). Working copy root can be different from the Unity project folder.
-		/// </summary>
-		public static string WorkingCopyRootPath()
-		{
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"info \"{GitFormatPath(ProjectRootNative)}\"", COMMAND_TIMEOUT);
-
-			if (result.HasErrors)
-				return string.Empty;
-
-			return ExtractLineValue("Working Copy Root Path:", result.Output);
-		}
-
-		/// <summary>
-		/// Get working copy root URL at your svn repository. Working copy root can be different from the Unity project folder.
-		/// </summary>
-		public static string WorkingCopyRootURL()
-		{
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"info \"{GitFormatPath(WorkingCopyRootPath())}\"", COMMAND_TIMEOUT);
-
-			if (result.HasErrors)
-				return string.Empty;
-
-			return ExtractLineValue("URL:", result.Output);
-		}
-
-		/// <summary>
-		/// Get the revision number of the last change at specified location.
-		/// Returns -1 if failed.
-		/// </summary>
-		public static int LastChangedRevision(string assetPathOrUrl)
-		{
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"info \"{GitFormatPath(assetPathOrUrl)}\"", COMMAND_TIMEOUT);
-
-			if (result.HasErrors)
-				return -1;
-
-			var revisionStr = ExtractLineValue("Last Changed Rev:", result.Output);
-			if (string.IsNullOrEmpty(revisionStr))
-				return -1;
-
-			return int.Parse(revisionStr);
-		}
-
-		/// <summary>
-		/// Checks if SVN CLI is setup and working properly.
-		/// Returns string containing the SVN errors if any.
+		/// Checks if git CLI is setup and working properly.
+		/// Returns string containing the git errors if any.
 		/// </summary>
 		public static string CheckForGitErrors()
 		{
@@ -1840,21 +1405,32 @@ namespace DevLocker.VersionControl.WiseGit
 		}
 
 		/// <summary>
-		/// Checks if SVN can authenticate properly.
+		/// Checks if git can authenticate properly.
 		/// This is asynchronous operation as it may take some time. Wait for the result.
 		/// </summary>
 		public static GitAsyncOperation<StatusOperationResult> CheckForGitAuthErrors()
 		{
-			return GetStatusesAsync(ProjectRootNative, false, false, new List<GitStatusData>(), false, ONLINE_COMMAND_TIMEOUT * 2);
+			var operation = GitAsyncOperation<StatusOperationResult>.Start(op => {
+				// This requres authentication.
+				var result = ShellUtils.ExecuteCommand(Git_Command, $"remote show {GetTrackedRemote()}", COMMAND_TIMEOUT);
+
+				if (result.HasErrors) {
+					return ParseCommonStatusError(result.Error);
+				}
+
+				return StatusOperationResult.Success;
+			});
+
+			return operation;
 		}
 
 		internal static void PromptForAuth(string path)
 		{
-			ShellUtils.ExecutePrompt(Git_Command, $"status  --depth=empty -u \"{GitFormatPath(path)}\"");
+			ShellUtils.ExecutePrompt(Git_Command, $"fetch", path);
 
 #if UNITY_EDITOR_OSX
 			// Interact with the user since we don't know when the terminal will close.
-			EditorUtility.DisplayDialog("SVN Authenticate", "A terminal window was open. When you authenticated in the terminal window, press \"Ready\".", "Ready");
+			EditorUtility.DisplayDialog("Git Authenticate", "A terminal window was open. When you authenticated in the terminal window, press \"Ready\".", "Ready");
 #endif
 		}
 
@@ -1890,10 +1466,10 @@ namespace DevLocker.VersionControl.WiseGit
 				if (!isMeta && !Silent) {
 					bool choice = EditorUtility.DisplayDialog(
 						"Deleted file",
-						$"The desired location\n\"{path}\"\nis marked as deleted in SVN. The file will be replaced in SVN with the new one.\n\nIf this is an automated change, consider adding this file to the exclusion list in the project preferences:\n\"{SVNPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\n...or change your tool to silence the integration.",
+						$"The desired location\n\"{path}\"\nis marked as deleted in git. The file will be replaced in git with the new one.\n\nIf this is an automated change, consider adding this file to the exclusion list in the project preferences:\n\"{GitPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\n...or change your tool to silence the integration.",
 						"Replace"
 #if UNITY_2019_4_OR_NEWER
-						, DialogOptOutDecisionType.ForThisSession, "WiseSVN.ReplaceFile"
+						, DialogOptOutDecisionType.ForThisSession, "WiseGit.ReplaceFile"
 					);
 #else
 					);
@@ -1904,14 +1480,11 @@ namespace DevLocker.VersionControl.WiseGit
 				*/
 
 				using (var reporter = CreateReporter()) {
-					reporter.AppendTraceLine($"Created file \"{path}\" has deleted svn status. Reverting SVN status, while keeping the original file...");
+					reporter.AppendTraceLine($"Created file \"{path}\" has deleted git status. Reverting git status, while keeping the original file...");
 
-					// File isn't still created, so we need to improvise.
-					var result = ShellUtils.ExecuteCommand(Git_Command, $"revert \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, reporter);
+					// Reset will restore the file in the index, but not in the working tree. For this do "git checkout -- <file>".
+					var result = ShellUtils.ExecuteCommand(Git_Command, $"reset -q -- \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, reporter);
 					Debug.Assert(!result.HasErrors, "Revert of deleted file failed.");
-					File.Delete(path);
-
-
 
 					if (isMeta) {
 						var mainAssetPath = path.Substring(0, path.Length - ".meta".Length);
@@ -1919,17 +1492,13 @@ namespace DevLocker.VersionControl.WiseGit
 						var mainStatusData = GetStatus(mainAssetPath, true, reporter);
 
 						// If asset came OUTSIDE of Unity, OnWillCreateAsset() will get called only for it's meta,
-						// leaving the main asset with Deleted svn status and existing file.
+						// leaving the main asset with Deleted git status and existing file.
 						if (File.Exists(mainAssetPath) && mainStatusData.Status == VCFileStatus.Deleted) {
+							reporter.AppendTraceLine($"Asset \"{mainAssetPath}\" was created from outside Unity and has deleted git status. Reverting git status, while keeping the original file...");
 
-							reporter.AppendTraceLine($"Asset \"{mainAssetPath}\" was created from outside Unity and has deleted SVN status. Reverting SVN status, while keeping the original file...");
-							File.Move(mainAssetPath, mainAssetPath + ".tmp");
-
-							result = ShellUtils.ExecuteCommand(Git_Command, $"revert \"{GitFormatPath(mainAssetPath)}\"", COMMAND_TIMEOUT, reporter);
+							// Reset will restore the file in the index, but not in the working tree. For this do "git checkout -- <file>".
+							result = ShellUtils.ExecuteCommand(Git_Command, $"reset -q -- \"{GitFormatPath(mainAssetPath)}\"", COMMAND_TIMEOUT, reporter);
 							Debug.Assert(!result.HasErrors, "Revert of deleted file failed.");
-							File.Delete(mainAssetPath);
-
-							File.Move(mainAssetPath + ".tmp", mainAssetPath);
 						}
 					}
 				}
@@ -1949,20 +1518,12 @@ namespace DevLocker.VersionControl.WiseGit
 
 			using (var reporter = CreateReporter()) {
 
-				var result = ShellUtils.ExecuteCommand(Git_Command, $"delete --force \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, reporter);
+				var result = ShellUtils.ExecuteCommand(Git_Command, $"rm --force -r \"{GitFormatPath(path)}\"", COMMAND_TIMEOUT, reporter);
 				if (result.HasErrors) {
 
-					// svn: E125001: '...' does not exist
-					// Unversioned file got deleted or is missing. Let someone else show the error if any.
-					if (result.Error.Contains("E125001")) {
-						reporter.ClearLogsAndErrorFlag();
-						return AssetDeleteResult.DidNotDelete;
-					}
-
-					// svn: E155007: '...' is not a working copy
-					// Unversioned file in unversioned sub folder. Whatever the reason, we don't care about it - skip it.
-					// NOTE: This should not happen, as status above should be unversioned, but it does while baking unversioned scene.
-					if (result.Error.Contains("E155007")) {
+					// fatal: pathspec '...' did not match any files
+					// Unversioned file got deleted or is already marked for deletion (staged). Let someone else show the error if any.
+					if (result.Error.Contains("did not match any files")) {
 						reporter.ClearLogsAndErrorFlag();
 						return AssetDeleteResult.DidNotDelete;
 					}
@@ -1970,20 +1531,12 @@ namespace DevLocker.VersionControl.WiseGit
 					return AssetDeleteResult.FailedDelete;
 				}
 
-				result = ShellUtils.ExecuteCommand(Git_Command, $"delete --force \"{GitFormatPath(path + ".meta")}\"", COMMAND_TIMEOUT, reporter);
+				result = ShellUtils.ExecuteCommand(Git_Command, $"rm --force \"{GitFormatPath(path + ".meta")}\"", COMMAND_TIMEOUT, reporter);
 				if (result.HasErrors) {
 
-					// svn: E125001: '...' does not exist
-					// Unversioned file got deleted or is missing. Let someone else show the error if any.
-					if (result.Error.Contains("E125001")) {
-						reporter.ClearLogsAndErrorFlag();
-						return AssetDeleteResult.DidNotDelete;
-					}
-
-					// svn: E155007: '...' is not a working copy
-					// Unversioned file in unversioned sub folder. Whatever the reason, we don't care about it - skip it.
-					// NOTE: This should not happen, as status above should be unversioned, but it does while baking unversioned scene.
-					if (result.Error.Contains("E155007")) {
+					// fatal: pathspec '...' did not match any files
+					// Unversioned file got deleted or is already marked for deletion (staged). Let someone else show the error if any.
+					if (result.Error.Contains("did not match any files")) {
 						reporter.ClearLogsAndErrorFlag();
 						return AssetDeleteResult.DidNotDelete;
 					}
@@ -2000,36 +1553,61 @@ namespace DevLocker.VersionControl.WiseGit
 			if (!Enabled || TemporaryDisabled || GitPreferencesManager.ShouldExclude(m_PersonalPrefs.Exclude.Concat(m_ProjectPrefs.Exclude), oldPath))
 				return AssetMoveResult.DidNotMove;
 
+			// Let Unity log error for "already existing" folder, before we try to git-mv it, as it will put it inside the folder.
+			if (Directory.Exists(newPath))
+				return AssetMoveResult.DidNotMove;
+
 			var oldStatusData = GetStatus(oldPath);
 			bool isFolder = Directory.Exists(oldPath);
 
-			if (oldStatusData.Status == VCFileStatus.Unversioned) {
+			/* Not needed as git doesn't really do renames - it compares files and decides on-the-fly what came from where. Also, doesn't care about folders.
+			 * Moving file onto another deleted file works fine.
+			 * Moving folder onto deleted folder works fine, even if contains files with same name but different content.
+			 * Moving file or folder onto existing folder will put them inside the target folder, but Unity wouldn't allow it.
 
-				var newStatusData = GetStatus(newPath);
-				if (newStatusData.Status == VCFileStatus.Deleted) {
-					if (Silent || EditorUtility.DisplayDialog(
-						"Deleted file",
-						$"The desired location\n\"{newPath}\"\nis marked as deleted in SVN. Are you trying to replace it with a new one?",
-						"Replace",
-						"Cancel"
+			var newStatusData = GetStatus(newPath);
+			if (newStatusData.Status == VCFileStatus.Deleted) {
+				if (Silent || EditorUtility.DisplayDialog(
+					"Deleted file/folder",
+					$"The desired location\n\"{newPath}\"\nis marked as deleted in git. Are you trying to replace it with a new one?",
+					"Replace",
+					"Cancel"
 #if UNITY_2019_4_OR_NEWER
-						, DialogOptOutDecisionType.ForThisSession, "WiseSVN.ReplaceFile"
-					)) {
+					, DialogOptOutDecisionType.ForThisSession, "WiseGit.ReplaceFile"
+				)) {
 #else
-					)) {
+				)) {
 #endif
+					using (var reporter = CreateReporter()) {
+						// Remember - if deleted, target should be missing. If exists, move will fail later on anyway.
 
-						using (var reporter = CreateReporter()) {
-							if (SVNReplaceFile(oldPath, newPath, reporter)) {
-								return AssetMoveResult.DidMove;
+						if (isFolder) {
+							// Revet the destination without checkout. They will remain "missing".
+							var revertPaths = oldStatusData.Status == VCFileStatus.Unversioned
+								? new[] { newPath + ".meta" }
+								: new[] { newPath, newPath + ".meta" }
+								;
+							var revertResult = Revert(revertPaths, includeMeta: false, checkoutAfterReset: false, shellMonitor: reporter);
+							if (revertResult != RevertOperationResult.Success) {
+								return AssetMoveResult.FailedMove;
+							}
+
+						} else {
+							var revertResult = Revert(new[] { newPath }, includeMeta: true, checkoutAfterReset: false, shellMonitor: reporter);
+							if (revertResult != RevertOperationResult.Success) {
+								return AssetMoveResult.FailedMove;
 							}
 						}
-
 					}
 
+				} else {
 					return AssetMoveResult.FailedMove;
 				}
 
+			}
+			*/
+
+			if (oldStatusData.Status == VCFileStatus.Unversioned) {
 				return AssetMoveResult.DidNotMove;
 			}
 
@@ -2045,14 +1623,18 @@ namespace DevLocker.VersionControl.WiseGit
 				return AssetMoveResult.FailedMove;
 			}
 
-			if (m_PersonalPrefs.AskOnMovingFolders && isFolder && oldStatusData.Status != VCFileStatus.Unversioned && !Application.isBatchMode) {
+			if (m_PersonalPrefs.AskOnMovingFolders && isFolder
+				&& oldStatusData.Status != VCFileStatus.Unversioned
+				//&& newStatusData.Status != VCFileStatus.Deleted	// Was already asked, don't do it again.
+				&& !Application.isBatchMode) {
+
 				if (!Silent && !EditorUtility.DisplayDialog(
 					"Move Versioned Folder?",
-					$"Do you really want to move this folder in SVN?\n\"{oldPath}\"",
+					$"Do you really want to move this folder in git?\n\"{oldPath}\"",
 					"Yes",
 					"No"
 #if UNITY_2019_4_OR_NEWER
-					, DialogOptOutDecisionType.ForThisSession, "WiseSVN.AskOnMovingFolders"
+					, DialogOptOutDecisionType.ForThisSession, "WiseGit.AskOnMovingFolders"
 				)) {
 #else
 				)) {
@@ -2067,23 +1649,13 @@ namespace DevLocker.VersionControl.WiseGit
 				if (!CheckAndAddParentFolderIfNeeded(newPath, true, reporter))
 					return AssetMoveResult.FailedMove;
 
-
-				if (m_ProjectPrefs.MoveBehaviour == GitMoveBehaviour.UseAddAndDeleteForAllAssets ||
-					m_ProjectPrefs.MoveBehaviour == GitMoveBehaviour.UseAddAndDeleteForFolders && isFolder
-					) {
-
-					return MoveAssetByAddDeleteOperations(oldPath, newPath, reporter)
-						? AssetMoveResult.DidMove
-						: AssetMoveResult.FailedMove
-						;
-				}
-
-
-				var result = ShellUtils.ExecuteCommand(Git_Command, $"move \"{GitFormatPath(oldPath)}\" \"{newPath}\"", COMMAND_TIMEOUT, reporter);
+				var result = ShellUtils.ExecuteCommand(Git_Command, $"mv \"{GitFormatPath(oldPath)}\" \"{newPath}\"", COMMAND_TIMEOUT, reporter);
 				if (result.HasErrors) {
 
 					// Moving files from one repository to another is not allowed (nested checkouts or externals).
 					//svn: E155023: Cannot copy to '...', as it is not from repository '...'; it is from '...'
+					// TODO: Nested repositories support is missing?
+					/*
 					if (result.Error.Contains("E155023")) {
 
 						if (Silent || EditorUtility.DisplayDialog(
@@ -2103,109 +1675,19 @@ namespace DevLocker.VersionControl.WiseGit
 							return AssetMoveResult.FailedMove;
 						}
 
-
-						// Moving files / folder into unversioned folder, sometimes results in this strange error. Handle it gracefully.
-						//svn: E155040: Cannot move mixed-revision subtree '...' [52:53]; try updating it first
-					} else if (result.Error.Contains("try updating it first") && !Silent) {
-						var formattedError = result
-							.Error
-							.Replace(ProjectRootNative + Path.DirectorySeparatorChar, "")
-							.Replace(" '", "\n'")
-							.Replace("; ", ";\n\n");
-
-						reporter.ResetErrorFlag();
-
-						if (EditorUtility.DisplayDialog(
-							"Update Needed",
-							$"Failed to move / rename files with error: \n{formattedError}",
-							"Run Update",
-							"Cancel"
-							)) {
-
-							reporter.AppendTraceLine("Running Update via GUI...");
-							RunUpdateUI?.Invoke();
-							reporter.AppendTraceLine("Update Finished.");
-
-							if (EditorUtility.DisplayDialog(
-								"Retry Move / Rename?",
-								$"Update finished.\nDo you wish to retry moving the asset?\nAsset: {oldPath}",
-								"Retry Move / Rename",
-								"Cancel"
-								)) {
-								// Try moving it again with all the checks because the situation may have changed (conflicts & stuff).
-								reporter.Dispose();
-								return OnWillMoveAsset(oldPath, newPath);
-							} else {
-								return AssetMoveResult.FailedMove;
-							}
-
-						} else {
-							return AssetMoveResult.FailedMove;
-						}
-					} else {
-						return AssetMoveResult.FailedMove;
 					}
+					*/
+
+					return AssetMoveResult.FailedMove;
 				}
 
-				// HACK: Really don't want to copy-paste the "try update first" error handle from above a second time. Hope this case never happens here.
-				result = ShellUtils.ExecuteCommand(Git_Command, $"move \"{GitFormatPath(oldPath + ".meta")}\" \"{newPath}.meta\"", COMMAND_TIMEOUT, reporter);
+				result = ShellUtils.ExecuteCommand(Git_Command, $"mv \"{GitFormatPath(oldPath + ".meta")}\" \"{newPath}.meta\"", COMMAND_TIMEOUT, reporter);
 				if (result.HasErrors)
 					return AssetMoveResult.FailedMove;
 
 				return AssetMoveResult.DidMove;
 			}
 		}
-
-		private static bool MoveAssetByAddDeleteOperations(string oldPath, string newPath, ResultConsoleReporter reporter)
-		{
-			reporter.AppendTraceLine($"Moving file \"{oldPath}\" to \"{newPath}\" without SVN history...");
-
-			if (Directory.Exists(oldPath)) {
-				Directory.Move(oldPath, newPath);
-				Directory.Move(oldPath + ".meta", newPath + ".meta");
-			} else {
-				File.Move(oldPath, newPath);
-				File.Move(oldPath + ".meta", newPath + ".meta");
-			}
-
-			// Reset after the danger is gone (manual file operations)
-			reporter.ResetErrorFlag();
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"delete --force \"{GitFormatPath(oldPath)}\"", COMMAND_TIMEOUT, reporter);
-			if (result.HasErrors)
-				return false;
-
-			result = ShellUtils.ExecuteCommand(Git_Command, $"delete --force \"{GitFormatPath(oldPath + ".meta")}\"", COMMAND_TIMEOUT, reporter);
-			if (result.HasErrors)
-				return false;
-
-			result = ShellUtils.ExecuteCommand(Git_Command, $"add \"{GitFormatPath(newPath)}\"", COMMAND_TIMEOUT, reporter);
-			if (result.HasErrors)
-				return false;
-
-			result = ShellUtils.ExecuteCommand(Git_Command, $"add \"{GitFormatPath(newPath + ".meta")}\"", COMMAND_TIMEOUT, reporter);
-			if (result.HasErrors)
-				return false;
-
-			return true;
-		}
-
-		private static bool SVNReplaceFile(string oldPath, string newPath, IShellMonitor shellMonitor = null)
-		{
-			File.Move(oldPath, newPath);
-			File.Move(oldPath + ".meta", newPath + ".meta");
-
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"add \"{GitFormatPath(newPath)}\"", COMMAND_TIMEOUT, shellMonitor);
-			if (result.HasErrors)
-				return false;
-
-			result = ShellUtils.ExecuteCommand(Git_Command, $"add \"{GitFormatPath(newPath + ".meta")}\"", COMMAND_TIMEOUT, shellMonitor);
-			if (result.HasErrors)
-				return false;
-
-			return true;
-		}
-
 
 		internal static void LogStatusErrorHint(StatusOperationResult result, string suffix = null)
 		{
@@ -2226,11 +1708,11 @@ namespace DevLocker.VersionControl.WiseGit
 					break;
 
 				case StatusOperationResult.AuthenticationFailed:
-					displayMessage = $"SVN Error: Trying to reach server repository failed because authentication is needed!\nGo to the WiseSVN preferences to do this:\"{GitPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\nTo have working online features authenticate your svn once via CLI.";
+					displayMessage = $"Git Error: Trying to reach remote server failed because authentication is needed!\nGo to the WiseGit preferences to do this:\"{GitPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\nTo have working online features authenticate your git once via CLI.";
 					break;
 
 				case StatusOperationResult.UnableToConnectError:
-					displayMessage = "SVN Error: Unable to connect to SVN repository server. Check your network connection. Overlay icons may not work correctly.";
+					displayMessage = "Git Error: Unable to connect to git remote server. Check your network connection. Overlay icons may not work correctly.";
 					break;
 
 				case StatusOperationResult.ExecutableNotFound:
@@ -2241,18 +1723,18 @@ namespace DevLocker.VersionControl.WiseGit
 					}
 
 					if (string.IsNullOrEmpty(userPath)) {
-						displayMessage = $"SVN CLI (Command Line Interface) not found by WiseSVN. " +
-							$"Please install it or specify path to a valid \"svn\" executable in the svn preferences at \"{GitPreferencesWindow.PROJECT_PREFERENCES_MENU}\"" +
-							$"You can also disable permanently the SVN integration.";
+						displayMessage = $"Git CLI (Command Line Interface) not found by WiseGit. " +
+							$"Please install it or specify path to a valid \"git\" executable in the git preferences at \"{GitPreferencesWindow.PROJECT_PREFERENCES_MENU}\"" +
+							$"You can also disable permanently the git integration.";
 					} else {
-						displayMessage = $"Cannot find the \"svn\" executable specified in the svn preferences:\n\"{userPath}\"\n\n" +
+						displayMessage = $"Cannot find the \"git\" executable specified in the git preferences:\n\"{userPath}\"\n\n" +
 							$"You can reconfigure it in the menu:\n\"{GitPreferencesWindow.PROJECT_PREFERENCES_MENU}\"\n\n" +
-							$"You can also disable the SVN integration.";
+							$"You can also disable the git integration.";
 					}
 					break;
 
 				default:
-					displayMessage = $"SVN \"{result}\" error occurred while processing the assets. Check the logs for more info.";
+					displayMessage = $"Git \"{result}\" error occurred while processing the assets. Check the logs for more info.";
 					break;
 			}
 
@@ -2263,9 +1745,9 @@ namespace DevLocker.VersionControl.WiseGit
 			}
 		}
 
-		private static IEnumerable<GitStatusData> ExtractStatuses(string output, bool recursive, bool offline, bool fetchLockDetails, int timeout, IShellMonitor shellMonitor = null)
+		private static IEnumerable<GitStatusData> ExtractStatuses(string output)
 		{
-			var lines = output.TrimEnd().Split('\0', StringSplitOptions.RemoveEmptyEntries);
+			var lines = output.Split('\0', StringSplitOptions.RemoveEmptyEntries);
 
 			for(int lineIndex = 0; lineIndex < lines.Length; ++lineIndex) {
 				string line = lines[lineIndex];
@@ -2276,84 +1758,57 @@ namespace DevLocker.VersionControl.WiseGit
 				//if (line.StartsWith("Performing status", StringComparison.Ordinal))
 				//	continue;
 
-				// TODO: Handle ignore-on-commit
-				// If user has files in the "ignore-on-commit" list, this is added at the end plus empty line:
-				// ---Changelist 'ignore-on-commit': ...
-				//if (string.IsNullOrWhiteSpace(line))
-				//	continue;
-				//if (line.StartsWith("---", StringComparison.Ordinal))
-				//	break;
-
 				// Rules are described in "git status -h".
 				var statusData = new GitStatusData();
+				statusData.Path = line.Substring(3);
+
 				// 1st is staging/index, 2nd char is working tree/files. Prefer the working status always.
+				// Note that you can have RM, AM, AD, etc...
+				// Any 'U' means conflict.
 				char statusChar = line[1] == ' ' ? line[0] : line[1];
-				statusData.Status = m_FileStatusMap[statusChar];
-				// TODO: Handle merge status.
-				// TODO: Handle other statuses?
-				//statusData.PropertiesStatus = m_PropertyStatusMap[line[1]];
-				//statusData.SwitchedExternalStatus = m_SwitchedExternalStatusMap[line[4]];
-				//statusData.LockStatus = m_LockStatusMap[line[5]];
-				//statusData.TreeConflictStatus = m_ConflictStatusMap[line[6]];
+				bool isRenamed = line[0] == 'R' || line[1] == 'R';
+				bool isConflict = line[0] == 'U' || line[1] == 'U' || line.StartsWith("DD") || line.StartsWith("AA");
+				if (isConflict) {
+					statusData.Status = VCFileStatus.Conflicted;
+				} else {
+					if (!m_FileStatusMap.TryGetValue(statusChar, out statusData.Status)) {
+						// Print lines instead of output, as output has '\0' chars that breaks the logging.
+						throw new KeyNotFoundException($"Unknown status {statusChar}, line {lineIndex}:\n{string.Join('\n', lines)}");
+					}
+				}
+
+				// Locks are handled elsewhere.
+				statusData.LockStatus = VCLockStatus.NoLock;
 				statusData.LockDetails = LockDetails.Empty;
 
 				// Status is renamed - next line tells us from where.
-				if (statusChar == 'R') {
+				if (isRenamed) {
 					statusData.MovedFrom = lines[lineIndex + 1];
 					lineIndex++;
 				}
 
-				// TODO: Remote Status
-				// 7 columns statuses + space;
-				//int pathStart = 7 + 1;
-				//
-				//if (!offline) {
-				//	// + remote status + revision
-				//	pathStart += 13;
-				//	statusData.RemoteStatus = m_RemoteStatusMap[line[8]];
-				//}
-
-				statusData.Path = line.Substring(3);
-
 				if (IsHiddenPath(statusData.Path))
 					continue;
-
-				// TODO: Fetch lock details.
-				//if (!offline && fetchLockDetails) {
-				//	if (statusData.LockStatus != VCLockStatus.NoLock && statusData.LockStatus != VCLockStatus.BrokenLock) {
-				//		statusData.LockDetails = FetchLockDetails(statusData.Path, timeout, shellMonitor);
-				//	}
-				//}
 
 				yield return statusData;
 			}
 		}
 
 
-
-		private static string ExtractLineValue(string pattern, string str)
-		{
-			var lineIndex = str.IndexOf(pattern, StringComparison.OrdinalIgnoreCase);
-			if (lineIndex == -1)
-				return string.Empty;
-
-			var valueStartIndex = lineIndex + pattern.Length + 1;
-			var lineEndIndex = str.IndexOf("\n", valueStartIndex, StringComparison.OrdinalIgnoreCase);
-			if (lineEndIndex == -1) {
-				lineEndIndex = str.Length - 1;
-			}
-
-			// F@!$!#@!#!
-			if (str[lineEndIndex - 1] == '\r') {
-				lineEndIndex--;
-			}
-
-			return str.Substring(valueStartIndex, lineEndIndex - valueStartIndex);
-		}
-
 		private static string GitFormatPath(string path)
 		{
+			// TODO: This method made sence for SVN, not sure about git.
 			return path;
+		}
+
+		private static string GitPathspecs(IEnumerable<string> pathspecs)
+		{
+			return string.Join(" ", pathspecs.Select(p => '"' + p + '"').Select(GitFormatPath));
+		}
+
+		private static string FilterOutLines(string str, params string[] excluded)
+		{
+			return string.Join('\n', str.Split('\n').Where(line => !excluded.Any(ex => line.Contains(ex, StringComparison.OrdinalIgnoreCase))));
 		}
 
 		private static IEnumerable<string> Enumerate(string str)
@@ -2380,9 +1835,9 @@ namespace DevLocker.VersionControl.WiseGit
 			}
 
 #if UNITY_2019_4_OR_NEWER
-			EditorUtility.DisplayDialog("SVN Error", message, "I will!", DialogOptOutDecisionType.ForThisSession, "WiseSVN.ErrorMessages");
+			EditorUtility.DisplayDialog("Git Error", message, "I will!", DialogOptOutDecisionType.ForThisSession, "WiseGit.ErrorMessages");
 #else
-			EditorUtility.DisplayDialog("SVN Error", message, "I will!");
+			EditorUtility.DisplayDialog("Git Error", message, "I will!");
 #endif
 		}
 
@@ -2395,9 +1850,9 @@ namespace DevLocker.VersionControl.WiseGit
 
 			var path = AssetDatabase.GUIDToAssetPath(Selection.assetGUIDs.FirstOrDefault());
 
-			var result = ShellUtils.ExecuteCommand(Git_Command, $"status \"{GitFormatPath(path)}\"");
+			var result = ShellUtils.ExecuteCommand(Git_Command, $"status --porcelain -z \"{GitFormatPath(path)}\"");
 			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+				Debug.LogError($"Git Error: {result.Error}");
 				return;
 			}
 

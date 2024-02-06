@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.Shell;
 using System.Collections.Generic;
@@ -64,14 +64,35 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			CheckChanges(new string[] { assetPath }, false, wait);
 		}
 
-		public override void Update(IEnumerable<string> assetPaths, bool includeMeta, bool wait = false)
+		public override void Pull(bool wait = false)
 		{
-			if (!assetPaths.Any())
-				return;
+			var result = ExecuteCommand("pull", WiseGitIntegration.ProjectRootNative, wait);
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
+			}
+		}
 
-			var result = ExecuteCommand("update", GetWorkingPath(assetPaths), wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+		public override void Merge(bool wait = false)
+		{
+			var result = ExecuteCommand("merge", WiseGitIntegration.ProjectRootNative, wait);
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
+			}
+		}
+
+		public override void Fetch(bool wait = false)
+		{
+			var result = ExecuteCommand("fetch", WiseGitIntegration.ProjectRootNative, wait);
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
+			}
+		}
+
+		public override void Push(bool wait = false)
+		{
+			var result = ExecuteCommand("push", WiseGitIntegration.ProjectRootNative, wait);
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -88,8 +109,8 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 					);
 
 			var result = ExecuteCommand("commit", GetWorkingPath(assetPaths), wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -103,17 +124,15 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 					return;
 			}
 
-			// Don't give versioned metas, as tortoiseSVN doesn't like it.
 			var metas = assetPaths
 				.Select(path => path + ".meta")
-				.Where(path => WiseGitIntegration.GetStatus(path).Status == VCFileStatus.Unversioned)
 				;
 
 			var pathsArg = AssetPathsToContextPaths(includeMeta ? assetPaths.Concat(metas) : assetPaths, false);
 
 			var result = ExecuteCommand("add", pathsArg, WiseGitIntegration.ProjectRootNative, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -130,8 +149,8 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 					);
 
 			var result = ExecuteCommand("revert", GetWorkingPath(assetPaths), wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -154,8 +173,8 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 				return;
 
 			var result = ExecuteCommand("lock", AssetPathsToContextPaths(assetPaths, includeMeta), WiseGitIntegration.ProjectRootNative, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -165,8 +184,8 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 				return;
 
 			var result = ExecuteCommand("unlock", AssetPathsToContextPaths(assetPaths, includeMeta), WiseGitIntegration.ProjectRootNative, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -178,8 +197,8 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			var pathArg = Directory.Exists(assetPath) ? assetPath : Path.GetDirectoryName(assetPath);
 
 			var result = ExecuteCommand("log", pathArg, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -191,8 +210,8 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 			// Support only one file.
 
 			var result = ExecuteCommand("blame", assetPath, WiseGitIntegration.ProjectRootNative, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
@@ -200,27 +219,27 @@ namespace DevLocker.VersionControl.WiseGit.ContextMenus.Implementation
 		{
 			// NOTE: SnailGit doesn't pop up dialog for clean up. It just does some shady stuff in the background and a notification is shown some time later.
 			var result = ExecuteCommand("cleanup", WiseGitIntegration.ProjectRootNative, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
-		public override void RepoBrowser(string url, bool wait = false)
+		public override void RepoBrowser(string path, string remoteBranch, bool wait = false)
 		{
 			// SnailGit Repo-Browser doesn't accept URLs, only working copy paths which is no good for us.
 			Debug.LogError($"SnailGit doesn't support Repo-Browser very well. Opening Repo-Browser for the current working copy.");
 
 			var result = ExecuteCommand("repo-browser", string.Empty, WiseGitIntegration.ProjectRootNative, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 
-		public override void Switch(string localPath, string url, bool wait = false)
+		public override void Switch(bool wait = false)
 		{
 			var result = ExecuteCommand("switch", string.Empty, WiseGitIntegration.ProjectRootNative, wait);
-			if (!string.IsNullOrEmpty(result.Error)) {
-				Debug.LogError($"SVN Error: {result.Error}");
+			if (result.HasErrors) {
+				Debug.LogError($"Git Error: {result.Error}");
 			}
 		}
 	}

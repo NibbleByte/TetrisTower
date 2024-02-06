@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.Preferences;
 using DevLocker.VersionControl.WiseGit.Shell;
@@ -40,7 +40,7 @@ namespace DevLocker.VersionControl.WiseGit
 	/// Status extraction happens in another thread so overhead should be minimal.
 	///
 	/// NOTE: Keep in mind that this cache can be out of date.
-	///		 If you want up to date information, use the WiseGitIntegration API for direct SVN queries.
+	///		 If you want up to date information, use the WiseGitIntegration API for direct git queries.
 	/// </summary>
 	public class GitStatusesDatabase : Utils.DatabasePersistentSingleton<GitStatusesDatabase, GuidStatusDatasBind>
 	{
@@ -66,13 +66,13 @@ namespace DevLocker.VersionControl.WiseGit
 		private GitPreferencesManager.PersonalPreferences m_PersonalPrefs => GitPreferencesManager.Instance.PersonalPrefs;
 		private GitPreferencesManager.ProjectPreferences m_ProjectPrefs => GitPreferencesManager.Instance.ProjectPrefs;
 
-		private GitPreferencesManager.PersonalPreferences m_PersonalCachedPrefs;
-		private GitPreferencesManager.ProjectPreferences m_ProjectCachedPrefs;
-		private bool m_DownloadRepositoryChangesCached = false;
+		private volatile GitPreferencesManager.PersonalPreferences m_PersonalCachedPrefs;
+		private volatile GitPreferencesManager.ProjectPreferences m_ProjectCachedPrefs;
+		private volatile bool m_FetchRemoteChangesCached = false;
 
 
 		/// <summary>
-		/// The database update can be enabled, but the SVN integration to be disabled as a whole.
+		/// The database update can be enabled, but the git integration to be disabled as a whole.
 		/// </summary>
 		public override bool IsActive => m_PersonalPrefs.PopulateStatusesDatabase && m_PersonalPrefs.EnableCoreIntegration;
 #if UNITY_2018_1_OR_NEWER
@@ -85,18 +85,15 @@ namespace DevLocker.VersionControl.WiseGit
 		public override double RefreshInterval => m_PersonalPrefs.AutoRefreshDatabaseInterval;
 
 		// Any assets contained in these folders are considered unversioned.
-		private string[] m_UnversionedFolders = new string[0];
+		private volatile string[] m_UnversionedFolders = new string[0];
 
-		// Nested SVN repositories (that have ".svn" in them). NOTE: These are not external, just check-out inside check-out.
-		public IReadOnlyCollection<string> NestedRepositories => Array.AsReadOnly(m_NestedRepositories);
-		private string[] m_NestedRepositories = new string[0];
+		// NOT SUPPORTED due to git workflow.
+		// Nested git repositories (that have ".git" in them). NOTE: These are not external, just check-out inside check-out.
+		//public IReadOnlyCollection<string> NestedRepositories => Array.AsReadOnly(m_NestedRepositories);
+		//private string[] m_NestedRepositories = new string[0];
 
-		// SVN-Ignored files and folders.
-		private string[] m_IgnoredEntries = new string[0];
-		// SVN-Global-ignored entries are stored separately as they are checked only once, because they are much slower.
-		private string[] m_GlobalIgnoredEntries = new string[0];
-
-		public bool m_GlobalIgnoresCollected = false;
+		// Git-Ignored files and folders.
+		private volatile string[] m_IgnoredEntries = new string[0];
 
 		/// <summary>
 		/// The collected statuses are not complete due to some reason (for example, they were too many).
@@ -115,7 +112,7 @@ namespace DevLocker.VersionControl.WiseGit
 
 		public override void Initialize(bool freshlyCreated)
 		{
-			// HACK: Force WiseSVN initialize first, so it doesn't happen in the thread.
+			// HACK: Force WiseGit initialize first, so it doesn't happen in the thread.
 			WiseGitIntegration.ProjectRootUnity.StartsWith(string.Empty);
 
 			GitPreferencesManager.Instance.PreferencesChanged += RefreshActive;
@@ -160,7 +157,7 @@ namespace DevLocker.VersionControl.WiseGit
 			m_PersonalCachedPrefs = m_PersonalPrefs.Clone();
 			m_ProjectCachedPrefs = m_ProjectPrefs.Clone();
 
-			m_DownloadRepositoryChangesCached = GitPreferencesManager.Instance.DownloadRepositoryChanges && !GitPreferencesManager.Instance.NeedsToAuthenticate;
+			m_FetchRemoteChangesCached = GitPreferencesManager.Instance.FetchRemoteChanges && !GitPreferencesManager.Instance.NeedsToAuthenticate;
 
 			LastError = StatusOperationResult.Success;
 
@@ -174,16 +171,20 @@ namespace DevLocker.VersionControl.WiseGit
 			List<string> unversionedFolders = new List<string>();
 			List<string> nestedRepositories = new List<string>();
 			List<string> ignoredEntries = new List<string>();
-			List<string> globalIgnoredEntries = new List<string>();
 			GuidStatusDatasBind[] pendingData;
 
-			var timings = new StringBuilder("SVNStatusesDatabase Gathering Data Timings:\n");
+			var timings = new StringBuilder("GitStatusesDatabase Gathering Data Timings:\n");
 			var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
 			var reporter = DoTraceLogs
-				? new WiseGitIntegration.ResultConsoleReporter(true, WiseGitIntegration.Silent, "SVNStatusesDatabase Operations:")
+				? new WiseGitIntegration.ResultConsoleReporter(true, WiseGitIntegration.Silent, "GitStatusesDatabase Operations:")
 				: null;
 			using (reporter) {
+
+				bool offline = !m_FetchRemoteChangesCached && !m_ProjectCachedPrefs.EnableLockPrompt;
+				if (!offline) {
+					FetchRemoteChanges(reporter);
+				}
 
 				GatherStatusDataInThreadRecursive("Assets", statuses, unversionedFolders, nestedRepositories, reporter);
 #if UNITY_2018_4_OR_NEWER
@@ -198,27 +199,20 @@ namespace DevLocker.VersionControl.WiseGit
 					}
 				}
 
-				timings.AppendLine("Gather Status Data - " + (stopwatch.ElapsedMilliseconds / 1000f));
+				timings.AppendLine($"Gather {statuses.Count} Status Data - {stopwatch.ElapsedMilliseconds / 1000f}s");
 				stopwatch.Restart();
 
 
 				if (m_PersonalCachedPrefs.PopulateIgnoresDatabase) {
-					GatherIgnoresInThread("Assets", ignoredEntries, reporter);
+					ignoredEntries.AddRange(WiseGitIntegration.GetIgnoredPaths("Assets", true));
 #if UNITY_2018_4_OR_NEWER
-					GatherIgnoresInThread("Packages", ignoredEntries, reporter);
+					ignoredEntries.AddRange(WiseGitIntegration.GetIgnoredPaths("Packages", true));
 #endif
-					timings.AppendLine("Gather svn:ignore - " + (stopwatch.ElapsedMilliseconds / 1000f));
+					timings.AppendLine($"Gather {ignoredEntries.Count} ignores - {stopwatch.ElapsedMilliseconds / 1000f}s");
 					stopwatch.Restart();
-
-					if (!m_GlobalIgnoresCollected) {
-						GatherGlobalIgnoresInThread(globalIgnoredEntries, reporter);
-
-						timings.AppendLine("Gather svn:global-ignores - " + (stopwatch.ElapsedMilliseconds / 1000f));
-						stopwatch.Restart();
-					}
 				}
 
-				DataIsIncomplete = unversionedFolders.Count >= SanityUnversionedFoldersLimit || statuses.Count >= SanityStatusesLimit || ignoredEntries.Count > SanityIgnoresLimit || globalIgnoredEntries.Count > SanityIgnoresLimit;
+				DataIsIncomplete = unversionedFolders.Count >= SanityUnversionedFoldersLimit || statuses.Count >= SanityStatusesLimit || ignoredEntries.Count > SanityIgnoresLimit;
 
 				// Just in case...
 				if (unversionedFolders.Count >= SanityUnversionedFoldersLimit) {
@@ -235,10 +229,6 @@ namespace DevLocker.VersionControl.WiseGit
 
 				if (ignoredEntries.Count >= SanityIgnoresLimit) {
 					ignoredEntries.RemoveRange(SanityIgnoresLimit, ignoredEntries.Count - SanityIgnoresLimit);
-				}
-
-				if (globalIgnoredEntries.Count >= SanityIgnoresLimit) {
-					globalIgnoredEntries.RemoveRange(SanityIgnoresLimit, globalIgnoredEntries.Count - SanityIgnoresLimit);
 				}
 
 
@@ -261,18 +251,8 @@ namespace DevLocker.VersionControl.WiseGit
 					.Distinct()
 					.ToArray();
 
-				if (!m_GlobalIgnoresCollected) {
-					m_GlobalIgnoredEntries = globalIgnoredEntries
-						.Select(path => path.Replace(projectRootPath, ""))
-						.Select(path => path.Replace('\\', '/'))
-						.Distinct()
-						.ToArray();
-
-					m_GlobalIgnoresCollected = true;
-				}
-
 				m_UnversionedFolders = unversionedFolders.ToArray();
-				m_NestedRepositories = nestedRepositories.ToArray();
+				//m_NestedRepositories = nestedRepositories.ToArray();
 
 			} // Dispose reporter.
 
@@ -286,14 +266,72 @@ namespace DevLocker.VersionControl.WiseGit
 			return pendingData;
 		}
 
+		private void FetchRemoteChanges(WiseGitIntegration.ResultConsoleReporter reporter)
+		{
+			// In git you can't just check remote changes - you need to "git fetch" the remote repository which can result in a lenghty download.
+
+			// Alternative option would be to clone the remote repo in a temp dir without downloading the blobs, then check it's history like this:
+			//   git merge-base --fork-point master origin/master	// Get the commit (SHA) where current working branch diverged from the remote one.
+			//   git clone --bare --filter=blob:none --single-branch --branch master https://yourrepohere.git	// Clone without downloading blobs.
+			//   git log f2f232908049336777deef13da9f7afe61691771..master --oneline --name-only  // Displays files with changes, no download.
+			//   (this works with git 2.37, previous did download blobs).
+			// If background fetching causes issues, implement this stragtegy.
+
+			string remote = WiseGitIntegration.GetTrackedRemote();
+			if (string.IsNullOrEmpty(remote))
+				return;
+
+			const string fetchProcessIdFile = "Temp/git_fetch_process.txt";
+
+			// No fetch in progress - start one.
+			if (!File.Exists(fetchProcessIdFile)) {
+				var result = ShellUtils.ExecuteCommand(new ShellUtils.ShellArgs {
+					Command = WiseGitIntegration.Git_Command,
+					Args = $"fetch --atomic --porcelain {remote} {WiseGitIntegration.GetWorkingBranch()}",
+					WaitForOutput = true,
+					WaitTimeout = WiseGitIntegration.ONLINE_COMMAND_TIMEOUT,
+					SkipTimeoutError = true,
+					Monitor = reporter
+				});
+				// Timeout may or may not have kicked in by now.
+				// If it did, process will continue downloading, while we track it regularly by the id in the file (see below).
+
+				if (result.HasErrors) {
+					// error: cannot lock ref '...': is at ... but expected ...
+					// This means another fetch was in progress when this one started. The fetch was done, but ours got error. Continue normally.
+					if (result.Error.Contains("error: cannot lock ref")) {
+						reporter.ResetErrorFlag();
+
+					} else {
+						LastError = WiseGitIntegration.ParseCommonStatusError(result.Error);
+					}
+				}
+
+				if (ShellUtils.IsProcessAlive(result.ProcessId)) {
+					reporter?.AppendTraceLine("Fetching remote took too long. Skipping until it finishes downloading in the background.");
+
+					// Write process id in file to track when it finished downloading server changes.
+					File.WriteAllText(fetchProcessIdFile, result.ProcessId.ToString());
+				}
+			}
+
+			// Fetch in progress - check if finished and delete process id file.
+			if (File.Exists(fetchProcessIdFile)) {
+				if (!ShellUtils.IsProcessAlive(int.Parse(File.ReadAllText(fetchProcessIdFile)))) {
+					reporter?.AppendTraceLine("Fetching remote finished. Obtaining remote changes...");
+					File.Delete(fetchProcessIdFile);
+				}
+			}
+		}
+
 		private void GatherStatusDataInThreadRecursive(string repositoryPath, List<GitStatusData> foundStatuses, List<string> foundUnversionedFolders, List<string> nestedRepositories, IShellMonitor shellMonitor)
 		{
-			bool offline = !m_DownloadRepositoryChangesCached && !m_ProjectCachedPrefs.EnableLockPrompt;
+			bool offline = !m_FetchRemoteChangesCached && !m_ProjectCachedPrefs.EnableLockPrompt;
 			var excludes = m_PersonalCachedPrefs.Exclude.Concat(m_ProjectCachedPrefs.Exclude);
 
 			// Will get statuses of all added / modified / deleted / conflicted / unversioned files. Only normal files won't be listed.
 			var statuses = new List<GitStatusData>();
-			StatusOperationResult result = WiseGitIntegration.GetStatuses(repositoryPath, true, offline, statuses, true, WiseGitIntegration.ONLINE_COMMAND_TIMEOUT * 2, shellMonitor);
+			StatusOperationResult result = WiseGitIntegration.GetStatuses(repositoryPath, offline, statuses, WiseGitIntegration.COMMAND_TIMEOUT * 2, shellMonitor);
 
 			statuses.RemoveAll(
 				s => GitPreferencesManager.ShouldExclude(excludes, s.Path) || // TODO: This will skip overlay icons for excludes by filename.
@@ -310,13 +348,16 @@ namespace DevLocker.VersionControl.WiseGit
 				// Statuses for entries under unversioned directories are not returned so we need to keep track of them.
 				if (statusData.Status == VCFileStatus.Unversioned && Directory.Exists(statusData.Path)) {
 
-					// Nested repositories return unknown status, but are hidden in the TortoiseSVN commit window.
+					// Nested repositories return unknown status, but are hidden in the TortoiseGit commit window.
 					// Add their statuses to support them. Also removing this folder data should display it as normal status.
-					if (Directory.Exists($"{statusData.Path}/.svn")) {
+					if (Directory.Exists($"{statusData.Path}/.git") && false) {
 
 						nestedRepositories.Add(statusData.Path);
 
-						GatherStatusDataInThreadRecursive(statusData.Path, foundStatuses, foundUnversionedFolders, nestedRepositories, shellMonitor);
+						// NOT SUPPORTED!!!
+						//   Git requires all commands be run from inside the repository folder (working directory),
+						//   which conflicts with all the shell commands written up till now (all our paths are relative to the Unity root, not the nested repos).
+						//GatherStatusDataInThreadRecursive(statusData.Path, foundStatuses, foundUnversionedFolders, nestedRepositories, shellMonitor);
 
 						// Folder meta file could also be unversioned. This will force unversioned overlay icon to show, even though the folder status is removed.
 						// Remove the meta file status as well.
@@ -344,110 +385,6 @@ namespace DevLocker.VersionControl.WiseGit
 			}
 		}
 
-		private void GatherIgnoresInThread(string repositoryPath, List<string> foundIgnoredEntries, IShellMonitor shellMonitor)
-		{
-			var propgets = new List<PropgetEntry>();
-
-			PropOperationResult result = WiseGitIntegration.Propget(repositoryPath, "svn:ignore", true, propgets, WiseGitIntegration.COMMAND_TIMEOUT, shellMonitor);
-			if (result != PropOperationResult.Success) {
-				if (DoTraceLogs) {
-					Debug.LogError($"SVN: Failed to collect svn ignored entries for \"{repositoryPath}\". Type: \"svn:ignore\".");
-				}
-				return;
-			}
-
-			// Keep in mind that "svn:ignore" values may include wildcards (* and ?).
-			// Also all ignored entries do not appear in the "svn status" command, which we consider as "normal" status.
-			// This is why we need to collect actual ignored files, as there is no good other way to recognize them.
-			foreach (PropgetEntry propget in propgets) {
-				foreach (string line in propget.Lines) {
-
-					// Skip hidden folders starting with ".". Some people put comments starting with "#".
-					// Example: # ---------------[ Unity generated ]------------------ #
-					if (line.StartsWith(".", StringComparison.OrdinalIgnoreCase) || line.StartsWith("#", StringComparison.OrdinalIgnoreCase) || line.StartsWith("/", StringComparison.OrdinalIgnoreCase) || line.StartsWith(":", StringComparison.OrdinalIgnoreCase))
-						continue;
-
-					// SVN ignores don't support folder paths - only names to direct files and names.
-					if (line.Contains('/') || line.Contains('\\'))
-						continue;
-
-					var matchedEntries = Directory.EnumerateFileSystemEntries(propget.Path, line, SearchOption.TopDirectoryOnly);
-					foundIgnoredEntries.AddRange(matchedEntries);
-				}
-			}
-		}
-
-		private void GatherGlobalIgnoresInThread(List<string> foundIgnoredEntries, IShellMonitor shellMonitor)
-		{
-			var propgets = new List<PropgetEntry>();
-
-			PropOperationResult result = WiseGitIntegration.Propget(WiseGitIntegration.ProjectRootNative, "svn:global-ignores", true, propgets, WiseGitIntegration.COMMAND_TIMEOUT, shellMonitor);
-			if (result != PropOperationResult.Success) {
-				if (DoTraceLogs) {
-					Debug.LogError($"SVN: Failed to collect svn ignored entries for \"{WiseGitIntegration.ProjectRootNative}\". Type: \"svn:global-ignores\".");
-				}
-				return;
-			}
-
-			foreach (PropgetEntry propget in propgets) {
-
-				// Start folder is returned as "."
-				if (propget.Path == ".") {
-
-					// Enumerating the root folder would be too expensive (Library is huge). Just enumerate meaningful folders.
-					// "svn:global-ignores" are applied recursively to all sub-folders.
-					foreach (string line in propget.Lines) {
-
-						// Skip hidden folders starting with ".". Some people put comments starting with "#".
-						// Example: # ---------------[ Unity generated ]------------------ #
-						if (line.StartsWith(".", StringComparison.OrdinalIgnoreCase) || line.StartsWith("#", StringComparison.OrdinalIgnoreCase) || line.StartsWith("/", StringComparison.OrdinalIgnoreCase) || line.StartsWith(":", StringComparison.OrdinalIgnoreCase))
-							continue;
-
-						// SVN ignores don't support folder paths - only names to direct files and names.
-						if (line.Contains('/') || line.Contains('\\'))
-							continue;
-
-						var matchedEntries = Directory.EnumerateFileSystemEntries("Assets", line, SearchOption.AllDirectories);
-						foundIgnoredEntries.AddRange(matchedEntries);
-					}
-
-#if UNITY_2018_4_OR_NEWER
-					foreach (string line in propget.Lines) {
-
-						// Skip hidden folders starting with ".". Some people put comments starting with "#".
-						// Example: # ---------------[ Unity generated ]------------------ #
-						if (line.StartsWith(".", StringComparison.OrdinalIgnoreCase) || line.StartsWith("#", StringComparison.OrdinalIgnoreCase) || line.StartsWith("/", StringComparison.OrdinalIgnoreCase) || line.StartsWith(":", StringComparison.OrdinalIgnoreCase))
-							continue;
-
-						// SVN ignores don't support folder paths - only names to direct files and names.
-						if (line.Contains('/') || line.Contains('\\'))
-							continue;
-
-						var matchedEntries = Directory.EnumerateFileSystemEntries("Packages", line, SearchOption.AllDirectories);
-						foundIgnoredEntries.AddRange(matchedEntries);
-					}
-#endif
-
-					continue;
-				}
-
-				foreach (string line in propget.Lines) {
-
-					// Skip hidden folders starting with ".". Some people put comments starting with "#".
-					// Example: # ---------------[ Unity generated ]------------------ #
-					if (line.StartsWith(".", StringComparison.OrdinalIgnoreCase) || line.StartsWith("#", StringComparison.OrdinalIgnoreCase) || line.StartsWith("/", StringComparison.OrdinalIgnoreCase) || line.StartsWith(":", StringComparison.OrdinalIgnoreCase))
-						continue;
-
-					// SVN ignores don't support folder paths - only names to direct files and names.
-					if (line.Contains('/') || line.Contains('\\'))
-						continue;
-
-					var matchedEntries = Directory.EnumerateFileSystemEntries(propget.Path, line, SearchOption.AllDirectories);
-					foundIgnoredEntries.AddRange(matchedEntries);
-				}
-			}
-		}
-
 		protected override void WaitAndFinishDatabaseUpdate(GuidStatusDatasBind[] pendingData)
 		{
 			// Handle error here, to avoid multi-threaded issues.
@@ -465,7 +402,7 @@ namespace DevLocker.VersionControl.WiseGit
 			if (pendingData.Length > SanityStatusesLimit) {
 				// No more logging, displaying an icon.
 				if (DoTraceLogs) {
-					Debug.LogWarning($"SVNStatusDatabase gathered {pendingData.Length} changes which is waay to much. Ignoring gathered changes to avoid slowing down the editor!");
+					Debug.LogWarning($"GitStatusDatabase gathered {pendingData.Length} changes which is waay to much. Ignoring gathered changes to avoid slowing down the editor!");
 				}
 
 				return;
@@ -504,7 +441,6 @@ namespace DevLocker.VersionControl.WiseGit
 				}
 
 				// File was added to the repository but is missing in the working copy.
-				// The proper way to check this is to parse the working revision from the svn output (when used with -u)
 				if (statusData.RemoteStatus == VCRemoteFileStatus.Modified
 					&& statusData.Status == VCFileStatus.Normal
 					&& string.IsNullOrEmpty(guid)
@@ -655,13 +591,7 @@ namespace DevLocker.VersionControl.WiseGit
 				return VCFileStatus.Excluded;
 
 			foreach (string ignoredPath in m_IgnoredEntries) {
-				if (path.StartsWith(ignoredPath, StringComparison.OrdinalIgnoreCase)) {
-					return VCFileStatus.Ignored;
-				}
-			}
-
-			foreach (string ignoredPath in m_GlobalIgnoredEntries) {
-				if (path.StartsWith(ignoredPath, StringComparison.OrdinalIgnoreCase)) {
+				if (path.StartsWith(ignoredPath, StringComparison.OrdinalIgnoreCase) || (ignoredPath.EndsWith('/') && ignoredPath == path + '/')) {
 					return VCFileStatus.Ignored;
 				}
 			}
@@ -696,7 +626,7 @@ namespace DevLocker.VersionControl.WiseGit
 
 			string path = null;
 			if (m_UnversionedFolders.Length > 0) {
-				path = AssetDatabase.GUIDToAssetPath(guid);
+				path = path ?? AssetDatabase.GUIDToAssetPath(guid);
 
 				foreach (string unversionedFolder in m_UnversionedFolders) {
 					if (path.StartsWith(unversionedFolder, StringComparison.OrdinalIgnoreCase))
@@ -708,17 +638,7 @@ namespace DevLocker.VersionControl.WiseGit
 				path = path ?? AssetDatabase.GUIDToAssetPath(guid);
 
 				foreach (string ignoredPath in m_IgnoredEntries) {
-					if (path.StartsWith(ignoredPath, StringComparison.OrdinalIgnoreCase)) {
-						return new GitStatusData() { Path = path, Status = VCFileStatus.Ignored, LockDetails = LockDetails.Empty };
-					}
-				}
-			}
-
-			if (m_GlobalIgnoredEntries.Length > 0) {
-				path = path ?? AssetDatabase.GUIDToAssetPath(guid);
-
-				foreach (string ignoredPath in m_GlobalIgnoredEntries) {
-					if (path.StartsWith(ignoredPath, StringComparison.OrdinalIgnoreCase)) {
+					if (path.StartsWith(ignoredPath, StringComparison.OrdinalIgnoreCase) || (ignoredPath.EndsWith('/') && ignoredPath == path + '/')) {
 						return new GitStatusData() { Path = path, Status = VCFileStatus.Ignored, LockDetails = LockDetails.Empty };
 					}
 				}
@@ -752,7 +672,7 @@ namespace DevLocker.VersionControl.WiseGit
 		private bool SetStatusData(string guid, GitStatusData statusData, bool skipPriorityCheck, bool compareOnlineStatuses, bool isMeta)
 		{
 			if (string.IsNullOrEmpty(guid)) {
-				Debug.LogError($"SVN: Trying to add empty guid for \"{statusData.Path}\" with status {statusData.Status}");
+				Debug.LogError($"Git: Trying to add empty guid for \"{statusData.Path}\" with status {statusData.Status}");
 				return false;
 			}
 
@@ -775,15 +695,6 @@ namespace DevLocker.VersionControl.WiseGit
 					if (!skipPriorityCheck) {
 						if (m_StatusPriority[bind.MergedStatusData.Status] > m_StatusPriority[statusData.Status]) {
 							// Merge any other data.
-							if (bind.MergedStatusData.PropertiesStatus == VCPropertiesStatus.Normal) {
-								bind.MergedStatusData.PropertiesStatus = statusData.PropertiesStatus;
-							}
-							if (bind.MergedStatusData.TreeConflictStatus == VCTreeConflictStatus.Normal) {
-								bind.MergedStatusData.TreeConflictStatus = statusData.TreeConflictStatus;
-							}
-							if (bind.MergedStatusData.SwitchedExternalStatus == VCSwitchedExternal.Normal) {
-								bind.MergedStatusData.SwitchedExternalStatus = statusData.SwitchedExternalStatus;
-							}
 							if (bind.MergedStatusData.LockStatus == VCLockStatus.NoLock) {
 								bind.MergedStatusData.LockStatus = statusData.LockStatus;
 								bind.MergedStatusData.LockDetails = statusData.LockDetails;
@@ -848,7 +759,7 @@ namespace DevLocker.VersionControl.WiseGit
 	}
 
 
-	internal class SVNStatusesDatabaseAssetPostprocessor : AssetPostprocessor
+	internal class GitStatusesDatabaseAssetPostprocessor : AssetPostprocessor
 	{
 		private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
 		{

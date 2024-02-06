@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.Preferences;
 using System;
@@ -9,7 +9,7 @@ using UnityEngine;
 namespace DevLocker.VersionControl.WiseGit
 {
 	/// <summary>
-	/// Renders SVN overlay icons in the project windows.
+	/// Renders git overlay icons in the project windows.
 	/// Hooks up to Unity file changes API and refreshes when needed to.
 	/// </summary>
 	[InitializeOnLoad]
@@ -57,7 +57,6 @@ namespace DevLocker.VersionControl.WiseGit
 		{
 			WiseGitIntegration.ClearLastDisplayedError();
 			GitPreferencesManager.Instance.TemporarySilenceLockPrompts = false;
-			GitStatusesDatabase.Instance.m_GlobalIgnoresCollected = false;
 			GitStatusesDatabase.Instance.InvalidateDatabase();
 			LockPrompting.GitLockPromptDatabase.Instance.ClearKnowledge();
 
@@ -67,7 +66,7 @@ namespace DevLocker.VersionControl.WiseGit
 				m_RefreshProgressId = null;
 			}
 
-			m_RefreshProgressId = Progress.Start("SVN Refresh", $"Checking all svn statuses...", Progress.Options.Indefinite);
+			m_RefreshProgressId = Progress.Start("Git Refresh", $"Checking all git statuses...", Progress.Options.Indefinite);
 			EditorApplication.update += UpdateDatabaseRefreshProgress;
 		}
 
@@ -94,8 +93,8 @@ namespace DevLocker.VersionControl.WiseGit
 		internal static GUIContent GetDataIsIncompleteWarning()
 		{
 			if (m_DataIsIncompleteWarning == null) {
-				string warningTooltip = "Some or all SVN overlay icons are skipped as you have too many changes to display.\n" +
-					"If you have a lot of unversioned files consider adding them to a svn ignore list.\n" +
+				string warningTooltip = "Some or all git overlay icons are skipped as you have too many changes to display.\n" +
+					"If you have a lot of unversioned files consider adding them to a git ignore list.\n" +
 					"If the server repository has a lot of changes, consider updating.";
 
 				m_DataIsIncompleteWarning = EditorGUIUtility.IconContent("console.warnicon.sml");
@@ -128,7 +127,7 @@ namespace DevLocker.VersionControl.WiseGit
 
 			var statusData = GitStatusesDatabase.Instance.GetKnownStatusData(guid);
 
-			var downloadRepositoryChanges = GitPreferencesManager.Instance.DownloadRepositoryChanges && !GitPreferencesManager.Instance.NeedsToAuthenticate;
+			var downloadRepositoryChanges = GitPreferencesManager.Instance.FetchRemoteChanges && !GitPreferencesManager.Instance.NeedsToAuthenticate;
 			var lockPrompt = GitPreferencesManager.Instance.ProjectPrefs.EnableLockPrompt;
 
 			//
@@ -193,12 +192,12 @@ namespace DevLocker.VersionControl.WiseGit
 								}
 							}
 							details += $"File: {System.IO.Path.GetFileName(knownStatusData.Path)}\n" +
-							          $"Lock Status: {ObjectNames.NicifyVariableName(knownStatusData.LockStatus.ToString())}\n" +
-							          $"Owner: {knownStatusData.LockDetails.Owner}\n" +
-							          $"Date: {dateStr}\n" +
-							          $"Message:\n{knownStatusData.LockDetails.Message}\n";
+									  $"Lock Status: {ObjectNames.NicifyVariableName(knownStatusData.LockStatus.ToString())}\n" +
+									  $"Owner: {knownStatusData.LockDetails.Owner}\n" +
+									  $"Date: {dateStr}\n\n";
+									  //$"Message:\n{knownStatusData.LockDetails.Message}\n";
 						}
-						EditorUtility.DisplayDialog("SVN Lock Details", details.TrimEnd('\n'), "Ok");
+						EditorUtility.DisplayDialog("Git LFS Lock Details", details.TrimEnd('\n'), "Ok");
 					}
 				}
 			}
@@ -208,14 +207,6 @@ namespace DevLocker.VersionControl.WiseGit
 			// File Status
 			//
 			VCFileStatus fileStatus = statusData.Status;
-			switch(statusData.PropertiesStatus) {
-				case VCPropertiesStatus.Conflicted:
-					fileStatus = VCFileStatus.Conflicted;
-					break;
-				case VCPropertiesStatus.Modified:
-					fileStatus = (fileStatus != VCFileStatus.Conflicted) ? VCFileStatus.Modified : VCFileStatus.Conflicted;
-					break;
-			}
 
 			// Handle unknown statuses.
 			if (m_ShowNormalStatusIcons && !statusData.IsValid) {

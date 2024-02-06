@@ -1,4 +1,4 @@
-// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseSVN
+// MIT License Copyright(c) 2022 Filip Slavov, https://github.com/NibbleByte/UnityWiseGit
 
 using DevLocker.VersionControl.WiseGit.LockPrompting;
 using DevLocker.VersionControl.WiseGit.ContextMenus;
@@ -50,7 +50,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 		public static void ShowProjectPreferences(PreferencesTab tab)
 		{
-			var window = GetWindow<GitPreferencesWindow>(true, "Wise SVN Preferences");
+			var window = GetWindow<GitPreferencesWindow>(true, "WiseGit Preferences");
 			window.m_PersonalPrefs = GitPreferencesManager.Instance.PersonalPrefs.Clone();
 			window.m_ProjectPrefs = GitPreferencesManager.Instance.ProjectPrefs.Clone();
 			window.ShowUtility();
@@ -67,10 +67,9 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 		private static readonly string[] m_PreferencesTabsNames = Enum.GetNames(typeof(PreferencesTab));
 
 		private Vector2 m_ProjectPreferencesScroll;
-		private const string m_DownloadRepositoryChangesHint = "Work online - will ask the repository if there are any changes on the server.\nEnabling this will show locks and out of date additional icons.\nRefreshes might be slower due to the network communication, but shouldn't slow down your editor.";
+		private const string m_FetchRepositoryChangesHint = "Work online - will regularly 'git fetch' the remote changes in the background. This will not change your working tree.\nEnabling this will show locks and out of date additional icons.";
 
 		private bool m_FoldLockPromptHint = true;
-		private bool m_FoldBranchesDatabaseHint = true;
 
 		private SerializedObject m_SerializedObject;
 
@@ -120,7 +119,6 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 					// Works when editor started with disabled integration. Doing it here to avoid circle dependency.
 					if (m_PersonalPrefs.EnableCoreIntegration) {
 						WiseGitIntegration.ClearLastDisplayedError();
-						GitStatusesDatabase.Instance.m_GlobalIgnoresCollected = false;
 						GitStatusesDatabase.Instance.InvalidateDatabase();
 						GitLockPromptDatabaseStarter.TryStartIfNeeded();
 
@@ -176,7 +174,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			}
 
 			if (!string.IsNullOrWhiteSpace(userPath) && !File.Exists(userPath)) {
-				EditorUtility.DisplayDialog("SVN Binary Missing", $"Cannot find the \"svn\" executable specified in the svn preferences:\n\"{userPath}\"", "Ok");
+				EditorUtility.DisplayDialog("Git Binary Missing", $"Cannot find the \"git\" executable specified in the git preferences:\n\"{userPath}\"", "Ok");
 			}
 
 			if (m_ProjectPrefs.EnableLockPrompt) {
@@ -193,25 +191,6 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 				if (m_ProjectPrefs.LockPromptParameters.Any(sp => !sp.IsValid)) {
 					EditorUtility.DisplayDialog("Lock Prompt", "Some of the lock prompt parameters have invalid data. Please fix it.\n\nLock Prompt will be disabled.", "Ok");
 					m_ProjectPrefs.EnableLockPrompt = false;
-				}
-			}
-
-			if (m_ProjectPrefs.EnableBranchesDatabase) {
-
-				if (m_ProjectPrefs.BranchesDatabaseScanParameters.Count == 0) {
-					EditorUtility.DisplayDialog("Branches Database", "In order to use Branches Database, you must provide at least one scan parameters element.\n\nBranches Database will be disabled.", "Ok");
-					m_ProjectPrefs.EnableBranchesDatabase = false;
-				}
-
-				m_ProjectPrefs.BranchesDatabaseScanParameters = m_ProjectPrefs.BranchesDatabaseScanParameters
-					.Select(sp => sp.Sanitized())
-					.ToList();
-
-				m_ProjectPrefs.PinnedBranches = SanitizeStringsList(m_ProjectPrefs.PinnedBranches);
-
-				if (m_ProjectPrefs.BranchesDatabaseScanParameters.Any(sp => !sp.IsValid)) {
-					EditorUtility.DisplayDialog("Branches Database", "Some of the branches scan parameters have invalid data. Please fix it.\n\nBranches Database will be disabled.", "Ok");
-					m_ProjectPrefs.EnableBranchesDatabase = false;
 				}
 			}
 		}
@@ -238,7 +217,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			var sp = m_SerializedObject.FindProperty("m_PersonalPrefs");
 
-			m_PersonalPrefs.EnableCoreIntegration = EditorGUILayout.Toggle("Enable SVN integration", m_PersonalPrefs.EnableCoreIntegration);
+			m_PersonalPrefs.EnableCoreIntegration = EditorGUILayout.Toggle("Enable Git integration", m_PersonalPrefs.EnableCoreIntegration);
 
 			EditorGUI.BeginDisabledGroup(!m_PersonalPrefs.EnableCoreIntegration);
 
@@ -248,18 +227,18 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			}
 			EditorGUI.BeginDisabledGroup(!m_PersonalPrefs.PopulateStatusesDatabase);
 
-			m_PersonalPrefs.PopulateIgnoresDatabase = EditorGUILayout.Toggle(new GUIContent("Scan for svn-ignores", "Enables svn-ignore overlay icons in the project windows. If disabled, svn-ignored items will be considered as Normal status (green icon)."), m_PersonalPrefs.PopulateIgnoresDatabase);
+			m_PersonalPrefs.PopulateIgnoresDatabase = EditorGUILayout.Toggle(new GUIContent("Scan for git-ignores", "Enables git-ignore overlay icons in the project windows. If disabled, git-ignored items will be considered as Normal status (green icon)."), m_PersonalPrefs.PopulateIgnoresDatabase);
 			m_PersonalPrefs.ShowNormalStatusOverlayIcon = EditorGUILayout.Toggle(new GUIContent("Show Normal status green icon", "Normal status is versioned asset that doesn't have any changes."), m_PersonalPrefs.ShowNormalStatusOverlayIcon);
-			m_PersonalPrefs.ShowExcludedStatusOverlayIcon = EditorGUILayout.Toggle(new GUIContent("Show Ignore & Excluded gray icon", "Show gray icon over the items that are svn-ignored or added in the Exclude list in the Project tab of these preferences. These are non-recursive."), m_PersonalPrefs.ShowExcludedStatusOverlayIcon);
+			m_PersonalPrefs.ShowExcludedStatusOverlayIcon = EditorGUILayout.Toggle(new GUIContent("Show Ignore & Excluded gray icon", "Show gray icon over the items that are git-ignored or added in the Exclude list in the Project tab of these preferences. These are non-recursive."), m_PersonalPrefs.ShowExcludedStatusOverlayIcon);
 			m_PersonalPrefs.AutoRefreshDatabaseInterval = EditorGUILayout.IntField(new GUIContent("Overlay icons refresh interval", "How much seconds to wait for the next overlay icons refresh.\nNOTE: -1 will deactivate it - only file changes will trigger refresh."), m_PersonalPrefs.AutoRefreshDatabaseInterval);
 
-			m_PersonalPrefs.DownloadRepositoryChanges =
+			m_PersonalPrefs.FetchRemoteChanges =
 				(GitPreferencesManager.BoolPreference)EditorGUILayout.EnumPopup(
-					new GUIContent("Check for repository changes", m_DownloadRepositoryChangesHint + "\n\nNOTE: this will override the project preference. Coordinate this with your team.")
-					, m_PersonalPrefs.DownloadRepositoryChanges);
+					new GUIContent("Fetch remote changes", m_FetchRepositoryChangesHint + "\n\nNOTE: this will override the project preference. Coordinate this with your team.")
+					, m_PersonalPrefs.FetchRemoteChanges);
 
-			bool downloadChangesEnabled = m_PersonalPrefs.DownloadRepositoryChanges == GitPreferencesManager.BoolPreference.Enabled ||
-										  m_PersonalPrefs.DownloadRepositoryChanges == GitPreferencesManager.BoolPreference.SameAsProjectPreference && m_ProjectPrefs.DownloadRepositoryChanges;
+			bool fetchChangesEnabled = m_PersonalPrefs.FetchRemoteChanges == GitPreferencesManager.BoolPreference.Enabled ||
+										  m_PersonalPrefs.FetchRemoteChanges == GitPreferencesManager.BoolPreference.SameAsProjectPreference && m_ProjectPrefs.FetchRemoteChanges;
 
 
 			Color prevColor = GUI.color;
@@ -268,7 +247,6 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 				GitPreferencesManager.Instance.TryToAuthenticate();
 
 				WiseGitIntegration.ClearLastDisplayedError();
-				GitStatusesDatabase.Instance.m_GlobalIgnoresCollected = false;
 				GitStatusesDatabase.Instance.InvalidateDatabase();
 			}
 			GUI.color = prevColor;
@@ -277,7 +255,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			m_PersonalPrefs.AutoLockOnModified = EditorGUILayout.Toggle(new GUIContent("Auto lock when modified", GitPreferencesManager.PersonalPreferences.AutoLockOnModifiedHint + "\n\nWorks only when lock prompts are enabled in the Project preferences tab."), m_PersonalPrefs.AutoLockOnModified);
 			EditorGUI.EndDisabledGroup();
 
-			EditorGUI.BeginDisabledGroup(!downloadChangesEnabled);
+			EditorGUI.BeginDisabledGroup(!fetchChangesEnabled);
 			m_PersonalPrefs.WarnForPotentialConflicts = EditorGUILayout.Toggle(new GUIContent("SceneView overlay for conflicts", "Display warning in the SceneView when the current scene or edited prefab is out of date or locked."), m_PersonalPrefs.WarnForPotentialConflicts);
 			EditorGUI.EndDisabledGroup();
 
@@ -285,7 +263,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			m_PersonalPrefs.AskOnMovingFolders = EditorGUILayout.Toggle(new GUIContent("Ask On Moving Folders", "Ask for confirmation when moving folders inside Unity."), m_PersonalPrefs.AskOnMovingFolders);
 
-			m_PersonalPrefs.GitCLIPath = EditorGUILayout.TextField(new GUIContent("SVN CLI Path", "Specify SVN CLI (svn.exe) binary path to use or leave empty for the defaults.\n\nNOTE: this will override the project preference. Coordinate this with your team."), m_PersonalPrefs.GitCLIPath);
+			m_PersonalPrefs.GitCLIPath = EditorGUILayout.TextField(new GUIContent("Git CLI Path", "Specify git CLI (git.exe) binary path to use or leave empty for the defaults.\n\nNOTE: this will override the project preference. Coordinate this with your team."), m_PersonalPrefs.GitCLIPath);
 
 			m_PersonalPrefs.ContextMenusClient = (ContextMenusClient)EditorGUILayout.EnumPopup(new GUIContent("Context menus client", "Select what client should be used with the context menus."), m_PersonalPrefs.ContextMenusClient);
 			if (GUI.changed) {
@@ -297,7 +275,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			m_PersonalPrefs.TraceLogs = (GitTraceLogs)EditorGUILayout.EnumFlagsField(new GUIContent("Trace logs", "Logs for nerds and debugging."), m_PersonalPrefs.TraceLogs);
 
-			EditorGUILayout.PropertyField(sp.FindPropertyRelative("Exclude"), new GUIContent("Exclude Paths", "Relative path (contains '/') or asset name to be ignored by the SVN integrations. Use with caution.\n\nExample: \"Assets/Scenes/Baked\" or \"_deprecated\""), true);
+			EditorGUILayout.PropertyField(sp.FindPropertyRelative("Exclude"), new GUIContent("Exclude Paths", "Relative path (contains '/') or asset name to be ignored by the git integrations. Use with caution.\n\nExample: \"Assets/Scenes/Baked\" or \"_deprecated\""), true);
 
 			EditorGUI.EndDisabledGroup();
 		}
@@ -308,12 +286,10 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			var sp = m_SerializedObject.FindProperty("m_ProjectPrefs");
 
-			m_ProjectPrefs.DownloadRepositoryChanges = EditorGUILayout.Toggle(new GUIContent("Check for repository changes", m_DownloadRepositoryChangesHint), m_ProjectPrefs.DownloadRepositoryChanges);
+			m_ProjectPrefs.FetchRemoteChanges = EditorGUILayout.Toggle(new GUIContent("Fetch remote changes", m_FetchRepositoryChangesHint), m_ProjectPrefs.FetchRemoteChanges);
 
-			m_ProjectPrefs.GitCLIPath = EditorGUILayout.TextField(new GUIContent("SVN CLI Path", "Specify SVN CLI (svn.exe) binary path to use or leave empty for the defaults."), m_ProjectPrefs.GitCLIPath);
-			m_ProjectPrefs.GitCLIPathMacOS = EditorGUILayout.TextField(new GUIContent("SVN CLI Path MacOS", "Same as above, but for MacOS."), m_ProjectPrefs.GitCLIPathMacOS);
-
-			m_ProjectPrefs.MoveBehaviour = (GitMoveBehaviour)EditorGUILayout.EnumPopup(new GUIContent("Assets move behaviour", "Depending on your SVN repository, sometimes you may need to execute move commands as simple add and remove operations, loosing their history. Use with caution.\n(I'm looking at you github that emulates svn)."), m_ProjectPrefs.MoveBehaviour);
+			m_ProjectPrefs.GitCLIPath = EditorGUILayout.TextField(new GUIContent("Git CLI Path", "Specify git CLI (git.exe) binary path to use or leave empty for the defaults."), m_ProjectPrefs.GitCLIPath);
+			m_ProjectPrefs.GitCLIPathMacOS = EditorGUILayout.TextField(new GUIContent("Git CLI Path MacOS", "Same as above, but for MacOS."), m_ProjectPrefs.GitCLIPathMacOS);
 
 			if (!m_PersonalPrefs.PopulateStatusesDatabase) {
 				EditorGUILayout.HelpBox("Lock prompts require enabled overlay icons support from the Personal preferences!", MessageType.Warning);
@@ -343,8 +319,6 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 					GUILayout.Label(lockPromptHint, EditorStyles.helpBox);
 					EditorGUILayout.EndHorizontal();
 				}
-
-				EditorGUILayout.PropertyField(sp.FindPropertyRelative("LockPromptMessage"), new GUIContent("Lock Message", GitPreferencesManager.ProjectPreferences.LockMessageHint));
 
 				EditorGUILayout.PropertyField(sp.FindPropertyRelative("AutoUnlockIfUnmodified"));
 
@@ -386,64 +360,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			EditorGUI.EndDisabledGroup();
 
-			bool prevBranchesDatabase = m_ProjectPrefs.EnableBranchesDatabase;
-			const string branchesEnableHint = "Scans the SVN repository for Unity projects in branches and keeps them in a simple database.\n\nSingle scan may take up to a few minutes, depending on your network connection and the complexity of your repository.";
-			m_ProjectPrefs.EnableBranchesDatabase = EditorGUILayout.Toggle(new GUIContent("Enable Branches Database", branchesEnableHint), m_ProjectPrefs.EnableBranchesDatabase);
-			if (m_ProjectPrefs.EnableBranchesDatabase) {
-
-				EditorGUI.indentLevel++;
-				m_FoldBranchesDatabaseHint = EditorGUILayout.Foldout(m_FoldBranchesDatabaseHint, "Branches Database Hint:");
-				var branchesHint = "Provide at least one branches scan parameter below.\n\n" +
-				                   "\"Entry Point URL\" serves as a starting location where scan will commence.\n\n" +
-				                   "\"Branch Signature Root Entries\" should contain names of files or folders that mark the beginning of a branch. This will be shown as a branch's name.\n\n" +
-				                   "Example setup:\n" +
-				                   "  /branches/VariantA/Server\n" +
-				                   "  /branches/VariantA/UnityClient\n" +
-				                   "  /branches/VariantB/Server\n" +
-				                   "  /branches/VariantB/UnityClient\n\n" +
-				                   "Set \"Entry Point URL\" to \"https://companyname.com/branches\" as a starting point.\n" +
-				                   "\"VariantA\" and \"VariantB\" should be considered as branch roots.\n" +
-				                   "UnityClient folder is not a branch root.\n" +
-				                   "Set \"Branch Signature Root Entries\" to { \"Server\", \"UnityClient\" } to match the roots ...\n\n" +
-				                   "Only one Unity project per branch is supported!" +
-				                   ""
-					;
-				if (m_FoldBranchesDatabaseHint) {
-					EditorGUILayout.BeginHorizontal();
-					GUILayout.Space((EditorGUI.indentLevel + 1) * 16f);
-					GUILayout.Label(branchesHint, EditorStyles.helpBox);
-					EditorGUILayout.EndHorizontal();
-				}
-
-				if (!prevBranchesDatabase && m_ProjectPrefs.BranchesDatabaseScanParameters.Count == 0) {
-					string url = WiseGitIntegration.AssetPathToURL("Assets");
-
-					// Guess where scan should start at...
-					int urlEndIndex = url.IndexOf("/trunk");
-					if (urlEndIndex != -1) {
-						url = url.Remove(urlEndIndex);
-					}
-
-					urlEndIndex = url.IndexOf("/branches");
-					if (urlEndIndex != -1) {
-						url = url.Remove(urlEndIndex);
-					}
-
-					m_ProjectPrefs.BranchesDatabaseScanParameters.Add(new BranchScanParameters() {
-						EntryPointURL = url,
-						BranchSignatureRootEntries = new string[] { "Assets", "ProjectSettings", "Packages" },
-						ExcludesFolderNames = new string[0],
-					});
-				}
-
-				EditorGUILayout.PropertyField(sp.FindPropertyRelative("BranchesDatabaseScanParameters"), new GUIContent("Branches Scan Parameters", "Must have at least one entry to work properly."), true);
-
-				EditorGUILayout.PropertyField(sp.FindPropertyRelative("PinnedBranches"), new GUIContent("Pinned Branches", "Pin these branches at the top."), true);
-
-				EditorGUI.indentLevel--;
-			}
-
-			EditorGUILayout.PropertyField(sp.FindPropertyRelative("Exclude"), new GUIContent("Exclude Paths", "Relative path (contains '/') or asset name to be ignored by the SVN integrations. Use with caution.\n\nExample: \"Assets/Scenes/Baked\" or \"_deprecated\""), true);
+			EditorGUILayout.PropertyField(sp.FindPropertyRelative("Exclude"), new GUIContent("Exclude Paths", "Relative path (contains '/') or asset name to be ignored by the git integrations. Use with caution.\n\nExample: \"Assets/Scenes/Baked\" or \"_deprecated\""), true);
 		}
 
 		public static void DrawHelpAbout()
@@ -452,7 +369,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			EditorGUILayout.LabelField("Help:", EditorStyles.boldLabel);
 
 			if (GUILayout.Button("Documentation", GUILayout.MaxWidth(EditorGUIUtility.labelWidth))) {
-				var assets = AssetDatabase.FindAssets("WiseSVN-Documentation");
+				var assets = AssetDatabase.FindAssets("WiseGit-Documentation");
 				if (assets.Length == 0) {
 					EditorUtility.DisplayDialog("Documentation missing!", "The documentation you requested is missing.", "Ok");
 				} else {
@@ -480,35 +397,35 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 				EditorGUILayout.BeginHorizontal();
 
 				if (GUILayout.Button("Asset Store", urlStyle, GUILayout.ExpandWidth(false))) {
-					var assetStoreURL = "https://assetstore.unity.com/packages/tools/version-control/wise-svn-162636";
+					var assetStoreURL = "https://assetstore.unity.com/packages/tools/version-control/TODO:SET_URL_WHEN_AVAILABLE";
 					Application.OpenURL(assetStoreURL);
 				}
 
 				GUILayout.Label("|", GUILayout.ExpandWidth(false));
 
 				if (GUILayout.Button("GitHub", urlStyle, GUILayout.ExpandWidth(false))) {
-					var githubURL = "https://github.com/NibbleByte/UnityWiseSVN";
+					var githubURL = "https://github.com/NibbleByte/UnityWiseGit";
 					Application.OpenURL(githubURL);
 				}
 
 				GUILayout.Label("|", GUILayout.ExpandWidth(false));
 
 				if (GUILayout.Button("Unity Forum", urlStyle, GUILayout.ExpandWidth(false))) {
-					var unityForumURL = "https://forum.unity.com/threads/wise-svn-powerful-tortoisesvn-snailsvn-integration.844168";
+					var unityForumURL = "https://forum.unity.com/threads/TODO:SET_URL_WHEN_AVAILABLE";
 					Application.OpenURL(unityForumURL);
 				}
 
 				GUILayout.Label("|", GUILayout.ExpandWidth(false));
 
 				if (GUILayout.Button("Reddit", urlStyle, GUILayout.ExpandWidth(false))) {
-					var redditURL = "https://www.reddit.com/r/Unity3D/comments/fgjovk/finally_a_fully_working_tortoisesvn_snailsvn";
+					var redditURL = "https://www.reddit.com/r/Unity3D/comments/fgjovk/TODO:SET_URL_WHEN_AVAILABLE";
 					Application.OpenURL(redditURL);
 				}
 
 				GUILayout.Label("|", GUILayout.ExpandWidth(false));
 
 				if (GUILayout.Button("OpenUPM", urlStyle, GUILayout.ExpandWidth(false))) {
-					var openUPMurl = "https://openupm.com/packages/devlocker.versioncontrol.wisesvn";
+					var openUPMurl = "https://openupm.com/packages/TODO:SET_URL_WHEN_AVAILABLE";
 					Application.OpenURL(openUPMurl);
 				}
 
@@ -552,7 +469,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 					string versionLine = File.ReadAllLines(pathToPackage).Where(l => l.Contains("\"version\": ")).FirstOrDefault();
 					if (!string.IsNullOrEmpty(versionLine)) {
-						m_Version = "WiseSVN " + System.Text.RegularExpressions.Regex.Match(versionLine, @"\d\.\d\.\d").Value;
+						m_Version = "WiseGit " + System.Text.RegularExpressions.Regex.Match(versionLine, @"\d\.\d\.\d").Value;
 						return m_Version;
 					}
 				}
@@ -591,14 +508,14 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			// As 2019 & 2020 incorporates the UIElements framework, background textures are now null / empty.
 			// Because this was written in the old IMGUI style using 2018, this quick and dirty hack was created.
 			// Manually create background textures imitating the real buttons ones.
-			System.IO.File.WriteAllBytes("Assets/SVN_Button_Hover_Dark.png", MakeButtonBackgroundTexture(new Color(0.404f, 0.404f, 0.404f, 1.0f)).EncodeToPNG());
-			System.IO.File.WriteAllBytes("Assets/SVN_Button_Hover_Light.png", MakeButtonBackgroundTexture(new Color(0.925f, 0.925f, 0.925f, 1.0f)).EncodeToPNG());
+			System.IO.File.WriteAllBytes("Assets/Git_Button_Hover_Dark.png", MakeButtonBackgroundTexture(new Color(0.404f, 0.404f, 0.404f, 1.0f)).EncodeToPNG());
+			System.IO.File.WriteAllBytes("Assets/Git_Button_Hover_Light.png", MakeButtonBackgroundTexture(new Color(0.925f, 0.925f, 0.925f, 1.0f)).EncodeToPNG());
 
-			System.IO.File.WriteAllBytes("Assets/SVN_Button_Active_Dark.png", MakeButtonBackgroundTexture(new Color(0.455f, 0.455f, 0.455f, 1.0f)).EncodeToPNG());
-			System.IO.File.WriteAllBytes("Assets/SVN_Button_Active_Light.png", MakeButtonBackgroundTexture(new Color(0.694f, 0.694f, 0.694f, 1.0f)).EncodeToPNG());
+			System.IO.File.WriteAllBytes("Assets/Git_Button_Active_Dark.png", MakeButtonBackgroundTexture(new Color(0.455f, 0.455f, 0.455f, 1.0f)).EncodeToPNG());
+			System.IO.File.WriteAllBytes("Assets/Git_Button_Active_Light.png", MakeButtonBackgroundTexture(new Color(0.694f, 0.694f, 0.694f, 1.0f)).EncodeToPNG());
 
-			System.IO.File.WriteAllBytes("Assets/SVN_Border_Normal_Dark.png", MakeBoxBackgroundTexture(new Color(0.290f, 0.290f, 0.290f, 1.0f)).EncodeToPNG());
-			System.IO.File.WriteAllBytes("Assets/SVN_Border_Normal_Light.png", MakeBoxBackgroundTexture(new Color(0.740f, 0.740f, 0.740f, 1.0f)).EncodeToPNG());
+			System.IO.File.WriteAllBytes("Assets/Git_Border_Normal_Dark.png", MakeBoxBackgroundTexture(new Color(0.290f, 0.290f, 0.290f, 1.0f)).EncodeToPNG());
+			System.IO.File.WriteAllBytes("Assets/Git_Border_Normal_Light.png", MakeBoxBackgroundTexture(new Color(0.740f, 0.740f, 0.740f, 1.0f)).EncodeToPNG());
 		}
 		*/
 
@@ -611,13 +528,13 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 			style.name = "";	// UIElements matches button styles by name and overrides everything.
 
 			if (style.hover.background == null) {
-				var path = EditorGUIUtility.isProSkin ? "Editor/SVNElementsUI/SVN_Button_Hover_Dark" : "Editor/SVNElementsUI/SVN_Button_Hover_Light";
+				var path = EditorGUIUtility.isProSkin ? "Editor/GitElementsUI/Git_Button_Hover_Dark" : "Editor/GitElementsUI/Git_Button_Hover_Light";
 				style.hover.background = Resources.Load<Texture2D>(path);
 
 			}
 
 			if (style.active.background == null) {
-				var path = EditorGUIUtility.isProSkin ? "Editor/SVNElementsUI/SVN_Button_Active_Dark" : "Editor/SVNElementsUI/SVN_Button_Active_Light";
+				var path = EditorGUIUtility.isProSkin ? "Editor/GitElementsUI/Git_Button_Active_Dark" : "Editor/GitElementsUI/Git_Button_Active_Light";
 				style.active.background = Resources.Load<Texture2D>(path);
 
 			}
@@ -631,7 +548,7 @@ namespace DevLocker.VersionControl.WiseGit.Preferences
 
 			style.name = "";	// UIElements matches button styles by name and overrides everything.
 			if (style.normal.background == null) {
-				var path = EditorGUIUtility.isProSkin ? "Editor/SVNElementsUI/SVN_Border_Normal_Dark" : "Editor/SVNElementsUI/SVN_Border_Normal_Light";
+				var path = EditorGUIUtility.isProSkin ? "Editor/GitElementsUI/Git_Border_Normal_Dark" : "Editor/GitElementsUI/Git_Border_Normal_Light";
 				style.normal.background = Resources.Load<Texture2D>(path);
 			}
 		}
