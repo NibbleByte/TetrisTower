@@ -350,6 +350,8 @@ namespace TetrisTower.Visuals
 				return coords;
 			}));
 
+			// Play only the first time.
+			bool soundPending = true;
 			foreach (var pair in action.PlacedShape.ShapeCoords) {
 
 				var reusedVisuals = m_PlacedShapeToBeReused?.ShapeCoords
@@ -367,7 +369,8 @@ namespace TetrisTower.Visuals
 				CreateInstanceAt(coords, pair.Value, reusedVisuals);
 
 				if (lowestRows[coords.Column] == coords.Row) {
-					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(coords), withSound: true);
+					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(coords), withSound: soundPending);
+					soundPending = false;
 				}
 			}
 

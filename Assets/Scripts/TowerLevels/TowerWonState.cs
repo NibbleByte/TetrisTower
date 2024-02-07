@@ -18,6 +18,8 @@ namespace TetrisTower.TowerLevels
 		private GridLevelController m_LevelController;
 		private GridLevelData m_LevelData => m_LevelController.LevelData;
 
+		private Visuals.WonAnimations.WonAnimationController m_WonAnimationController;
+
 		private FlashMessageUIController m_FlashMessage;
 
 		private int m_BonusBlocksCount = 0;
@@ -34,6 +36,7 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_UIController);
 			context.SetByType(out m_LevelController);
 			context.SetByType(out m_FlashMessage);
+			context.TrySetByType(out m_WonAnimationController);
 
 
 			m_PlayerControls.Enable(this, m_PlayerControls.UI);
@@ -52,6 +55,8 @@ namespace TetrisTower.TowerLevels
 
 			m_StartTime = Time.time;
 
+			m_WonAnimationController?.StartAnimation();
+
 			if (m_LevelData.FallingShape != null) {
 				// HACK: This happens only via cheats. This will eventually the currently displayed falling shape.
 				m_LevelData.FallingShape = null;
@@ -61,6 +66,8 @@ namespace TetrisTower.TowerLevels
 
 		public void ExitState()
 		{
+			m_WonAnimationController?.EndAnimation();
+
 			m_PlayerControls.TowerLevelPlay.PointerPress.performed -= OnInterruptAnimation;
 			m_PlayerControls.CommonHotkeys.Back.performed -= OnInterruptAnimation;
 			m_PlayerControls.CommonHotkeys.Confirm.performed -= OnInterruptAnimation;

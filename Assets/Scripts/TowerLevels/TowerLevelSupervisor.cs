@@ -232,7 +232,9 @@ namespace TetrisTower.TowerLevels
 				behaviours.OfType<Visuals.Effects.FairyMatchingController>().FirstOrDefault(),
 				behaviours.OfType<Visuals.Effects.TowerCameraEffects>().First(),
 				behaviours.OfType<TowerStatesAPI>().First(),
-				behaviours.OfType<ILostAnimationExecutor>().ToArray()	// Tower level prefab OR scene ones.
+				behaviours.OfType<ILostAnimationExecutor>().ToArray(),	// Tower level prefab OR scene ones.
+				behaviours.OfType<Visuals.WonAnimations.WonAnimationController>().FirstOrDefault(),
+				behaviours.OfType<TowerMusicController>().FirstOrDefault()
 				);
 
 
