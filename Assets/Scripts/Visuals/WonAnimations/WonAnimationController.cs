@@ -21,11 +21,14 @@ namespace TetrisTower.Visuals.WonAnimations
 		[SerializeField]
 		private AudioMixerGroup m_MusicMixerGroup;
 
+		[SerializeField]
+		private AudioSource m_WinAudio;
+
 		public void StartAnimation()
 		{
 			m_WonMixerSnapshot.TransitionTo(m_TransitionTime);
 
-			GetComponent<AudioSource>()?.Play();
+			m_WinAudio?.Play();
 		}
 
 		public void EndAnimation()

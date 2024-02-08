@@ -24,6 +24,9 @@ namespace TetrisTower.Visuals.LostAnimations
 		public Vector2 TorqueRange = new Vector2(-10, 10);
 		public ForceMode TorqueMode = ForceMode.Impulse;
 
+		public AudioSource LoseAudio;
+		public AudioSource EarthquakeAudio;
+
 		private bool m_Interrupted = false;
 
 		public IEnumerator Execute(ConeVisualsGrid visualsGrid, Transform fallingVisualsContainer, List<KeyValuePair<GridCoords, ConeVisualsBlock>> blocks)
@@ -31,6 +34,9 @@ namespace TetrisTower.Visuals.LostAnimations
 			m_Interrupted = false;
 
 			StartCoroutine(OperateCamera(fallingVisualsContainer));
+
+			EarthquakeAudio.loop = true;
+			EarthquakeAudio.Play();
 
 			var cameraEffects = fallingVisualsContainer.GetComponentInChildren<TowerCameraEffects>();
 			cameraEffects.Shake(this, CameraShakeRange);
@@ -40,6 +46,11 @@ namespace TetrisTower.Visuals.LostAnimations
 			while(Time.time < startTime + StartDelay) {
 				if (m_Interrupted)
 					yield break;
+
+				// Because the audio has a slow start, do it a bit before the tower explosion.
+				if (!LoseAudio.isPlaying && Time.time > startTime + StartDelay * 0.75f) {
+					LoseAudio.Play();
+				}
 
 				yield return null;
 			}
@@ -67,6 +78,7 @@ namespace TetrisTower.Visuals.LostAnimations
 
 		public void Interrupt()
 		{
+			EarthquakeAudio.Stop();
 			m_Interrupted = true;
 		}
 
