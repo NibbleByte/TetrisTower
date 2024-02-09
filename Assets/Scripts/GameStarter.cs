@@ -75,8 +75,8 @@ namespace TetrisTower.GameStarter
 				gameObject.AddComponent<Tools.DebugLogDisplay>();	// Because Android doesn't display dev console on errors. Have to use Logcat.
 #endif
 
-				Application.targetFrameRate = Screen.currentResolution.refreshRate;		// Max possible FPS.
-				//Application.targetFrameRate = -1;										// Defaults to 30 FPS to save battery.
+				Application.targetFrameRate = (int) System.Math.Round(Screen.currentResolution.refreshRateRatio.value);		// Max possible FPS.
+				//Application.targetFrameRate = -1;																			// Defaults to 30 FPS to save battery.
 			} else {
 				Application.targetFrameRate = 60;
 			}
