@@ -139,12 +139,12 @@ namespace DevLocker.GFrame.Utils
 				DrawClearButton(buttonRect, property, Color.red, "Clear");
 			}
 
-			label = EditorGUI.BeginProperty(position, label, property);
-			EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+			//label = EditorGUI.BeginProperty(position, label, property);
+			//EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-			EditorGUI.PropertyField(position, property, true);
+			EditorGUI.PropertyField(position, property, label, true);
 
-			EditorGUI.EndProperty();
+			//EditorGUI.EndProperty();
 		}
 
 		/// <summary>
