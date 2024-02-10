@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: R2_River_Offset_Big-Egypt-Modified
   m_Shader: {fileID: 4800000, guid: afbb1d8a9ff99304691b993b80fbc309, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _SPECULAR_SETUP
   - _SURFACE_TYPE_TRANSPARENT
@@ -25,8 +27,8 @@ Material:
     MotionVector: User
     RenderType: Transparent
   disabledShaderPasses:
-  - MOTIONVECTORS
   - TransparentBackface
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -219,6 +221,7 @@ Material:
     - _AlphaCutoffEnable: 0
     - _AlphaDstBlend: 10
     - _AlphaSrcBlend: 1
+    - _AlphaToMask: 0
     - _BackfaceAlpha: 0.929
     - _BigCascadeAngle: 10.2
     - _BigCascadeAngleFalloff: 2.3
@@ -238,6 +241,7 @@ Material:
     - _BigCascadeWaterTessScale: 0.2
     - _Blend: 0
     - _BlendMode: 0
+    - _BlendModePreserveSpecular: 0
     - _CascadeFalloff: 0.84
     - _CascadeFalloffSlow: 5.86
     - _CascadeMetalic: 0
@@ -463,3 +467,4 @@ Material:
     - _WaterMainSpeed: {r: 0.3, g: 0.3, b: 0, a: 0}
     - _WaterMixSpeed: {r: 0.002, g: 0.002, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

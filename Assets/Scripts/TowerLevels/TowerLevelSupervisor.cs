@@ -345,7 +345,7 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
-			var renderers = GameObject.FindObjectsOfType<Renderer>()
+			var renderers = GameObject.FindObjectsByType<Renderer>(FindObjectsSortMode.None)
 				.Where(r => r is MeshRenderer || r is SkinnedMeshRenderer)  // Skip particles and others.
 				.ToArray();
 
@@ -356,7 +356,7 @@ namespace TetrisTower.TowerLevels
 				m_LevelBounds.Encapsulate(renderer.bounds);
 			}
 
-			var terrains = GameObject.FindObjectsOfType<Terrain>();
+			var terrains = GameObject.FindObjectsByType<Terrain>(FindObjectsSortMode.None);
 			foreach (var terrain in terrains) {
 				if (terrain.terrainData == null)
 					continue;

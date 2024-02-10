@@ -62,7 +62,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 			}
 #endif
 
-			var eventSystems = GameObject.FindObjectsOfType<MultiplayerEventSystem>();
+			var eventSystems = GameObject.FindObjectsByType<MultiplayerEventSystem>(FindObjectsSortMode.None);
 			Array.Sort(eventSystems, (left, right) => left.name.CompareTo(right.name));
 
 			// Setup all the context and stacks for each player.

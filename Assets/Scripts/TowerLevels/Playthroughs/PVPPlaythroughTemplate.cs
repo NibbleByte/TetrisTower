@@ -30,7 +30,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override IEnumerable<LevelParamData> GetAllLevels()
 		{
-			yield return m_PlayerData.Level;
+			if (m_PlayerData.Level != null)
+				yield return m_PlayerData.Level;
 		}
 
 
