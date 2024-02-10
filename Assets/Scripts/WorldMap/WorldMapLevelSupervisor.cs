@@ -47,13 +47,13 @@ namespace TetrisTower.WorldMap
 				await Saves.SavesManager.SavePlaythrough(Saves.SavesManager.DefaultStorySlot, m_PlaythroughData, gameContext.GameConfig);
 			}
 
-			var levelController = GameObject.FindObjectOfType<WorldMapController>();
+			var levelController = GameObject.FindAnyObjectByType<WorldMapController>();
 
 			levelController.Init(m_PlaythroughData);
 
-			var uiController = GameObject.FindObjectOfType<UI.WorldMapUIController>(true);
+			var uiController = GameObject.FindAnyObjectByType<UI.WorldMapUIController>(FindObjectsInactive.Include);
 
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+			var behaviours = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
 			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext,
@@ -85,7 +85,7 @@ namespace TetrisTower.WorldMap
 				await Saves.SavesManager.SavePlaythrough(Saves.SavesManager.DefaultStorySlot, m_PlaythroughData, gameContext.GameConfig);
 			}
 
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+			var behaviours = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
 			foreach (var behaviour in behaviours) {
 				var listener = behaviour as ILevelLoadedListener;

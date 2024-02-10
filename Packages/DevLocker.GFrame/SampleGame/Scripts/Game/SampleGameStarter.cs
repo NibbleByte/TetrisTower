@@ -75,7 +75,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 		void Start()
 		{
 			// Boot game from current scene
-			if (GameObject.FindObjectOfType<PlayerInputManager>()) {
+			if (GameObject.FindAnyObjectByType<PlayerInputManager>()) {
 #if GFRAME_ASYNC
 				SampleLevelsManager.Instance.SwitchLevelAsync(new Play.SampleMultiPlaySupervisor());
 #else
@@ -84,7 +84,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 				return;
 			}
 
-			if (GameObject.FindObjectOfType<Play.SamplePlayerController>()) {
+			if (GameObject.FindAnyObjectByType<Play.SamplePlayerController>()) {
 #if GFRAME_ASYNC
 				SampleLevelsManager.Instance.SwitchLevelAsync(new Play.SamplePlaySupervisor());
 #else
@@ -93,7 +93,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 				return;
 			}
 
-			if (GameObject.FindObjectOfType<MainMenu.SampleMainMenuController>()) {
+			if (GameObject.FindAnyObjectByType<MainMenu.SampleMainMenuController>()) {
 #if GFRAME_ASYNC
 				SampleLevelsManager.Instance.SwitchLevelAsync(new MainMenu.SampleMainMenuLevelSupervisor());
 #else
@@ -102,7 +102,7 @@ namespace DevLocker.GFrame.SampleGame.Game
 				return;
 			}
 
-			if (GameObject.FindObjectOfType<UITester.SampleUITesterController>()) {
+			if (GameObject.FindAnyObjectByType<UITester.SampleUITesterController>()) {
 #if GFRAME_ASYNC
 				SampleLevelsManager.Instance.SwitchLevelAsync(new UITester.SampleUITesterLevelSupervisor());
 #else

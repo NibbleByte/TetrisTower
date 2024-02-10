@@ -184,7 +184,7 @@ namespace DevLocker.GFrame.Input.UIScope
 				if (Application.isPlaying) {
 					if (m_ForcedDisplayAsset) {
 						if (m_ForceInputDevice == null) {
-							m_ForceInputDevice = GameObject.FindObjectOfType<ForceInputDevice>();
+							m_ForceInputDevice = GameObject.FindAnyObjectByType<ForceInputDevice>();
 
 							if (m_ForceInputDevice == null) {
 								m_ForceInputDevice = EventSystem.current?.gameObject.AddComponent<ForceInputDevice>();

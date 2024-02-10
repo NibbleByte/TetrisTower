@@ -86,7 +86,7 @@ namespace TetrisTower.GameStarter
 		{
 			await LoadPreferences();
 
-			if (GameObject.FindObjectOfType<WorldMapController>()) {
+			if (GameObject.FindAnyObjectByType<WorldMapController>()) {
 				var playthroughData = (WorldPlaythroughData) StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
 
 				playthroughData.SetupRandomGenerator(StartingRandomSeed);
@@ -101,7 +101,7 @@ namespace TetrisTower.GameStarter
 			}
 
 			// Boot game from current scene
-			var towerLevelController = GameObject.FindObjectOfType<GridLevelController>();
+			var towerLevelController = GameObject.FindAnyObjectByType<GridLevelController>();
 			if (towerLevelController || GameObject.FindGameObjectWithTag(GameTags.TowerPlaceholderTag)) {
 
 				DevLocker.Utils.SceneReference overrideScene = null;
@@ -163,7 +163,7 @@ namespace TetrisTower.GameStarter
 				return;
 			}
 
-			if (GameObject.FindObjectOfType<HomeScreenController>()) {
+			if (GameObject.FindAnyObjectByType<HomeScreenController>()) {
 				GameContext.ClearCurrentPlaythrough();
 				GameManager.Instance.SwitchLevelAsync(new HomeScreenLevelSupervisor());
 				return;

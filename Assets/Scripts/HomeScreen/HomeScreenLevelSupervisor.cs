@@ -44,7 +44,7 @@ namespace TetrisTower.HomeScreen
 			storyPlaythrough?.TryCancelCurrentLevel();
 			gameContext.SetStoryInProgress(storyPlaythrough);
 
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+			var behaviours = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
 			// StateStack not needed for now.
 			var levelController = behaviours.OfType<HomeScreenController>().First();
@@ -73,7 +73,7 @@ namespace TetrisTower.HomeScreen
 		{
 			GameManager.Instance.GameContext.GlobalControls.DisableAll(this);
 
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+			var behaviours = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
 			foreach (var behaviour in behaviours) {
 				var listener = behaviour as ILevelLoadedListener;

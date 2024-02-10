@@ -38,7 +38,7 @@ namespace DevLocker.GFrame.UIUtils
 
 				// Assuming there is only one instance.
 				// Singleton (if present) is implemented by the user code which is not accessible here.
-				m_LevelsManager = GameObject.FindObjectOfType<LevelsManager>();
+				m_LevelsManager = GameObject.FindAnyObjectByType<LevelsManager>();
 
 				if (m_LevelsManager == null)
 					return;

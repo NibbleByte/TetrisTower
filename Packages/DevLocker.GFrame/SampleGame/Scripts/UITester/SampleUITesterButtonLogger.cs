@@ -29,7 +29,7 @@ namespace DevLocker.GFrame.SampleGame.UITester
 			}
 			Debug.Log($"{buttonText} was pressed! {AdditionalMessage}", this);
 
-			FindObjectOfType<SampleUITesterButtonLogDisplay>()?.LogText(buttonText);
+			FindAnyObjectByType<SampleUITesterButtonLogDisplay>()?.LogText(buttonText);
 		}
 	}
 }

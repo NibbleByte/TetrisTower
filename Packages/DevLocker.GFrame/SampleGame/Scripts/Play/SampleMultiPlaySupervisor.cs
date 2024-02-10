@@ -88,7 +88,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 				eventSystem.gameObject.SetActive(false);
 				eventSystem.gameObject.SetActive(true);
 
-				var inputContext = new InputComponentContext(playerInput, new InputActionsMaskedStack(playerControls), GameObject.FindObjectOfType<SampleGameStarter>().BindingDisplayAssets);
+				var inputContext = new InputComponentContext(playerInput, new InputActionsMaskedStack(playerControls), GameObject.FindAnyObjectByType<SampleGameStarter>().BindingDisplayAssets);
 				playerControls.SetInputContext(inputContext);
 
 				//
@@ -131,7 +131,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 #endif
 		{
 			// Stop the manager as it will log errors complaining about the global PlayerInput not having camera.
-			GameObject.FindObjectOfType<PlayerInputManager>().enabled = false;
+			GameObject.FindAnyObjectByType<PlayerInputManager>().enabled = false;
 
 			// Same goes for player input & event systems. Note: collection is modified on disable PlayerInput
 			foreach(PlayerInput playerInput in PlayerInput.all.ToList()) {
@@ -140,7 +140,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 				}
 			}
 
-			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadedListener>();
+			var levelListeners = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None).OfType<ILevelLoadedListener>();
 			foreach (var listener in levelListeners) {
 				listener.OnLevelUnloading();
 			}

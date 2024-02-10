@@ -66,7 +66,7 @@ namespace TetrisTower.WorldMap
 				var locationBind = new LocationBind() {
 					Level = level,
 				};
-				
+
 				locationBind.WorldLocation = GameObject.Instantiate(WorldMapLocationPrefab, LocationsRoot);
 				locationBind.WorldLocation.name = "L-" + level.LevelID;
 				locationBind.WorldLocation.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
@@ -138,7 +138,7 @@ namespace TetrisTower.WorldMap
 		{
 #if UNITY_EDITOR
 			if (UnityEngine.InputSystem.Keyboard.current.ctrlKey.isPressed || UnityEngine.InputSystem.Keyboard.current.shiftKey.isPressed) {
-				FindObjectOfType<WorldMapDebugAPI>().CompleteLevel(levelID);
+				FindAnyObjectByType<WorldMapDebugAPI>().CompleteLevel(levelID);
 				return;
 			}
 #endif

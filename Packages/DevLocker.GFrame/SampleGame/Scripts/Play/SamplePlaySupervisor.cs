@@ -52,9 +52,9 @@ namespace DevLocker.GFrame.SampleGame.Play
 			}
 #endif
 
-			var playerController = GameObject.FindObjectOfType<SamplePlayerController>();
+			var playerController = GameObject.FindAnyObjectByType<SamplePlayerController>();
 
-			var uiController = GameObject.FindObjectOfType<SamplePlayUIController>(true);
+			var uiController = GameObject.FindAnyObjectByType<SamplePlayUIController>(FindObjectsInactive.Include);
 
 			PlayerContextUIRootObject.GlobalPlayerContext.CreatePlayerStack(
 				gameContext.PlayerControls,
@@ -63,7 +63,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 				);
 
 
-			var behaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true);
+			var behaviours = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
 			foreach (var listener in behaviours.OfType<ILevelLoadingListener>()) {
 #if GFRAME_ASYNC
@@ -87,7 +87,7 @@ namespace DevLocker.GFrame.SampleGame.Play
 		public IEnumerator Unload()
 #endif
 		{
-			var levelListeners = GameObject.FindObjectsOfType<MonoBehaviour>(true).OfType<ILevelLoadedListener>();
+			var levelListeners = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None).OfType<ILevelLoadedListener>();
 			foreach (var listener in levelListeners) {
 				listener.OnLevelUnloading();
 			}
