@@ -30,7 +30,7 @@ namespace TetrisTower.Visuals
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 		public Effects.FallTrailEffectsManager WonFallTrailEffectsManager;
 
-		public AudioSource RotateSoundSound;
+		public AudioSource RotateSound;
 		public AudioSource FallSpeedUpSoundSound;
 
 		public VisualsShape FallingVisualsShape { get; private set; }
@@ -243,7 +243,7 @@ namespace TetrisTower.Visuals
 
 			Debug.Assert(FallingVisualsShape.ShapeCoords.Length == m_LevelData.FallingShape.ShapeCoords.Length);
 
-			RotateSoundSound?.PlayOneShot(RotateSoundSound?.clip);
+			RotateSound?.Play();
 
 			m_RotatingFallingShape = true;
 			m_RotatingFallingShapeStarted = m_Timing.TimeElapsed;

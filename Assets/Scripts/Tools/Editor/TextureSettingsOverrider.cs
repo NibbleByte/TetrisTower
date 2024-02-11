@@ -18,7 +18,6 @@ namespace UnityTools.AssetProcessingTools
 			{BuildTargetGroup.Unknown, "DefaultTexturePlatform"},
 			{BuildTargetGroup.Standalone, BuildTargetGroup.Standalone.ToString()},
 			{BuildTargetGroup.WSA, "Windows Store Apps"},	// Cause why not...
-			{BuildTargetGroup.Stadia, BuildTargetGroup.Stadia.ToString()},
 			{BuildTargetGroup.XboxOne, BuildTargetGroup.XboxOne.ToString()},
 			{BuildTargetGroup.PS4, BuildTargetGroup.PS4.ToString()},
 			{BuildTargetGroup.Android, BuildTargetGroup.Android.ToString()},
@@ -159,7 +158,6 @@ namespace UnityTools.AssetProcessingTools
 
 			// Per platform settings.
 			//ApplyPlatformSettings(textureImporter, BuildTargetGroup.Standalone);
-			//ApplyPlatformSettings(textureImporter, BuildTargetGroup.Stadia);
 			//ApplyPlatformSettings(textureImporter, BuildTargetGroup.XboxOne);
 			//ApplyPlatformSettings(textureImporter, BuildTargetGroup.PS4);
 			ApplyPlatformSettings(textureImporter, BuildTargetGroup.Android);
