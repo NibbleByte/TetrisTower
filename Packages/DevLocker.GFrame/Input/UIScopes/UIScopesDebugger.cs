@@ -156,7 +156,11 @@ namespace DevLocker.GFrame.Input.UIScope
 					if (Application.isPlaying) {
 						Selection.activeObject = SelectionController.GetActiveInstanceFor(PlayerContextUIRootObject.GlobalPlayerContext);
 					} else {
+#if UNITY_2023_2_OR_NEWER
+						Selection.activeObject = GameObject.FindAnyObjectByType<SelectionController>(FindObjectsInactive.Include);
+#else
 						Selection.activeObject = GameObject.FindObjectOfType<SelectionController>(true);
+#endif
 					}
 				}
 			}
@@ -203,7 +207,11 @@ namespace DevLocker.GFrame.Input.UIScope
 					if (Application.isPlaying) {
 						Selection.activeGameObject = EventSystem.current?.gameObject;
 					} else {
+#if UNITY_2023_2_OR_NEWER
+						Selection.activeObject = GameObject.FindAnyObjectByType<EventSystem>(FindObjectsInactive.Include)?.gameObject;
+#else
 						Selection.activeObject = GameObject.FindObjectOfType<EventSystem>(true)?.gameObject;
+#endif
 					}
 				}
 			}
