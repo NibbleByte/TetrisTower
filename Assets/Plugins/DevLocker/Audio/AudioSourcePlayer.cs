@@ -10,6 +10,7 @@ namespace DevLocker.Audio
 	/// </summary>
 	public class AudioSourcePlayer : MonoBehaviour
 	{
+#if UNITY_2023_2_OR_NEWER
 		public AudioResource AudioResource {
 			get => m_AudioResource;
 			set {
@@ -17,6 +18,15 @@ namespace DevLocker.Audio
 				if (m_AudioSource) m_AudioSource.resource = value;
 			}
 		}
+#else
+		public AudioClip AudioResource {
+			get => m_AudioResource;
+			set {
+				m_AudioResource = value;
+				if (m_AudioSource) m_AudioSource.clip = value;
+			}
+		}
+#endif
 
 		public AudioMixerGroup Output {
 			get => m_Output;
@@ -80,7 +90,11 @@ namespace DevLocker.Audio
 
 		[SerializeField]
 		[Tooltip("Resource to play")]
+#if UNITY_2023_2_OR_NEWER
 		private AudioResource m_AudioResource;
+#else
+		private AudioClip m_AudioResource;
+#endif
 
 		[SerializeField]
 		[Tooltip("Resource to play. If left empty, it will copy the one of the template, if any")]
@@ -324,7 +338,11 @@ namespace DevLocker.Audio
 			}
 
 			m_AudioSource.playOnAwake = false; // Will be handled by us.
+#if UNITY_2023_2_OR_NEWER
 			m_AudioSource.resource = m_AudioResource;
+#else
+			m_AudioSource.clip = m_AudioResource;
+#endif
 			m_AudioSource.outputAudioMixerGroup = m_Output ?? m_AudioSource.outputAudioMixerGroup;
 			m_AudioSource.loop = m_Loop;
 			m_AudioSource.volume = m_Volume;
