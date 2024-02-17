@@ -1,14 +1,15 @@
+using DevLocker.Audio;
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
-using System.Collections;
-using System.Collections.Generic;
 using TetrisTower.Game;
 using UnityEngine;
 
 namespace TetrisTower.TowerLevels
 {
-	[RequireComponent(typeof(AudioSource))]
-	public class TowerPlayerSound : MonoBehaviour, ILevelLoadedListener
+	/// <summary>
+	/// Split-screen support (forces spatial blend to be 3D with endless range).
+	/// </summary>
+	public class TowerAudioPlayer : AudioSourcePlayer, ILevelLoadedListener
 	{
 		void Awake()
 		{

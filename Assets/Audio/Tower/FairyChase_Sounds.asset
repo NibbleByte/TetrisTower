@@ -1,32 +1,12 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1233149941 &-2232338154299215084
-AudioContainerElement:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 010_{-2232338154299215084}
-  m_AudioClip: {fileID: 8300000, guid: 1ed9a7e5f9085c846b523a928132bc66, type: 3}
-  m_Volume: 0
-  m_Enabled: 1
---- !u!1233149941 &4969616612338443319
-AudioContainerElement:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 007_{4969616612338443319}
-  m_AudioClip: {fileID: 8300000, guid: 367ff20a68b06c24cb84a0f7068de4b1, type: 3}
-  m_Volume: 0
-  m_Enabled: 1
 --- !u!1307931743 &6418180475301049370
 AudioRandomContainer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RotateSounds
+  m_Name: FairyChase_Sounds
   m_Volume: 0
   m_Pitch: 0
   m_AutomaticTriggerTime: 0
@@ -37,8 +17,6 @@ AudioRandomContainer:
   m_LoopCountRandomizationRange: {x: 0, y: 0}
   m_Elements:
   - {fileID: 7330324079999369325}
-  - {fileID: 4969616612338443319}
-  - {fileID: -2232338154299215084}
   m_AvoidRepeatingLast: 0
   m_PlaybackMode: 2
   m_TriggerMode: 0
@@ -54,7 +32,7 @@ AudioContainerElement:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 004_{7330324079999369325}
-  m_AudioClip: {fileID: 8300000, guid: a109b7abb8be0a144bb77cb196f0f549, type: 3}
+  m_Name: BEAM_{7330324079999369325}
+  m_AudioClip: {fileID: 8300000, guid: 731bfc96a0b1faa43a94ff3364f11c06, type: 3}
   m_Volume: 0
   m_Enabled: 1

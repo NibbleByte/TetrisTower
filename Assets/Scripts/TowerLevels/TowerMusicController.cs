@@ -1,3 +1,4 @@
+using DevLocker.Audio;
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using System;
@@ -8,7 +9,7 @@ namespace TetrisTower.TowerLevels
 {
 	public class TowerMusicController : MonoBehaviour, ILevelLoadedListener
 	{
-		public AudioSource MusicSource;
+		public AudioSourcePlayer MusicSource;
 
 		private GridLevelController m_TowerLevel;
 

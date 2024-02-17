@@ -7,6 +7,7 @@ using System.Linq;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Timing;
 using TetrisTower.Game;
+using DevLocker.Audio;
 
 namespace TetrisTower.Visuals
 {
@@ -30,8 +31,8 @@ namespace TetrisTower.Visuals
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
 		public Effects.FallTrailEffectsManager WonFallTrailEffectsManager;
 
-		public AudioSource RotateSound;
-		public AudioSource FallSpeedUpSoundSound;
+		public AudioSourcePlayer RotateSound;
+		public AudioSourcePlayer FallSpeedUpSoundSound;
 
 		public VisualsShape FallingVisualsShape { get; private set; }
 
@@ -107,7 +108,7 @@ namespace TetrisTower.Visuals
 
 		private void OnFallingShapeSpeedUp()
 		{
-			FallSpeedUpSoundSound?.PlayOneShot(FallSpeedUpSoundSound?.clip);
+			FallSpeedUpSoundSound?.Play();
 
 			if (m_LevelData.HasWon) {
 				// Rotation happens for the next block, so shouldn't affect the last one.

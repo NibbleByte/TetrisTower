@@ -1,3 +1,4 @@
+using DevLocker.Audio;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Timing;
 using System.Collections;
@@ -710,9 +711,9 @@ namespace TetrisTower.Visuals
 			particleSystem.Emit(count);
 
 			if (withSound) {
-				var audioSource = particleSystem.GetComponent<AudioSource>();
+				var audioSource = particleSystem.GetComponent<AudioSourcePlayer>();
 				if (audioSource) {
-					audioSource.PlayOneShot(audioSource.clip);
+					audioSource.Play();
 				}
 			}
 		}

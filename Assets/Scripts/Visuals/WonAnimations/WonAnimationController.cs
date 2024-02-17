@@ -1,3 +1,4 @@
+using DevLocker.Audio;
 using System.Linq;
 using TetrisTower.Game;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace TetrisTower.Visuals.WonAnimations
 		private AudioMixerGroup m_MusicMixerGroup;
 
 		[SerializeField]
-		private AudioSource m_WinAudio;
+		private AudioSourcePlayer m_WinAudio;
 
 		public void StartAnimation()
 		{
