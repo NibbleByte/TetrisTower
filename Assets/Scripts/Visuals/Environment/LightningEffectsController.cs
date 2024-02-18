@@ -1,3 +1,4 @@
+using DevLocker.Audio;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace TetrisTower.Visuals.Environment
 		public AnimationCurve[] FogDensityCurves;
 
 		public float EffectsDuration = 1.5f;
+
+		public AudioSourcePlayer LightningSound;
 
 		public GameObject[] LightningStrikeSpawners;
 
@@ -84,6 +87,8 @@ namespace TetrisTower.Visuals.Environment
 				Spawner = selectedSpawner,
 				FogDensityCurve = FogDensityCurves[Random.Range(0, FogDensityCurves.Length)]
 			});
+
+			LightningSound?.Play();
 		}
 
 		void UpdateEffects()

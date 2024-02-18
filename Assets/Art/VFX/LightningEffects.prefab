@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1868753962111010818}
   - component: {fileID: 1868753962111010819}
+  - component: {fileID: 383725813495219430}
   m_Layer: 0
   m_Name: LightningEffects
   m_TagString: Untagged
@@ -24,6 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1868753962111010816}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -34,7 +36,6 @@ Transform:
   - {fileID: 1868753961722014268}
   - {fileID: 1868753962746172564}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1868753962111010819
 MonoBehaviour:
@@ -139,12 +140,34 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 0
   EffectsDuration: 0.4
+  LightningSound: {fileID: 383725813495219430}
   LightningStrikeSpawners: []
+--- !u!114 &383725813495219430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868753962111010816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2d8c61140f63ff47af27ba898a150a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AudioResource: {fileID: 6418180475301049370, guid: ceab60afc47e4e04a9957c7b67a5ff17, type: 2}
+  m_Output: {fileID: 1261248299509615662, guid: e7ba0b6bbce139246afb42b9fcbfb444, type: 2}
+  m_Template: {fileID: 0}
+  m_Mute: 0
+  m_PlayOnEnable: 0
+  m_Loop: 0
+  InterruptionFadeDuration: 0.2
+  m_Volume: 1
 --- !u!1001 &1868753961417815563
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 1868753962111010818}
     m_Modifications:
     - target: {fileID: 139794, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
@@ -196,6 +219,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
 --- !u!4 &1868753961418141111 stripped
 Transform:
@@ -207,6 +233,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 1868753962111010818}
     m_Modifications:
     - target: {fileID: 139794, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
@@ -258,6 +285,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
 --- !u!4 &1868753961681821809 stripped
 Transform:
@@ -269,6 +299,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 1868753962111010818}
     m_Modifications:
     - target: {fileID: 139794, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
@@ -320,6 +351,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
 --- !u!4 &1868753961722014268 stripped
 Transform:
@@ -331,6 +365,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 1868753962111010818}
     m_Modifications:
     - target: {fileID: 139794, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
@@ -382,6 +417,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ed9b763dad79434dac96eaaa4a79cba, type: 3}
 --- !u!4 &1868753962746172564 stripped
 Transform:
