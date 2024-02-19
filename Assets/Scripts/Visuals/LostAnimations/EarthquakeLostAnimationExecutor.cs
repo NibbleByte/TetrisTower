@@ -45,8 +45,10 @@ namespace TetrisTower.Visuals.LostAnimations
 			float startTime = Time.time;
 
 			while(Time.time < startTime + StartDelay) {
-				if (m_Interrupted)
+				if (m_Interrupted) {
+					cameraEffects.ClearShake(this);
 					yield break;
+				}
 
 				// Because the audio has a slow start, do it a bit before the tower explosion.
 				if (!LoseAudio.IsPlaying && Time.time > startTime + StartDelay * 0.75f) {

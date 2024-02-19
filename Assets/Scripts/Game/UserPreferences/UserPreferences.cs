@@ -77,7 +77,7 @@ namespace TetrisTower.Game.Preferences
 			#region Input
 
 			[field:JsonProperty(nameof(DownIsDrop))]
-			public bool DownIsDrop { get; set; } = true;
+			public bool DownIsDrop { get; set; } = false;
 
 			[field:JsonProperty(nameof(TouchInputControls))]
 			public IUserPreferences.TouchInputControlMethod TouchInputControls { get; set; } = IUserPreferences.TouchInputControlMethod.Drag;
