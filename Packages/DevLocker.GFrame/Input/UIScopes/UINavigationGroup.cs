@@ -877,11 +877,10 @@ namespace DevLocker.GFrame.Input.UIScope
 	[CustomPropertyDrawer(typeof(UINavigationGroup.WrapBehaviour))]
 	internal class NavigationGroupWrapBehaviourPropertyDrawer : PropertyDrawer
 	{
-		private static UINavigationGroup.WrapMode[] s_WrapModeValues = (UINavigationGroup.WrapMode[]) Enum.GetValues(typeof(UINavigationGroup.WrapMode));
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			var mode = s_WrapModeValues[property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).enumValueIndex];
+			var mode = (UINavigationGroup.WrapMode) property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).intValue;
 			switch (mode) {
 				case UINavigationGroup.WrapMode.None:
 				case UINavigationGroup.WrapMode.Wrap:
@@ -906,7 +905,7 @@ namespace DevLocker.GFrame.Input.UIScope
 
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-			var mode = s_WrapModeValues[property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).enumValueIndex];
+			var mode = (UINavigationGroup.WrapMode) property.FindPropertyRelative(nameof(UINavigationGroup.WrapBehaviour.Mode)).intValue;
 
 			switch (mode) {
 				case UINavigationGroup.WrapMode.None:

@@ -218,8 +218,6 @@ namespace DevLocker.GFrame.Input.UIScope
 	[CanEditMultipleObjects]
 	internal class HotkeyFocusScopeElementEditor : HotkeyBaseScopeElementEditor
 	{
-		private static HotkeyFocusScopeElement.FocusPolicyType[] s_HotkeyFocusScopeElementFocusPolicyValues = (HotkeyFocusScopeElement.FocusPolicyType[]) Enum.GetValues(typeof(HotkeyFocusScopeElement.FocusPolicyType));
-
 		public override void OnInspectorGUI()
 		{
 			base.OnInspectorGUI();
@@ -233,7 +231,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(HotkeyFocusScopeElement.FocusWhilePressed)));
 			EditorGUILayout.PropertyField(focusPolicyProperty);
 
-			var focusPolicy = s_HotkeyFocusScopeElementFocusPolicyValues[focusPolicyProperty.enumValueIndex];
+			var focusPolicy = (HotkeyFocusScopeElement.FocusPolicyType) focusPolicyProperty.intValue;
 
 			switch (focusPolicy) {
 				case HotkeyFocusScopeElement.FocusPolicyType.FocusScope:

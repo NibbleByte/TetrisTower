@@ -380,7 +380,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 		public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
 		{
 			var modeProperty = property.FindPropertyRelative(nameof(HotkeyDisplayUI.DisplayModeData.Mode));
-			var mode = (HotkeyDisplayUI.DisplayModes)modeProperty.enumValueIndex;
+			var mode = (HotkeyDisplayUI.DisplayModes)modeProperty.intValue;
 
 			float height = UnityEditor.EditorGUIUtility.singleLineHeight;
 
@@ -413,7 +413,7 @@ namespace DevLocker.GFrame.Input.UIInputDisplay
 
 			lineRect.y += UnityEditor.EditorGUIUtility.singleLineHeight + UnityEditor.EditorGUIUtility.standardVerticalSpacing;
 
-			var mode = (HotkeyDisplayUI.DisplayModes) modeProperty.enumValueIndex;
+			var mode = (HotkeyDisplayUI.DisplayModes) modeProperty.intValue;
 			UnityEditor.EditorGUI.indentLevel++;
 			switch(mode) {
 				case HotkeyDisplayUI.DisplayModes.UpdateWithCurrentDevice:

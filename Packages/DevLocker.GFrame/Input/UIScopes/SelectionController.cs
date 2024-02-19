@@ -468,7 +468,6 @@ namespace DevLocker.GFrame.Input.UIScope
 	[UnityEditor.CanEditMultipleObjects]
 	internal class SelectionControllerEditor : UnityEditor.Editor
 	{
-		private static SelectionController.StartSelectionSourceTypes[] s_StartSelectionSourceTypeValues = (SelectionController.StartSelectionSourceTypes[]) System.Enum.GetValues(typeof(SelectionController.StartSelectionSourceTypes));
 
 		public override void OnInspectorGUI()
 		{
@@ -481,7 +480,7 @@ namespace DevLocker.GFrame.Input.UIScope
 			var startSelectionSource = serializedObject.FindProperty(nameof(SelectionController.StartSelectionSource));
 			UnityEditor.EditorGUILayout.PropertyField(startSelectionSource);
 
-			var sourceType = s_StartSelectionSourceTypeValues[startSelectionSource.enumValueIndex];
+			var sourceType = (SelectionController.StartSelectionSourceTypes) startSelectionSource.intValue;
 
 			switch(sourceType) {
 				case SelectionController.StartSelectionSourceTypes.Selectables:
