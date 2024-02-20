@@ -22,8 +22,10 @@ namespace TetrisTower.Saves
 				new Core.RandomXoShiRo128starstarJsonConverter(),
 		};
 
-		private const string ReplaysFolder = "Replays/";
+		public const string ReplaysFolder = "Replays/";
 		private const string PlaythroughsFolder = "Saves/";
+
+		private const string AutoReplaySavesPrefix = "AUTO";
 
 		private const string ReplayExtension = ".trep";
 		private const string PlaythroughsExtension = ".wsav";
@@ -74,16 +76,31 @@ namespace TetrisTower.Saves
 
 		#region Replays
 
-		public static async void SaveReplay(string name, ReplayRecording recording, GameConfig config)
+		public static async void SaveReplay(string name, ReplayRecording recording, bool isAutoReplaySave, GameConfig config)
 		{
+			if (isAutoReplaySave) {
+				name = $"{AutoReplaySavesPrefix}_{name}";
+			}
+
 			using (GameManager.Instance.GetManager<BlockingOperationOverlayController>().BlockScope(recording)) {
 				try {
 
 					string content = Serialize<ReplayRecording>(recording, config);
 
-					await Platforms.PlatformsStorage.WriteZipFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension), content);
+					string path = Path.Combine(ReplaysFolder, isAutoReplaySave ? AutoReplaySavesPrefix : "", name + ReplayExtension);
+					await Platforms.PlatformsStorage.WriteZipFileAsync(path, content);
 
-					GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("Replay saved!");
+					// Limit the number of autosaves
+					if (isAutoReplaySave) {
+						string[] autosaveNames = await FetchReplaysList(true);
+						Array.Sort(autosaveNames);
+						for(int i = 0;  autosaveNames.Length - i > 30; ++i) {
+							await DeleteReplay(autosaveNames[i], true);
+						}
+					}
+
+					// Can be called during OnApplicationQuit() while trying to save the current auto replay. Objects may be destroyed at that time.
+					GameManager.Instance?.GetManager<ToastNotificationsController>().ShowNotification("Replay saved!");
 
 				} catch (Exception ex) {
 
@@ -94,20 +111,23 @@ namespace TetrisTower.Saves
 			}
 		}
 
-		public static async Task<ReplayRecording> LoadReplay(string name, GameConfig config)
+		public static async Task<ReplayRecording> LoadReplay(string name, bool isAutoReplaySave, GameConfig config)
 		{
-			string content = await Platforms.PlatformsStorage.ReadZipFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension));
+			string path = Path.Combine(ReplaysFolder, isAutoReplaySave ? AutoReplaySavesPrefix : "", name + ReplayExtension);
+			string content = await Platforms.PlatformsStorage.ReadZipFileAsync(path);
 			return Deserialize<ReplayRecording>(content, config);
 		}
 
-		public static async Task<bool> DeleteReplay(string name)
+		public static async Task<bool> DeleteReplay(string name, bool isAutoReplaySave)
 		{
-			return await Platforms.PlatformsStorage.DeleteFileAsync(Path.Combine(ReplaysFolder, name + ReplayExtension));
+			string path = Path.Combine(ReplaysFolder, isAutoReplaySave ? AutoReplaySavesPrefix : "", name + ReplayExtension);
+			return await Platforms.PlatformsStorage.DeleteFileAsync(path);
 		}
 
-		public static async Task<string[]> FetchReplaysList()
+		public static async Task<string[]> FetchReplaysList(bool isAutoReplaySave)
 		{
-			string[] paths = await Platforms.PlatformsStorage.ListFilesAsync(ReplaysFolder, ReplayExtension);
+			string folder = isAutoReplaySave ? Path.Combine(ReplaysFolder, AutoReplaySavesPrefix) : ReplaysFolder;
+			string[] paths = await Platforms.PlatformsStorage.ListFilesAsync(folder, ReplayExtension);
 			return paths.Select(p => Path.GetFileNameWithoutExtension(p)).OrderBy(n => n).ToArray();
 		}
 

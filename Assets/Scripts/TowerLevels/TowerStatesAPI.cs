@@ -55,6 +55,8 @@ namespace TetrisTower.TowerLevels
 
 		public void QuitLevel()
 		{
+			SaveReplay(true);
+
 			m_PlaythroughData.QuitLevel();
 
 			GameManager.Instance.SwitchLevelAsync(m_PlaythroughData.PrepareSupervisor());
@@ -62,11 +64,15 @@ namespace TetrisTower.TowerLevels
 
 		public void ExitToHomeScreen()
 		{
+			SaveReplay(true);
+
 			GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());
 		}
 
 		public void RetryLevel()
 		{
+			SaveReplay(true);
+
 			RetryLevelApply(m_PlaythroughData);
 
 			GameManager.Instance.SwitchLevelAsync(m_PlaythroughData.PrepareSupervisor());
@@ -89,6 +95,8 @@ namespace TetrisTower.TowerLevels
 
 		public void GoToNextLevel()
 		{
+			SaveReplay(true);
+
 			if (!GoToNextLevelApply(m_PlaythroughData))
 				return;
 
@@ -123,6 +131,8 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
+			SaveReplay(true);
+
 			IPlaythroughData nextPlaythroughData = m_PlaythroughData;
 
 			if (!m_IsReplay) {
@@ -146,15 +156,30 @@ namespace TetrisTower.TowerLevels
 
 		public void SaveReplay()
 		{
+			SaveReplay(false);
+		}
+
+		private void SaveReplay(bool isAutoReplay)
+		{
 			ReplayRecording recording;
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
+
+				// Don't auto-save replays in playback mode, as it was already saved.
+				if (isAutoReplay)
+					return;
+
 				// Null controller as we are not gonna execute the recording.
 				recording = replayPlaythroughData.GetReplayRecording(controller: null, fairy: null);
 			} else {
 				recording = m_PlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 			}
 
-			Saves.SavesManager.SaveReplay($"{DateTime.Now:yyyyMMdd_HHmmss} {m_PlaythroughData.ActiveTowerLevels[0].BackgroundScene.SceneName}", recording, m_Config);
+			Saves.SavesManager.SaveReplay($"{DateTime.Now:yyyyMMdd_HHmmss} {m_PlaythroughData.ActiveTowerLevels[0].BackgroundScene.SceneName}", recording, isAutoReplay, m_Config);
+		}
+
+		void OnApplicationQuit()
+		{
+			SaveReplay(true);
 		}
 	}
 }

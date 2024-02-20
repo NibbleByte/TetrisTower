@@ -67,6 +67,10 @@ namespace TetrisTower.SystemUI
 		{
 			bool removed = m_Blockers.Remove(source);
 
+			// Can be called during OnApplicationQuit() while trying to save the current auto replay. Objects may be destroyed at that time.
+			if (this == null)
+				return true;
+
 			if (m_Blockers.Count == 0) {
 				gameObject.SetActive(false);
 				Canvas.alpha = 0f;

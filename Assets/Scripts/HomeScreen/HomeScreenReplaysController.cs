@@ -8,22 +8,29 @@ using TetrisTower.SystemUI;
 using TetrisTower.TowerLevels.Playthroughs;
 using TetrisTower.TowerLevels.Replays;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TetrisTower.HomeScreen
 {
 	public class HomeScreenReplaysController : MonoBehaviour, ILevelLoadedListener
 	{
 		public Transform ReplaysListContainer;
+		public GameObject LoadingOverlay;
+		public Toggle AutoSavesToggle;
 
 		private GameConfig m_Config;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			context.SetByType(out m_Config);
+
+			AutoSavesToggle.SetIsOnWithoutNotify(false);
+			AutoSavesToggle.onValueChanged.AddListener(OnAutoSavesToggle);
 		}
 
 		public void OnLevelUnloading()
 		{
+			AutoSavesToggle.onValueChanged.RemoveListener(OnAutoSavesToggle);
 		}
 
 		void OnEnable()
@@ -33,9 +40,24 @@ namespace TetrisTower.HomeScreen
 			FetchReplaysAsync();
 		}
 
+		public void BrowseReplaysFolder()
+		{
+			System.Diagnostics.Process.Start(System.IO.Path.Combine(Application.persistentDataPath, Saves.SavesManager.ReplaysFolder));
+		}
+
+		private void OnAutoSavesToggle(bool value)
+		{
+			FetchReplaysAsync();
+		}
+
 		private async void FetchReplaysAsync()
 		{
-			string[] replayNames = await Saves.SavesManager.FetchReplaysList();
+			LoadingOverlay?.SetActive(true);
+			AutoSavesToggle.interactable = false;
+
+			InPlacePools.TransformPool(ReplaysListContainer, 0);
+
+			string[] replayNames = await Saves.SavesManager.FetchReplaysList(AutoSavesToggle.isOn);
 
 			// Changed state/screen.
 			if (!gameObject.activeInHierarchy)
@@ -43,10 +65,13 @@ namespace TetrisTower.HomeScreen
 
 			InPlacePools.TransformPool(ReplaysListContainer, replayNames.Length);
 
-			for(int i = 0; i < replayNames.Length; i++) {
+			AutoSavesToggle.interactable = true;
+			LoadingOverlay?.SetActive(false);
+
+			for (int i = 0; i < replayNames.Length; i++) {
 				var entry = ReplaysListContainer.GetChild(i).GetComponent<HomeScreenReplaysEntryElement>();
 
-				entry.Init(replayNames[i], OnPlay, OnDelete);
+				entry.Init(replayNames[replayNames.Length - i - 1], OnPlay, OnDelete);
 			}
 		}
 
@@ -56,7 +81,7 @@ namespace TetrisTower.HomeScreen
 
 				try {
 
-					ReplayRecording recording = await Saves.SavesManager.LoadReplay(replayEntry.ReplayName, m_Config);
+					ReplayRecording recording = await Saves.SavesManager.LoadReplay(replayEntry.ReplayName, AutoSavesToggle.isOn, m_Config);
 
 					if (recording.IsVersionSupported) {
 
@@ -104,7 +129,7 @@ namespace TetrisTower.HomeScreen
 
 				try {
 
-					await Saves.SavesManager.DeleteReplay(replayEntry.ReplayName);
+					await Saves.SavesManager.DeleteReplay(replayEntry.ReplayName, AutoSavesToggle.isOn);
 
 				} catch (Exception ex) {
 
