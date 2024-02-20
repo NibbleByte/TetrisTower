@@ -161,6 +161,10 @@ namespace TetrisTower.TowerLevels
 
 		private void SaveReplay(bool isAutoReplay)
 		{
+			// Level finished, already saved (probably)
+			if (isAutoReplay && m_PlayerContext.StatesStack == null)
+				return;
+
 			ReplayRecording recording;
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
 

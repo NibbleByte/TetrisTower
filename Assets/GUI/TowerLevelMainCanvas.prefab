@@ -2121,7 +2121,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -11.250061, y: 33.749985}
+  m_AnchoredPosition: {x: -11.25, y: 33.75}
   m_SizeDelta: {x: 35, y: 200}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &3158287853886314914
@@ -5269,10 +5269,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ActivateOnState: 2
-  HasWon: 1
+  FinishedWonState: 2
   ActivatedObjects:
-  - {fileID: 4757464412371532071}
   - {fileID: 5932794371714255677}
+  - {fileID: 4757464412371532071}
 --- !u!114 &4667125744311256273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5286,10 +5286,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ActivateOnState: 2
-  HasWon: 0
+  FinishedWonState: 1
   ActivatedObjects:
-  - {fileID: 9073084524670188588}
   - {fileID: 5404175916041125923}
+  - {fileID: 9073084524670188588}
 --- !u!1 &5932794371714255677
 GameObject:
   m_ObjectHideFlags: 0

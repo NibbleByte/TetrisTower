@@ -7,10 +7,17 @@ namespace TetrisTower.TowerUI
 {
 	public class ActivateOnRunningStateUIController : MonoBehaviour, ILevelLoadedListener
 	{
+		public enum FinishedWonStateType
+		{
+			Both,
+			Lost,
+			Won,
+		}
+
 		public TowerLevelRunningState ActivateOnState;
 
 		[Tooltip("Used when target state is Finished")]
-		public bool HasWon;
+		public FinishedWonStateType FinishedWonState;
 
 		public GameObject[] ActivatedObjects;
 
@@ -33,7 +40,11 @@ namespace TetrisTower.TowerUI
 			bool activate = false;
 
 			if (m_LevelData?.RunningState == ActivateOnState) {
-				if (ActivateOnState != TowerLevelRunningState.Finished || m_LevelData.HasWon == HasWon) {
+				if (ActivateOnState != TowerLevelRunningState.Finished
+					|| m_LevelData.HasWon && FinishedWonState == FinishedWonStateType.Won
+					|| !m_LevelData.HasWon && FinishedWonState == FinishedWonStateType.Lost
+					|| FinishedWonState == FinishedWonStateType.Both
+					) {
 					activate = true;
 				}
 			}
