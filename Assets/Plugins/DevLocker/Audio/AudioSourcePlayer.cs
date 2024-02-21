@@ -266,11 +266,13 @@ namespace DevLocker.Audio
 
 		public virtual void PlayOnGamepad(int playerIndex)
 		{
+#if UNITY_EDITOR
 			m_ShouldPlayRepeating = true;
 			StopVolumeCrt();
-			AudioSource.PlayOnGamepad(playerIndex);
+			AudioSource.PlayOnGamepad(playerIndex);	// This is not available for every platform (e.g. PC doesn't have it).
 
 			PlayStarted?.Invoke(this);
+#endif
 		}
 
 		[ContextMenu("Stop")]
