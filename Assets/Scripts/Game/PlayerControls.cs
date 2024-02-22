@@ -173,6 +173,17 @@ namespace TetrisTower.Game
                 },
                 {
                     ""name"": """",
+                    ""id"": ""6b0ae87d-b58e-4f60-8b23-406ae48e97e3"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""MoveShapeLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""4c7376a0-a019-4e59-ab10-a13dda1bf8cd"",
                     ""path"": ""<Keyboard>/rightArrow"",
                     ""interactions"": """",
@@ -206,6 +217,17 @@ namespace TetrisTower.Game
                 },
                 {
                     ""name"": """",
+                    ""id"": ""2a3296a9-fa40-4ad5-b319-d79f7a2cb10d"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""MoveShapeRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""948d3740-9b93-40c0-97a5-0308b3036a65"",
                     ""path"": ""<Keyboard>/upArrow"",
                     ""interactions"": """",
@@ -228,8 +250,41 @@ namespace TetrisTower.Game
                 },
                 {
                     ""name"": """",
+                    ""id"": ""9009778f-1fb7-4e8e-b8ba-7477cbdc7d10"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RotateShapeUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""82e71138-8a47-40c0-be21-4fff19a2d157"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RotateShapeUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""a2fb49a3-b61b-4942-8d6f-26fdb3e979a6"",
                     ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RotateShapeUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d50edf2d-24fc-49b3-a32e-68a7f0d994d1"",
+                    ""path"": ""<Gamepad>/leftStick/up"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -263,6 +318,17 @@ namespace TetrisTower.Game
                     ""name"": """",
                     ""id"": ""6b97bb9e-2c32-4ea2-9248-e04b2ac7fdbd"",
                     ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RotateShapeDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""392422a0-04fd-4d07-b80f-44634c64de3d"",
+                    ""path"": ""<Gamepad>/leftStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
