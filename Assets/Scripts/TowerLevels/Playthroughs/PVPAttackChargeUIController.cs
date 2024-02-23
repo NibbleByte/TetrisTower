@@ -42,7 +42,7 @@ namespace TetrisTower.TowerUI
 
 		void Update()
 		{
-			if (m_PlaythroughData.HaveFinishedLevels)
+			if (!m_PlaythroughPlayer.LevelData.IsPlaying)
 				return;
 
 			float attackCharge = m_PlaythroughData.GetAttackChargeNormalized(m_PlaythroughPlayer);
