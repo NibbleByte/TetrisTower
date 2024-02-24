@@ -4,11 +4,6 @@ using UnityEngine;
 using UnityEngine.Audio;
 using System.Collections.Generic;
 
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace DevLocker.Audio
 {
 	/// <summary>
@@ -125,6 +120,10 @@ namespace DevLocker.Audio
 			}
 		}
 
+		public float Pitch => AudioSource?.pitch ?? 0f;
+
+		public float SpatialBlend => AudioSource?.spatialBlend ?? 0f;
+
 		public AudioSource AudioSource {
 			get {
 				if (m_AudioSource == null) {
@@ -210,17 +209,17 @@ namespace DevLocker.Audio
 #if UNITY_EDITOR
 			if (InterruptionFadeDuration < 0f) {
 				InterruptionFadeDuration = 0f;
-				EditorUtility.SetDirty(this);
+				UnityEditor.EditorUtility.SetDirty(this);
 			}
 
 			if (m_RepeatIntervalRange.MinSeconds < 0f) {
 				m_RepeatIntervalRange.MinSeconds = 0f;
-				EditorUtility.SetDirty(this);
+				UnityEditor.EditorUtility.SetDirty(this);
 			}
 
 			if (m_RepeatIntervalRange.MaxSeconds < m_RepeatIntervalRange.MinSeconds) {
 				m_RepeatIntervalRange.MaxSeconds = m_RepeatIntervalRange.MinSeconds;
-				EditorUtility.SetDirty(this);
+				UnityEditor.EditorUtility.SetDirty(this);
 			}
 
 			if (Application.isPlaying && m_AudioSource) {
@@ -462,40 +461,4 @@ namespace DevLocker.Audio
 			}
 		}
 	}
-
-#if UNITY_EDITOR
-	[CustomEditor(typeof(AudioSourcePlayer), true)]
-	[CanEditMultipleObjects]
-	public class __AudioSourcePlayerEditor : Editor
-	{
-		protected void DrawScriptProperty()
-		{
-			EditorGUI.BeginDisabledGroup(true);
-			EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
-			EditorGUI.EndDisabledGroup();
-		}
-
-		public override void OnInspectorGUI()
-		{
-			serializedObject.Update();
-
-			DrawScriptProperty();
-
-			EditorGUI.BeginChangeCheck();
-
-			var repeatPattern = (AudioSourcePlayer.RepeatPatternType) serializedObject.FindProperty("m_RepeatPattern").intValue;
-
-			// Will draw any child properties without [HideInInspector] attribute.
-			if (repeatPattern == AudioSourcePlayer.RepeatPatternType.RepeatInterval) {
-				DrawPropertiesExcluding(serializedObject, "m_Script");
-			} else {
-				DrawPropertiesExcluding(serializedObject, "m_Script", "m_RepeatIntervalRange");
-			}
-
-			if (EditorGUI.EndChangeCheck()) {
-				serializedObject.ApplyModifiedProperties();
-			}
-		}
-	}
-#endif
 }
