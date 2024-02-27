@@ -33,15 +33,19 @@ namespace DevLocker.GFrame.Input
 			/// Actions that no one asked the <see cref="IInputContext"/> to enable, but they are enabled anyway. This means that some code is bypassing the <see cref="IInputContext"/>.
 			/// </summary>
 			public List<InputAction> IllegalActions => m_IllegalActions != null ? m_IllegalActions : (m_IllegalActions = new ());
-			public List<InputAction> m_IllegalActions;
+			private List<InputAction> m_IllegalActions;
 
-			public bool HasIssuesFound => Conflicts.Count > 0 || IllegalActions.Count > 0;
+			public bool HasIssuesFound => m_Conflicts?.Count > 0 || m_IllegalActions?.Count > 0;
 
 			/// <summary>
 			/// Compare if two collections of conflicts are equal.
 			/// </summary>
 			public bool Equals(InputActionConflictsReport conflictsReport)
 			{
+				// Avoid creating garbage by invoking getter properties for nothing.
+				if (m_Conflicts == null && conflictsReport.m_Conflicts == null && m_IllegalActions == null || conflictsReport.m_IllegalActions == null)
+					return true;
+
 				return conflictsReport.Conflicts.SequenceEqual(Conflicts) && conflictsReport.IllegalActions.SequenceEqual(IllegalActions);
 			}
 		}
