@@ -15,6 +15,7 @@ namespace TetrisTower.TowerObjectives
 	[JsonObject(MemberSerialization.Fields)]
 	public class ClearCoordinates_Objective : Objective
 	{
+		[field: JsonProperty(nameof(Status))]
 		public ObjectiveStatus Status { get; private set; } = ObjectiveStatus.InProgress;
 
 		public List<GridCoords> Coordinates = new List<GridCoords>();

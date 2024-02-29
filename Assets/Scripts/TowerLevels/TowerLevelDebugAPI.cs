@@ -26,7 +26,7 @@ namespace TetrisTower.TowerLevels
 		private PlayerControls m_PlayerControls;
 		private GridLevelController m_TowerLevel;
 		private TowerStatesAPI m_TowerLevelAPI;
-		private ReplayRecording m_ReplayRecording;
+		private ReplayActionsRecording m_ReplayRecording;
 
 		private GameContext m_Context;
 		private FlashMessageUIController m_FlashMessage;

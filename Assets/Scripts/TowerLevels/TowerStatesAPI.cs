@@ -1,6 +1,5 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
-using DevLocker.GFrame.Input.Contexts;
 using System;
 using System.Linq;
 using TetrisTower.Game;
@@ -20,6 +19,8 @@ namespace TetrisTower.TowerLevels
 		private IPlayerContext m_PlayerContext;
 		private GameConfig m_Config;
 
+		private bool m_IsPrimaryPlayer = false;
+
 		private bool m_IsReplay => m_PlaythroughData is ReplayPlaythroughData;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
@@ -27,6 +28,8 @@ namespace TetrisTower.TowerLevels
 			context.SetByType(out m_PlaythroughData);
 			context.SetByType(out m_Config);
 			context.SetByType(out m_PlayerContext);
+
+			m_IsPrimaryPlayer = context.FindByType<PlaythroughPlayer>().IsPrimaryPlayer;
 		}
 
 		public void OnLevelUnloading()
@@ -137,8 +140,10 @@ namespace TetrisTower.TowerLevels
 
 			if (!m_IsReplay) {
 				var recording = m_PlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
-				if (!recording.HasEnding) {
-					recording.EndReplayRecording();
+				foreach (var playerRecording in recording.PlayerRecordings) {
+					if (!playerRecording.HasEnding) {
+						playerRecording.EndReplayRecording();
+					}
 				}
 				recording = recording.Clone();
 
@@ -162,7 +167,7 @@ namespace TetrisTower.TowerLevels
 		private void SaveReplay(bool isAutoReplay)
 		{
 			// Level finished, already saved (probably)
-			if (isAutoReplay && m_PlayerContext.StatesStack == null)
+			if (isAutoReplay && m_PlayerContext?.StatesStack == null)
 				return;
 
 			ReplayRecording recording;
@@ -173,7 +178,7 @@ namespace TetrisTower.TowerLevels
 					return;
 
 				// Null controller as we are not gonna execute the recording.
-				recording = replayPlaythroughData.GetReplayRecording(controller: null, fairy: null);
+				recording = replayPlaythroughData.GetReplayRecording();
 			} else {
 				recording = m_PlayerContext.StatesStack.Context.FindByType<ReplayRecording>();
 			}
@@ -183,7 +188,10 @@ namespace TetrisTower.TowerLevels
 
 		void OnApplicationQuit()
 		{
-			SaveReplay(true);
+			// Don't make copies per player.
+			if (m_IsPrimaryPlayer) {
+				SaveReplay(true);
+			}
 		}
 	}
 }

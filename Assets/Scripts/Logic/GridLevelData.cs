@@ -88,6 +88,10 @@ namespace TetrisTower.Logic
 		public GridCoords CalcFallShapeCoordsAt(int column) => new GridCoords(Grid.Rows - (int)Math.Floor(FallDistanceNormalized) - 1, column);
 		public GridCoords FallShapeCoords => CalcFallShapeCoordsAt(FallingColumn);
 
+		// Used for PVP.
+		public int AttackCharge = 0;
+		public int AttackChargeMax = -1;	// Less or equal to 0 means no attack is possible.
+
 		// Used for debug / cheat.
 		[NonSerialized]
 		public bool FallFrozen = false;

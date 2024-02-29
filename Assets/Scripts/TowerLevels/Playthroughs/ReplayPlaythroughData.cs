@@ -3,6 +3,7 @@ using DevLocker.GFrame.Utils;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Replays;
@@ -28,29 +29,47 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			m_PlaybackRecording = recording;
 			m_ReturnPlaythrough = returnPlaythrough;
 
-			m_PlaybackRecording.GridLevelController = null; // Just in case.
-			m_PlaybackRecording.Fairy = null;				// Just in case.
+			// Just in case.
+			foreach (var playerRecording in recording.PlayerRecordings) {
+				playerRecording.GridLevelController = null;
+				playerRecording.Fairy = null;
+			}
 		}
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{
 			return m_PlaybackRecording != null
-				? new TowerLevelSupervisor(this)
+				? new TowerLevelSupervisor(this, m_PlaybackRecording.PlayerRecordings.Length)
 				: m_ReturnPlaythrough?.PrepareSupervisor() ?? new HomeScreen.HomeScreenLevelSupervisor();
 		}
 
 		public override GridLevelData SetupCurrentTowerLevel(GameConfig gameConfig, SceneReference overrideScene)
 		{
-			m_ActiveTowerLevels.Clear();
+			// Support replays with multiple players.
+			//m_ActiveTowerLevels.Clear();
+
 			m_ActiveTowerLevels.Add(Saves.SavesManager.Deserialize<GridLevelData>(m_PlaybackRecording.InitialState, gameConfig));
 
-			return m_ActiveTowerLevels[0];
+			return m_ActiveTowerLevels.Last();
 		}
 
-		public ReplayRecording GetReplayRecording(GridLevelController controller, Visuals.Effects.FairyMatchingController fairy)
+		public ReplayRecording GetReplayRecording()
 		{
 			// Clone it just in case?
-			ReplayRecording recording = m_PlaybackRecording.Clone();
+			var clone = m_PlaybackRecording.Clone();
+
+			foreach(var playerRecording in clone.PlayerRecordings) {
+				playerRecording.GridLevelController = null;
+				playerRecording.Fairy = null;
+			}
+
+			return clone;
+		}
+
+		public ReplayActionsRecording GetPlayerRecording(int playerIndex, GridLevelController controller, Visuals.Effects.FairyMatchingController fairy)
+		{
+			// Clone it just in case?
+			ReplayActionsRecording recording = m_PlaybackRecording.PlayerRecordings[playerIndex].Clone();
 			recording.GridLevelController = controller;
 			recording.Fairy = fairy;
 

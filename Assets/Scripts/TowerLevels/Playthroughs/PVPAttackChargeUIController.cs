@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using TetrisTower.Game;
+using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,26 +13,23 @@ namespace TetrisTower.TowerUI
 	{
 		public Slider ProgressBar;
 
-		private PlaythroughPlayer m_PlaythroughPlayer;
-		private PVPPlaythroughData m_PlaythroughData;
+		private GridLevelData m_LevelData;
 
 		private bool m_Rising;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			context.SetByType(out m_PlaythroughPlayer);
-			context.TrySetByType(out m_PlaythroughData);    // Will be missing in normal playthroughs.
+			context.TrySetByType(out m_LevelData);
 
-			enabled = m_PlaythroughData != null;
-			ProgressBar.gameObject.SetActive(m_PlaythroughData != null);
+			enabled = m_LevelData.AttackChargeMax > 0;
+			ProgressBar.gameObject.SetActive(m_LevelData.AttackChargeMax > 0);
 			m_Rising = true;
 		}
 
 		public void OnLevelUnloading()
 		{
 			enabled = false;
-			m_PlaythroughPlayer = null;
-			m_PlaythroughData = null;
+			m_LevelData = null;
 		}
 
 		void Awake()
@@ -42,10 +40,10 @@ namespace TetrisTower.TowerUI
 
 		void Update()
 		{
-			if (!m_PlaythroughPlayer.LevelData.IsPlaying)
+			if (!m_LevelData.IsPlaying)
 				return;
 
-			float attackCharge = m_PlaythroughData.GetAttackChargeNormalized(m_PlaythroughPlayer);
+			float attackCharge = (float) m_LevelData.AttackCharge / m_LevelData.AttackChargeMax;
 			if (ProgressBar.value == attackCharge)
 				return;
 

@@ -26,7 +26,7 @@ namespace TetrisTower.TowerLevels
 
 		public PlaythroughPlayer SetupPlayer(GameConfig config, int playerIndex, GridLevelController levelController, GridLevelData levelData, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
 		{
-			var playthroughPlayer = PlaythroughPlayer.Create(config, levelController, camera, playerContextRoot, uiCanvases);
+			var playthroughPlayer = PlaythroughPlayer.Create(config, isPrimaryPlayer: playerIndex == 0, levelController, camera, playerContextRoot, uiCanvases);
 			m_PlaythroughData.AssignPlayer(playthroughPlayer, levelData);
 
 			levelController.FinishedLevel += () => OnLevelFinished(playthroughPlayer);
@@ -265,7 +265,7 @@ namespace TetrisTower.TowerLevels
 			foreach (var player in m_PlaythroughData.ActivePlayers) {
 				var recordComponent = player.LevelController.GetComponent<LevelReplayRecorder>();
 				if (recordComponent) {
-					recordComponent.Recording.AddAndRun(ReplayActionType.Pause);
+					recordComponent.PlayerRecording.AddAndRun(ReplayActionType.Pause);
 				}
 			}
 

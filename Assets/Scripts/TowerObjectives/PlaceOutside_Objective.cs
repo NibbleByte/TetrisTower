@@ -16,6 +16,7 @@ namespace TetrisTower.TowerObjectives
 	{
 		public bool PlacingOutsideIsWin = false;
 
+		[field: JsonProperty(nameof(Status))]
 		public ObjectiveStatus Status { get; private set; }
 
 		[JsonIgnore]

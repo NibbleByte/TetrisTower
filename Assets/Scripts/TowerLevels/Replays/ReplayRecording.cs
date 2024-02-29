@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace TetrisTower.TowerLevels.Replays
 {
-	public enum ReplayActionType
+	public enum ReplayActionType : byte
 	{
 		Update = 0,
 
@@ -25,14 +25,19 @@ namespace TetrisTower.TowerLevels.Replays
 
 		FallSpeedUp = 16,
 
+		ChargeAttack = 30,			// Players accumulate attack charge
+		ConsumeAttackCharge = 32,	// When players perform the attack, it consumes (resets) the charge to 0.
+
+		PushUpLine_Attack = 35,		// Attack that happens to the target player, recorded in their replay.
+
 		// Keep gameplay changing actions before Pause.
-		Pause = 20,
+		Pause = 50,
 
 
-		Cheat_Generic = 40,
-		Cheat_EndLevel = 44,
+		Cheat_Generic = 100,
+		Cheat_EndLevel = 104,
 
-		RecordingEnd = 99,
+		RecordingEnd = byte.MaxValue,
 	}
 
 	[JsonObject(MemberSerialization.Fields)]
@@ -74,6 +79,17 @@ namespace TetrisTower.TowerLevels.Replays
 
 				case ReplayActionType.FallSpeedUp: levelController.RequestFallingSpeedUp(Value); break;
 
+				// PVP
+				case ReplayActionType.ChargeAttack:
+					levelController.LevelData.AttackCharge += (int)Value;
+					break;
+				case ReplayActionType.ConsumeAttackCharge:
+					levelController.LevelData.AttackCharge = 0;
+					break;
+				case ReplayActionType.PushUpLine_Attack:
+					levelController.LevelData.PendingBonusActions.Add(new PushUpLine_BonusAction());
+					break;
+
 				// Don't pause during playback.
 				// Advance the random sequence in case of pause to prevent easy modifying of the replay. And maybe "cheating".
 				case ReplayActionType.Pause: levelController.LevelData.Random.Next(); break;
@@ -100,10 +116,18 @@ namespace TetrisTower.TowerLevels.Replays
 
 				ReplayActionType.OffsetMove => levelController.FallingColumnAnalogOffset,
 				ReplayActionType.OffsetRotate => levelController.FallingShapeAnalogRotateOffset,
+
+				ReplayActionType.ChargeAttack => levelController.LevelData.AttackCharge,
+				ReplayActionType.ConsumeAttackCharge => levelController.LevelData.AttackCharge,
+				ReplayActionType.PushUpLine_Attack => levelController.LevelData.PendingBonusActions.Count,
+
 				_ => 0f,
 			};
 	}
 
+	/// <summary>
+	/// Recording that includes the initial state and recorded actions for each player.
+	/// </summary>
 	[JsonObject(MemberSerialization.Fields)]
 	public class ReplayRecording
 	{
@@ -112,19 +136,83 @@ namespace TetrisTower.TowerLevels.Replays
 		public int Version;
 		public bool IsVersionSupported => Version == CurrentRuntimeVersion;
 
+		[field: JsonProperty(nameof(InitialState))]
+		public string InitialState { get; private set; }
+
+		[field: JsonProperty(nameof(InitialFairyPos))]
+		public Vector3Int InitialFairyPos { get; private set; }
+
+		[field: JsonProperty(nameof(InitialFairyRestPoints))]
+		public Vector3Int[] InitialFairyRestPoints { get; private set; }
+
+		[field: JsonProperty(nameof(InitialVisualsRandomSeed))]
+		public int InitialVisualsRandomSeed { get; private set; }
+
+		[field: JsonProperty(nameof(PlayerRecordings))]
+		public ReplayActionsRecording[] PlayerRecordings { get; private set; }
+
+		private const int FloatMultiplier = 1000;
+
+		public static ReplayRecording CreateRecording(int players) => new ReplayRecording() {
+			PlayerRecordings = Enumerable.Range(0, players).Select(index => new ReplayActionsRecording()).ToArray(),
+		};
+
+		public ReplayRecording Clone()
+		{
+			ReplayRecording clone = (ReplayRecording) MemberwiseClone();
+			clone.InitialFairyRestPoints = InitialFairyRestPoints.ToArray();
+			clone.PlayerRecordings = PlayerRecordings.Select(r => r.Clone()).ToArray();
+
+			return clone;
+		}
+
+		public void SaveInitialState(GridLevelData levelData, GameConfig gameConfig, Visuals.Effects.FairyMatchingController fairy, List<Transform> fairyRestPoints, int initialVisualsRandomSeed)
+		{
+			InitialState = Saves.SavesManager.Serialize<GridLevelData>(levelData, gameConfig);
+			InitialFairyPos = Vector3Int.FloorToInt(fairy.transform.localPosition * FloatMultiplier);
+			InitialFairyRestPoints = fairyRestPoints.Select(t => Vector3Int.FloorToInt(t.localPosition * FloatMultiplier)).ToArray();
+			InitialVisualsRandomSeed = initialVisualsRandomSeed;
+
+			Version = CurrentRuntimeVersion;
+
+			ApplyFairyPositions(fairy, fairyRestPoints);
+		}
+
+		public void ApplyFairyPositions(Visuals.Effects.FairyMatchingController fairy, List<Transform> fairyRestPoints)
+		{
+			fairy.transform.localPosition = InitialFairyPos / FloatMultiplier;
+
+			while (fairyRestPoints.Count > InitialFairyRestPoints.Length) {
+				GameObject.DestroyImmediate(fairyRestPoints[fairyRestPoints.Count - 1]);
+				fairyRestPoints.RemoveAt(fairyRestPoints.Count - 1);
+			}
+
+			for (int i = 0; i < InitialFairyRestPoints.Length; i++) {
+				if (i < fairyRestPoints.Count) {
+					fairyRestPoints[i].localPosition = InitialFairyRestPoints[i] / FloatMultiplier;
+				} else {
+					Transform additionalPoint = GameObject.Instantiate(fairyRestPoints[0].gameObject, fairyRestPoints[0].parent).transform;
+					additionalPoint.localPosition = InitialFairyRestPoints[i] / FloatMultiplier;
+					fairyRestPoints.Add(additionalPoint);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Recorded actions for a signle player.
+	/// </summary>
+	[JsonObject(MemberSerialization.Fields)]
+	public class ReplayActionsRecording
+	{
 		public IReadOnlyList<ReplayAction> Actions => m_Actions;
+		[field: JsonProperty(nameof(Actions))]
 		private List<ReplayAction> m_Actions = new List<ReplayAction>();
 
 		public bool HasEnding => m_Actions.LastOrDefault().ActionType == ReplayActionType.RecordingEnd;
 
-		public string InitialState { get; private set; }
-		public Vector3Int InitialFairyPos { get; private set; }
-		public Vector3Int[] InitialFairyRestPoints { get; private set; }
-		public int InitialVisualsRandomSeed { get; private set; }
-
+		[field: JsonProperty(nameof(FinalState))]
 		public string FinalState { get; private set; }
-
-		private const int FloatMultiplier = 1000;
 
 		[JsonIgnore]
 		public GridLevelController GridLevelController;
@@ -132,11 +220,10 @@ namespace TetrisTower.TowerLevels.Replays
 		[JsonIgnore]
 		public Visuals.Effects.FairyMatchingController Fairy;
 
-		public ReplayRecording Clone()
+		public ReplayActionsRecording Clone()
 		{
-			ReplayRecording clone = MemberwiseClone() as ReplayRecording;
+			ReplayActionsRecording clone = (ReplayActionsRecording) MemberwiseClone();
 			clone.m_Actions = m_Actions.ToList();
-			InitialFairyRestPoints = clone.InitialFairyRestPoints.ToArray();
 
 			return clone;
 		}
@@ -158,38 +245,6 @@ namespace TetrisTower.TowerLevels.Replays
 				m_Actions.Add(new ReplayAction(ReplayActionType.RecordingEnd));
 
 				FinalState = Saves.SavesManager.Serialize<GridLevelData>(GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
-			}
-		}
-
-		public void SaveInitialState(GridLevelData levelData, GameConfig gameConfig, Visuals.Effects.FairyMatchingController fairy, List<Transform> fairyRestPoints, int initialVisualsRandomSeed)
-		{
-			InitialState = Saves.SavesManager.Serialize<GridLevelData>(levelData, gameConfig);
-			InitialFairyPos = Vector3Int.FloorToInt(fairy.transform.localPosition * FloatMultiplier);
-			InitialFairyRestPoints = fairyRestPoints.Select(t => Vector3Int.FloorToInt(t.localPosition * FloatMultiplier)).ToArray();
-			InitialVisualsRandomSeed = initialVisualsRandomSeed;
-
-			Version = CurrentRuntimeVersion;
-
-			ApplyFairyPositions(fairy, fairyRestPoints);
-		}
-
-		public void ApplyFairyPositions(Visuals.Effects.FairyMatchingController fairy, List<Transform> fairyRestPoints)
-		{
-			fairy.transform.localPosition = InitialFairyPos / FloatMultiplier;
-
-			while(fairyRestPoints.Count > InitialFairyRestPoints.Length) {
-				GameObject.DestroyImmediate(fairyRestPoints[fairyRestPoints.Count - 1]);
-				fairyRestPoints.RemoveAt(fairyRestPoints.Count - 1);
-			}
-
-			for(int i = 0; i < InitialFairyRestPoints.Length; i++) {
-				if (i < fairyRestPoints.Count) {
-					fairyRestPoints[i].localPosition = InitialFairyRestPoints[i] / FloatMultiplier;
-				} else {
-					Transform additionalPoint = GameObject.Instantiate(fairyRestPoints[0].gameObject, fairyRestPoints[0].parent).transform;
-					additionalPoint.localPosition = InitialFairyRestPoints[i] / FloatMultiplier;
-					fairyRestPoints.Add(additionalPoint);
-				}
 			}
 		}
 

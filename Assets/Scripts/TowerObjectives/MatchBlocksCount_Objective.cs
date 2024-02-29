@@ -27,6 +27,7 @@ namespace TetrisTower.TowerObjectives
 			;
 
 
+		[field: JsonProperty(nameof(Status))]
 		public ObjectiveStatus Status { get; private set; } = ObjectiveStatus.InProgress;
 
 		private int m_MatchesDone;

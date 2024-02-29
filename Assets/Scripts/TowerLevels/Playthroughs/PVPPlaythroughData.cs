@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerLevels.Replays;
 using UnityEngine;
 
 namespace TetrisTower.TowerLevels.Playthroughs
@@ -37,10 +38,6 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override bool IsFinalLevel => true;
 		public override bool HaveFinishedLevels => true;
-
-		private Dictionary<PlaythroughPlayer, int> m_AttacksCharge = new Dictionary<PlaythroughPlayer, int>();
-
-		public float GetAttackChargeNormalized(PlaythroughPlayer player) => Mathf.Clamp01(m_AttacksCharge[player] / (float)AttackChargeMax);
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{
@@ -94,25 +91,28 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			// No need to unsubscribe, as instance will be lost on level unload?
 			levelData.Score.ClearActionSequenceFinished += () => OnClearActionSequenceFinished(player);
 
-			m_AttacksCharge.Add(player, 0);
+			levelData.AttackCharge = 0;
+			levelData.AttackChargeMax = AttackChargeMax;
 		}
 
 		protected override void DisposeTowerLevels()
 		{
 			base.DisposeTowerLevels();
 
-			m_AttacksCharge.Clear();
-
 			m_OverrideLevelParam = null;
 		}
 
 		private void OnClearActionSequenceFinished(PlaythroughPlayer player)
 		{
-			int charge = m_AttacksCharge[player] + player.LevelData.Score.LastMatchBonus.ResultBonusScore;
-			if (charge < AttackChargeMax) {
-				m_AttacksCharge[player] = charge;
+			var recording = player.PlayerContext.StatesStack.Context.FindByType<ReplayActionsRecording>();
 
-			} else {
+			// Won bonus blocks falling down. Skip them.
+			if (!player.LevelData.IsPlaying || recording.HasEnding)
+				return;
+
+			recording.AddAndRun(ReplayActionType.ChargeAttack, player.LevelData.Score.LastMatchBonus.ResultBonusScore);
+
+			if (player.LevelData.AttackCharge >= AttackChargeMax) {
 
 				// Pick who to attack.
 				PlaythroughPlayer bestEnemy = null;
@@ -127,9 +127,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 				// In debug we can run 1 player, so no best enemy would be found?
 				if (bestEnemy != null) {
-					m_AttacksCharge[player] = 0;
+					recording.AddAndRun(ReplayActionType.ConsumeAttackCharge);
 
-					bestEnemy.LevelData.PendingBonusActions.Add(new PushUpLine_BonusAction());
+					var bestRecording = bestEnemy.PlayerContext.StatesStack.Context.FindByType<ReplayActionsRecording>();
+					bestRecording.AddAndRun(ReplayActionType.PushUpLine_Attack, 0);
 				}
 			}
 		}

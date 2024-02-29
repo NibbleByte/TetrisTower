@@ -20,7 +20,7 @@ namespace TetrisTower.TowerLevels
 		private IUserPreferences m_UserPrefs;
 		private GridLevelController m_LevelController;
 		private TowerLevelUIController m_UIController;
-		private ReplayRecording m_ReplayRecording;
+		private ReplayActionsRecording m_ReplayRecording;
 
 		private bool m_PointerPressed = false;
 		private bool m_PointerDragConsumed = false;

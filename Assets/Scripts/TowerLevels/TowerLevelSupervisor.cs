@@ -56,11 +56,23 @@ namespace TetrisTower.TowerLevels
 				MessageBox.Instance.ForceCloseAllMessages();
 			}
 
+			ReplayRecording replayRecording;
+			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
+				replayRecording = replayPlaythroughData.GetReplayRecording();
+
+				if (!replayRecording.IsVersionSupported) {
+					Debug.LogError($"Replay version {replayRecording.Version} is older than the currently used {ReplayRecording.CurrentRuntimeVersion}. Expect desync.");
+				}
+			} else {
+				replayRecording = ReplayRecording.CreateRecording(m_PlayersCount);
+				// NOTE: initial state is not yet initialized. Do it after first player is loaded.
+			}
+
 			var allPlayersStartData = new List<StartData>();
 
 			// Load levels + scenes per player. Scene index corresponds to the player index.
 			for (int playerIndex = 0; playerIndex < m_PlayersCount; playerIndex++) {
-				var startData = await LoadPlayerAsync(gameContext, playerIndex);
+				var startData = await LoadPlayerAsync(gameContext, playerIndex, replayRecording);
 
 				// Error happened - should be already handled. Maybe use exceptions instead?
 				if (startData.Player == null)
@@ -74,7 +86,7 @@ namespace TetrisTower.TowerLevels
 			await StartLevels(allPlayersStartData);
 		}
 
-		private async Task<StartData> LoadPlayerAsync(GameContext gameContext, int playerIndex)
+		private async Task<StartData> LoadPlayerAsync(GameContext gameContext, int playerIndex, ReplayRecording replayRecording)
 		{
 			GridLevelData levelData = playerIndex < m_PlaythroughData.ActiveTowerLevels.Count ? m_PlaythroughData.ActiveTowerLevels[playerIndex] : null;
 
@@ -160,7 +172,17 @@ namespace TetrisTower.TowerLevels
 				Debug.LogError("Parts of the UI are missing!");
 			}
 
+			//
+			// Setup Player
+			//
+			// Must be called BEFORE replay, as the playthrough may modify the level data at the last moment (e.g. PVP max attack charge).
+			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
+			var playthroughPlayer = m_PlayersManager.SetupPlayer(gameContext.GameConfig, playerIndex, levelController, levelData, camera, playerContext, uiCanvases);
+			playthroughPlayer.EventSystem.name = $"{gameContext.GameConfig.GameInputPrefab.name} [{playerIndex}]";
 
+			//
+			// Setup Replay
+			//
 			WiseTiming timing;
 			LevelReplayPlayback playbackComponent = null;
 			LevelReplayRecorder recordComponent = null;
@@ -168,42 +190,46 @@ namespace TetrisTower.TowerLevels
 
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
 				playbackComponent = levelController.gameObject.AddComponent<LevelReplayPlayback>();
-				playbackComponent.PlaybackRecording = replayPlaythroughData.GetReplayRecording(levelController, fairy);
-				playbackComponent.PlaybackRecording.ApplyFairyPositions(fairy, restPoints);
+				playbackComponent.PlayerPlaybackRecording = replayPlaythroughData.GetPlayerRecording(playerIndex, levelController, fairy);
 				playbackComponent.enabled = false;
 
-				visualsRandom = new Xoshiro.PRNG32.XoShiRo128starstar(playbackComponent.PlaybackRecording.InitialVisualsRandomSeed);
+				// Will get offset below per player.
+				replayRecording.ApplyFairyPositions(fairy, restPoints);
+
+				visualsRandom = new Xoshiro.PRNG32.XoShiRo128starstar(replayRecording.InitialVisualsRandomSeed);
 
 				timing = playbackComponent.Timing;
 			} else {
 				int seed = levelData.RandomInitialLevelSeed;
 				visualsRandom = new Xoshiro.PRNG32.XoShiRo128starstar(seed);
 
+				// Save the initial state only once with the first player.
+				// NOTE: PVP playthrough makes sure the seed is the same for all players.
+				if (playerIndex == 0) {
+					replayRecording.SaveInitialState(levelData, gameContext.GameConfig, fairy, restPoints, seed);
+				} else {
+					replayRecording.ApplyFairyPositions(fairy, restPoints);
+				}
+
 				recordComponent = levelController.gameObject.AddComponent<LevelReplayRecorder>();
-				recordComponent.Recording.SaveInitialState(levelData, gameContext.GameConfig, fairy, restPoints, seed);
-				recordComponent.Recording.GridLevelController = levelController;
-				recordComponent.Recording.Fairy = fairy;
+				recordComponent.PlayerRecording = replayRecording.PlayerRecordings[playerIndex];
+				recordComponent.PlayerRecording.GridLevelController = levelController;
+				recordComponent.PlayerRecording.Fairy = fairy;
 				recordComponent.enabled = false;
 
 				timing = recordComponent.Timing;
 			}
 
-			if (m_PlayersCount > 1) {
-				uiController.SetPlayMode(TowerLevelUIPlayMode.PVPPlay);
-			} else if (playbackComponent != null) {
+			if (playbackComponent != null) {
 				uiController.SetPlayMode(TowerLevelUIPlayMode.Replay);
+			} else if (m_PlayersCount > 1) {
+				uiController.SetPlayMode(TowerLevelUIPlayMode.PVPPlay);
 			} else {
 				uiController.SetPlayMode(TowerLevelUIPlayMode.NormalPlay);
 			}
 
-			//
-			// Setup Player
-			//
-			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
-			var playthroughPlayer = m_PlayersManager.SetupPlayer(gameContext.GameConfig, playerIndex, levelController, levelData, camera, playerContext, uiCanvases);
-			playthroughPlayer.EventSystem.name = $"{gameContext.GameConfig.GameInputPrefab.name} [{playerIndex}]";
-
 			// Offset loaded scene for secondary players.
+			// Must be done after replay applies initial state.
 			m_PlayersManager.SetupOffset(playerIndex, SceneManager.GetSceneAt(playerIndex).GetRootGameObjects());
 
 			//
@@ -223,7 +249,8 @@ namespace TetrisTower.TowerLevels
 				uiController,
 				timing,
 				playbackComponent,
-				recordComponent?.Recording, // Provide it for recording, otherwise, don't need it.
+				replayRecording,
+				recordComponent?.PlayerRecording, // Provide it for recording, otherwise, don't need it.
 				new MultiObjectivesPresenter(behaviours.OfType<ObjectivesUIController>()),
 				behaviours.OfType<GreetMessageUIController>().FirstOrDefault(),
 				behaviours.OfType<FlashMessageUIController>().FirstOrDefault(),

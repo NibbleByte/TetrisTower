@@ -23,7 +23,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 		public int PlaybackSpeed = 1;
 
-		public ReplayRecording PlaybackRecording;
+		public ReplayActionsRecording PlayerPlaybackRecording;
 		private int m_PlaybackIndex = 0;
 
 		public bool PlaybackFinished { get; private set; } = false;
@@ -33,10 +33,6 @@ namespace TetrisTower.TowerLevels.Replays
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			context.SetByType(out m_FlashMessage);
-
-			if (!PlaybackRecording.IsVersionSupported) {
-				Debug.LogError($"Replay version {PlaybackRecording.Version} is older than the currently used {ReplayRecording.CurrentRuntimeVersion}. Expect desync.", this);
-			}
 		}
 
 		public void OnLevelUnloading()
@@ -45,13 +41,13 @@ namespace TetrisTower.TowerLevels.Replays
 
 		private void EndPlayback()
 		{
-			string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
-			if (currentState != PlaybackRecording.FinalState) {
+			string currentState = PlayerPlaybackRecording.GetSavedState(PlayerPlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+			if (currentState != PlayerPlaybackRecording.FinalState) {
 				//m_FlashMessage.ShowMessage("Replay Desynced", false);	// MessageBox is displayed by the state.
 
 				Debug.LogError($"Replay current state doesn't match the final playback state. Compared states:", this);
 				Debug.LogError(currentState, this);
-				Debug.LogError(PlaybackRecording.FinalState, this);
+				Debug.LogError(PlayerPlaybackRecording.FinalState, this);
 
 				PlaybackInterruptionReason = InterruptReason.FinalStateMismatch;
 
@@ -59,7 +55,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 			} else {
 
-				if (PlaybackRecording.GridLevelController.LevelData.IsPlaying) {
+				if (PlayerPlaybackRecording.GridLevelController.LevelData.IsPlaying) {
 					// Ended replay from paused menu while playing.
 					Debug.Log($"Replay playback finished succesfully, but level did not! Stop further playback.", this);
 					enabled = false;
@@ -73,7 +69,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 		private void InterruptPlayback(InterruptReason reason, ReplayAction interruptAction, int actionIndex, float expectedValue, float resultValue)
 		{
-			string currentState = PlaybackRecording.GetSavedState(PlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
+			string currentState = PlayerPlaybackRecording.GetSavedState(PlayerPlaybackRecording.GridLevelController.LevelData, GameManager.Instance.GameContext.GameConfig);
 
 			//m_FlashMessage.ShowMessage("Replay Desynced", false); // MessageBox is displayed by the state.
 
@@ -89,7 +85,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 		void Update()
 		{
-			if (PlaybackRecording.GridLevelController.IsPaused)
+			if (PlayerPlaybackRecording.GridLevelController.IsPaused)
 				return;
 
 			if (PlaybackFinished) {
@@ -99,8 +95,8 @@ namespace TetrisTower.TowerLevels.Replays
 
 			int startPlaybackIndex = m_PlaybackIndex;
 
-			while (m_PlaybackIndex < PlaybackRecording.Actions.Count) {
-				ReplayAction action = PlaybackRecording.Actions[m_PlaybackIndex];
+			while (m_PlaybackIndex < PlayerPlaybackRecording.Actions.Count) {
+				ReplayAction action = PlayerPlaybackRecording.Actions[m_PlaybackIndex];
 
 				if (action.ActionType == ReplayActionType.RecordingEnd) {
 					EndPlayback();
@@ -110,14 +106,14 @@ namespace TetrisTower.TowerLevels.Replays
 				m_PlaybackIndex++;
 
 				// Because we ++ above, index is now pointing to the next one.
-				ReplayActionType nextType = m_PlaybackIndex < PlaybackRecording.Actions.Count
-					? PlaybackRecording.Actions[m_PlaybackIndex].ActionType
+				ReplayActionType nextType = m_PlaybackIndex < PlayerPlaybackRecording.Actions.Count
+					? PlayerPlaybackRecording.Actions[m_PlaybackIndex].ActionType
 					: default;
 
 				// Expected value will be overriden during replay action.
 				float expectedValue = action.ExpectedResultValue;
 
-				action.Replay(PlaybackRecording.GridLevelController, PlaybackRecording.Fairy);
+				action.Replay(PlayerPlaybackRecording.GridLevelController, PlayerPlaybackRecording.Fairy);
 
 				if (action.ExpectedResultValue != expectedValue) {
 					InterruptPlayback(InterruptReason.DesyncDetected, action, m_PlaybackIndex - 1, expectedValue, action.ExpectedResultValue);
@@ -134,7 +130,7 @@ namespace TetrisTower.TowerLevels.Replays
 				}
 
 				// If playback finishes before replay end, don't continue, display desync right away.
-				if (!PlaybackRecording.GridLevelController.LevelData.IsPlaying && nextType != ReplayActionType.RecordingEnd) {
+				if (!PlayerPlaybackRecording.GridLevelController.LevelData.IsPlaying && nextType != ReplayActionType.RecordingEnd) {
 					InterruptPlayback(InterruptReason.LevelEndedBeforeReplay, action, m_PlaybackIndex - 1, expectedValue, action.ExpectedResultValue);
 					return;
 				}
@@ -143,7 +139,7 @@ namespace TetrisTower.TowerLevels.Replays
 					case ReplayActionType.Pause:
 						// Don't show if last action (right before ending) - it's probably when the user paused the game to end the replay record.
 						// NOTE: m_PlaybackIndex is the next action at the moment, because of the ++ above.
-						if (m_PlaybackIndex >= PlaybackRecording.Actions.Count || nextType != ReplayActionType.RecordingEnd) {
+						if (m_PlaybackIndex >= PlayerPlaybackRecording.Actions.Count || nextType != ReplayActionType.RecordingEnd) {
 							m_FlashMessage.ShowMessage("Pause Skipped");
 						}
 						break;

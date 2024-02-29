@@ -11,7 +11,7 @@ namespace TetrisTower.TowerLevels
 		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private TowerLevelUIController m_UIController;
-		private ReplayRecording m_ReplayRecording;
+		private ReplayActionsRecording m_ReplayRecording;
 
 		public void EnterState(PlayerStatesContext context)
 		{
