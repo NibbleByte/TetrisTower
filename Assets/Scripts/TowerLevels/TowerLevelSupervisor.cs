@@ -48,6 +48,11 @@ namespace TetrisTower.TowerLevels
 			m_OverrideScene = overrideScene;
 		}
 
+		public override string ToString()
+		{
+			return $"{nameof(TowerLevelSupervisor)} for {m_PlayersCount} players with \"{m_PlaythroughData?.GetType().Name}\" playthrough.";
+		}
+
 		public async Task LoadAsync()
 		{
 			GameContext gameContext = GameManager.Instance.GameContext;
@@ -191,6 +196,7 @@ namespace TetrisTower.TowerLevels
 			if (m_PlaythroughData is ReplayPlaythroughData replayPlaythroughData) {
 				playbackComponent = levelController.gameObject.AddComponent<LevelReplayPlayback>();
 				playbackComponent.PlayerPlaybackRecording = replayPlaythroughData.GetPlayerRecording(playerIndex, levelController, fairy);
+				playbackComponent.PlayerIndex = playerIndex;
 				playbackComponent.enabled = false;
 
 				// Will get offset below per player.

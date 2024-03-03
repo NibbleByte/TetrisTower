@@ -90,6 +90,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			// No need to unsubscribe, as instance will be lost on level unload?
 			levelData.Score.ClearActionSequenceFinished += () => OnClearActionSequenceFinished(player);
+			player.LevelController.FinishedLevel += () => OnLevelFinished(player);
 
 			levelData.AttackCharge = 0;
 			levelData.AttackChargeMax = AttackChargeMax;
@@ -133,6 +134,44 @@ namespace TetrisTower.TowerLevels.Playthroughs
 					bestRecording.AddAndRun(ReplayActionType.PushUpLine_Attack, 0);
 				}
 			}
+		}
+
+		private void OnLevelFinished(PlaythroughPlayer player)
+		{
+			// Single player is handled by the level itself.
+			if (ActivePlayers.Count() == 1)
+				return;
+
+			// If player loses - play animation and wait for the rest to finish. (check the TowerFinishedLevelState)
+			// If player wins the level objectives - stop all the player and announce this one as winner.
+			// If only one player is left - win instantly.
+
+
+			if (player.LevelData.HasWon) {
+
+				player.RenderInputCanvasToScreen();
+
+				foreach (var otherPlayer in ActivePlayers.Where(p => p.LevelData.IsPlaying)) {
+					if (player != otherPlayer) {
+						otherPlayer.Pause(pauseInput: true, this);
+					}
+				}
+
+				return;
+			}
+
+			// Hide UI for lost players.
+			player.Pause(pauseInput: true, this);
+
+			// Let others have a chance.
+			if (ActivePlayers.Count(p => p.LevelData.IsPlaying) >= 2)
+				return;
+
+			// Only one player left - announce it a winner. It's should be impossible to have no playing player left?
+			PlaythroughPlayer winner = ActivePlayers.First(p => p.LevelData.IsPlaying);
+			// Should call this same method with the winner player and handle the UI.
+			var winnerRecording = winner.PlayerContext.StatesStack.Context.FindByType<ReplayActionsRecording>();
+			winnerRecording.AddAndRun(ReplayActionType.OtherPlayersLost);
 		}
 	}
 

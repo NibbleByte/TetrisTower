@@ -30,12 +30,15 @@ namespace TetrisTower.TowerLevels.Replays
 
 		PushUpLine_Attack = 35,		// Attack that happens to the target player, recorded in their replay.
 
+		OtherPlayersLost = 50,		// When other players lost, this is recorded by the winner.
+
 		// Keep gameplay changing actions before Pause.
-		Pause = 50,
+		Pause = 100,
 
 
-		Cheat_Generic = 100,
-		Cheat_EndLevel = 104,
+
+		Cheat_Generic = 150,
+		Cheat_EndLevel = 154,
 
 		RecordingEnd = byte.MaxValue,
 	}
@@ -89,6 +92,8 @@ namespace TetrisTower.TowerLevels.Replays
 				case ReplayActionType.PushUpLine_Attack:
 					levelController.LevelData.PendingBonusActions.Add(new PushUpLine_BonusAction());
 					break;
+
+				case ReplayActionType.OtherPlayersLost: levelController.FinishLevel(true); break;
 
 				// Don't pause during playback.
 				// Advance the random sequence in case of pause to prevent easy modifying of the replay. And maybe "cheating".
