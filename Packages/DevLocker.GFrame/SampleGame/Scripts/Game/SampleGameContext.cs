@@ -35,8 +35,10 @@ namespace DevLocker.GFrame.SampleGame.Game
 		public InputActionsMaskedStack InputActionsMaskedStack => InputContext.InputActionsMaskedStack;
 
 		public InputUser User => InputContext.User;
+		public ReadOnlyArray<InputDevice> PairedDevices => InputContext.PairedDevices;
 
 		public void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None) => InputContext.PerformPairingWithDevice(device, options);
+		public void UnpairDevice(InputDevice device) => InputContext.UnpairDevice(device);
 		public void PerformPairingWithEmptyDevice() => InputContext.PerformPairingWithEmptyDevice();
 		public void UnpairDevices() => InputContext.UnpairDevices();
 
@@ -53,7 +55,6 @@ namespace DevLocker.GFrame.SampleGame.Game
 
 		public IEnumerable<InputAction> GetUIActions() => InputContext.GetUIActions();
 		public IEnumerable<InputAction> GetAllActions() => InputContext.GetAllActions();
-		public ReadOnlyArray<InputDevice> GetPairedInputDevices() => InputContext.GetPairedInputDevices();
 
 		public InputDevice GetLastUsedInputDevice() => InputContext.GetLastUsedInputDevice();
 		public InputControlScheme GetLastUsedInputControlScheme() => InputContext.GetLastUsedInputControlScheme();

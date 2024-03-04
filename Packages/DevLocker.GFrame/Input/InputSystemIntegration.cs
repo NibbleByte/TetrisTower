@@ -193,10 +193,20 @@ namespace DevLocker.GFrame.Input
 		InputUser User { get; }
 
 		/// <summary>
+		/// Get all paired devices to this player (user).
+		/// </summary>
+		ReadOnlyArray<InputDevice> PairedDevices { get; }
+
+		/// <summary>
 		/// Pair the given device to a user.
 		/// Useful for local multiplayer / split screen. For single player game, you can skip this.
 		/// </summary>
 		void PerformPairingWithDevice(InputDevice device, InputUserPairingOptions options = InputUserPairingOptions.None);
+
+		/// <summary>
+		/// Unpair the device from the user.
+		/// </summary>
+		void UnpairDevice(InputDevice device);
 
 		/// <summary>
 		/// Will make the user paired with no devices - they won't have any input.
@@ -297,11 +307,6 @@ namespace DevLocker.GFrame.Input
 		/// Returns all <see cref="InputAction"/>.
 		/// </summary>
 		IEnumerable<InputAction> GetAllActions();
-
-		/// <summary>
-		/// Get all paired devices to this player.
-		/// </summary>
-		ReadOnlyArray<InputDevice> GetPairedInputDevices();
 
 		/// <summary>
 		/// Get last updated device.

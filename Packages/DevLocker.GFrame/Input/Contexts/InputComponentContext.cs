@@ -34,6 +34,8 @@ namespace DevLocker.GFrame.Input.Contexts
 
 		public InputUser User => PlayerInput.user;
 
+		public ReadOnlyArray<InputDevice> PairedDevices => PlayerInput ? PlayerInput.devices : new InputDevice[0];
+
 		public virtual bool DeviceSupportsUINavigationSelection => m_LastUsedDisplayData?.SupportsUINavigationSelection ?? false;
 
 		private InputDevice m_LastUsedDevice;
@@ -135,6 +137,13 @@ namespace DevLocker.GFrame.Input.Contexts
 			User.AssociateActionsWithUser(PlayerInput.actions);
 		}
 
+		public void UnpairDevice(InputDevice device)
+		{
+			if (User.valid) {
+				User.UnpairDevice(device);
+			}
+		}
+
 		public void PerformPairingWithEmptyDevice()
 		{
 			UnpairDevices();
@@ -216,11 +225,6 @@ namespace DevLocker.GFrame.Input.Contexts
 		public InputDevice GetLastUsedInputDevice()
 		{
 			return m_LastUsedDevice;
-		}
-
-		public ReadOnlyArray<InputDevice> GetPairedInputDevices()
-		{
-			return PlayerInput ? PlayerInput.devices : new InputDevice[0];
 		}
 
 		public InputControlScheme GetLastUsedInputControlScheme()

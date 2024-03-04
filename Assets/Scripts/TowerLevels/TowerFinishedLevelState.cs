@@ -3,6 +3,7 @@ using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.TowerUI;
+using UnityEngine.InputSystem;
 
 namespace TetrisTower.TowerLevels
 {
@@ -12,6 +13,8 @@ namespace TetrisTower.TowerLevels
 		private GridLevelController m_LevelController;
 		private PlayerControls m_PlayerControls;
 		private TowerLevelUIController m_UIController;
+
+		private bool m_MouseAdded = false;
 
 		public void EnterState(PlayerStatesContext context)
 		{
@@ -28,11 +31,25 @@ namespace TetrisTower.TowerLevels
 				m_UIController.SwitchState(TowerLevelUIState.LevelFinished);
 				// Don't pause the level as it will interrupt the won bonus animation.
 			}
+
+			// In split screen, each player gets their own device. But when using menus, it's best to provide the mouse.
+			if (Mouse.current != null && m_PlayerControls.PairedDevices.Count > 0 && !m_PlayerControls.PairedDevices.OfType<Mouse>().Any()) {
+				m_PlayerControls.PerformPairingWithDevice(Mouse.current);
+				m_MouseAdded = true;
+			}
 		}
 
 		public void ExitState()
 		{
 			m_PlayerControls.DisableAll(this);
+
+			if (m_MouseAdded) {
+				// Mouse should not dissapear, but just in case?
+				if (Mouse.current != null) {
+					m_PlayerControls.UnpairDevice(Mouse.current);
+				}
+				m_MouseAdded = false;
+			}
 		}
 	}
 }
