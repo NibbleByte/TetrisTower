@@ -20,6 +20,7 @@ namespace TetrisTower.Game
 
 		public BlocksSkinSet BlocksSet { get; }
 
+		public bool QuitLevelCanResumePlaythrough { get; }
 		public bool HaveFinishedLevels { get; }
 
 		public float TotalPlayTime { get; }

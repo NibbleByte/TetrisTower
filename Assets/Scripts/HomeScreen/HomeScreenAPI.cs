@@ -1,3 +1,4 @@
+using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.TowerLevels;
 using TetrisTower.TowerLevels.Playthroughs;
@@ -47,14 +48,18 @@ namespace TetrisTower.HomeScreen
 		{
 			var gameContext = GameManager.Instance.GameContext;
 
-			gameContext.SetCurrentPlaythrough(locationPicker.TargetPlaythroughTemplate);
+			var levelParams = locationPicker.TargetPlaythroughTemplate.GetAllLevels().Select(originalParam => {
 
-			var supervisor = gameContext.CurrentPlaythrough.PrepareSupervisor();
-			if (supervisor is TowerLevelSupervisor towerSupervisor) {
-				towerSupervisor.SetSceneOverride(locationPicker.PickedLevelParam.GetAppropriateBackgroundScene());
-			}
+				var levelParam = Saves.SavesManager.Clone<LevelParamData>(originalParam, gameContext.GameConfig);
+				levelParam.BackgroundScene = levelParam.BackgroundSceneMobile = locationPicker.PickedLevelParam.GetAppropriateBackgroundScene();
+				return levelParam;
+			});
 
-			GameManager.Instance.SwitchLevelAsync(supervisor);
+			// Don't use the TowerLevelSupervisor scene override parameter, as it would be lost on replay quit.
+			IPlaythroughData playthroughData = locationPicker.TargetPlaythroughTemplate.GeneratePlaythroughData(gameContext.GameConfig, levelParams);
+			gameContext.SetCurrentPlaythrough(playthroughData);
+
+			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
 		}
 	}
 

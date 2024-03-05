@@ -43,12 +43,20 @@ namespace TetrisTower.TowerUI
 		[Tooltip("Elements needed only when game is playing (i.e. not won / lost animation).")]
 		public GameObject[] PlayingOnlyElements;
 
+		[Tooltip("All \"Quit Level\" buttons. They will remain active if the playthrough allows it.")]
+		public GameObject[] QuitButtons;
+
 		public TowerLevelUIPlayMode PlayMode { get; private set; }
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			foreach (var bind in StatePanels.Concat(PVPStatePanels).Concat(ReplayStatePanels)) {
 				bind.Panel.SetActive(false);
+			}
+
+			bool canQuit = context.FindByType<IPlaythroughData>().QuitLevelCanResumePlaythrough;
+			foreach(GameObject button in QuitButtons) {
+				button.SetActive(canQuit);
 			}
 		}
 

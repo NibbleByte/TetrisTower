@@ -20,7 +20,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		private ReplayRecording m_PlaybackRecording;
 		private readonly IPlaythroughData m_ReturnPlaythrough;
 
-		public override bool IsFinalLevel => m_ReturnPlaythrough == null;
+		public override bool QuitLevelCanResumePlaythrough => m_ReturnPlaythrough != null;
 
 		public override bool HaveFinishedLevels => m_ReturnPlaythrough == null;
 

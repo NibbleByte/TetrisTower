@@ -36,7 +36,6 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[NonSerialized]
 		private LevelParamData m_OverrideLevelParam;
 
-		public override bool IsFinalLevel => true;
 		public override bool HaveFinishedLevels => true;
 
 		public override ILevelSupervisor PrepareSupervisor()
@@ -96,12 +95,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			levelData.AttackChargeMax = AttackChargeMax;
 		}
 
-		protected override void DisposeTowerLevels()
-		{
-			base.DisposeTowerLevels();
-
-			m_OverrideLevelParam = null;
-		}
+		// Don't clear the param, so "Quit Replay" can work properly for PVP playthrough.
+		//protected override void DisposeTowerLevels()
+		//{
+		//	base.DisposeTowerLevels();
+		//
+		//	m_OverrideLevelParam = null;
+		//}
 
 		private void OnClearActionSequenceFinished(PlaythroughPlayer player)
 		{

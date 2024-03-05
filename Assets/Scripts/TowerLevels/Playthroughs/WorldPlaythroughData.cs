@@ -52,7 +52,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		private string m_CurrentLevelID;
 
-		public override bool IsFinalLevel => false;	// World doesn't have a final level... for now?!
+		public override bool QuitLevelCanResumePlaythrough => true;
 		public override bool HaveFinishedLevels => m_Accomplishments.Where(a => a.State == WorldLocationState.Completed).Count() >= m_LevelsSet.LevelsCount;
 
 		public WorldLevelAccomplishment GetAccomplishment(string levelID) => m_Accomplishments.FirstOrDefault(a => a.LevelID == levelID);

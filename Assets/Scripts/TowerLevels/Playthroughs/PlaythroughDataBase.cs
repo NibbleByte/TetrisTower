@@ -50,7 +50,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public float PlayTimeOnLevelStart = 0f;
 		public float TotalPlayTime => PlayTimeOnLevelStart + (m_ActiveTowerLevels.FirstOrDefault()?.PlayTime ?? 0);
 
-		public abstract bool IsFinalLevel { get; }
+		public virtual bool QuitLevelCanResumePlaythrough => false;
 		public abstract bool HaveFinishedLevels { get; }
 
 		public abstract ILevelSupervisor PrepareSupervisor();
