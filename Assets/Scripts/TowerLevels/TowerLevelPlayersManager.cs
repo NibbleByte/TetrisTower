@@ -125,7 +125,20 @@ namespace TetrisTower.TowerLevels
 			}
 		}
 
-		public void SetupPlayersInput()
+		public void SetupPlayersInputForReplay()
+		{
+			MessageBox.Instance.MessageShown += SystemPauseLevels;
+			MessageBox.Instance.MessageClosed += SystemResumeLevels;
+
+			var players = m_PlaythroughData.ActivePlayers.ToList();
+
+			// First player has all the control, the rest have none.
+			for(int playerIndex = 1; playerIndex < players.Count; playerIndex++) {
+				players[playerIndex].InputContext.PerformPairingWithEmptyDevice();
+			}
+		}
+
+		public void SetupPlayersInputForPVP()
 		{
 			MessageBox.Instance.MessageShown += SystemPauseLevels;
 			MessageBox.Instance.MessageClosed += SystemResumeLevels;

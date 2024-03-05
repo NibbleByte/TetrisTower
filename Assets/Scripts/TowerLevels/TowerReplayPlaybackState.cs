@@ -6,12 +6,13 @@ using TetrisTower.TowerUI;
 using System.Linq;
 using DevLocker.GFrame;
 using TetrisTower.TowerLevels.Replays;
+using TetrisTower.TowerLevels.Playthroughs;
 
 namespace TetrisTower.TowerLevels
 {
 	public class TowerReplayPlaybackState : IPlayerState, IUpdateListener
 	{
-		private IPlaythroughData m_PlaythroughData;
+		private ReplayPlaythroughData m_PlaythroughData;
 		private IPlayerContext m_PlayerContext;
 		private PlayerControls m_PlayerControls;
 		private IInputContext m_InputContext;
@@ -73,6 +74,8 @@ namespace TetrisTower.TowerLevels
 				} else {
 					m_PlayerContext.StatesStack.SetState(new TowerFinishedLevelState());
 				}
+
+				m_PlaythroughData.OnReplayEnded(m_PlayerContext.StatesStack.Context.FindByType<PlaythroughPlayer>());
 
 				return;
 			}

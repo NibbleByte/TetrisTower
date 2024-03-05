@@ -113,6 +113,11 @@ namespace TetrisTower.Game
 			foreach (Canvas canvas in UICanvases) {
 				canvas.enabled = canvas.gameObject == EventSystem.playerRoot;
 				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+				// HACK: setting back RenderMode.ScreenSpaceOverlay breaks the sorting order,
+				//		 making the loading screen appear behind the menus. Touch any sorting order to fix.
+				canvas.sortingOrder++;
+				canvas.sortingOrder--;
 			}
 		}
 

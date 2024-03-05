@@ -282,7 +282,11 @@ namespace TetrisTower.TowerLevels
 
 		private async Task StartLevels(List<StartData> allPlayersStartData)
 		{
-			m_PlayersManager.SetupPlayersInput();
+			if (m_PlaythroughData is ReplayPlaythroughData) {
+				m_PlayersManager.SetupPlayersInputForReplay();
+			} else {
+				m_PlayersManager.SetupPlayersInputForPVP();
+			}
 
 			// After all players have loaded their scenes, start the game.
 			for (int playerIndex = 0; playerIndex < allPlayersStartData.Count; playerIndex++) {

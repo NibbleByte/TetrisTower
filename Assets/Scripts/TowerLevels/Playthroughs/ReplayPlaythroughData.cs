@@ -53,6 +53,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			return m_ActiveTowerLevels.Last();
 		}
 
+		public override void AssignPlayer(PlaythroughPlayer player, GridLevelData levelData)
+		{
+			base.AssignPlayer(player, levelData);
+
+			player.LevelController.FinishedLevel += () => OnLevelFinished(player);
+		}
+
 		public ReplayRecording GetReplayRecording()
 		{
 			// Clone it just in case?
@@ -81,6 +88,51 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			base.QuitLevel();
 
 			m_PlaybackRecording = null;
+		}
+
+		public void OnReplayEnded(PlaythroughPlayer player)
+		{
+			// In case the replay ended without the level finishing (no winner).
+
+			if (ActivePlayers.All(p => p.PlayerContext.StatesStack.Context.FindByType<LevelReplayPlayback>().PlayerPlaybackRecording.HasEnding)) {
+
+				// First player has all the control - show his UI and hide the rest.
+				player = ActivePlayers.First();
+
+				player.RenderInputCanvasToScreen();
+
+				foreach (var otherPlayer in ActivePlayers) {
+					if (player != otherPlayer) {
+						otherPlayer.HideCanvases();
+					}
+				}
+			}
+		}
+
+		private void OnLevelFinished(PlaythroughPlayer player)
+		{
+			// Single player is handled by the level itself.
+			if (ActivePlayers.Count() == 1)
+				return;
+
+			if (player.LevelData.HasWon) {
+
+				// First player has all the control - show his UI and hide the rest.
+				player = ActivePlayers.First();
+
+				player.RenderInputCanvasToScreen();
+
+				foreach (var otherPlayer in ActivePlayers) {
+					if (player != otherPlayer) {
+						otherPlayer.HideCanvases();
+					}
+				}
+
+				return;
+			}
+
+			// Hide UI for lost players.
+			player.HideCanvases();
 		}
 	}
 
