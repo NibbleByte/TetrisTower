@@ -26,7 +26,7 @@ namespace TetrisTower.TowerLevels
 
 		public PlaythroughPlayer SetupPlayer(GameConfig config, int playerIndex, GridLevelController levelController, GridLevelData levelData, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
 		{
-			var playthroughPlayer = PlaythroughPlayer.Create(config, isPrimaryPlayer: playerIndex == 0, levelController, camera, playerContextRoot, uiCanvases);
+			var playthroughPlayer = PlaythroughPlayer.Create(config, isMultiplayer: m_PlayersCount > 1, playerIndex, levelController, camera, playerContextRoot, uiCanvases);
 			m_PlaythroughData.AssignPlayer(playthroughPlayer, levelData);
 
 			SetupCamera(camera, playerIndex);

@@ -34,9 +34,6 @@ namespace TetrisTower.TowerUI
 			public GameObject Panel;
 		}
 
-		public GameObject SinglePlayerDecorations;
-		public GameObject MultiPlayerDecorations;
-
 		public TowerLevelUIState CurrentState = TowerLevelUIState.Play;
 
 		public StatePanelBinds[] StatePanels;
@@ -50,10 +47,6 @@ namespace TetrisTower.TowerUI
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
-			bool isSinglePlayer = context.FindByType<IPlaythroughData>().IsSinglePlayer;
-			SinglePlayerDecorations.SetActive(isSinglePlayer);
-			MultiPlayerDecorations.SetActive(!isSinglePlayer);
-
 			foreach (var bind in StatePanels.Concat(PVPStatePanels).Concat(ReplayStatePanels)) {
 				bind.Panel.SetActive(false);
 			}

@@ -173,6 +173,9 @@ namespace TetrisTower.TowerLevels
 				}
 			}
 
+			// Exclude decorations (used in PVP). They should always be visible.
+			uiCanvases = uiCanvases.Where(c => !c.gameObject.CompareTag(GameTags.TowerDecors)).ToArray();
+
 			if (uiCanvases.Length < 2 || uiCanvases.Any(c => c == null)) {
 				Debug.LogError("Parts of the UI are missing!");
 			}
@@ -427,6 +430,9 @@ namespace TetrisTower.TowerLevels
 				throw new Exception($"Scene {SceneManager.GetActiveScene().name} has missing level controller and placeholder. Cannot load current level.");
 			}
 
+			// Get decors before reparenting stuff, so we know which came from the placeholder in the scene.
+			Transform[] overrideDecors = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
+
 			levelController = GameObject.Instantiate<GridLevelController>(gameContext.GameConfig.TowerLevelController, placeholder.transform.position, placeholder.transform.rotation);
 			SceneManager.MoveGameObjectToScene(levelController.gameObject, SceneManager.GetSceneAt(playerIndex));
 			levelController.name = $"{gameContext.GameConfig.TowerLevelController.name} [{playerIndex}]";
@@ -447,7 +453,6 @@ namespace TetrisTower.TowerLevels
 				camera = overrideCamera;
 			}
 
-			Transform[] overrideDecors = placeholder.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
 			if (overrideDecors.Length != 0) {
 				Transform[] decors = levelController.GetComponentsInChildren<Transform>(true).Where(t => t.CompareTag(GameTags.TowerDecors)).ToArray();
 
@@ -459,7 +464,9 @@ namespace TetrisTower.TowerLevels
 				}
 
 				foreach (Transform decor in decors) {
-					GameObject.DestroyImmediate(decor.gameObject);
+					if (!overrideDecors.Contains(decor)) {
+						GameObject.DestroyImmediate(decor.gameObject);
+					}
 				}
 			}
 

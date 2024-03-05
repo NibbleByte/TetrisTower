@@ -14,6 +14,8 @@ namespace TetrisTower.Game
 	public class PlaythroughPlayer
 	{
 		public bool IsPrimaryPlayer { get; private set; }
+		public bool IsMultiplayer { get; private set; }
+		public int PlayerIndex { get; private set; }
 		public MultiplayerEventSystem EventSystem { get; private set; }
 		public InputSystemUIInputModule InputModule { get; private set; }
 		public PlayerControls PlayerControls { get; private set; }
@@ -28,13 +30,23 @@ namespace TetrisTower.Game
 
 		private PlaythroughPlayer() { }
 
-		public static PlaythroughPlayer Create(GameConfig config, bool isPrimaryPlayer, GridLevelController levelController, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
+		public static PlaythroughPlayer Create(
+			GameConfig config,
+			bool isMultiplayer,
+			int playerIndex,
+			GridLevelController levelController,
+			Camera camera,
+			PlayerContextUIRootObject playerContextRoot,
+			Canvas[] uiCanvases
+			)
 		{
 			var gameInputObject = GameObject.Instantiate(config.GameInputPrefab);
 			SceneManager.MoveGameObjectToScene(gameInputObject, camera.gameObject.scene);
 
 			var player = new PlaythroughPlayer {
-				IsPrimaryPlayer = isPrimaryPlayer,
+				IsPrimaryPlayer = playerIndex == 0,
+				PlayerIndex = playerIndex,
+				IsMultiplayer = isMultiplayer,
 				LevelController = levelController,
 
 				PlayerControls = new PlayerControls(),
@@ -106,6 +118,11 @@ namespace TetrisTower.Game
 
 		public void RenderCanvasesToCamera()
 		{
+			// Skip to avoid performance slow down for single player
+			// (while camera moves, canvas layout rebuilds as the rect "changes" because of camera transform)
+			if (!IsMultiplayer)
+				return;
+
 			foreach (Canvas canvas in UICanvases) {
 				canvas.enabled = true;
 				canvas.renderMode = RenderMode.ScreenSpaceCamera;
