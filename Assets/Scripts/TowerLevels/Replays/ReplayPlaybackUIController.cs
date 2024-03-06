@@ -1,5 +1,8 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using TetrisTower.TowerLevels.Replays;
 using TMPro;
 using UnityEngine;
@@ -8,34 +11,30 @@ using UnityEngine.UI;
 namespace TetrisTower.TowerUI
 {
 	// HACK: This should be in the TowerUI folder, but because of dependency hell, it's not. :D
-	public class ReplayPlaybackUIController : MonoBehaviour, ILevelLoadedListener
+	public class ReplayPlaybackUIController : MonoBehaviour
 	{
-		private LevelReplayPlayback m_PlaybackComponent;
-
 		public Button PlaybackSpeedButton;
 
+		private int m_PlaybackSpeed = 1;
+		private LevelReplayPlayback[] m_PlaybackComponents;
 
-		public void OnLevelLoaded(PlayerStatesContext context)
+		public void Setup(IEnumerable<LevelReplayPlayback> playbackComponents)
 		{
-			context.TrySetByType(out m_PlaybackComponent);
+			m_PlaybackComponents = playbackComponents.ToArray();
 
 			PlaybackSpeedButton.onClick.AddListener(OnPlaybackSpeedClicked);
 
-			if (m_PlaybackComponent == null)
-				return;
-
-			PlaybackSpeedButton.GetComponentInChildren<TMP_Text>().text = $"x{m_PlaybackComponent.PlaybackSpeed}";
-		}
-
-		public void OnLevelUnloading()
-		{
-			PlaybackSpeedButton.onClick.RemoveListener(OnPlaybackSpeedClicked);
+			PlaybackSpeedButton.GetComponentInChildren<TMP_Text>().text = $"x{m_PlaybackSpeed}";
 		}
 
 		private void OnPlaybackSpeedClicked()
 		{
-			m_PlaybackComponent.PlaybackSpeed = (m_PlaybackComponent.PlaybackSpeed * 2) % 7; // 1, 2, 4
-			PlaybackSpeedButton.GetComponentInChildren<TMP_Text>().text = $"x{m_PlaybackComponent.PlaybackSpeed}";
+			m_PlaybackSpeed = (m_PlaybackSpeed * 2) % 7; // 1, 2, 4
+			PlaybackSpeedButton.GetComponentInChildren<TMP_Text>().text = $"x{m_PlaybackSpeed}";
+
+			foreach(LevelReplayPlayback playback in m_PlaybackComponents) {
+				playback.PlaybackSpeed = m_PlaybackSpeed;
+			}
 		}
 	}
 

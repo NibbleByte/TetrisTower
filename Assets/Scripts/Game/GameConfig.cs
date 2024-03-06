@@ -34,6 +34,7 @@ namespace TetrisTower.Game
 
 		public GameObject[] UIPrefabs;
 		public GameObject[] UIPrefabsMobile;
+		public GameObject UIReplayControls;
 
 		[Header("Gameplay")]
 		public float FallSpeedup = 40f;

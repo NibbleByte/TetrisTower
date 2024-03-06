@@ -5,6 +5,7 @@ using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Replays;
+using TetrisTower.TowerUI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,17 +17,21 @@ namespace TetrisTower.TowerLevels
 		private int m_PlayersCount;
 		private Bounds m_FirstPlayerBounds;
 
+		private GameConfig m_GameConfig;
+		private ReplayPlaybackUIController m_UIReplayControls;
+
 		public void SetFirstPlayerBounds(Bounds bounds) => m_FirstPlayerBounds = bounds;
 
-		public TowerLevelPlayersManager(IPlaythroughData playthroughData, int playersCount)
+		public TowerLevelPlayersManager(GameConfig config, IPlaythroughData playthroughData, int playersCount)
 		{
+			m_GameConfig = config;
 			m_PlaythroughData = playthroughData;
 			m_PlayersCount = playersCount;
 		}
 
-		public PlaythroughPlayer SetupPlayer(GameConfig config, int playerIndex, GridLevelController levelController, GridLevelData levelData, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
+		public PlaythroughPlayer SetupPlayer(int playerIndex, GridLevelController levelController, GridLevelData levelData, Camera camera, PlayerContextUIRootObject playerContextRoot, Canvas[] uiCanvases)
 		{
-			var playthroughPlayer = PlaythroughPlayer.Create(config, isMultiplayer: m_PlayersCount > 1, playerIndex, levelController, camera, playerContextRoot, uiCanvases);
+			var playthroughPlayer = PlaythroughPlayer.Create(m_GameConfig, isMultiplayer: m_PlayersCount > 1, playerIndex, levelController, camera, playerContextRoot, uiCanvases);
 			m_PlaythroughData.AssignPlayer(playthroughPlayer, levelData);
 
 			SetupCamera(camera, playerIndex);
@@ -47,6 +52,13 @@ namespace TetrisTower.TowerLevels
 			//PlayerContextUIRootObject.GlobalPlayerContext.EventSystem.gameObject.SetActive(true);
 
 			m_PlaythroughData = null;
+
+			if (m_UIReplayControls) {
+				GameObject.DestroyImmediate(m_UIReplayControls.gameObject);
+				m_UIReplayControls = null;
+
+				PlayerContextUIRootObject.GlobalPlayerContext.InputContext.DisableAll(this);
+			}
 		}
 
 		private void SetupCamera(Camera camera, int playerIndex)
@@ -135,6 +147,14 @@ namespace TetrisTower.TowerLevels
 			// First player has all the control, the rest have none.
 			for(int playerIndex = 1; playerIndex < players.Count; playerIndex++) {
 				players[playerIndex].InputContext.PerformPairingWithEmptyDevice();
+			}
+
+			// Instantiate shared replay controls that applies to each player playback component.
+			m_UIReplayControls = GameObject.Instantiate(m_GameConfig.UIReplayControls).GetComponent<ReplayPlaybackUIController>();
+			m_UIReplayControls.Setup(players.Select(p => p.PlayerContext.StatesStack.Context.FindByType<LevelReplayPlayback>()));
+
+			foreach(var uiAction in PlayerContextUIRootObject.GlobalPlayerContext.InputContext.GetUIActions()) {
+				PlayerContextUIRootObject.GlobalPlayerContext.InputContext.EnableAction(this, uiAction);
 			}
 		}
 

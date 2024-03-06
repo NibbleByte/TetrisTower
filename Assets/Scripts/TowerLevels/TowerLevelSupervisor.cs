@@ -40,7 +40,6 @@ namespace TetrisTower.TowerLevels
 		{
 			m_PlaythroughData = playthroughData;
 			m_PlayersCount = playersCount;
-			m_PlayersManager = new TowerLevelPlayersManager(m_PlaythroughData, m_PlayersCount);
 		}
 
 		public void SetSceneOverride(SceneReference overrideScene)
@@ -56,6 +55,8 @@ namespace TetrisTower.TowerLevels
 		public async Task LoadAsync()
 		{
 			GameContext gameContext = GameManager.Instance.GameContext;
+
+			m_PlayersManager = new TowerLevelPlayersManager(gameContext.GameConfig, m_PlaythroughData, m_PlayersCount);
 
 			if (MessageBox.Instance) {
 				MessageBox.Instance.ForceCloseAllMessages();
@@ -185,7 +186,7 @@ namespace TetrisTower.TowerLevels
 			//
 			// Must be called BEFORE replay, as the playthrough may modify the level data at the last moment (e.g. PVP max attack charge).
 			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
-			var playthroughPlayer = m_PlayersManager.SetupPlayer(gameContext.GameConfig, playerIndex, levelController, levelData, camera, playerContext, uiCanvases);
+			var playthroughPlayer = m_PlayersManager.SetupPlayer(playerIndex, levelController, levelData, camera, playerContext, uiCanvases);
 			playthroughPlayer.EventSystem.name = $"{gameContext.GameConfig.GameInputPrefab.name} [{playerIndex}]";
 
 			//
@@ -341,6 +342,7 @@ namespace TetrisTower.TowerLevels
 		public Task UnloadAsync()
 		{
 			m_PlayersManager.Dispose();
+			m_PlayersManager = null;
 
 			for (int playerIndex = 0; playerIndex < m_PlayersCount; ++playerIndex) {
 
