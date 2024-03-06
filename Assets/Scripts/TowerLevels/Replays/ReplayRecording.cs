@@ -225,6 +225,9 @@ namespace TetrisTower.TowerLevels.Replays
 		[JsonIgnore]
 		public Visuals.Effects.FairyMatchingController Fairy;
 
+		[JsonIgnore]
+		private bool m_AddAndRunInProgress = false;
+
 		public ReplayActionsRecording Clone()
 		{
 			ReplayActionsRecording clone = (ReplayActionsRecording) MemberwiseClone();
@@ -236,14 +239,24 @@ namespace TetrisTower.TowerLevels.Replays
 		public void AddAndRun(ReplayActionType actionType, float value = 0f)
 		{
 			if (HasEnding)
-				throw new InvalidOperationException($"Trying to add action {actionType} after recording has ended is now allowed.");
+				throw new InvalidOperationException($"Trying to add action {actionType} after recording has ended is not allowed.");
 
 			var action = new ReplayAction(actionType, value);
+
+			// If running action causes another action to be added - just run it. Replay should produce the same result so no need to record it.
+			if (m_AddAndRunInProgress) {
+				action.Replay(GridLevelController, Fairy);
+				return;
+			}
+
+			m_AddAndRunInProgress = true;
 
 			// Execute before adding the action as it will also store the expected value.
 			action.Replay(GridLevelController, Fairy);
 
 			m_Actions.Add(action);
+
+			m_AddAndRunInProgress = false;
 
 			if (!GridLevelController.LevelData.IsPlaying) {
 

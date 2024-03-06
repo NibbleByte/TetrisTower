@@ -115,6 +115,10 @@ namespace TetrisTower.TowerLevels
 			if (Pointer.current == null)
 				return;
 
+			// Level may end while dragging - cancel everything.
+			if (m_ReplayRecording.HasEnding)
+				return;
+
 			switch (context.phase) {
 				case InputActionPhase.Started:
 					m_PointerPressedStartPosition = Pointer.current.position.ReadValue();
@@ -141,13 +145,22 @@ namespace TetrisTower.TowerLevels
 					// Maybe Started is called after update and Canceled before? Or there is some race condition?
 					if (m_LastUpdateFrame != Time.frameCount) {
 						Update();
+
+						if (m_ReplayRecording.HasEnding)
+							return;
 					}
 
 					m_PointerPressed = false;
 					m_PointerDragConsumed = false;
 					m_PointerDragSwiped = false;
+
 					m_ReplayRecording.AddAndRun(ReplayActionType.ClearMoveOffset);
+					if (m_ReplayRecording.HasEnding)
+						return;
+
 					m_ReplayRecording.AddAndRun(ReplayActionType.ClearRotateOffset);
+					if (m_ReplayRecording.HasEnding)
+						return;
 
 
 					var pressDuration = Time.time - m_PointerPressedTime;
