@@ -51,6 +51,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Scroll-MoveRotate",
+                    "type": "Value",
+                    "id": "c28d57e2-827b-4821-ae26-495c5cfb0f19",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Pointer-FallSpeedUp",
                     "type": "PassThrough",
                     "id": "262069d4-7042-4ac7-a47f-46cec272d1c9",
@@ -333,6 +342,61 @@
                     "action": "Pointer-Press",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "ScrollWheel",
+                    "id": "26a01c09-ba84-44f6-b58e-19703bf4ea9d",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "ScaleVector2(x=0.15,y=0.15)",
+                    "groups": "",
+                    "action": "Scroll-MoveRotate",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "0c84fc8d-f812-4ee0-bdcb-6016351152e6",
+                    "path": "<Mouse>/scroll/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Scroll-MoveRotate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "86b56c9a-e5b4-4088-bbea-34eb52fe7956",
+                    "path": "<Mouse>/scroll/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Scroll-MoveRotate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "a2d9c0b0-8d12-4dd7-accf-0080ea7c1a27",
+                    "path": "<Mouse>/scroll/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Scroll-MoveRotate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "19f0f045-d6fb-497d-a810-41e0a38934c8",
+                    "path": "<Mouse>/scroll/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Scroll-MoveRotate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         },

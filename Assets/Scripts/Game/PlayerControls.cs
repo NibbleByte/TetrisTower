@@ -75,6 +75,15 @@ namespace TetrisTower.Game
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Scroll-MoveRotate"",
+                    ""type"": ""Value"",
+                    ""id"": ""c28d57e2-827b-4821-ae26-495c5cfb0f19"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""Pointer-FallSpeedUp"",
                     ""type"": ""PassThrough"",
                     ""id"": ""262069d4-7042-4ac7-a47f-46cec272d1c9"",
@@ -357,6 +366,61 @@ namespace TetrisTower.Game
                     ""action"": ""Pointer-Press"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""ScrollWheel"",
+                    ""id"": ""26a01c09-ba84-44f6-b58e-19703bf4ea9d"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": ""ScaleVector2(x=0.15,y=0.15)"",
+                    ""groups"": """",
+                    ""action"": ""Scroll-MoveRotate"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""0c84fc8d-f812-4ee0-bdcb-6016351152e6"",
+                    ""path"": ""<Mouse>/scroll/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Scroll-MoveRotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""86b56c9a-e5b4-4088-bbea-34eb52fe7956"",
+                    ""path"": ""<Mouse>/scroll/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Scroll-MoveRotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""a2d9c0b0-8d12-4dd7-accf-0080ea7c1a27"",
+                    ""path"": ""<Mouse>/scroll/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Scroll-MoveRotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""19f0f045-d6fb-497d-a810-41e0a38934c8"",
+                    ""path"": ""<Mouse>/scroll/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Scroll-MoveRotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -1566,6 +1630,7 @@ namespace TetrisTower.Game
             m_TowerLevelPlay_RotateShapeUp = m_TowerLevelPlay.FindAction("RotateShapeUp", throwIfNotFound: true);
             m_TowerLevelPlay_RotateShapeDown = m_TowerLevelPlay.FindAction("RotateShapeDown", throwIfNotFound: true);
             m_TowerLevelPlay_FallSpeedUp = m_TowerLevelPlay.FindAction("FallSpeedUp", throwIfNotFound: true);
+            m_TowerLevelPlay_ScrollMoveRotate = m_TowerLevelPlay.FindAction("Scroll-MoveRotate", throwIfNotFound: true);
             m_TowerLevelPlay_PointerFallSpeedUp = m_TowerLevelPlay.FindAction("Pointer-FallSpeedUp", throwIfNotFound: true);
             m_TowerLevelPlay_PointerPress = m_TowerLevelPlay.FindAction("Pointer-Press", throwIfNotFound: true);
             // TowerLevelPaused
@@ -1667,6 +1732,7 @@ namespace TetrisTower.Game
         private readonly InputAction m_TowerLevelPlay_RotateShapeUp;
         private readonly InputAction m_TowerLevelPlay_RotateShapeDown;
         private readonly InputAction m_TowerLevelPlay_FallSpeedUp;
+        private readonly InputAction m_TowerLevelPlay_ScrollMoveRotate;
         private readonly InputAction m_TowerLevelPlay_PointerFallSpeedUp;
         private readonly InputAction m_TowerLevelPlay_PointerPress;
         public struct TowerLevelPlayActions
@@ -1678,6 +1744,7 @@ namespace TetrisTower.Game
             public InputAction @RotateShapeUp => m_Wrapper.m_TowerLevelPlay_RotateShapeUp;
             public InputAction @RotateShapeDown => m_Wrapper.m_TowerLevelPlay_RotateShapeDown;
             public InputAction @FallSpeedUp => m_Wrapper.m_TowerLevelPlay_FallSpeedUp;
+            public InputAction @ScrollMoveRotate => m_Wrapper.m_TowerLevelPlay_ScrollMoveRotate;
             public InputAction @PointerFallSpeedUp => m_Wrapper.m_TowerLevelPlay_PointerFallSpeedUp;
             public InputAction @PointerPress => m_Wrapper.m_TowerLevelPlay_PointerPress;
             public InputActionMap Get() { return m_Wrapper.m_TowerLevelPlay; }
@@ -1704,6 +1771,9 @@ namespace TetrisTower.Game
                 @FallSpeedUp.started += instance.OnFallSpeedUp;
                 @FallSpeedUp.performed += instance.OnFallSpeedUp;
                 @FallSpeedUp.canceled += instance.OnFallSpeedUp;
+                @ScrollMoveRotate.started += instance.OnScrollMoveRotate;
+                @ScrollMoveRotate.performed += instance.OnScrollMoveRotate;
+                @ScrollMoveRotate.canceled += instance.OnScrollMoveRotate;
                 @PointerFallSpeedUp.started += instance.OnPointerFallSpeedUp;
                 @PointerFallSpeedUp.performed += instance.OnPointerFallSpeedUp;
                 @PointerFallSpeedUp.canceled += instance.OnPointerFallSpeedUp;
@@ -1729,6 +1799,9 @@ namespace TetrisTower.Game
                 @FallSpeedUp.started -= instance.OnFallSpeedUp;
                 @FallSpeedUp.performed -= instance.OnFallSpeedUp;
                 @FallSpeedUp.canceled -= instance.OnFallSpeedUp;
+                @ScrollMoveRotate.started -= instance.OnScrollMoveRotate;
+                @ScrollMoveRotate.performed -= instance.OnScrollMoveRotate;
+                @ScrollMoveRotate.canceled -= instance.OnScrollMoveRotate;
                 @PointerFallSpeedUp.started -= instance.OnPointerFallSpeedUp;
                 @PointerFallSpeedUp.performed -= instance.OnPointerFallSpeedUp;
                 @PointerFallSpeedUp.canceled -= instance.OnPointerFallSpeedUp;
@@ -2182,6 +2255,7 @@ namespace TetrisTower.Game
             void OnRotateShapeUp(InputAction.CallbackContext context);
             void OnRotateShapeDown(InputAction.CallbackContext context);
             void OnFallSpeedUp(InputAction.CallbackContext context);
+            void OnScrollMoveRotate(InputAction.CallbackContext context);
             void OnPointerFallSpeedUp(InputAction.CallbackContext context);
             void OnPointerPress(InputAction.CallbackContext context);
         }

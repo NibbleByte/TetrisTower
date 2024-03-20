@@ -109,6 +109,20 @@ namespace TetrisTower.TowerLevels
 			}
 		}
 
+		public void OnScrollMoveRotate(InputAction.CallbackContext context)
+		{
+			var scrollValue = context.ReadValue<Vector2>();
+
+			if (scrollValue == Vector2.zero || context.phase != InputActionPhase.Performed)
+				return;
+
+			if (Mathf.Abs(scrollValue.x) > Mathf.Abs(scrollValue.y)) {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Move, Mathf.Sign(scrollValue.x));
+			} else {
+				m_ReplayRecording.AddAndRun(ReplayActionType.Rotate, Mathf.Sign(scrollValue.y));
+			}
+		}
+
 		// Pointer (touch or mouse) gesture detections.
 		public void OnPointerPress(InputAction.CallbackContext context)
 		{
