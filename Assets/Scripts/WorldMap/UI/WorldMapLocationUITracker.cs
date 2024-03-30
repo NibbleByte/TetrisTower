@@ -18,8 +18,8 @@ namespace TetrisTower.WorldMap.UI
 
 		public GameObject CompletedImage;
 
-		public Sprite EarnedStarSprite;
-		public Sprite MissingStarSprite;
+		private Sprite m_EarnedStarSprite;
+		private Sprite m_MissingStarSprite;
 
 		public AnimationCurve ZoomScaleCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 		public AnimationCurve ZoomFadeOutCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -34,9 +34,11 @@ namespace TetrisTower.WorldMap.UI
 
 		public WorldLocationState State { get; private set; }
 
-		public void Setup(WorldMapLevelParamData levelData)
+		public void Setup(WorldMapLevelParamData levelData, Sprite earnedStarSprite, Sprite missingStarSprite)
 		{
 			m_LevelData = levelData;
+			m_EarnedStarSprite = earnedStarSprite;
+			m_MissingStarSprite = missingStarSprite;
 
 			LocationImage.sprite = m_LevelData.PreviewImage;
 
@@ -90,7 +92,7 @@ namespace TetrisTower.WorldMap.UI
 				Image earnedStarImage = EarnedStarImages[i];
 				earnedStarImage.gameObject.SetActive(State == WorldLocationState.Completed);
 
-				earnedStarImage.sprite = i + 1 <= starsEarned ? EarnedStarSprite : MissingStarSprite;
+				earnedStarImage.sprite = i + 1 <= starsEarned ? m_EarnedStarSprite : m_MissingStarSprite;
 			}
 
 			foreach(GameObject element in StarsCostElements) {

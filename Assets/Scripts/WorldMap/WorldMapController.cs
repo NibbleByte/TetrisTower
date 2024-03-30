@@ -4,6 +4,7 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TetrisTower.Game;
 using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 
@@ -58,7 +59,7 @@ namespace TetrisTower.WorldMap
 
 		private LocationBind GetLocationBind(string levelID) => m_Locations.FirstOrDefault(lb => lb.LevelID == levelID);
 
-		public void Init(WorldPlaythroughData playthroughData)
+		public void Init(WorldPlaythroughData playthroughData, GameConfig gameConfig)
 		{
 			m_PlaythroughData = playthroughData;
 
@@ -80,7 +81,7 @@ namespace TetrisTower.WorldMap
 				if (TrackerController && UILocationTrackerPrefab) {
 					locationBind.UITracker = GameObject.Instantiate(UILocationTrackerPrefab);
 					locationBind.UITracker.name = "UI-" + level.LevelID;
-					locationBind.UITracker.Setup(level);
+					locationBind.UITracker.Setup(level, gameConfig.StarEarnedSprite, gameConfig.StarMissingSprite);
 					locationBind.UITracker.Clicked += OnLocationSelected;
 
 					TrackerController.StartTracking(locationBind.WorldLocation.transform, (RectTransform) locationBind.UITracker.transform);

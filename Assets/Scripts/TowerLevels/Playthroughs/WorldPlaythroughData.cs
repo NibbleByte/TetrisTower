@@ -51,6 +51,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public IReadOnlyCollection<WorldLevelAccomplishment> Accomplishments => m_Accomplishments;
 		private WorldLevelAccomplishment[] m_Accomplishments = new WorldLevelAccomplishment[0];
 
+		public string CurrentLevelID => m_CurrentLevelID;
 		private string m_CurrentLevelID;
 
 		public override bool QuitLevelCanResumePlaythrough => true;

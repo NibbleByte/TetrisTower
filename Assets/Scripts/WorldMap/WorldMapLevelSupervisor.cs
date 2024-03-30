@@ -49,7 +49,7 @@ namespace TetrisTower.WorldMap
 
 			var levelController = GameObject.FindAnyObjectByType<WorldMapController>();
 
-			levelController.Init(m_PlaythroughData);
+			levelController.Init(m_PlaythroughData, gameContext.GameConfig);
 
 			var uiController = GameObject.FindAnyObjectByType<UI.WorldMapUIController>(FindObjectsInactive.Include);
 

@@ -32,9 +32,12 @@ namespace TetrisTower.Game
 		public SceneReference WorldMapScene;
 		public SceneReference WorldMapSceneMobile;
 
+		[Header("UI")]
 		public GameObject[] UIPrefabs;
 		public GameObject[] UIPrefabsMobile;
 		public GameObject UIReplayControls;
+		public Sprite StarEarnedSprite;
+		public Sprite StarMissingSprite;
 
 		[Header("Gameplay")]
 		public float FallSpeedup = 40f;
