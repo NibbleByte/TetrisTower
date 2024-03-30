@@ -46,7 +46,7 @@ namespace TetrisTower.WorldMap
 					accomplishment.LevelID = levelData.LevelID;
 				}
 
-				if (accomplishment.State == WorldLocationState.Hidden) {
+				if (accomplishment.State < WorldLocationState.Unlocked) {
 					accomplishment.State = WorldLocationState.Unlocked;
 				}
 
@@ -55,7 +55,8 @@ namespace TetrisTower.WorldMap
 
 			m_PlaythroughData.__ReplaceAccomplishments(accomplishments);
 			m_PlaythroughData.DataIntegrityCheck();
-			m_WorldLevel.StartCoroutine(m_WorldLevel.RevealUnlockedLocations());
+
+			m_WorldLevel.StartCoroutine(m_WorldLevel.RevealReachedLocations());
 		}
 
 		public void CompleteLevel(string levelID)
@@ -71,6 +72,7 @@ namespace TetrisTower.WorldMap
 
 				if (levelID == levelData.LevelID) {
 					accomplishment.State = WorldLocationState.Completed;
+					accomplishment.HighestScore = levelData.ScoreToStars.LastOrDefault();
 				}
 
 				accomplishments.Add(accomplishment);
@@ -78,7 +80,9 @@ namespace TetrisTower.WorldMap
 
 			m_PlaythroughData.__ReplaceAccomplishments(accomplishments);
 			m_PlaythroughData.DataIntegrityCheck();
-			m_WorldLevel.StartCoroutine(m_WorldLevel.RevealUnlockedLocations());
+
+			m_WorldLevel.RefreshLocation(levelID);
+			m_WorldLevel.StartCoroutine(m_WorldLevel.RevealReachedLocations());
 		}
 	}
 }

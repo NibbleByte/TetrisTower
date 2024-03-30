@@ -4,4 +4,18 @@
 PresetManager:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_DefaultPresets: {}
+  m_DefaultPresets:
+  - first:
+      m_NativeTypeID: 1006
+      m_ManagedTypePPtr: {fileID: 0}
+      m_ManagedTypeFallback: 
+    second:
+    - m_Preset: {fileID: 0}
+      m_Filter: glob:"Assets/Art/GUI/**.png"
+      m_Disabled: 0
+    - m_Preset: {fileID: 0}
+      m_Filter: glob:"Assets/Art/GUI/**.psd"
+      m_Disabled: 0
+    - m_Preset: {fileID: 0}
+      m_Filter: glob:"Assets/Art/GUI/**.jpg"
+      m_Disabled: 0

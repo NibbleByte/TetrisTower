@@ -24,11 +24,16 @@ namespace TetrisTower.WorldMap
 					gameObject.SetActive(false);
 					break;
 
-				case WorldLocationState.Unlocked:
+				case WorldLocationState.Reached:
 					gameObject.SetActive(false);
 					break;
 
 				case WorldLocationState.Revealed:
+					// TODO: Colorize differently
+					gameObject.SetActive(true);
+					break;
+
+				case WorldLocationState.Unlocked:
 					// TODO: Colorize differently
 					gameObject.SetActive(true);
 					break;

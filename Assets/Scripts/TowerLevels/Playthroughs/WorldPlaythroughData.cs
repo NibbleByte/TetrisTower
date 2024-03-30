@@ -14,14 +14,15 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	public enum WorldLocationState
 	{
 		Hidden,
-		Unlocked,	// Unlocked but not yet revealed to the player. UI has to do this.
-		Revealed,	// Level is unlocked and shown to player.
-		Completed   // Player needs to complete the level objective once to unlock the adjacent levels.
+		Reached,	// Reached but not yet revealed to the player. UI has to do this.
+		Revealed,	// Level is reached and shown to player.
+		Unlocked,	// Level was unlocked by the player using stars and can be played.
+		Completed	// Player needs to complete the level objective once to reach the adjacent levels.
 	}
 
 	public static class WorldLocationExtensions
 	{
-		public static bool IsVisible(this WorldLocationState state) => state == WorldLocationState.Revealed || state == WorldLocationState.Completed;
+		public static bool IsVisible(this WorldLocationState state) => state >= WorldLocationState.Revealed;
 	}
 
 	/// <summary>
@@ -92,19 +93,21 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		/// <summary>
 		/// Call this to ensure location state is up to date (supporting save migration & modding).
-		/// Checks if all locations linked to completed ones are unlocked.
+		/// Checks if all locations linked to completed ones are set as reached.
 		/// </summary>
 		public void DataIntegrityCheck()
 		{
-			int startIndex = GetAccomplishmentIndex(m_LevelsSet.StartLevel.LevelParam.LevelID, true);
-			ref WorldLevelAccomplishment startAccomplishment = ref m_Accomplishments[startIndex];
-			if (startAccomplishment.State == WorldLocationState.Hidden) {
-				startAccomplishment.State = WorldLocationState.Unlocked;
+			foreach(var levelParam in m_LevelsSet.Levels.Where(lp => lp.StarsCost == 0 || lp == m_LevelsSet.StartLevel.LevelParam)) {
+				int index = GetAccomplishmentIndex(levelParam.LevelID, true);
+				ref WorldLevelAccomplishment startAccomplishment = ref m_Accomplishments[index];
+				if (startAccomplishment.State < WorldLocationState.Unlocked) {
+					startAccomplishment.State = WorldLocationState.Unlocked;
+				}
 			}
 
 			foreach (WorldMapLevelParamData level in GetAllLevels()) {
 				if (GetAccomplishment(level.LevelID).State == WorldLocationState.Completed) {
-					UnlockLinkedLevels(level.LevelID);
+					ReachLinkedLevels(level.LevelID);
 				}
 			}
 		}
@@ -175,12 +178,40 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			ScoreOnLevelStart = m_Accomplishments.Sum(a => a.HighestScore);
 
-			UnlockLinkedLevels(m_CurrentLevelID);
+			ReachLinkedLevels(m_CurrentLevelID);
 
 			m_CurrentLevelID = "";
 		}
 
-		private void UnlockLinkedLevels(string levelID)
+		public int CalculateEarnedStars() => GetAllLevels()
+			.OfType<WorldMapLevelParamData>()
+			.Sum(lp => {
+				var accomplishment = GetAccomplishment(lp.LevelID);
+				return accomplishment.State == WorldLocationState.Completed ? lp.CalculateStarsEarned(accomplishment.HighestScore) : 0;
+				});
+
+		public bool CanUnlock(string levelID, out string failReason)
+		{
+			WorldLocationState state = GetLocationState(levelID);
+			if (state != WorldLocationState.Revealed && state != WorldLocationState.Reached) {
+				failReason = $"Trying to unlock level {levelID} that is not revealed. Found state: {state}.";
+				return false;
+			}
+
+			int earnedStars = CalculateEarnedStars();
+
+			WorldMapLevelParamData levelParam = m_LevelsSet.GetLevelData(levelID);
+
+			if (earnedStars < levelParam.StarsCost) {
+				failReason = $"Not enough stars {earnedStars} to unlock level {levelID} which costs {levelParam.StarsCost}.";
+				return false;
+			}
+
+			failReason = "";
+			return true;
+		}
+
+		private void ReachLinkedLevels(string levelID)
 		{
 			foreach (string linkedLevelID in GetLinkedLevelIDsFor(levelID)) {
 				int linkedIndex = GetAccomplishmentIndex(linkedLevelID, true);
@@ -188,26 +219,42 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				ref WorldLevelAccomplishment linkedAccomplishment = ref m_Accomplishments[linkedIndex];
 
 				if (linkedAccomplishment.State == WorldLocationState.Hidden) {
-					linkedAccomplishment.State = WorldLocationState.Unlocked;
+					linkedAccomplishment.State = WorldLocationState.Reached;
 				}
 			}
 		}
 
-		public void RevealUnlockedLevel(string levelID)
+		public void RevealReachedLevel(string levelID)
 		{
 			int index = GetAccomplishmentIndex(levelID, false);
 			if (index == -1) {
-				Debug.LogError($"{levelID} trying to reveal level that is not unlocked or missing.");
+				Debug.LogError($"{levelID} trying to reveal level that is not reached or missing.");
 				return;
 			}
 
 			ref WorldLevelAccomplishment accomplishment = ref m_Accomplishments[index];
 
-			if (accomplishment.State == WorldLocationState.Unlocked) {
+			if (accomplishment.State == WorldLocationState.Reached) {
 				accomplishment.State = WorldLocationState.Revealed;
 			} else {
-				Debug.LogError($"Trying to reveal level {levelID} that is not unlocked. Found state: {accomplishment.State}.");
+				Debug.LogError($"Trying to reveal level {levelID} that is not reached. Found state: {accomplishment.State}.");
 			}
+		}
+
+		public void UnlockRevealedLevel(string levelID)
+		{
+			int index = GetAccomplishmentIndex(levelID, false);
+			if (index == -1) {
+				Debug.LogError($"{levelID} trying to unlock level that is not reached or missing.");
+				return;
+			}
+
+			if (!CanUnlock(levelID, out string reason)) {
+				Debug.LogError(reason);
+				return;
+			}
+
+			m_Accomplishments[index].State = WorldLocationState.Unlocked;
 		}
 
 		public override void Validate(Core.AssetsRepository repo, UnityEngine.Object context)

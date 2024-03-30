@@ -90,7 +90,7 @@ namespace TetrisTower.HomeScreen
 			if (m_GameContext.StoryInProgress != null) {
 				var playthroughData = (WorldPlaythroughData)m_GameContext.StoryInProgress;
 				var locationState = playthroughData.GetLocationState(m_AllLevels[m_DisplayedIndex].LevelID);
-				// First level should always be visible. World map may not have unlocked it when saved.
+				// First level should always be visible. World map may not have revealed it when saved.
 				isHidden = locationState == WorldLocationState.Hidden && m_DisplayedIndex != 0;
 
 			} else {

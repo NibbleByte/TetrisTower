@@ -19,10 +19,34 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public Vector2 WorldMapPosition;
 		public Sprite PreviewImage; // TODO: This doesn't support modding easily. Make an option to load by image name from streaming assets.
 
+		public int StarsCost = -1;  // Cost to unlock this level.
+		public int[] ScoreToStars;  // Score needed to earn the corresponding star.
+
+		public int CalculateStarsEarned(int score)
+		{
+			return Array.FindLastIndex(ScoreToStars, s => score >= s) + 1;
+		}
+
 		public override void Validate(AssetsRepository repo, UnityEngine.Object context)
 		{
 			if (string.IsNullOrEmpty(LevelID)) {
 				Debug.LogError($"{context} doesn't have LevelID set!", context);
+			}
+
+			// 0 is considered a starting level.
+			if (StarsCost < 0) {
+				Debug.LogError($"{context} needs to have some StarsCost assigned.", context);
+			}
+
+			if (ScoreToStars == null || ScoreToStars.Length != 3) {
+				Debug.LogError($"{context} needs to have 3 ScoreToStars.", context);
+			} else {
+				for(int i = 1; i < ScoreToStars.Length; i++) {
+					if (ScoreToStars[i - 1] >= ScoreToStars[i]) {
+						Debug.LogError($"{context} ScoreToStars isn't sorted!", context);
+						break;
+					}
+				}
 			}
 
 			base.Validate(repo, context);
