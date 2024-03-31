@@ -236,7 +236,7 @@ namespace TetrisTower.TowerLevels.Replays
 			return clone;
 		}
 
-		public void AddAndRun(ReplayActionType actionType, float value = 0f)
+		public void AddAndRun(ReplayActionType actionType, float value = 0f, bool forceAdd = false)
 		{
 			if (HasEnding)
 				throw new InvalidOperationException($"Trying to add action {actionType} after recording has ended is not allowed.");
@@ -244,7 +244,8 @@ namespace TetrisTower.TowerLevels.Replays
 			var action = new ReplayAction(actionType, value);
 
 			// If running action causes another action to be added - just run it. Replay should produce the same result so no need to record it.
-			if (m_AddAndRunInProgress) {
+			// ForceAdd will skip this and add it anyway. Use it when the replay level won't produce this action on its own (e.g. PVP playthrough logic).
+			if (m_AddAndRunInProgress && !forceAdd) {
 				action.Replay(GridLevelController, Fairy);
 				return;
 			}

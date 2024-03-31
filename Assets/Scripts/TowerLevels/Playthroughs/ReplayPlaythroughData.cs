@@ -116,13 +116,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 				return;
 
 			if (player.LevelData.HasWon) {
-
-				// First player has all the control - show his UI and hide the rest.
-				player = ActivePlayers.First();
-
 				player.RenderInputCanvasToScreen();
 
 				foreach (var otherPlayer in ActivePlayers) {
+
+					// Restore input for all players (everybody controls everybody).
+					otherPlayer.InputContext.UnpairDevices();
+
 					if (player != otherPlayer) {
 						otherPlayer.HideCanvases();
 					}
