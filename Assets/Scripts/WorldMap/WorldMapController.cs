@@ -53,7 +53,7 @@ namespace TetrisTower.WorldMap
 			public void SetState(WorldPlaythroughData.WorldLevelAccomplishment accomplishment)
 			{
 				WorldLocation.SetState(accomplishment.State);
-				UITracker?.SetState(accomplishment.State, LevelParam.CalculateStarsEarned(accomplishment.HighestScore));
+				UITracker?.SetState(accomplishment.State, accomplishment.HighestScore, LevelParam.CalculateStarsEarned(accomplishment.HighestScore));
 			}
 		}
 

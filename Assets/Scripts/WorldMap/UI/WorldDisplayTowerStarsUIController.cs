@@ -4,6 +4,7 @@ using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
 using TetrisTower.TowerLevels.Playthroughs;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +12,12 @@ namespace TetrisTower.WorldMap.UI
 {
 	public class WorldDisplayTowerStarsUIController : MonoBehaviour, ILevelLoadedListener
 	{
+		public GameObject StarsPanelRoot;
 		public Image[] StarImages;
+		public TMP_Text[] StarValues;
+
+		public string HighScoreFormat = "High Score: {VALUE}";
+		public TMP_Text HighScore;
 
 		private GameConfig m_GameConfig;
 		private GridLevelData m_LevelData;
@@ -23,13 +29,19 @@ namespace TetrisTower.WorldMap.UI
 			context.SetByType(out m_LevelData);
 			context.TrySetByType(out m_PlaythroughData);
 
-			foreach (Image starImage in StarImages) {
-				starImage.gameObject.SetActive(m_PlaythroughData != null);
-			}
+			StarsPanelRoot.SetActive(m_PlaythroughData != null);
+			HighScore?.gameObject.SetActive(m_PlaythroughData != null);
 		}
 
 		public void OnLevelUnloading()
 		{
+		}
+
+		void OnValidate()
+		{
+			if (StarImages != null && StarImages.Length != StarValues.Length) {
+				Debug.LogError($"{this} has different number of images and values linked.", this);
+			}
 		}
 
 		void OnEnable()
@@ -42,6 +54,11 @@ namespace TetrisTower.WorldMap.UI
 			int earnedIndex = levelParam.CalculateStarsEarned(m_LevelData.Score.Score) - 1;
 			for(int i = 0; i < StarImages.Length; i++) {
 				StarImages[i].sprite = i <= earnedIndex ? m_GameConfig.StarEarnedSprite : m_GameConfig.StarMissingSprite;
+				StarValues[i].text = levelParam.ScoreToStars[i].ToString();
+			}
+
+			if (HighScore) {
+				HighScore.text = HighScoreFormat.Replace("{VALUE}", m_PlaythroughData.GetAccomplishment(levelParam.LevelID).HighestScore.ToString());
 			}
 		}
 	}

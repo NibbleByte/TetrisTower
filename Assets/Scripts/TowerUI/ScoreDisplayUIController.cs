@@ -18,10 +18,10 @@ namespace TetrisTower.TowerUI
 		private IPlaythroughData m_PlaythroughData;
 
 		[Header("Prefixes")]
-		public string TotalScorePrefix = "Total: ";
-		public string CurrentScorePrefix = "Current: ";
-		public string BlocksClearedCountPrefix = "Blocks: ";
-		public string BonusRatioPrefix = "Bonus Ratio: ";
+		public string TotalScoreFormat = "Total: {VALUE}";
+		public string CurrentScoreFormat = "Score: {VALUE} ({BONUS_RATIO})";
+		public string BlocksClearedCountFormat = "Blocks: {VALUE}";
+		public string BonusRatioFormat = "Bonus Ratio: {VALUE}";
 
 		[Header("UI Texts")]
 		public TextMeshProUGUI TotalScoreText;
@@ -52,7 +52,7 @@ namespace TetrisTower.TowerUI
 		private void UpdateScore()
 		{
 			if (TotalScoreText) {
-				TotalScoreText.text = TotalScorePrefix + m_PlaythroughData.TotalScore;
+				TotalScoreText.text = TotalScoreFormat.Replace("{VALUE}", m_PlaythroughData.TotalScore.ToString());
 			}
 
 			// WorldMap doesn't have this.
@@ -60,14 +60,14 @@ namespace TetrisTower.TowerUI
 				return;
 
 			if (CurrentScoreText) {
-				CurrentScoreText.text = CurrentScorePrefix + m_LevelData.Score.Score;
+				CurrentScoreText.text = CurrentScoreFormat.Replace("{VALUE}", m_LevelData.Score.Score.ToString()).Replace("{BONUS_RATIO}", m_LevelData.Score.BonusRatio.ToString("0.000"));
 			}
 
 			if (BlocksClearedCountText) {
-				BlocksClearedCountText.text = BlocksClearedCountPrefix + m_LevelData.Score.TotalClearedBlocksCount;
+				BlocksClearedCountText.text = BlocksClearedCountFormat.Replace("{VALUE}", m_LevelData.Score.TotalClearedBlocksCount.ToString());
 			}
 			if (BonusRatioText) {
-				BonusRatioText.text = BonusRatioPrefix + m_LevelData.Score.BonusRatio.ToString("0.000");
+				BonusRatioText.text = BonusRatioFormat.Replace("{VALUE}", m_LevelData.Score.BonusRatio.ToString("0.000"));
 			}
 		}
 	}

@@ -16,7 +16,7 @@ namespace TetrisTower.WorldMap.UI
 		public GameObject[] StarsCostElements;
 		public Image[] EarnedStarImages;
 
-		public GameObject CompletedImage;
+		public GameObject CompletedElement;
 
 		private Sprite m_EarnedStarSprite;
 		private Sprite m_MissingStarSprite;
@@ -57,7 +57,7 @@ namespace TetrisTower.WorldMap.UI
 			CanvasGroup.alpha = ZoomFadeOutCurve.Evaluate(zoom);
 		}
 
-		public void SetState(WorldLocationState state, int starsEarned)
+		public void SetState(WorldLocationState state, int highscore, int starsEarned)
 		{
 			State = state;
 
@@ -99,8 +99,9 @@ namespace TetrisTower.WorldMap.UI
 				element.SetActive(State == WorldLocationState.Revealed);
 			}
 
-			if (CompletedImage) {
-				CompletedImage.SetActive(State == WorldLocationState.Completed);
+			if (CompletedElement) {
+				CompletedElement.SetActive(State == WorldLocationState.Completed);
+				CompletedElement.GetComponentInChildren<TMP_Text>(true).text = highscore.ToString();
 			}
 		}
 

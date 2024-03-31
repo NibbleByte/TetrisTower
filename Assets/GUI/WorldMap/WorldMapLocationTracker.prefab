@@ -312,9 +312,7 @@ MonoBehaviour:
   - {fileID: 3317448281997723767}
   - {fileID: 7237131230127920811}
   - {fileID: 2813625387761471210}
-  CompletedImage: {fileID: 2329333922701724861}
-  EarnedStarSprite: {fileID: -1945121241, guid: 82e9d416174704845a84fbff2c4c7c40, type: 3}
-  MissingStarSprite: {fileID: 22336171, guid: 82e9d416174704845a84fbff2c4c7c40, type: 3}
+  CompletedElement: {fileID: 2329333922701724861}
   ZoomScaleCurve:
     serializedVersion: 2
     m_Curve:
@@ -385,7 +383,7 @@ GameObject:
   - component: {fileID: 6823120770843572596}
   - component: {fileID: 7373013577114102728}
   m_Layer: 5
-  m_Name: Text
+  m_Name: HighScore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -407,8 +405,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 25}
-  m_SizeDelta: {x: -36, y: 50}
+  m_AnchoredPosition: {x: 0, y: 20}
+  m_SizeDelta: {x: -36, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6823120770843572596
 CanvasRenderer:
@@ -438,7 +436,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Completed
+  m_text: 356
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -465,10 +463,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.55
-  m_fontSizeBase: 40
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
