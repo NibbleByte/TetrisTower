@@ -111,7 +111,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			if (!player.LevelData.IsPlaying || recording.HasEnding)
 				return;
 
-			recording.AddAndRun(ReplayActionType.ChargeAttack, player.LevelData.Score.LastMatchBonus.ResultBonusScore, forceAdd: true);
+			recording.AddAndRun(ReplayActionType.ChargeAttack, player.LevelData.Score.LastMatchBonus.ResultBonusScore, queueIfBusy: true);
 
 			if (player.LevelData.AttackCharge >= AttackChargeMax) {
 
@@ -128,7 +128,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 				// In debug we can run 1 player, so no best enemy would be found?
 				if (bestEnemy != null) {
-					recording.AddAndRun(ReplayActionType.ConsumeAttackCharge, forceAdd: true);
+					recording.AddAndRun(ReplayActionType.ConsumeAttackCharge, queueIfBusy: true);
 
 					var bestRecording = bestEnemy.PlayerContext.StatesStack.Context.FindByType<ReplayActionsRecording>();
 					bestRecording.AddAndRun(ReplayActionType.PushUpLine_Attack, 0);	// No force as it is the other's recording, not executing at atm.
