@@ -32,18 +32,20 @@ namespace TetrisTower.Logic
 		private int m_Score = 0;
 		public int Score => m_Score;
 
+		private int m_ScorePlayOnly = 0; // Score without WonBonus, used to calculate the ratio.
+
 
 		[JsonProperty] public int TotalMatched { get; private set; }	// These are matched, which can be more than the actually cleared blocks (when overlapping).
 		[JsonProperty] public int TotalClearedBlocksCount { get; private set; }
 
-		public float BonusRatio => TotalClearedBlocksCount != 0 ? (float)Score / TotalClearedBlocksCount : 1f;
+		public float BonusRatio => TotalClearedBlocksCount != 0 ? (float)m_ScorePlayOnly / TotalClearedBlocksCount : 1f;
 
 		private int m_CurrentClearedBlocksCount = 0;
 		private int m_CurrentCascadesCount = 0;
 
 		public MatchBonus LastMatchBonus { get; private set; }
 
-		public int BonusScore { get; private set; } = 0;
+		public int WonBonusScore { get; private set; } = 0;
 
 		// For serialization.
 		public ScoreGrid()
@@ -129,6 +131,8 @@ namespace TetrisTower.Logic
 			};
 
 			m_Score += LastMatchBonus.ResultBonusScore;
+			m_ScorePlayOnly += LastMatchBonus.ResultBonusScore;
+
 			m_CurrentClearedBlocksCount = 0;
 			m_CurrentCascadesCount++;
 
@@ -143,13 +147,13 @@ namespace TetrisTower.Logic
 
 		public void IncrementWonBonusScore()
 		{
-			BonusScore++;
+			WonBonusScore++;
 		}
 
 		public void ConsumeBonusScore()
 		{
-			m_Score += BonusScore;
-			BonusScore = 0;
+			m_Score += WonBonusScore;
+			WonBonusScore = 0;
 		}
 	}
 }
