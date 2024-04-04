@@ -182,7 +182,7 @@ MonoBehaviour:
     SkinOverrides:
     - {fileID: 11400000, guid: 3883c9f6bfbddbf418ee5560dd8c5170, type: 2}
     LevelID: VikingsID
-    WorldMapPosition: {x: -6, y: -14.4}
+    WorldMapPosition: {x: -17.5, y: -9}
     PreviewImage: {fileID: 21300000, guid: eb9dfd40eecb1d74fa78ff4ac8c47868, type: 3}
     StarsCost: 8
     ScoreToStars: 2c0100005e01000090010000
@@ -282,6 +282,72 @@ MonoBehaviour:
           Column: 10
         - Row: 0
           Column: 11
+--- !u!114 &-1769026591806782059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: IcelandID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|-1769026591806782059
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: b5fa508578ae2894ca0296d85aa967a5, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Iceland.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: b5fa508578ae2894ca0296d85aa967a5, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Iceland.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 3
+    Objectives:
+    - rid: 3890169005972389888
+    - rid: 3890169005972389889
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0.05
+      BlockSmiteChance: 0.005
+      RowSmiteChance: 0.005
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: IcelandID
+    WorldMapPosition: {x: -8.8, y: -11.3}
+    PreviewImage: {fileID: 21300000, guid: 9c6c02898f628fb43a0e0da832e6b475, type: 3}
+    StarsCost: 8
+    ScoreToStars: 2c0100005e01000090010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3890169005972389888
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3890169005972389889
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,6 +371,7 @@ MonoBehaviour:
   - {fileID: -9033090740975800640}
   - {fileID: 3075740806775852930}
   - {fileID: -5133656246103420669}
+  - {fileID: -1769026591806782059}
   LevelsLinks:
   - LevelID1: BabylonID
     LevelID2: ColosseumID
@@ -315,13 +382,15 @@ MonoBehaviour:
   - LevelID1: ColosseumID
     LevelID2: StonehengeID
   - LevelID1: StonehengeID
-    LevelID2: VikingsID
+    LevelID2: IcelandID
   - LevelID1: BabylonID
     LevelID2: EgyptID
   - LevelID1: AtlantisID
     LevelID2: EgyptID
   - LevelID1: EgyptID
     LevelID2: SaharaID
+  - LevelID1: IcelandID
+    LevelID2: VikingsID
 --- !u!114 &1554497649489288964
 MonoBehaviour:
   m_ObjectHideFlags: 0
