@@ -11,7 +11,7 @@ namespace UnityTools.AssetProcessingTools
 {
 	public static class FocusCameraOnMouseTool
 	{
-		[MenuItem("Tetris Tower/Focus Camera On Mouse &3")]
+		[MenuItem("Tetris Tower/Focus Camera On Mouse &F3")]
 		public static void FocusCamera()
 		{
 			if (Application.isPlaying)
