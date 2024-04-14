@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4801148039743534123
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Magma
+  m_Shader: {fileID: -6465566751694194690, guid: 4b5a391092216624fbb38763e9b91d8b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BackgroundTexture:
+        m_Texture: {fileID: 2800000, guid: 537570c61742d7f4e83ac7092bbb9909, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FlowMap:
+        m_Texture: {fileID: 2800000, guid: 8b7f3fa212acaf84589dbf8d6241c532, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ForegroundTexture:
+        m_Texture: {fileID: 2800000, guid: 38b81d526cfd1294cb2d24ee30a5a16c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HeightMapTexture:
+        m_Texture: {fileID: 2800000, guid: 0542670c4b818d0409a0ffa5174b8aba, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HeigthMapTexture:
+        m_Texture: {fileID: 2800000, guid: 0542670c4b818d0409a0ffa5174b8aba, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MiddlegroundTexture:
+        m_Texture: {fileID: 2800000, guid: 799697df4d274fb4492701e9609f5b68, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - Vector1_5eccd077d2344b87aa00babc99f10fe3: 0
+    - Vector1_711d86d373ca442e945a718016b10a77: 0
+    - _BackgroundTextureSpeed: 0.03
+    - _BackgroundTextureTiling: 0.04
+    - _FlowMapSpeed: 0.2
+    - _FlowMapStrength: 0.8
+    - _FlowMapTiling: 0.19
+    - _ForegroundTextureSpeed: 0.03
+    - _ForegroundTextureTiling: 0.13
+    - _HeightColorPosition: 0.95
+    - _HeightMapStrength: 0.9
+    - _HeightMapTiling: 0.04
+    - _HeightTextureSpeed: 0.01
+    - _HeigthColorPosition: 0.2
+    - _HeigthMapStrength: 0.65
+    - _HeigthMapTiling: 0.04
+    - _HeigthTextureSpeed: 0.01
+    - _MiddlegroundTextureStrenght: 1
+    - _MiddlegroundTextureTiling: 0.01
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _TilingFlowMap: 1
+    - _heightMapStrength: 1
+    m_Colors:
+    - _BackgroundColor: {r: 2, g: 0.8392157, b: 0, a: 0}
+    - _ColorForeground: {r: 0.8666667, g: 0.7672725, b: 0.10196077, a: 0}
+    - _ForegroundTextureColor: {r: 0.92941177, g: 0.65882355, b: 0.10980392, a: 0}
+    - _HeightColor: {r: 0.95, g: 0.6016666, b: 0, a: 0}
+    - _HeigthColor: {r: 0.9528302, g: 0.60673326, b: 0, a: 0}
+    - _MiddleGroundTextureColor: {r: 0.8784314, g: 0.35682404, b: 0, a: 1}
+    - _MiddlegroundTextureColor2: {r: 0.85882354, g: 0.023529412, b: 0, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
