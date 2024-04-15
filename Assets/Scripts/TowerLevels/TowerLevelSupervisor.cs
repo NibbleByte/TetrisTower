@@ -464,7 +464,8 @@ namespace TetrisTower.TowerLevels
 
 				foreach (Transform overrideDecor in overrideDecors) {
 					// Child of tower decors were already moved - don't change their hierarchy.
-					if (overrideDecor.IsChildOf(placeholder.transform)) {
+					// Don't touch effects, they will be moved later.
+					if (overrideDecor.IsChildOf(placeholder.transform) && overrideDecor.GetComponent<Visuals.Effects.EffectsOverrider>() == null) {
 						overrideDecor.SetParent(levelController.transform, true);
 					}
 				}
