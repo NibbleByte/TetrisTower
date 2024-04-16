@@ -5453,6 +5453,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 199147237951294076, guid: ee1c7f7523df2fc4d880dc29036036d8, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 301ce48c87cd6664aa010c6681b22a51, type: 2}
+    - target: {fileID: 199147237951294076, guid: ee1c7f7523df2fc4d880dc29036036d8, type: 3}
       propertyPath: m_VertexStreams.Array.size
       value: 5
       objectReference: {fileID: 0}
@@ -5471,6 +5475,10 @@ PrefabInstance:
     - target: {fileID: 199147237951294076, guid: ee1c7f7523df2fc4d880dc29036036d8, type: 3}
       propertyPath: 'm_VertexStreams.Array.data[4]'
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 199904288898595800, guid: ee1c7f7523df2fc4d880dc29036036d8, type: 3}
+      propertyPath: m_SortingOrder
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 199904288898595800, guid: ee1c7f7523df2fc4d880dc29036036d8, type: 3}
       propertyPath: m_Materials.Array.size
@@ -16841,8 +16849,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 6
-      minScalar: 4
+      scalar: 30
+      minScalar: 20
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -17222,7 +17230,7 @@ ParticleSystem:
     angle: 15
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
-    radiusThickness: 1
+    radiusThickness: 0.3
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
@@ -17424,7 +17432,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 15
+      scalar: 5
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -21608,7 +21616,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_RenderMode: 1
   m_MeshDistribution: 0
   m_SortMode: 1
@@ -31988,7 +31996,8 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 3754fffffd5ea1e4a8defef1e9a3805e, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7353676534273612343, guid: d9adcef554b707845b0ca160899e8066, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
