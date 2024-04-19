@@ -4,6 +4,8 @@ using TetrisTower.Core;
 using TetrisTower.Game;
 using UnityEngine;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,6 +19,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[Header("World Map Info")]
 		public string LevelID;
 		public Vector2 WorldMapPosition;
+
+		[JsonIgnore]
 		public Sprite PreviewImage; // TODO: This doesn't support modding easily. Make an option to load by image name from streaming assets.
 
 		public int StarsCost = -1;  // Cost to unlock this level.

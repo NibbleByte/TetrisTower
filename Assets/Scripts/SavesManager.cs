@@ -19,6 +19,8 @@ namespace TetrisTower.Saves
 				new LevelParamAssetConverter(config.AssetsRepository),
 				new WorldLevelsSetConverter(config.AssetsRepository),
 				new GridShapeTemplateConverter(config.AssetsRepository),
+				new Core.Vector2JsonConverter(),
+				new Core.Vector3JsonConverter(),
 				new Core.RandomXoShiRo128starstarJsonConverter(),
 		};
 
