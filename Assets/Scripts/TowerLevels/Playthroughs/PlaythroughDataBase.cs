@@ -23,8 +23,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		protected List<GridLevelData> m_ActiveTowerLevels = new List<GridLevelData>();
 		public IReadOnlyList<GridLevelData> ActiveTowerLevels => m_ActiveTowerLevels;
 
+		[JsonIgnore]
 		protected List<PlaythroughPlayer> m_Players = new List<PlaythroughPlayer>();
-		public IEnumerable<PlaythroughPlayer> ActivePlayers => m_Players.Where(p => p != null);
+		public IEnumerable<PlaythroughPlayer> ActivePlayers => (m_Players ?? (m_Players = new List<PlaythroughPlayer>())).Where(p => p != null);	// JSONIgnore overrides to null
 		public bool IsSinglePlayer => ActivePlayers.Count() <= 1;
 		public bool IsMultiPlayer => ActivePlayers.Count() > 1;
 
@@ -60,6 +61,11 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			int index = m_ActiveTowerLevels.IndexOf(levelData);
 			if (index == -1)
 				throw new InvalidOperationException("Provided level data is not currently active.");
+
+			// [JSONIgnore] overrides the field initializator.
+			if (m_Players == null) {
+				m_Players = new List<PlaythroughPlayer>();
+			}
 
 			while(m_Players.Count <= index) {
 				m_Players.Add(null);

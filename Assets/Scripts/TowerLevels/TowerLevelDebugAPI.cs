@@ -118,6 +118,9 @@ namespace TetrisTower.TowerLevels
 				return;
 			}
 
+			// Quit the leve so towers are disposed of properly.
+			m_PlaythroughData.QuitLevel();
+
 			var playthrough = Saves.SavesManager.Deserialize<IPlaythroughData>(savedData, m_Context.GameConfig);
 
 			m_Context.SetCurrentPlaythrough(playthrough);

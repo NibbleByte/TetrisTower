@@ -79,6 +79,9 @@ namespace TetrisTower.Game
 
 		public void Dispose()
 		{
+			// Restore UI in case level is reloaded and scene is reused.
+			RenderInputCanvasToScreen();
+
 			PlayerContext.DisposePlayerStack();
 			InputContext.Dispose();
 

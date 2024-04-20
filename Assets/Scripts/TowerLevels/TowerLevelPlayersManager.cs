@@ -45,7 +45,7 @@ namespace TetrisTower.TowerLevels
 			MessageBox.Instance.MessageClosed -= SystemResumeLevels;
 
 			foreach (var player in m_PlaythroughData.ActivePlayers) {
-				player.EventSystem.gameObject.SetActive(false);
+				GameObject.DestroyImmediate(player.EventSystem.gameObject);
 			}
 
 			// Restore the global input.
@@ -221,6 +221,7 @@ namespace TetrisTower.TowerLevels
 							continue;
 
 						if (nextGamepadIndex < gamepads.Count) {
+							// NOTE: if the controller is also controlling the keyboard, turn off the Steam client!
 							players[playerIndex].InputContext.PerformPairingWithDevice(gamepads[nextGamepadIndex]);
 							nextGamepadIndex++;
 						} else {

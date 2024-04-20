@@ -188,6 +188,7 @@ namespace TetrisTower.TowerLevels
 			var playerContext = uiController.GetComponent<PlayerContextUIRootObject>();
 			var playthroughPlayer = m_PlayersManager.SetupPlayer(playerIndex, levelController, levelData, camera, playerContext, uiCanvases);
 			playthroughPlayer.EventSystem.name = $"{gameContext.GameConfig.GameInputPrefab.name} [{playerIndex}]";
+			playthroughPlayer.PlayerControls.asset.name += $" [{playerIndex}]";
 
 			//
 			// Setup Replay

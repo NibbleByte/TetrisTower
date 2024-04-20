@@ -62,7 +62,8 @@ namespace TetrisTower.TowerUI
 
 		public void OnLevelUnloading()
 		{
-
+			// If scene is reused, set the state again.
+			CurrentState = TowerLevelUIState.None;
 		}
 
 		public void SwitchState(TowerLevelUIState state)
