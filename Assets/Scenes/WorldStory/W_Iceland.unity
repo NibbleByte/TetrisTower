@@ -10625,7 +10625,7 @@ PrefabInstance:
     - target: {fileID: 7466454041888997387, guid: 6b0a0eb8625368f458fe1ad0cb5aff16, type: 3}
       propertyPath: m_AudioResource
       value: 
-      objectReference: {fileID: 8300000, guid: 6a51332b65d2b9a4ba9c50c528f15290, type: 3}
+      objectReference: {fileID: 8300000, guid: fbdd63863b30c6c4a9822e5eb32edd1f, type: 3}
     - target: {fileID: 7695595173519071222, guid: 6b0a0eb8625368f458fe1ad0cb5aff16, type: 3}
       propertyPath: m_Resource
       value: 
@@ -10693,7 +10693,7 @@ PrefabInstance:
     - target: {fileID: 8934392850830311910, guid: 6b0a0eb8625368f458fe1ad0cb5aff16, type: 3}
       propertyPath: m_AudioResource
       value: 
-      objectReference: {fileID: 8300000, guid: ff9e593153760e9429268ed6da3fd200, type: 3}
+      objectReference: {fileID: 8300000, guid: b1cc15c6f30890848a2bb3c64252d2b1, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -36539,6 +36539,7 @@ GameObject:
   - component: {fileID: 1722158058}
   - component: {fileID: 1722158060}
   - component: {fileID: 1722158059}
+  - component: {fileID: 1722158061}
   m_Layer: 0
   m_Name: ReplaceEffect
   m_TagString: Untagged
@@ -41448,6 +41449,29 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!114 &1722158061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1722158057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85ab2fdf287245643aeb1a63850cdc65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AudioResource: {fileID: 6418180475301049370, guid: f2ed58b21a6df144b86a2cd33e18ec33, type: 2}
+  m_Output: {fileID: 4958703806281149810, guid: e7ba0b6bbce139246afb42b9fcbfb444, type: 2}
+  m_Template: {fileID: 0}
+  m_Mute: 0
+  m_PlayOnEnable: 0
+  m_RepeatPattern: 0
+  m_RepeatIntervalRange:
+    MinSeconds: 0
+    MaxSeconds: 0
+  InterruptionFadeDuration: 0.2
+  m_Volume: 1
 --- !u!4 &1758478131 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4953184811056532, guid: d3f86dc7e026ba7478d56ec7225940f6, type: 3}
