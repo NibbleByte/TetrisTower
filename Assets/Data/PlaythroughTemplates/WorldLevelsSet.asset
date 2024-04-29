@@ -305,7 +305,7 @@ MonoBehaviour:
       m_IsDirty: 0
       m_ScenePath: Assets/Scenes/WorldStory/W_Iceland.unity
     GreetMessage: 
-    InitialSpawnBlockTypesCount: 3
+    InitialSpawnBlockTypesCount: 4
     Objectives:
     - rid: 3890169005972389888
     - rid: 3890169005972389889
@@ -328,7 +328,8 @@ MonoBehaviour:
     StartGridWithPinnedBlocks: 0
     StartGrid:
       rid: -2
-    SkinOverrides: []
+    SkinOverrides:
+    - {fileID: 11400000, guid: 6dfd86c18062faa438788d828518a6f0, type: 2}
     LevelID: IcelandID
     WorldMapPosition: {x: -8.8, y: -11.3}
     PreviewImage: {fileID: 21300000, guid: 9c6c02898f628fb43a0e0da832e6b475, type: 3}
@@ -342,7 +343,7 @@ MonoBehaviour:
     - rid: 3890169005972389888
       type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
-        MatchesEndCount: 300
+        MatchesEndCount: 200
         MatchesType: 7
     - rid: 3890169005972389889
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}

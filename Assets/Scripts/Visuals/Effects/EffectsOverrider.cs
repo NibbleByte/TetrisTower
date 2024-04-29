@@ -11,6 +11,8 @@ namespace TetrisTower.Visuals.Effects
 		public ParticleSystem MatchBlockEffect;
 		public FallTrailEffectsManager GridMoveFallTrailEffectsManager;
 
+		public ParticleSystem ReplaceBlockEffect;
+
 		[Header(nameof(TowerConeVisualsController))]
 		public FallTrailEffectsManager SelectedShapeFallTrailEffectsManager;
 		public FallTrailEffectsManager WonFallTrailEffectsManager;
@@ -30,6 +32,10 @@ namespace TetrisTower.Visuals.Effects
 
 			if (GridMoveFallTrailEffectsManager) {
 				visualsGrid.FallTrailEffectsManager = GridMoveFallTrailEffectsManager;
+			}
+
+			if (ReplaceBlockEffect) {
+				visualsGrid.ReplaceBlockEffect = ReplaceBlockEffect;
 			}
 		}
 

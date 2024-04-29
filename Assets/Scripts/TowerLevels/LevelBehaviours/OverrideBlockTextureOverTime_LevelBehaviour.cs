@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace TetrisTower.Visuals.Environment
 {
-	public class OverrideBlockTextureOverTime : MonoBehaviour, ILevelLoadedListener
+	public class OverrideBlockTextureOverTime_LevelBehaviour : MonoBehaviour, ILevelLoadedListener
 	{
 		public Texture OverrideTexture;
 		public float OverrideSpeed = 0.01f;
@@ -41,7 +41,7 @@ namespace TetrisTower.Visuals.Environment
 			m_VisualsGrid.CreatedVisualsBlock += OnCreatedVisualsBlock;
 
 			foreach (ConeVisualsBlock block in m_VisualsGrid.AllBlocks) {
-				OnCreatedVisualsBlock(block);
+				OnCreatedVisualsBlock(block, GridCoords.Zero);
 			}
 
 			m_LevelController.Timing.PostUpdate += LevelUpdate;
@@ -56,7 +56,7 @@ namespace TetrisTower.Visuals.Environment
 			m_LevelController = null;
 		}
 
-		private void OnCreatedVisualsBlock(ConeVisualsBlock block)
+		private void OnCreatedVisualsBlock(ConeVisualsBlock block, GridCoords coords)
 		{
 			block.SetTexture(m_OverrideTextureID, OverrideTexture)
 				.SetFloat(m_OverridePatternScaleID, PatternScale)

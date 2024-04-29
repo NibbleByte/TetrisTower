@@ -66,6 +66,7 @@ namespace TetrisTower.Visuals
 		public ParticleSystem FallHitEffect;
 		public ParticleSystem MatchBlockEffect;
 		public Effects.FallTrailEffectsManager FallTrailEffectsManager;
+		public ParticleSystem ReplaceBlockEffect;
 		public Vector2 PushUpWarningShakeRange = new Vector2(-0.1f, 0.1f);
 
 		public delegate void ScoreEventHandler(ScoreGrid scoreGrid);
@@ -88,7 +89,7 @@ namespace TetrisTower.Visuals
 		public IReadOnlyList<ConeVisualsBlock> AllBlocks => m_AllBlocks;
 		private List<ConeVisualsBlock> m_AllBlocks = new();
 
-		public delegate void VisualsBlockEventHandler(ConeVisualsBlock block);
+		public delegate void VisualsBlockEventHandler(ConeVisualsBlock block, GridCoords coords);
 		public event VisualsBlockEventHandler CreatedVisualsBlock;
 		public event VisualsBlockEventHandler DestroyingVisualsBlock;
 
@@ -302,6 +303,9 @@ namespace TetrisTower.Visuals
 						break;
 					case PushUpCellsAction pushUpAction:
 						yield return PushUpCells(pushUpAction);
+						break;
+					case ReplaceCellsAction replaceAction:
+						yield return ReplaceCells(replaceAction);
 						break;
 					case EvaluationSequenceFinishAction finishAction:
 						ScoreFinished?.Invoke(m_ScoreGrid);
@@ -612,6 +616,26 @@ namespace TetrisTower.Visuals
 			yield break;
 		}
 
+		private IEnumerator ReplaceCells(ReplaceCellsAction action)
+		{
+			if (Application.isPlaying) {
+				if (ReplaceBlockEffect) {
+
+					foreach (var pair in action.ReplacePairs) {
+						EmitParticlesAt(ReplaceBlockEffect, GridToWorldBottomCenter(pair.Key), withSound: true);
+					}
+					yield return new WaitForSeconds(ReplaceBlockEffect.main.duration);
+				}
+
+				foreach(var pair in action.ReplacePairs) {
+					DestroyInstanceAt(pair.Key);
+					CreateInstanceAt(pair.Key, pair.Value, null);
+				}
+			}
+
+			yield break;
+		}
+
 		private ConeVisualsBlock CreateInstanceAt(GridCoords coords, BlockType blockType, GameObject reuseVisuals = null, bool placeInGrid = true)
 		{
 			if (reuseVisuals) {
@@ -647,7 +671,7 @@ namespace TetrisTower.Visuals
 
 				m_AllBlocks.Add(visualsBlock);
 
-				CreatedVisualsBlock?.Invoke(visualsBlock);
+				CreatedVisualsBlock?.Invoke(visualsBlock, coords);
 
 				return visualsBlock;
 
@@ -661,7 +685,7 @@ namespace TetrisTower.Visuals
 		{
 			ConeVisualsBlock block = this[coords];
 
-			DestroyingVisualsBlock?.Invoke(block);
+			DestroyingVisualsBlock?.Invoke(block, coords);
 
 			m_AllBlocks.Remove(block);
 

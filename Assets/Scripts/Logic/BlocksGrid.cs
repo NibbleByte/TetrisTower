@@ -119,6 +119,9 @@ namespace TetrisTower.Logic
 					case PushUpCellsAction pushUpAction:
 						yield return PushUpCells(pushUpAction);
 						break;
+					case ReplaceCellsAction replaceAction:
+						yield return ReplaceCells(replaceAction);
+						break;
 				}
 			}
 		}
@@ -235,6 +238,17 @@ namespace TetrisTower.Logic
 				}
 
 				this[0, column] = pair.Value;
+			}
+
+			yield break;
+		}
+
+		private IEnumerator ReplaceCells(ReplaceCellsAction action)
+		{
+			foreach(var pair in action.ReplacePairs) {
+				UnityEngine.Debug.Assert(this[pair.Key] != BlockType.None);
+
+				this[pair.Key] = pair.Value;
 			}
 
 			yield break;

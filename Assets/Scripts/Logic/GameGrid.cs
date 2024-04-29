@@ -121,6 +121,11 @@ namespace TetrisTower.Logic
 		public IReadOnlyList<KeyValuePair<int, BlockType>> PushBlocks;
 	}
 
+	public class ReplaceCellsAction : GridAction
+	{
+		public IReadOnlyList<KeyValuePair<GridCoords, BlockType>> ReplacePairs;
+	}
+
 	public class EvaluationSequenceFinishAction : GridAction
 	{
 

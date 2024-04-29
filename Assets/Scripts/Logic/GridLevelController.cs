@@ -612,11 +612,13 @@ namespace TetrisTower.Logic
 
 		private void LevelUpdate()
 		{
-			if (LevelData.FallingShape != null) {
-				UpdateFallShape();
+			if (!AreGridActionsRunning) {
+				if (LevelData.FallingShape != null) {
+					UpdateFallShape();
 
-			} else if (!AreGridActionsRunning && LevelData.IsPlaying && CanSelectNextShape()) {
-				SelectFallingShape();
+				} else if (LevelData.IsPlaying && CanSelectNextShape()) {
+					SelectFallingShape();
+				}
 			}
 
 			if (LevelData.IsPlaying) {
