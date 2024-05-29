@@ -26,8 +26,12 @@ namespace TetrisTower.Game
 
 		public BlocksSkinSet DefaultBlocksSet;
 
-		public SceneReference BootScene;
-		public SceneReference BootSceneMobile;
+		[Header("Scenes")]
+		public SceneReference IntroScreenScene;
+		public SceneReference IntroScreenSceneMobile;
+
+		public SceneReference HomeScreenScene;
+		public SceneReference HomeScreenSceneMobile;
 
 		public SceneReference WorldMapScene;
 		public SceneReference WorldMapSceneMobile;

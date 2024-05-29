@@ -24,8 +24,8 @@ namespace TetrisTower.HomeScreen
 			}
 
 			SceneReference scene = Platforms.PlatformsUtils.IsMobileOrSimulator
-				? gameContext.GameConfig.BootSceneMobile
-				: gameContext.GameConfig.BootScene
+				? gameContext.GameConfig.HomeScreenSceneMobile
+				: gameContext.GameConfig.HomeScreenScene
 				;
 
 			if (SceneManager.GetActiveScene().name != scene.SceneName) {

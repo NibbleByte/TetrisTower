@@ -29,7 +29,8 @@ namespace TetrisTower.Game.Build
 
 			List<string> scenes = new List<string>();
 
-			scenes.Add(isMobile ? gameConfig.BootSceneMobile.ScenePath : gameConfig.BootScene.ScenePath);
+			scenes.Add(isMobile ? gameConfig.IntroScreenSceneMobile.ScenePath : gameConfig.IntroScreenScene.ScenePath);
+			scenes.Add(isMobile ? gameConfig.HomeScreenSceneMobile.ScenePath : gameConfig.HomeScreenScene.ScenePath);
 			scenes.Add(isMobile ? gameConfig.WorldMapSceneMobile.ScenePath : gameConfig.WorldMapScene.ScenePath);
 
 			var levels = AssetDatabase.FindAssets("t:PlaythroughTemplateBase")
