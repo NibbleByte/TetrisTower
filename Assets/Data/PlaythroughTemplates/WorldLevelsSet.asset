@@ -200,6 +200,72 @@ MonoBehaviour:
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0
+--- !u!114 &-5004525024643935433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: ThraciansID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|-5004525024643935433
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 75df303f413d65b409f7429f8a360ad3, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Thracians.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 75df303f413d65b409f7429f8a360ad3, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Thracians.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 3
+    Objectives:
+    - rid: 7812390375079280642
+    - rid: 7812390375079280643
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: ThraciansID
+    WorldMapPosition: {x: 3, y: -26.6}
+    PreviewImage: {fileID: 21300000, guid: 2b2b489ad3a5ac04795770028157e371, type: 3}
+    StarsCost: 1
+    ScoreToStars: 320000006400000096000000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 7812390375079280642
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 7812390375079280643
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
 --- !u!114 &-3451992996147784845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +431,7 @@ MonoBehaviour:
   StartLevel: {fileID: 1554497649489288964}
   m_Levels:
   - {fileID: 1554497649489288964}
+  - {fileID: -5004525024643935433}
   - {fileID: -5849076406278750976}
   - {fileID: 2539950144918906801}
   - {fileID: -3451992996147784845}
@@ -376,6 +443,8 @@ MonoBehaviour:
   LevelsLinks:
   - LevelID1: BabylonID
     LevelID2: ColosseumID
+  - LevelID1: BabylonID
+    LevelID2: ThraciansID
   - LevelID1: BabylonID
     LevelID2: GreeceID
   - LevelID1: GreeceID
