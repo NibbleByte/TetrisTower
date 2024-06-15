@@ -440,6 +440,7 @@ MonoBehaviour:
   - {fileID: 3075740806775852930}
   - {fileID: -5133656246103420669}
   - {fileID: -1769026591806782059}
+  - {fileID: 369840095846413832}
   LevelsLinks:
   - LevelID1: BabylonID
     LevelID2: ThraciansID
@@ -461,6 +462,74 @@ MonoBehaviour:
     LevelID2: SaharaID
   - LevelID1: IcelandID
     LevelID2: VikingsID
+  - LevelID1: IcelandID
+    LevelID2: EskimosID
+--- !u!114 &369840095846413832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: EskimosID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|369840095846413832
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 7785982c2ffb2a047a04e3da4c86dfe9, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Eskimos.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 7785982c2ffb2a047a04e3da4c86dfe9, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Eskimos.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 4
+    Objectives:
+    - rid: 3020088180791312618
+    - rid: 3020088180791312619
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: EskimosID
+    WorldMapPosition: {x: -7.6, y: -2.2}
+    PreviewImage: {fileID: 21300000, guid: 2b2b489ad3a5ac04795770028157e371, type: 3}
+    StarsCost: 1
+    ScoreToStars: 2c0100005e01000090010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3020088180791312618
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3020088180791312619
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
 --- !u!114 &1554497649489288964
 MonoBehaviour:
   m_ObjectHideFlags: 0
