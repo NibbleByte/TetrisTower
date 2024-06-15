@@ -1166,6 +1166,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6837942234520228760, guid: 9017c834ab626474aa14b4edcd9f02a4, type: 3}
   m_PrefabInstance: {fileID: 851435502}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &943044679
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 943044681}
+  - component: {fileID: 943044680}
+  m_Layer: 0
+  m_Name: BlockEffects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &943044680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943044679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af1a4125abec45946b8f1bf5d185eb56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OverrideTexture: {fileID: 2800000, guid: 04b4aa864a5f01d4a8dc5ae0645cf230, type: 3}
+  OverrideSpeed: 0.025
+  OverrideMax: 0.62
+  PatternRandomOffset: {x: 20, y: 20}
+  PatternScale: 40
+--- !u!4 &943044681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943044679}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 32.02342, y: 37.25636, z: 66.310844}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &953777617 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4060481939114612, guid: 514fa6f57f8581a4cb00a70651522faf, type: 3}
@@ -6472,4 +6521,5 @@ SceneRoots:
   - {fileID: 277325622}
   - {fileID: 213175666}
   - {fileID: 589754462}
+  - {fileID: 943044681}
   - {fileID: 548401945}
