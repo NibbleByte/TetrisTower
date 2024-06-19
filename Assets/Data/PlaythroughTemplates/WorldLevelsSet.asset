@@ -266,6 +266,63 @@ MonoBehaviour:
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0
+--- !u!114 &-3530123885792191267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: AuroraID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|-3530123885792191267
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: fa3b7d093e2b92b4fa58b133e130a143, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Aurora.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: fa3b7d093e2b92b4fa58b133e130a143, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/WorldStory/W_Aurora.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    Objectives:
+    - rid: -2
+    - rid: -2
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: AuroraID
+    WorldMapPosition: {x: -0.3, y: -12.4}
+    PreviewImage: {fileID: 21300000, guid: cad4d0ad1a62ad6488fa64cf1436f243, type: 3}
+    StarsCost: 1
+    ScoreToStars: 2c0100005e01000090010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &-3451992996147784845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,6 +495,7 @@ MonoBehaviour:
   - {fileID: 4486701649466151832}
   - {fileID: -9033090740975800640}
   - {fileID: 3075740806775852930}
+  - {fileID: -3530123885792191267}
   - {fileID: -5133656246103420669}
   - {fileID: -1769026591806782059}
   - {fileID: 369840095846413832}
@@ -456,6 +514,8 @@ MonoBehaviour:
     LevelID2: StonehengeID
   - LevelID1: StonehengeID
     LevelID2: IcelandID
+  - LevelID1: StonehengeID
+    LevelID2: AuroraID
   - LevelID1: AtlantisID
     LevelID2: EgyptID
   - LevelID1: EgyptID
