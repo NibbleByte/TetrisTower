@@ -291,8 +291,8 @@ MonoBehaviour:
     GreetMessage: 
     InitialSpawnBlockTypesCount: 5
     Objectives:
-    - rid: -2
-    - rid: -2
+    - rid: 3020088400949543014
+    - rid: 3020088400949543015
     Rules:
       MatchHorizontalLines: 3
       MatchVerticalLines: 3
@@ -316,13 +316,22 @@ MonoBehaviour:
     LevelID: AuroraID
     WorldMapPosition: {x: -0.3, y: -12.4}
     PreviewImage: {fileID: 21300000, guid: cad4d0ad1a62ad6488fa64cf1436f243, type: 3}
-    StarsCost: 1
+    StarsCost: 10
     ScoreToStars: 2c0100005e01000090010000
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 3020088400949543014
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3020088400949543015
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
 --- !u!114 &-3451992996147784845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -574,7 +583,7 @@ MonoBehaviour:
     LevelID: EskimosID
     WorldMapPosition: {x: -7.6, y: -2.2}
     PreviewImage: {fileID: 21300000, guid: bf13982aa2df0e140a37364aaf8aff6b, type: 3}
-    StarsCost: 1
+    StarsCost: 12
     ScoreToStars: 2c0100005e01000090010000
   references:
     version: 2
