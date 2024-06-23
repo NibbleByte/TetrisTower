@@ -18,34 +18,9 @@ namespace TetrisTower.WorldMap
 		public void SetState(WorldLocationState state)
 		{
 			State = state;
+			gameObject.SetActive(true);
 
-			switch(State) {
-				case WorldLocationState.Hidden:
-					gameObject.SetActive(false);
-					break;
-
-				case WorldLocationState.Reached:
-					gameObject.SetActive(false);
-					break;
-
-				case WorldLocationState.Revealed:
-					// TODO: Colorize differently
-					gameObject.SetActive(true);
-					break;
-
-				case WorldLocationState.Unlocked:
-					// TODO: Colorize differently
-					gameObject.SetActive(true);
-					break;
-
-				case WorldLocationState.Completed:
-					// TODO: Colorize differently
-					transform.localScale = Vector3.one / 2f;
-					gameObject.SetActive(true);
-					break;
-
-				default: throw new System.NotSupportedException(State.ToString());
-			}
+			// At the moment 3D location markers are always visible.
 		}
 	}
 }

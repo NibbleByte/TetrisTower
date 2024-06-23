@@ -1,5 +1,6 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
+using DevLocker.Utils;
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace TetrisTower.WorldMap
 		public Transform Sun;
 
 		public Transform LocationsRoot;
+		public Transform LinksRoot;
 
 		public Vector2 MoveRange = new Vector2(-200f, 0f);
 		public Vector2 ZoomRange = new Vector2(50f, 150f);
@@ -37,11 +39,19 @@ namespace TetrisTower.WorldMap
 
 		public UI.UIObjectsTrackerController TrackerController;
 		public WorldMapLocation WorldMapLocationPrefab;
+		public LineRenderer WorldMapLocationsLinkPrefab;
 		public UI.WorldMapLocationUITracker UILocationTrackerPrefab;
 
 		private WorldPlaythroughData m_PlaythroughData;
 
 		private List<LocationBind> m_Locations = new List<LocationBind>();
+		private List<LinksBind> m_Links = new List<LinksBind>();
+
+		private struct LinksBind
+		{
+			public WorldLevelsLink Link;
+			public LineRenderer LineRenderer;
+		}
 
 		private struct LocationBind
 		{
@@ -56,8 +66,6 @@ namespace TetrisTower.WorldMap
 				UITracker?.SetState(accomplishment.State, accomplishment.HighestScore, LevelParam.CalculateStarsEarned(accomplishment.HighestScore));
 			}
 		}
-
-		private LocationBind GetLocationBind(string levelID) => m_Locations.FirstOrDefault(lb => lb.LevelID == levelID);
 
 		public void Init(WorldPlaythroughData playthroughData, GameConfig gameConfig)
 		{
@@ -74,7 +82,7 @@ namespace TetrisTower.WorldMap
 				locationBind.WorldLocation.name = "L-" + level.LevelID;
 				locationBind.WorldLocation.transform.localPosition = new Vector3(level.WorldMapPosition.x, 0f, level.WorldMapPosition.y);
 				locationBind.WorldLocation.transform.localRotation= Quaternion.identity;
-				locationBind.WorldLocation.transform.localScale = Vector3.one;
+				locationBind.WorldLocation.transform.localScale = WorldMapLocationPrefab.transform.localScale;
 				locationBind.WorldLocation.Setup(level);
 
 
@@ -93,6 +101,31 @@ namespace TetrisTower.WorldMap
 			foreach(LocationBind locationBind in m_Locations) {
 				WorldLocationState state = m_PlaythroughData.GetLocationState(locationBind.LevelID);
 				locationBind.SetState(m_PlaythroughData.GetAccomplishment(locationBind.LevelID));
+			}
+
+			foreach(WorldLevelsLink link in m_PlaythroughData.GetAllLevelLinks()) {
+				var linksBind = new LinksBind() {
+					Link = link,
+				};
+
+				LocationBind location1 = GetLocationBind(link.LevelID1);
+				LocationBind location2 = GetLocationBind(link.LevelID2);
+
+				linksBind.LineRenderer = GameObject.Instantiate(WorldMapLocationsLinkPrefab, LinksRoot);
+				linksBind.LineRenderer.transform.ResetTransform();
+				linksBind.LineRenderer.SetPositions(new Vector3[] {
+					// Root is raised a bit above the ground so no z-fighting is happening.
+					location1.WorldLocation.transform.localPosition,
+					location2.WorldLocation.transform.localPosition
+				});
+
+				bool shouldDisplay =
+					location1.WorldLocation.State >= WorldLocationState.Revealed &&
+					location2.WorldLocation.State >= WorldLocationState.Revealed;
+
+				linksBind.LineRenderer.gameObject.SetActive(shouldDisplay);
+
+				m_Links.Add(linksBind);
 			}
 		}
 
@@ -134,10 +167,28 @@ namespace TetrisTower.WorldMap
 				}
 
 				if (playAnimation) {
+
 					float duration = 0.5f;
 					Sequence seq = DOTween.Sequence();
 					seq.Append(locationBind.WorldLocation.transform.DOScale(0.2f, duration).From());
 					seq.Insert(0f, locationBind.UITracker.PlayRevealAnimation(duration));
+
+
+					// Show the links too
+					foreach(var link in GetRevealedLinksFor(locationBind.LevelID)) {
+
+						if (link.LineRenderer.gameObject.activeSelf) // Should not happen?
+							continue;
+
+						link.LineRenderer.gameObject.SetActive(true);
+						var endColor = new Color2(link.LineRenderer.startColor, link.LineRenderer.endColor);
+						var startColor = endColor;
+						startColor.ca.a = 0f;
+						startColor.cb.a = 0f;
+						link.LineRenderer.startColor = startColor.ca;
+						link.LineRenderer.endColor = startColor.cb;
+						seq.Insert(0f, link.LineRenderer.DOColor(startColor, endColor, duration));
+					}
 
 					yield return seq;
 				}
@@ -148,6 +199,10 @@ namespace TetrisTower.WorldMap
 		{
 			LocationBind locationBind = GetLocationBind(levelID);
 			locationBind.SetState(m_PlaythroughData.GetAccomplishment(locationBind.LevelID));
+
+			foreach (var link in GetRevealedLinksFor(locationBind.LevelID)) {
+				link.LineRenderer.gameObject.SetActive(true);
+			}
 		}
 
 		// TODO: Not used - locations are purely UI for now.
@@ -159,6 +214,39 @@ namespace TetrisTower.WorldMap
 				var location = hitInfo.collider.GetComponentInParent<WorldMapLocation>();
 				if (location) {
 					LoadLocation(location.LevelID);
+				}
+			}
+		}
+
+		private LocationBind GetLocationBind(string levelID) => m_Locations.FirstOrDefault(lb => lb.LevelID == levelID);
+
+		private IEnumerable<LinksBind> GetLinksFor(string levelID)
+		{
+			foreach (LinksBind linksBind in m_Links) {
+				if (linksBind.Link.LevelID1 == levelID)
+					yield return linksBind;
+
+				if (linksBind.Link.LevelID2 == levelID)
+					yield return linksBind;
+			}
+		}
+
+		private IEnumerable<LinksBind> GetRevealedLinksFor(string levelID)
+		{
+			if (GetLocationBind(levelID).WorldLocation.State < WorldLocationState.Revealed) {
+				yield break;
+			}
+
+			foreach (var link in GetLinksFor(levelID)) {
+
+				string otherLocationID = link.Link.LevelID1 == levelID
+					? link.Link.LevelID2
+					: link.Link.LevelID1
+					;
+
+				var otherLocation = GetLocationBind(otherLocationID);
+				if (otherLocation.WorldLocation.State >= WorldLocationState.Revealed) {
+					yield return link;
 				}
 			}
 		}

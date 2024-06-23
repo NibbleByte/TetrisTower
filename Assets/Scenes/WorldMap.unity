@@ -430,6 +430,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63e0ef3b37615ad41b3af1b71a4c7762, type: 3}
+--- !u!1 &1459575670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1459575671}
+  m_Layer: 0
+  m_Name: Links
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1459575671
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459575670}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2072404839}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1479819311
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,6 +511,7 @@ MonoBehaviour:
   Camera: {fileID: 1990093021}
   Sun: {fileID: 2011307993}
   LocationsRoot: {fileID: 1726896486}
+  LinksRoot: {fileID: 1459575671}
   MoveRange: {x: -100, y: 0}
   ZoomRange: {x: 25, y: 150}
   RotateSpeed: 35
@@ -513,6 +545,7 @@ MonoBehaviour:
   DragDamp: 0.2
   TrackerController: {fileID: 8367899548843854626}
   WorldMapLocationPrefab: {fileID: 4445682420543862849, guid: 2ede8e409af420846b601f546d8a2f06, type: 3}
+  WorldMapLocationsLinkPrefab: {fileID: 5082861286204778639, guid: 6bcd4f441af656748b3d2cb62a37cd3b, type: 3}
   UILocationTrackerPrefab: {fileID: 2862559360953991826, guid: 467b24f9c8be57a4e85cd6e07db17b64, type: 3}
 --- !u!1 &1492642052
 GameObject:
@@ -916,6 +949,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: ddb3e2ee16fdb9f4e86d9c888edf5342, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1726896486}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: ddb3e2ee16fdb9f4e86d9c888edf5342, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1459575671}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ddb3e2ee16fdb9f4e86d9c888edf5342, type: 3}
 --- !u!4 &2072404839 stripped
