@@ -90,7 +90,7 @@ namespace TetrisTower.TowerUI
 				return false;
 			}
 
-			block.IsObjective = true;
+			block.SetHighlighted(VisualsBlockHighlightType.Objective, true);
 			return true;
 		}
 	}

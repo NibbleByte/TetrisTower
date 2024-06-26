@@ -69,6 +69,8 @@ namespace TetrisTower.Visuals
 		public ParticleSystem ReplaceBlockEffect;
 		public Vector2 PushUpWarningShakeRange = new Vector2(-0.1f, 0.1f);
 
+		public BlockVisualsSharedSettings BlockVisualsSettings;
+
 		public delegate void ScoreEventHandler(ScoreGrid scoreGrid);
 		public event ScoreEventHandler ScoreUpdated;
 		public event ScoreEventHandler ScoreFinished;
@@ -409,7 +411,7 @@ namespace TetrisTower.Visuals
 				visualsBlock.MatchHits--;
 
 				if (visualsBlock.MatchHits != 0) {
-					visualsBlock.IsHighlighted = true;
+					visualsBlock.SetHighlighted(VisualsBlockHighlightType.MatchCombo, true);
 				} else {
 					DestroyInstanceAt(coord);
 				}
@@ -480,10 +482,10 @@ namespace TetrisTower.Visuals
 					EmitParticlesAt(FallHitEffect, GridToWorldBottomCenter(movedPair.Value), withSound: false);
 				}
 
-				if (visualsBlock.IsHighlighted && movedPair.Value.Row < m_PlayableArea.Row) {
-					visualsBlock.IsHighlighted = false;
-				} else if (!visualsBlock.IsHighlighted && movedPair.Value.Row >= m_PlayableArea.Row) {
-					visualsBlock.IsHighlighted = true;
+				if (visualsBlock.IsHighlighted(VisualsBlockHighlightType.Danger) && movedPair.Value.Row < m_PlayableArea.Row) {
+					visualsBlock.SetHighlighted(VisualsBlockHighlightType.Danger, false);
+				} else if (!visualsBlock.IsHighlighted(VisualsBlockHighlightType.Danger) && movedPair.Value.Row >= m_PlayableArea.Row) {
+					visualsBlock.SetHighlighted(VisualsBlockHighlightType.Danger, true);
 				}
 			}
 
@@ -586,10 +588,10 @@ namespace TetrisTower.Visuals
 								ConeVisualsBlock visualsBlock = this[toRow];
 								visualsBlock.transform.localScale = GridToScale(toRow);
 
-								if (visualsBlock.IsHighlighted && toRow.Row < m_PlayableArea.Row) {
-									visualsBlock.IsHighlighted = false;
-								} else if (!visualsBlock.IsHighlighted && toRow.Row >= m_PlayableArea.Row) {
-									visualsBlock.IsHighlighted = true;
+								if (visualsBlock.IsHighlighted(VisualsBlockHighlightType.Danger) && toRow.Row < m_PlayableArea.Row) {
+									visualsBlock.SetHighlighted(VisualsBlockHighlightType.Danger, false);
+								} else if (!visualsBlock.IsHighlighted(VisualsBlockHighlightType.Danger) && toRow.Row >= m_PlayableArea.Row) {
+									visualsBlock.SetHighlighted(VisualsBlockHighlightType.Danger, true);
 								}
 							}
 
@@ -653,6 +655,7 @@ namespace TetrisTower.Visuals
 			// Hitting the limit, won't be stored.
 			if (coords.Row < Rows) {
 				var visualsBlock = reuseVisuals.AddComponent<ConeVisualsBlock>();
+				visualsBlock.SharedSettings = BlockVisualsSettings;
 
 				if (placeInGrid) {
 					if (this[coords] != null) {
@@ -666,7 +669,7 @@ namespace TetrisTower.Visuals
 
 				// Warn that this is outside play area.
 				if (coords.Row >= m_PlayableArea.Row) {
-					visualsBlock.IsHighlighted = true;
+					visualsBlock.SetHighlighted(VisualsBlockHighlightType.Danger, true);
 				}
 
 				m_AllBlocks.Add(visualsBlock);

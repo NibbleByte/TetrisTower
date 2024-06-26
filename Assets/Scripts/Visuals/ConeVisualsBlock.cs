@@ -4,46 +4,55 @@ using System.Collections.Generic;
 
 namespace TetrisTower.Visuals
 {
+	public enum VisualsBlockHighlightType
+	{
+		None,
+
+		MatchCombo = 1 << 0,
+		Objective = 1 << 2,
+		Danger = 1 << 4,
+	}
+
 	public class ConeVisualsBlock : MonoBehaviour
 	{
 		[NonSerialized]
 		public int MatchHits = 0;
 
-		public bool IsHighlighted {
-			get => m_IsHighlighted;
-			set {
-				m_IsHighlighted = value;
+		public BlockVisualsSharedSettings SharedSettings { private get; set; }
 
-				if (m_IsHighlighted || m_IsObjective) {
-					SetFloat(m_HighlightEnabledId, 1f);
-				} else {
-					ClearProperty(m_HighlightEnabledId);
-				}
-				ApplyProperties();
+
+		private VisualsBlockHighlightType m_Highlight = VisualsBlockHighlightType.None;
+
+		public bool IsHighlighted(VisualsBlockHighlightType type) => m_Highlight.HasFlag(type);
+		public void SetHighlighted(VisualsBlockHighlightType type, bool value)
+		{
+			if (m_Highlight.HasFlag(type) == value)
+				return;
+
+			m_Highlight = value ? m_Highlight | type : m_Highlight ^ type;
+
+			// Highlights have priority.
+			if (m_Highlight.HasFlag(VisualsBlockHighlightType.Danger)) {
+				SetColor(m_HighlightColorId, SharedSettings.DangerColor);
+			} else if (m_Highlight.HasFlag(VisualsBlockHighlightType.Objective)) {
+				SetColor(m_HighlightColorId, SharedSettings.ObjectiveColor);
+			} else if (m_Highlight.HasFlag(VisualsBlockHighlightType.MatchCombo)) {
+				SetColor(m_HighlightColorId, SharedSettings.MatchComboColor);
+			} else {
+				ClearProperty(m_HighlightColorId);
 			}
-		}
-		private bool m_IsHighlighted;
 
-		public bool IsObjective {
-			get => m_IsObjective;
-			set {
-				m_IsObjective = value;
-
-				if (m_IsHighlighted || m_IsObjective) {
-					SetFloat(m_HighlightEnabledId, 1f);
-				} else {
-					ClearProperty(m_HighlightEnabledId);
-				}
-				ApplyProperties();
-			}
+			ApplyProperties();
 		}
-		private bool m_IsObjective;
 
 		public void ClearAnyHighlights()
 		{
-			// Don't change the highlight bools state, just clear the visuals.
-			// It may need to be restored at some point? No? Whatever.
-			ClearProperty(m_HighlightEnabledId);
+			if (m_Highlight == VisualsBlockHighlightType.None)
+				return;
+
+			m_Highlight = VisualsBlockHighlightType.None;
+			ClearProperty(m_HighlightColorId);
+
 			ApplyProperties();
 		}
 
@@ -55,9 +64,10 @@ namespace TetrisTower.Visuals
 
 		private Dictionary<int, float> m_FloatProperties = new ();
 		private Dictionary<int, Vector4> m_VectorProperties = new ();
+		private Dictionary<int, Color> m_ColorProperties = new ();
 		private Dictionary<int, Texture> m_TextureProperties = new ();
 
-		private int m_HighlightEnabledId;
+		private int m_HighlightColorId;
 
 		void Awake()
 		{
@@ -65,7 +75,7 @@ namespace TetrisTower.Visuals
 			m_Renderer = GetComponentInChildren<Renderer>();
 			m_OriginalMaterial = m_Renderer.sharedMaterial;
 
-			m_HighlightEnabledId = Shader.PropertyToID("_HighlightEnabled");
+			m_HighlightColorId = Shader.PropertyToID("_Highlight_Color");
 		}
 
 		void OnDestroy()
@@ -109,6 +119,22 @@ namespace TetrisTower.Visuals
 			return this;
 		}
 
+		public Color GetColor(int propertyNameId)
+		{
+			Color value;
+			m_ColorProperties.TryGetValue(propertyNameId, out value);
+			return value;
+		}
+
+		public ConeVisualsBlock SetColor(int propertyNameId, Color value)
+		{
+			m_ColorProperties[propertyNameId] = value;
+
+			m_AppliedBlock.SetColor(propertyNameId, value);
+
+			return this;
+		}
+
 
 		public Texture GetTexture(int propertyNameId)
 		{
@@ -135,6 +161,7 @@ namespace TetrisTower.Visuals
 			foreach(int propertyNameId in propertyNameIds) {
 				removed = m_FloatProperties.Remove(propertyNameId) | removed;
 				removed = m_VectorProperties.Remove(propertyNameId) | removed;
+				removed = m_ColorProperties.Remove(propertyNameId) | removed;
 				removed = m_TextureProperties.Remove(propertyNameId) | removed;
 			}
 
@@ -148,6 +175,10 @@ namespace TetrisTower.Visuals
 
 				foreach (var pair in m_VectorProperties) {
 					m_AppliedBlock.SetVector(pair.Key, pair.Value);
+				}
+
+				foreach (var pair in m_ColorProperties) {
+					m_AppliedBlock.SetColor(pair.Key, pair.Value);
 				}
 
 				foreach (var pair in m_TextureProperties) {
@@ -164,6 +195,7 @@ namespace TetrisTower.Visuals
 
 			m_FloatProperties.Clear();
 			m_VectorProperties.Clear();
+			m_ColorProperties.Clear();
 			m_TextureProperties.Clear();
 
 			ApplyProperties();
@@ -171,7 +203,7 @@ namespace TetrisTower.Visuals
 
 		public void ApplyProperties()
 		{
-			if (0 == m_FloatProperties.Count + m_VectorProperties.Count + m_TextureProperties.Count) {
+			if (0 == m_FloatProperties.Count + m_VectorProperties.Count + m_ColorProperties.Count + m_TextureProperties.Count) {
 				m_Renderer.SetPropertyBlock(null);
 			} else {
 				m_Renderer.SetPropertyBlock(m_AppliedBlock);

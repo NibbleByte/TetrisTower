@@ -13,6 +13,8 @@ namespace TetrisTower.Visuals.Effects
 
 		public GameObject[] FallTrailEffectPreviewBlocks;
 
+		public BlockVisualsSharedSettings BlockVisualsSettings;
+
 		private List<ConeVisualsBlock> m_Blocks = new List<ConeVisualsBlock>();
 		private FallTrailEffectsManager m_FallTrailEffectManager;
 
@@ -23,22 +25,28 @@ namespace TetrisTower.Visuals.Effects
 		{
 			foreach(var renderer in GetComponentsInChildren<Renderer>()) {
 				m_Blocks.Add(renderer.gameObject.AddComponent<ConeVisualsBlock>());
+				m_Blocks.Last().SharedSettings = BlockVisualsSettings;
 			}
 
 			m_FallTrailEffectManager = GetComponentInParent<FallTrailEffectsManager>();
 			m_FallTrailEffectManager.BlocksLayer = GameLayers.BlocksLayer(0);
 		}
 
-		public void HighlightBlocks()
+		public void HighlightMatchCombo() => HighlightBlocks(VisualsBlockHighlightType.MatchCombo);
+		public void HighlightObjective() => HighlightBlocks(VisualsBlockHighlightType.Objective);
+		public void HighlightDanger() => HighlightBlocks(VisualsBlockHighlightType.Danger);
+
+		public void HighlightBlocks(VisualsBlockHighlightType type)
 		{
 			foreach(var block in m_Blocks) {
-				block.IsHighlighted = true;
+				block.SetHighlighted(type, true);
 			}
 		}
 
 		public void RestoreToNormalBlocks()
 		{
 			foreach(var block in m_Blocks) {
+				block.ClearAnyHighlights();
 				block.ClearAllProperties();
 				block.gameObject.SetActive(true);
 			}
