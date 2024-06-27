@@ -323,7 +323,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7480362386816802958
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2052,10 +2052,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3dcb93e8ed0e4b4296cf6ae36d5c72e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TotalScorePrefix: 'Total: '
-  CurrentScorePrefix: 'Current: '
-  BlocksClearedCountPrefix: 'Blocks Cleared: '
-  BonusRatioPrefix: 'Bonus: '
+  TotalScoreFormat: 'Total: {VALUE}'
+  CurrentScoreFormat: 'Score: {VALUE} ({BONUS_RATIO})'
+  BlocksClearedCountFormat: 'Blocks: {VALUE}'
+  BonusRatioFormat: 'Bonus Ratio: {VALUE}'
   TotalScoreText: {fileID: 2400510370270929200}
   CurrentScoreText: {fileID: 0}
   BlocksClearedCountText: {fileID: 0}

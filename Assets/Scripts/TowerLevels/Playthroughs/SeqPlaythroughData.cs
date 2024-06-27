@@ -32,7 +32,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[Tooltip("List of level assets to use. Will be overridden by Levels if any.")]
 		private WorldMapLevelParamAsset[] m_LevelAssets = new WorldMapLevelParamAsset[0];
 
-		public override bool QuitLevelCanResumePlaythrough => CurrentLevelIndex < m_Levels.Length - 1;
+		public override bool QuitLevelCanResumePlaythrough => false;
 
 		public override bool HaveFinishedLevels => CurrentLevelIndex >= Levels.Length;
 

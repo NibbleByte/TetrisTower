@@ -45,7 +45,7 @@ namespace TetrisTower.WorldMap.UI
 			foreach(GameObject element in StarsCostElements) {
 				var elementText = element.GetComponentInChildren<TMP_Text>(true);
 				if (elementText) {
-					elementText.text = levelData.StarsCost.ToString();
+					elementText.text = levelData.StarsCostNOTUSED.ToString();
 				}
 			}
 		}

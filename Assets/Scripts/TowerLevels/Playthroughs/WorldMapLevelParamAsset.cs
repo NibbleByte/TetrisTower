@@ -23,7 +23,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		[JsonIgnore]
 		public Sprite PreviewImage; // TODO: This doesn't support modding easily. Make an option to load by image name from streaming assets.
 
-		public int StarsCost = -1;  // Cost to unlock this level.
+		// TODO: Not used anymore.
+		[NonSerialized]
+		public int StarsCostNOTUSED = -1;  // Cost to unlock this level.
+
 		public int[] ScoreToStars;  // Score needed to earn the corresponding star.
 
 		public int CalculateStarsEarned(int score)
@@ -38,9 +41,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 			}
 
 			// 0 is considered a starting level.
-			if (StarsCost < 0) {
-				Debug.LogError($"{context} needs to have some StarsCost assigned.", context);
-			}
+			//if (StarsCostNOTUSED < 0) {
+			//	Debug.LogError($"{context} needs to have some StarsCost assigned.", context);
+			//}
 
 			if (ScoreToStars == null || ScoreToStars.Length != 3) {
 				Debug.LogError($"{context} needs to have 3 ScoreToStars.", context);

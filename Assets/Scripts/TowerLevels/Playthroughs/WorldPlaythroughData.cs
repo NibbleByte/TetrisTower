@@ -54,8 +54,20 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public string CurrentLevelID => m_CurrentLevelID;
 		private string m_CurrentLevelID;
 
+		[JsonIgnore]
+		[NonSerialized]
+		private bool m_GoToWorldMapNext = true;
+
 		public override bool QuitLevelCanResumePlaythrough => true;
 		public override bool HaveFinishedLevels => m_Accomplishments.Where(a => a.State == WorldLocationState.Completed).Count() >= m_LevelsSet.LevelsCount;
+
+		[JsonConstructor]
+		public WorldPlaythroughData()
+		{
+			// HACK: Json kept ignoring the default value, so I had to use this constructor.
+			//		 Needed so starting from the Homescreen doesn't go to tower level directly.
+			m_GoToWorldMapNext = true;
+		}
 
 		public WorldLevelAccomplishment GetAccomplishment(string levelID) => m_Accomplishments.FirstOrDefault(a => a.LevelID == levelID);
 
@@ -89,7 +101,29 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{
-			return ActiveTowerLevels.Count == 0 && string.IsNullOrEmpty(m_CurrentLevelID) ? new WorldMap.WorldMapLevelSupervisor(this) : new TowerLevelSupervisor(this);
+			if (ActiveTowerLevels.Count != 0 || !string.IsNullOrEmpty(m_CurrentLevelID))
+				return new TowerLevelSupervisor(this);
+
+			// This was the original flow. Now just load the next level.
+			//return new WorldMap.WorldMapLevelSupervisor(this);
+
+
+			// HACK: Set on quit so next prepared supervisor is the WorldMap.
+			//		 Otherwise, quit level would still start the next level.
+			if (!m_GoToWorldMapNext) {
+
+				// Load the next revealed level. Yes the list order matters.
+				foreach (WorldMapLevelParamData level in GetAllLevels()) {
+					var accomplishment = GetAccomplishment(level.LevelID);
+					if (accomplishment.State >= WorldLocationState.Reached && accomplishment.State != WorldLocationState.Completed) {
+						m_CurrentLevelID = level.LevelID;
+						return new TowerLevelSupervisor(this);
+					}
+				}
+			}
+
+			m_GoToWorldMapNext = false;
+			return new WorldMap.WorldMapLevelSupervisor(this);
 		}
 
 		/// <summary>
@@ -98,7 +132,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		/// </summary>
 		public void DataIntegrityCheck()
 		{
-			foreach(var levelParam in m_LevelsSet.Levels.Where(lp => lp.StarsCost == 0 || lp == m_LevelsSet.StartLevel.LevelParam)) {
+			foreach(var levelParam in m_LevelsSet.Levels.Where(lp => lp.StarsCostNOTUSED == 0 || lp == m_LevelsSet.StartLevel.LevelParam)) {
 				int index = GetAccomplishmentIndex(levelParam.LevelID, true);
 				ref WorldLevelAccomplishment startAccomplishment = ref m_Accomplishments[index];
 				if (startAccomplishment.State < WorldLocationState.Unlocked) {
@@ -158,6 +192,13 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override void QuitLevel()
 		{
+			m_GoToWorldMapNext = true;
+
+			if (m_ActiveTowerLevels.Any(ld => ld.HasWon)) {
+				FinishLevel();
+				return;
+			}
+
 			base.QuitLevel();
 
 			m_CurrentLevelID = "";
@@ -203,8 +244,8 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 			WorldMapLevelParamData levelParam = m_LevelsSet.GetLevelData(levelID);
 
-			if (earnedStars < levelParam.StarsCost) {
-				failReason = $"Not enough stars {earnedStars} to unlock level {levelID} which costs {levelParam.StarsCost}.";
+			if (earnedStars < levelParam.StarsCostNOTUSED) {
+				failReason = $"Not enough stars {earnedStars} to unlock level {levelID} which costs {levelParam.StarsCostNOTUSED}.";
 				return false;
 			}
 
