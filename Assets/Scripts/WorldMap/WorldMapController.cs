@@ -131,6 +131,15 @@ namespace TetrisTower.WorldMap
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
+			// Focus on the next level.
+			foreach (WorldMapLevelParamData level in m_PlaythroughData.GetAllLevels()) {
+				var accomplishment = m_PlaythroughData.GetAccomplishment(level.LevelID);
+				if (accomplishment.State >= WorldLocationState.Reached && accomplishment.State != WorldLocationState.Completed) {
+					SnapToLocation(level);
+					break;
+				}
+			}
+
 			StartCoroutine(RevealReachedLocations());
 		}
 
@@ -322,6 +331,32 @@ namespace TetrisTower.WorldMap
 
 			Vector3 pos = Camera.localPosition;
 			pos.y = Mathf.Clamp(pos.y - zoom * Time.deltaTime * ZoomSpeed, ZoomRange.x, ZoomRange.y);
+			Camera.localPosition = pos;
+		}
+
+		public void SnapToLocation(WorldMapLevelParamData level)
+		{
+			var locationBind = GetLocationBind(level.LevelID);
+			var location = locationBind.WorldLocation.transform;
+
+			Vector3 dir1 = Camera.position - transform.position;
+			dir1.y = 0;
+
+			// Gimble-lock - looking at the center.
+			if (dir1.magnitude < 0.01f) {
+				dir1 = transform.forward * -1;
+			}
+			dir1.Normalize();
+
+			Vector3 dir2 = location.position - transform.position.normalized;
+			dir2.y = 0;
+			dir2.Normalize();
+
+
+			Discworld.rotation *= Quaternion.FromToRotation(dir1, dir2);
+
+			Vector3 pos = Camera.localPosition;
+			pos.z = -location.localPosition.magnitude;
 			Camera.localPosition = pos;
 		}
 
