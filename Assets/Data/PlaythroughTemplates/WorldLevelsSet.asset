@@ -408,6 +408,136 @@ MonoBehaviour:
           Column: 10
         - Row: 0
           Column: 11
+--- !u!114 &-2236085156791986128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: ChinaID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|-2236085156791986128
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    Objectives:
+    - rid: 3020088603790278664
+    - rid: 3020088603790278665
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: ChinaID
+    WorldMapPosition: {x: 25.75, y: -0.75}
+    PreviewImage: {fileID: 21300000, guid: 2e526d2821d549348a46332f40534da5, type: 3}
+    ScoreToStars: c80000000e01000040010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3020088603790278664
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3020088603790278665
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+--- !u!114 &-2215403901141677719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: MoaiID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|-2215403901141677719
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    Objectives:
+    - rid: 3020088603790278660
+    - rid: 3020088603790278661
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: MoaiID
+    WorldMapPosition: {x: 4.7, y: 43}
+    PreviewImage: {fileID: 21300000, guid: 2a70ebbde0c19814bb64a1fa74a6b19b, type: 3}
+    ScoreToStars: c80000000e01000040010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3020088603790278660
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3020088603790278661
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
 --- !u!114 &-1769026591806782059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -501,6 +631,12 @@ MonoBehaviour:
   - {fileID: -1769026591806782059}
   - {fileID: 369840095846413832}
   - {fileID: -5133656246103420669}
+  - {fileID: 2027579539838830795}
+  - {fileID: -2215403901141677719}
+  - {fileID: 1230550946363061185}
+  - {fileID: -2236085156791986128}
+  - {fileID: 7691078681192186591}
+  - {fileID: 3010646941826014844}
   LevelsLinks:
   - LevelID1: BabylonID
     LevelID2: ThraciansID
@@ -524,6 +660,18 @@ MonoBehaviour:
     LevelID2: VikingsID
   - LevelID1: IcelandID
     LevelID2: EskimosID
+  - LevelID1: VikingsID
+    LevelID2: MayanID
+  - LevelID1: MayanID
+    LevelID2: MoaiID
+  - LevelID1: MoaiID
+    LevelID2: JapanID
+  - LevelID1: JapanID
+    LevelID2: ChinaID
+  - LevelID1: ChinaID
+    LevelID2: TopOfTheWorldID
+  - LevelID1: TopOfTheWorldID
+    LevelID2: HAL-9000ID
 --- !u!114 &369840095846413832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -586,6 +734,71 @@ MonoBehaviour:
         MatchesEndCount: 300
         MatchesType: 7
     - rid: 3020088180791312619
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+--- !u!114 &1230550946363061185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: JapanID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|1230550946363061185
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    Objectives:
+    - rid: 3020088603790278662
+    - rid: 3020088603790278663
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: JapanID
+    WorldMapPosition: {x: 26, y: 15}
+    PreviewImage: {fileID: 21300000, guid: e4d26877fc0679745846f6723a1c059c, type: 3}
+    ScoreToStars: c80000000e01000040010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3020088603790278662
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3020088603790278663
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0
@@ -654,6 +867,71 @@ MonoBehaviour:
         MatchesEndCount: 100
         MatchesType: 7
     - rid: 5506456835523608941
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+--- !u!114 &2027579539838830795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: MayanID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|2027579539838830795
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    Objectives:
+    - rid: 3020088603790278657
+    - rid: 3020088603790278659
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: MayanID
+    WorldMapPosition: {x: -38, y: 13}
+    PreviewImage: {fileID: 21300000, guid: 617d6a5affd4adc43a172a0b1aae5d30, type: 3}
+    ScoreToStars: c80000000e01000040010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3020088603790278657
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3020088603790278659
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0
@@ -727,6 +1005,71 @@ MonoBehaviour:
         m_Columns: 13
         m_Blocks: 050000000400000001000000030000000100000002000000040000000400000002000000010000000300000001000000040000000600000005000000020000000400000002000000010000000300000003000000010000000200000004000000020000000500000000000000050000000100000003000000010000000200000004000000040000000200000001000000030000000100000005000000000000000400000005000000040000000500000006000000040000000400000006000000050000000400000005000000040000000000000000000000040000000400000005000000010000000600000006000000010000000500000004000000040000000000000000000000000000000100000003000000030000000400000003000000030000000400000003000000030000000100000000000000000000000000000001000000030000000300000004000000010000000100000004000000030000000300000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
         m_PinnedCoords: []
+--- !u!114 &3010646941826014844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: HAL-9000ID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|3010646941826014844
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    Objectives:
+    - rid: 3020088603790278668
+    - rid: 3020088603790278669
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: HAL-9000ID
+    WorldMapPosition: {x: 2.5, y: 6.7}
+    PreviewImage: {fileID: 21300000, guid: 739bfd56e5fb9474592fd3ef596e5b0d, type: 3}
+    ScoreToStars: c80000000e01000040010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3020088603790278668
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 400
+        MatchesType: 7
+    - rid: 3020088603790278669
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
 --- !u!114 &3075740806775852930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -865,6 +1208,71 @@ MonoBehaviour:
         MatchesEndCount: 300
         MatchesType: 7
     - rid: 6777769135320858625
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+--- !u!114 &7691078681192186591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3731441272053dd42b67b4fc64a77f4b, type: 3}
+  m_Name: TopOfTheWorldID
+  m_EditorClassIdentifier: 
+  SEID: 4627b4debeed84d4681b87d1edc51827|7691078681192186591
+  LevelParam:
+    BackgroundScene:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    BackgroundSceneMobile:
+      m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+      m_IsDirty: 0
+      m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+    GreetMessage: 
+    InitialSpawnBlockTypesCount: 5
+    Objectives:
+    - rid: 3020088603790278666
+    - rid: 3020088603790278667
+    Rules:
+      MatchHorizontalLines: 3
+      MatchVerticalLines: 3
+      MatchDiagonalsLines: 3
+      WildBlockChance: 0
+      BlockSmiteChance: 0
+      RowSmiteChance: 0
+      FallSpeedNormalized: 2
+      FallSpeedupPerAction: 0.02
+      MatchesToModifySpawnedBlocksRange: 120
+      ModifyBlocksRangeType: 0
+      WrapSidesOnMatch: 1
+      WrapSidesOnMove: 1
+    GridRows: 9
+    GridColumns: 13
+    ShapeTemplates: []
+    StartGridWithPinnedBlocks: 0
+    StartGrid:
+      rid: -2
+    SkinOverrides: []
+    LevelID: TopOfTheWorldID
+    WorldMapPosition: {x: 0, y: 0}
+    PreviewImage: {fileID: 21300000, guid: f25a1be4db7db8e4183ae23e621fa330, type: 3}
+    ScoreToStars: c80000000e01000040010000
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 3020088603790278666
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 3020088603790278667
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0
