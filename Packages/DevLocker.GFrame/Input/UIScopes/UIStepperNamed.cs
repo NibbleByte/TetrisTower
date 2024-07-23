@@ -126,10 +126,16 @@ namespace DevLocker.GFrame.Input.UIScope
 
 		private void RefreshDisplay()
 		{
-			m_DisplayText.text = SelectedOption;
+			if (m_DisplayText) {
+				m_DisplayText.text = SelectedOption;
+			}
 
-			m_NextStep.interactable = WrapOptions || m_SelectedIndex < m_Options.Length - 1;
-			m_PrevStep.interactable = WrapOptions || m_SelectedIndex > 0;
+			if (m_NextStep) {
+				m_NextStep.interactable = WrapOptions || m_SelectedIndex < m_Options.Length - 1;
+			}
+			if (m_PrevStep) {
+				m_PrevStep.interactable = WrapOptions || m_SelectedIndex > 0;
+			}
 		}
 
 		public override void OnMove(AxisEventData eventData)

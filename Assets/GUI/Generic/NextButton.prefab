@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5135240855519071182}
   - component: {fileID: 7357312780434862507}
   - component: {fileID: 443362967666126404}
-  - component: {fileID: 1236625652529205482}
   m_Layer: 5
   m_Name: NextButton
   m_TagString: Untagged
@@ -34,7 +33,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -135,17 +133,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 512a19e674610f7458ea0cc7a09f9213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1236625652529205482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7464795200041156986}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43db0ed6d78b11f4ab42da2b30287b51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SkipHotkey: 1
-  m_InputAction: {fileID: 674060837155593934, guid: 47e8b8e14204c284ca62a22ed473d3b3, type: 3}

@@ -1,6 +1,7 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
 using DevLocker.GFrame.Input.Contexts;
+using DevLocker.GFrame.Input.UIScope;
 using System.Linq;
 using TetrisTower.Core;
 using TetrisTower.Game;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 
 namespace TetrisTower.HomeScreen
 {
-	public class TowerLocationPickerController : MonoBehaviour, ILevelLoadedListener
+	public class TowerLocationPickerController : UIStepperNamed, ILevelLoadedListener
 	{
 		// HACK: Because UnityEvents can't have two parameters - put it here.
 		public PlaythroughTemplateBase TargetPlaythroughTemplate;
@@ -22,12 +23,11 @@ namespace TetrisTower.HomeScreen
 
 		public Button StartButton;
 
-		public LevelParamData PickedLevelParam => m_AllLevels[m_DisplayedIndex];
+		public LevelParamData PickedLevelParam => m_AllLevels[SelectedIndex];
 
 		private GameContext m_GameContext;
 
 		private WorldMapLevelParamData[] m_AllLevels;
-		private int m_DisplayedIndex = 0;
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
@@ -40,31 +40,30 @@ namespace TetrisTower.HomeScreen
 				m_AllLevels = WorldPlaythroughTemplate.GetAllLevels().OfType<WorldMapLevelParamData>().ToArray();
 			}
 
-			m_DisplayedIndex = 0;
+			Options = m_AllLevels.Select(lp => lp.PreviewImage.name).ToArray();
+			SelectedIndex = 0;
+
+			SelectedIndexChanged.AddListener(OnSelectedIndexChanged);
 			RefreshPreview();
 		}
 
 		public void OnLevelUnloading()
 		{
-
+			SelectedIndexChanged.RemoveListener(OnSelectedIndexChanged);
 		}
 
-		void OnEnable()
+		protected override void OnEnable()
 		{
-			// Reset every time - feels better.
-			m_DisplayedIndex = 0;
-			RefreshPreview();
+			base.OnEnable();
+
+			if (Application.isPlaying) {
+				// Reset every time - feels better.
+				SelectedIndex = 0;
+			}
 		}
 
-		public void NextLocation()
+		private void OnSelectedIndexChanged(int selectedIndex)
 		{
-			m_DisplayedIndex = MathUtils.WrapValue(m_DisplayedIndex + 1, m_AllLevels.Length);
-			RefreshPreview();
-		}
-
-		public void PrevLocation()
-		{
-			m_DisplayedIndex = MathUtils.WrapValue(m_DisplayedIndex - 1, m_AllLevels.Length);
 			RefreshPreview();
 		}
 
@@ -83,18 +82,18 @@ namespace TetrisTower.HomeScreen
 				return;
 			}
 
-			LocationPreview.sprite = m_AllLevels[m_DisplayedIndex].PreviewImage;
+			LocationPreview.sprite = m_AllLevels[SelectedIndex].PreviewImage;
 
 			bool isHidden;
 
 			if (m_GameContext.StoryInProgress != null) {
 				var playthroughData = (WorldPlaythroughData)m_GameContext.StoryInProgress;
-				var locationState = playthroughData.GetLocationState(m_AllLevels[m_DisplayedIndex].LevelID);
+				var locationState = playthroughData.GetLocationState(m_AllLevels[SelectedIndex].LevelID);
 				// First level should always be visible. World map may not have revealed it when saved.
-				isHidden = locationState == WorldLocationState.Hidden && m_DisplayedIndex != 0;
+				isHidden = locationState == WorldLocationState.Hidden && SelectedIndex != 0;
 
 			} else {
-				isHidden = m_DisplayedIndex != 0;
+				isHidden = SelectedIndex != 0;
 			}
 
 			LocationPreview.color = isHidden ? grayColor : Color.white;
@@ -102,8 +101,6 @@ namespace TetrisTower.HomeScreen
 
 			if (StartButton) {
 				StartButton.interactable = !isHidden;
-
-				PlayerContextUIRootObject.GlobalPlayerContext.SetSelectedGameObject(StartButton.gameObject);
 			}
 		}
 	}
