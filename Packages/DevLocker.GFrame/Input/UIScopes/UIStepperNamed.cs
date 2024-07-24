@@ -95,6 +95,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			base.Start();
 
+			if (!Application.isPlaying)
+				return;
+
 			// Clamp and refresh.
 			m_SelectedIndex = Mathf.Clamp(m_SelectedIndex, 0, m_Options.Length - 1);
 			RefreshDisplay();

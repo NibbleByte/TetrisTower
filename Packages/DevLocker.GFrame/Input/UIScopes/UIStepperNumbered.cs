@@ -93,6 +93,9 @@ namespace DevLocker.GFrame.Input.UIScope
 		{
 			base.Start();
 
+			if (!Application.isPlaying)
+				return;
+
 			// Clamp and refresh.
 			m_SelectedValue = Mathf.Clamp(m_SelectedValue, MinValue, MaxValue > MinValue ? MaxValue : int.MaxValue);
 			RefreshDisplay();
