@@ -21,9 +21,19 @@ namespace TetrisTower.HomeScreen
 
 		public WorldPlaythroughTemplate WorldPlaythroughTemplate;
 
+		[SerializeField] private UIStepperNamed m_DifficultyStepper;
+		[SerializeField] private UIStepperNamed m_SeedStepper;
+
 		public Button StartButton;
 
 		public LevelParamData PickedLevelParam => m_AllLevels[SelectedIndex];
+
+		public LevelDifficulty PickedDifficulty => (LevelDifficulty) (m_DifficultyStepper.SelectedIndex - 1);
+		public int PickedSeed => m_SeedStepper.SelectedIndex switch {
+			0 => 0,
+			1 => 666,
+			_ => throw new System.NotSupportedException($"Not supported seed selection {m_SeedStepper.SelectedIndex}."),
+		};
 
 		private GameContext m_GameContext;
 

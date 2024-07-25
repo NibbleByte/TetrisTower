@@ -6,6 +6,13 @@ using UnityEngine;
 
 namespace TetrisTower.HomeScreen
 {
+	public enum LevelDifficulty
+	{
+		Easy = -1,
+		Medium = 0,
+		Hard = 1,
+	}
+
 	public class HomeScreenAPI : MonoBehaviour
 	{
 		public HomeScreenController HomeScreenController;
@@ -37,8 +44,14 @@ namespace TetrisTower.HomeScreen
 		{
 			var gameContext = GameManager.Instance.GameContext;
 
-			var levelParams = new[] { locationPicker.PickedLevelParam };
+			var pickedParam = Saves.SavesManager.Clone<LevelParamData>(locationPicker.PickedLevelParam, gameContext.GameConfig);
+
+			ModifyParamDifficulty(pickedParam, locationPicker.PickedDifficulty);
+
+			var levelParams = new[] { pickedParam };
 			IPlaythroughData playthroughData = locationPicker.TargetPlaythroughTemplate.GeneratePlaythroughData(gameContext.GameConfig, levelParams);
+			playthroughData.SetupRandomGenerator(locationPicker.PickedSeed);
+
 			gameContext.SetCurrentPlaythrough(playthroughData);
 
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
@@ -74,14 +87,23 @@ namespace TetrisTower.HomeScreen
 			pickedParam.GreetMessage = "Endless!";
 			pickedParam.Objectives = new List<Objective>{ new TowerObjectives.PlaceOutside_Objective() { PlacingOutsideIsWin = true } };
 
+			ModifyParamDifficulty(pickedParam, locationPicker.PickedDifficulty);
 
 			var levelParams = new[] { pickedParam };
 
 			// Don't use the TowerLevelSupervisor scene override parameter, as it would be lost on replay quit.
 			IPlaythroughData playthroughData = locationPicker.TargetPlaythroughTemplate.GeneratePlaythroughData(gameContext.GameConfig, levelParams);
+			playthroughData.SetupRandomGenerator(locationPicker.PickedSeed);
+
 			gameContext.SetCurrentPlaythrough(playthroughData);
 
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
+		}
+
+		private void ModifyParamDifficulty(LevelParamData param, LevelDifficulty difficulty)
+		{
+			param.InitialSpawnBlockTypesCount = Mathf.Max(param.InitialSpawnBlockTypesCount + (int)difficulty, 3);
+			param.Rules.FallSpeedNormalized += ((int)difficulty) * param.Rules.FallSpeedupPerAction * 3f;
 		}
 	}
 
