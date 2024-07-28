@@ -69,16 +69,6 @@ namespace TetrisTower.HomeScreen
 			m_SeedStepper.SelectedIndexChanged.RemoveListener(OnSelectedIndexChanged);
 		}
 
-		protected override void OnEnable()
-		{
-			base.OnEnable();
-
-			if (Application.isPlaying) {
-				// Reset every time - feels better.
-				SelectedIndex = 0;
-			}
-		}
-
 		private void OnSelectedIndexChanged(int selectedIndex)
 		{
 			RefreshPreview();

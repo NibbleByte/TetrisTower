@@ -191,6 +191,8 @@ namespace TetrisTower.GameStarter
 			foreach (var manager in preferencesManager.GetComponentsInChildren<IPreferencesManager>(true)) {
 				manager.Init(GameContext);
 			}
+
+			GameManager.Instance.AppendManager(preferencesManager.GetComponentInChildren<RuntimeSessionPreferencesManager>(true));
 		}
 
 		private async Task LoadTowerModesHighScores()

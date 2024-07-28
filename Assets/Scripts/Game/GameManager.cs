@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -40,6 +41,12 @@ namespace TetrisTower.Game
 
 		public void SetManagers(params object[] managers) => m_Managers = new List<object>(managers);
 
-		public void AppendManager(object manager) => m_Managers.Add(manager);
+		public void AppendManager(object manager)
+		{
+			if (manager == null)
+				throw new ArgumentNullException(nameof(manager));
+
+			m_Managers.Add(manager);
+		}
 	}
 }
