@@ -3,6 +3,7 @@ using DevLocker.GFrame.Input;
 using DevLocker.Utils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using TetrisTower.Core;
 using TetrisTower.Logic;
 using UnityEngine;
 
@@ -45,12 +46,17 @@ namespace TetrisTower.Game
 		void Validate(Core.AssetsRepository repo, UnityEngine.Object context);
 	}
 
-	public abstract class PlaythroughTemplateBase : ScriptableObject
+	public abstract class PlaythroughTemplateBase : SerializableAsset // Serialized for level mode distinction for high scores - LevelHighScoreEntry.
 	{
 		public abstract IPlaythroughData GeneratePlaythroughData(GameConfig config, IEnumerable<LevelParamData> overrideParams = null);
 
 		public abstract IEnumerable<LevelParamData> GetAllLevels();
 
 		public abstract bool HasActiveLevel { get; }
+	}
+
+	public class PlaythroughTemplateBaseConverter : SerializableAssetConverter<PlaythroughTemplateBase>
+	{
+		public PlaythroughTemplateBaseConverter(AssetsRepository repository) : base(repository) { }
 	}
 }

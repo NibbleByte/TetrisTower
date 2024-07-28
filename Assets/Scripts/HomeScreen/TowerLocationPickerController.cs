@@ -1,11 +1,11 @@
 using DevLocker.GFrame;
 using DevLocker.GFrame.Input;
-using DevLocker.GFrame.Input.Contexts;
 using DevLocker.GFrame.Input.UIScope;
 using System.Linq;
-using TetrisTower.Core;
 using TetrisTower.Game;
+using TetrisTower.TowerLevels.Modes;
 using TetrisTower.TowerLevels.Playthroughs;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,12 +23,13 @@ namespace TetrisTower.HomeScreen
 
 		[SerializeField] private UIStepperNamed m_DifficultyStepper;
 		[SerializeField] private UIStepperNamed m_SeedStepper;
+		[SerializeField] private TMP_Text m_HighScoreValueText;
 
 		public Button StartButton;
 
-		public LevelParamData PickedLevelParam => m_AllLevels[SelectedIndex];
+		public WorldMapLevelParamData PickedLevelParam => m_AllLevels[SelectedIndex];
 
-		public LevelDifficulty PickedDifficulty => (LevelDifficulty) (m_DifficultyStepper.SelectedIndex - 1);
+		public TowerDifficulty PickedDifficulty => (TowerDifficulty) (m_DifficultyStepper.SelectedIndex - 1);
 		public int PickedSeed => m_SeedStepper.SelectedIndex switch {
 			0 => 0,
 			1 => 666,
@@ -38,6 +39,8 @@ namespace TetrisTower.HomeScreen
 		private GameContext m_GameContext;
 
 		private WorldMapLevelParamData[] m_AllLevels;
+
+		private TowerModesHighScoresDatabase HighScoresDatabase => GameManager.Instance.GetManager<TowerModesHighScoresDatabase>();
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
@@ -54,12 +57,16 @@ namespace TetrisTower.HomeScreen
 			SelectedIndex = 0;
 
 			SelectedIndexChanged.AddListener(OnSelectedIndexChanged);
+			m_DifficultyStepper.SelectedIndexChanged.AddListener(OnSelectedIndexChanged);
+			m_SeedStepper.SelectedIndexChanged.AddListener(OnSelectedIndexChanged);
 			RefreshPreview();
 		}
 
 		public void OnLevelUnloading()
 		{
 			SelectedIndexChanged.RemoveListener(OnSelectedIndexChanged);
+			m_DifficultyStepper.SelectedIndexChanged.RemoveListener(OnSelectedIndexChanged);
+			m_SeedStepper.SelectedIndexChanged.RemoveListener(OnSelectedIndexChanged);
 		}
 
 		protected override void OnEnable()
@@ -108,6 +115,8 @@ namespace TetrisTower.HomeScreen
 
 			LocationPreview.color = isHidden ? grayColor : Color.white;
 			HiddenIndicator.SetActive(isHidden);
+
+			m_HighScoreValueText.text = HighScoresDatabase.GetHighScoreForMode(TargetPlaythroughTemplate, PickedLevelParam.LevelID, PickedDifficulty, PickedSeed).ToString();
 
 			if (StartButton) {
 				StartButton.interactable = !isHidden;

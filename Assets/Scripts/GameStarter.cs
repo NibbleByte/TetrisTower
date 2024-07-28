@@ -85,6 +85,7 @@ namespace TetrisTower.GameStarter
 		async void Start()
 		{
 			await LoadPreferences();
+			await LoadTowerModesHighScores();
 
 			if (GameObject.FindAnyObjectByType<WorldMapController>()) {
 				var playthroughData = (WorldPlaythroughData) StartingPlaythroughTemplate.GeneratePlaythroughData(GameConfig);
@@ -190,6 +191,13 @@ namespace TetrisTower.GameStarter
 			foreach (var manager in preferencesManager.GetComponentsInChildren<IPreferencesManager>(true)) {
 				manager.Init(GameContext);
 			}
+		}
+
+		private async Task LoadTowerModesHighScores()
+		{
+			var highScoresDatabase = await Saves.SavesManager.LoadTowerModesHighScoresDatabase(GameConfig);
+
+			GameManager.Instance.AppendManager(highScoresDatabase);
 		}
 
 		private void LateUpdate()

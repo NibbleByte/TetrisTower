@@ -1,4 +1,5 @@
 using DevLocker.GFrame;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace TetrisTower.Game
 
 		public GameContext GameContext { get; private set; }
 
-		private object[] m_Managers;
+		private List<object> m_Managers;
 
 		public T GetManager<T>() => m_Managers.OfType<T>().First();
 
@@ -35,14 +36,10 @@ namespace TetrisTower.Game
 			}
 		}
 
-		public void SetGameContext(GameContext gameContext)
-		{
-			GameContext = gameContext;
-		}
+		public void SetGameContext(GameContext gameContext) => GameContext = gameContext;
 
-		public void SetManagers(params object[] managers)
-		{
-			m_Managers = managers.ToArray();
-		}
+		public void SetManagers(params object[] managers) => m_Managers = new List<object>(managers);
+
+		public void AppendManager(object manager) => m_Managers.Add(manager);
 	}
 }

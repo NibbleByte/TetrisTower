@@ -2,20 +2,18 @@ using System.Collections.Generic;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerLevels.Modes;
+using TetrisTower.TowerLevels.Playthroughs;
 using UnityEngine;
 
 namespace TetrisTower.HomeScreen
 {
-	public enum LevelDifficulty
-	{
-		Easy = -1,
-		Medium = 0,
-		Hard = 1,
-	}
 
 	public class HomeScreenAPI : MonoBehaviour
 	{
 		public HomeScreenController HomeScreenController;
+
+		private TowerModesHighScoresDatabase HighScoresDatabase => GameManager.Instance.GetManager<TowerModesHighScoresDatabase>();
 
 		public void StartNewStory(PlaythroughTemplateBase template)
 		{
@@ -44,7 +42,7 @@ namespace TetrisTower.HomeScreen
 		{
 			var gameContext = GameManager.Instance.GameContext;
 
-			var pickedParam = Saves.SavesManager.Clone<LevelParamData>(locationPicker.PickedLevelParam, gameContext.GameConfig);
+			var pickedParam = Saves.SavesManager.Clone<WorldMapLevelParamData>(locationPicker.PickedLevelParam, gameContext.GameConfig);
 
 			ModifyParamDifficulty(pickedParam, locationPicker.PickedDifficulty);
 
@@ -53,6 +51,9 @@ namespace TetrisTower.HomeScreen
 			playthroughData.SetupRandomGenerator(locationPicker.PickedSeed);
 
 			gameContext.SetCurrentPlaythrough(playthroughData);
+
+			// Don't start mode for PVP - doesn't make sense.
+			//HighScoresDatabase.StartTowerMode(locationPicker.TargetPlaythroughTemplate, pickedParam.LevelID, locationPicker.PickedDifficulty, locationPicker.PickedSeed);
 
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
 		}
@@ -82,7 +83,7 @@ namespace TetrisTower.HomeScreen
 
 			// locationPicker.TargetPlaythroughTemplate is not needed here as we can recreate the objectives ourselves in the code. For now.
 
-			var pickedParam = Saves.SavesManager.Clone<LevelParamData>(locationPicker.PickedLevelParam, gameContext.GameConfig);
+			var pickedParam = Saves.SavesManager.Clone<WorldMapLevelParamData>(locationPicker.PickedLevelParam, gameContext.GameConfig);
 
 			pickedParam.GreetMessage = "Endless!";
 			pickedParam.Objectives = new List<Objective>{ new TowerObjectives.PlaceOutside_Objective() { PlacingOutsideIsWin = true } };
@@ -96,11 +97,12 @@ namespace TetrisTower.HomeScreen
 			playthroughData.SetupRandomGenerator(locationPicker.PickedSeed);
 
 			gameContext.SetCurrentPlaythrough(playthroughData);
+			HighScoresDatabase.StartTowerMode(locationPicker.TargetPlaythroughTemplate, pickedParam.LevelID, locationPicker.PickedDifficulty, locationPicker.PickedSeed);
 
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
 		}
 
-		private void ModifyParamDifficulty(LevelParamData param, LevelDifficulty difficulty)
+		private void ModifyParamDifficulty(LevelParamData param, TowerDifficulty difficulty)
 		{
 			param.InitialSpawnBlockTypesCount = Mathf.Max(param.InitialSpawnBlockTypesCount + (int)difficulty, 3);
 			param.Rules.FallSpeedNormalized += ((int)difficulty) * param.Rules.FallSpeedupPerAction * 3f;

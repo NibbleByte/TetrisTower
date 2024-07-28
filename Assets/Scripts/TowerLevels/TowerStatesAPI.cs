@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerLevels.Modes;
 using TetrisTower.TowerLevels.Playthroughs;
 using TetrisTower.TowerLevels.Replays;
 using UnityEngine;
@@ -22,6 +23,8 @@ namespace TetrisTower.TowerLevels
 		private bool m_IsPrimaryPlayer = false;
 
 		private bool m_IsReplay => m_PlaythroughData is ReplayPlaythroughData;
+
+		private TowerModesHighScoresDatabase HighScoresDatabase => GameManager.Instance.GetManager<TowerModesHighScoresDatabase>();
 
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
@@ -62,12 +65,16 @@ namespace TetrisTower.TowerLevels
 
 			m_PlaythroughData.QuitLevel();
 
+			HighScoresDatabase.ClearTowerMode();
+
 			GameManager.Instance.SwitchLevelAsync(m_PlaythroughData.PrepareSupervisor());
 		}
 
 		public void ExitToHomeScreen()
 		{
 			SaveReplay(true);
+
+			HighScoresDatabase.ClearTowerMode();
 
 			GameManager.Instance.SwitchLevelAsync(new HomeScreen.HomeScreenLevelSupervisor());
 		}

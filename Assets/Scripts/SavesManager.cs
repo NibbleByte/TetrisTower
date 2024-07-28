@@ -17,6 +17,7 @@ namespace TetrisTower.Saves
 		public static JsonConverter[] GetConverters(GameConfig config) => new JsonConverter[] {
 				new BlocksSkinSetConverter(config.AssetsRepository),
 				new LevelParamAssetConverter(config.AssetsRepository),
+				new PlaythroughTemplateBaseConverter(config.AssetsRepository),
 				new WorldLevelsSetConverter(config.AssetsRepository),
 				new GridShapeTemplateConverter(config.AssetsRepository),
 				new Core.Vector2JsonConverter(),
@@ -31,6 +32,7 @@ namespace TetrisTower.Saves
 
 		private const string ReplayExtension = ".trep";
 		private const string PlaythroughsExtension = ".wsav";
+		private const string HighscoresExtension = ".hsav";
 		private const string PreferencesFilename = "Preferences.json";
 
 		#region Serialization
@@ -221,6 +223,52 @@ namespace TetrisTower.Saves
 				UnityEngine.Debug.LogException(ex);
 
 				return new Game.Preferences.Implementation.UserPreferences();
+			}
+		}
+
+		#endregion
+
+		#region Highscores
+
+		public static async void SaveTowerModesHighScoresDatabase(TowerLevels.Modes.TowerModesHighScoresDatabase highscoresDatabase, GameConfig config)
+		{
+			try {
+				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Block(highscoresDatabase);
+
+				string content = Serialize<TowerLevels.Modes.TowerModesHighScoresDatabase>(highscoresDatabase, config, formatted: true);
+				await Platforms.PlatformsStorage.WriteZipFileAsync(Path.Combine(PlaythroughsFolder, $"HighScores{HighscoresExtension}"), content);
+
+				GameManager.Instance.GetManager<ToastNotificationsController>().ShowNotification("High Score Saved!");
+
+			} catch (Exception ex) {
+
+				UnityEngine.Debug.LogException(ex);
+
+				MessageBox.Instance.ShowSimple("Save Failed", $"High Score failed to save!", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
+
+			} finally {
+
+				GameManager.Instance.GetManager<BlockingOperationOverlayController>().Unblock(highscoresDatabase);
+			}
+		}
+
+		public static async Task<TowerLevels.Modes.TowerModesHighScoresDatabase> LoadTowerModesHighScoresDatabase(GameConfig config)
+		{
+			string filePath = Path.Combine(PlaythroughsFolder, $"HighScores{HighscoresExtension}");
+			if (!Platforms.PlatformsStorage.FileExists(filePath))
+				return new TowerLevels.Modes.TowerModesHighScoresDatabase();
+
+			try {
+				string content = await Platforms.PlatformsStorage.ReadZipFileAsync(filePath);
+				return Deserialize<TowerLevels.Modes.TowerModesHighScoresDatabase>(content, config);
+
+			} catch (Exception ex) {
+
+				UnityEngine.Debug.LogException(ex);
+
+				MessageBox.Instance.ShowSimple("Load Failed", $"Failed to load high scores!", MessageBoxIcon.Error, MessageBoxButtons.OK, (Action)null);
+
+				return new TowerLevels.Modes.TowerModesHighScoresDatabase();
 			}
 		}
 

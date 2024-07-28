@@ -3,6 +3,7 @@ using DevLocker.GFrame.Input;
 using System.Linq;
 using TetrisTower.Game;
 using TetrisTower.Logic;
+using TetrisTower.TowerLevels.Modes;
 using TetrisTower.TowerLevels.Playthroughs;
 using TMPro;
 using UnityEngine;
@@ -23,6 +24,8 @@ namespace TetrisTower.WorldMap.UI
 		private GridLevelData m_LevelData;
 		private WorldPlaythroughData m_PlaythroughData;
 
+		private TowerModesHighScoresDatabase HighScoresDatabase => GameManager.Instance.GetManager<TowerModesHighScoresDatabase>();
+
 		public void OnLevelLoaded(PlayerStatesContext context)
 		{
 			context.SetByType(out m_GameConfig);
@@ -30,7 +33,7 @@ namespace TetrisTower.WorldMap.UI
 			context.TrySetByType(out m_PlaythroughData);
 
 			StarsPanelRoot.SetActive(m_PlaythroughData != null);
-			HighScore?.gameObject.SetActive(m_PlaythroughData != null);
+			HighScore?.gameObject.SetActive(m_PlaythroughData != null || HighScoresDatabase.ModeStarted);
 		}
 
 		public void OnLevelUnloading()
@@ -46,6 +49,21 @@ namespace TetrisTower.WorldMap.UI
 
 		void OnEnable()
 		{
+			if (HighScoresDatabase.ModeStarted) {
+				if (HighScore) {
+					int highScore = HighScoresDatabase.StartedModeHighScore;
+					if (m_LevelData.Score.Score > highScore && m_LevelData.HasWon) {
+						highScore = m_LevelData.Score.Score;
+
+						HighScoresDatabase.CheckTowerModeScore(m_LevelData.Score.Score, m_GameConfig);
+						// TODO: Celebrate.
+					}
+
+					HighScore.text = HighScoreFormat.Replace("{VALUE}", highScore.ToString());
+				}
+				return;
+			}
+
 			if (m_PlaythroughData == null)
 				return;
 
@@ -58,7 +76,13 @@ namespace TetrisTower.WorldMap.UI
 			}
 
 			if (HighScore) {
-				HighScore.text = HighScoreFormat.Replace("{VALUE}", m_PlaythroughData.GetAccomplishment(levelParam.LevelID).HighestScore.ToString());
+				int highScore = m_PlaythroughData.GetAccomplishment(levelParam.LevelID).HighestScore;
+				if (m_LevelData.Score.Score > highScore) {
+					highScore = m_LevelData.Score.Score;
+					// TODO: Celebrate.
+				}
+
+				HighScore.text = HighScoreFormat.Replace("{VALUE}", highScore.ToString());
 			}
 		}
 	}

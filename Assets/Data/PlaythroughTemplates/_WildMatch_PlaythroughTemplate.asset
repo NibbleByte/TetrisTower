@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db9374f2e4f65f3469683e1287ce1e80, type: 3}
   m_Name: _WildMatch_PlaythroughTemplate
   m_EditorClassIdentifier: 
+  SEID: e4f9d76d6a05d2445b292e2d304c7d28
   m_PlayerData:
     m_ActiveTowerLevels:
     - rid: 0
@@ -78,9 +79,12 @@ MonoBehaviour:
         Objectives:
         - rid: 5506456835523608916
         - rid: 5506456835523608917
+        PendingBonusActions: []
         RunningState: 0
         HasWon: 0
         GreetMessage: 
+        AttackCharge: 0
+        AttackChargeMax: -1
     - rid: 2
       type: {class: BlocksShape, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
       data:

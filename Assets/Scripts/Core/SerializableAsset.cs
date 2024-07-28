@@ -9,7 +9,7 @@ namespace TetrisTower.Core
 		public string SEID;	// As in SerializationId
 
 #if UNITY_EDITOR
-		private void OnValidate()
+		protected virtual void OnValidate()
 		{
 			string guid;
 			long localId;

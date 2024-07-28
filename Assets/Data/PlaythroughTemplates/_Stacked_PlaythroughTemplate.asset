@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db9374f2e4f65f3469683e1287ce1e80, type: 3}
   m_Name: _Stacked_PlaythroughTemplate
   m_EditorClassIdentifier: 
+  SEID: b3af0b7b7a3cf88458b9b0254182a3c4
   m_PlayerData:
     m_ActiveTowerLevels:
     - rid: 0
@@ -78,9 +79,12 @@ MonoBehaviour:
         Objectives:
         - rid: 5506456835523608914
         - rid: 5506456835523608915
+        PendingBonusActions: []
         RunningState: 0
         HasWon: 0
         GreetMessage: 
+        AttackCharge: 0
+        AttackChargeMax: -1
     - rid: 2
       type: {class: BlocksShape, ns: TetrisTower.Logic, asm: TetrisTower.Logic}
       data:

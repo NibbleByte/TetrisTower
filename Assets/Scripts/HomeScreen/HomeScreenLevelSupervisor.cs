@@ -8,6 +8,7 @@ using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using TetrisTower.Game;
+using TetrisTower.TowerLevels.Modes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -36,6 +37,7 @@ namespace TetrisTower.HomeScreen
 			TowerLevels.TowerLevelDebugAPI.__DebugInitialTowerLevel = string.Empty;
 
 			gameContext.ClearCurrentPlaythrough();
+			GameManager.Instance.GetManager<TowerModesHighScoresDatabase>().ClearTowerMode();
 
 			var storyPlaythrough = await Saves.SavesManager.LoadPlaythrough(Saves.SavesManager.DefaultStorySlot, gameContext.GameConfig);
 			// On switching to tower level, the world is saved with pending current level.

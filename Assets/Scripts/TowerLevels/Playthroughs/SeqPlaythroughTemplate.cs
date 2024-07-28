@@ -39,8 +39,10 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 #if UNITY_EDITOR
 
-		private void OnValidate()
+		protected override void OnValidate()
 		{
+			base.OnValidate();
+
 			if (UnityEditor.EditorApplication.isUpdating)
 				return;
 
