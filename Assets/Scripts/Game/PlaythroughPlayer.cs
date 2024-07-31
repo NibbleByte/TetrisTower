@@ -128,8 +128,13 @@ namespace TetrisTower.Game
 		{
 			// Skip to avoid performance slow down for single player
 			// (while camera moves, canvas layout rebuilds as the rect "changes" because of camera transform)
-			if (!IsMultiplayer)
+			if (!IsMultiplayer) {
+				foreach (Canvas canvas in UICanvases) {
+					canvas.enabled = true;
+				}
+
 				return;
+			}
 
 			foreach (Canvas canvas in UICanvases) {
 				canvas.enabled = true;
