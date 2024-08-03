@@ -1,0 +1,444 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9374f2e4f65f3469683e1287ce1e80, type: 3}
+  m_Name: Marathon_PlaythroughTemplate
+  m_EditorClassIdentifier: 
+  SEID: 60294f0d66fa93e4b94582f721705452
+  m_PlayerData:
+    m_ActiveTowerLevels: []
+    m_BlocksSet: {fileID: 0}
+    RandomSeed: 0
+    RandomInitialSeed: 0
+    ScoreOnLevelStart: 0
+    PlayTimeOnLevelStart: 0
+    CurrentLevelIndex: 0
+    m_Levels:
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: a35fc937ade46df42b1e56067073a56e, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/SkyStory/S00_Babylon-Stormy.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 3
+      Objectives:
+      - rid: 5506456835523608918
+      - rid: 5506456835523608919
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 3a064c98f1c61db47b2ed3a5ca56a0a7, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Greece.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 3
+      Objectives:
+      - rid: 5506456835523608920
+      - rid: 5506456835523608921
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 11aa518b027c5dd4f8b78489ffa37c37, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Colosseum.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 3
+      Objectives:
+      - rid: 5506456835523608922
+      - rid: 5506456835523608923
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 6c5fc7ab53fadb641af161f1f1ef2570, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Stonehenge.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 3
+      Objectives:
+      - rid: 5506456835523608924
+      - rid: 5506456835523608925
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: fa3b7d093e2b92b4fa58b133e130a143, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Aurora.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 3
+      Objectives:
+      - rid: 5506456835523608926
+      - rid: 5506456835523608927
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 7785982c2ffb2a047a04e3da4c86dfe9, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Eskimos.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 5506456835523608928
+      - rid: 5506456835523608929
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: 17f494c607e7b5a4b85f20d17c39e596, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Vikings.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 5506456835523608930
+      - rid: 5506456835523608931
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: aebb086cc80f793449da2f415203276c, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Atlantis.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 5506456835523608932
+      - rid: 5506456835523608933
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: ad71bb18bd6e3b045981078f69550649, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Maya.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: 17333bfbc239a5248b7f8c369baee914, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/_DevTowerScene.unity
+      GreetMessage: 
+      InitialSpawnBlockTypesCount: 4
+      Objectives:
+      - rid: 5506456835523608934
+      - rid: 5506456835523608935
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    - BackgroundScene:
+        m_SceneAsset: {fileID: 102900000, guid: b5fa508578ae2894ca0296d85aa967a5, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/WorldStory/W_Iceland.unity
+      BackgroundSceneMobile:
+        m_SceneAsset: {fileID: 102900000, guid: a932d6f0f5ac1fd4db70eeab77fdc09a, type: 3}
+        m_IsDirty: 0
+        m_ScenePath: Assets/Scenes/TowerScene-1-Mobile.unity
+      GreetMessage: Endless!
+      InitialSpawnBlockTypesCount: 5
+      Objectives:
+      - rid: 5506456835523608937
+      Rules:
+        MatchHorizontalLines: 3
+        MatchVerticalLines: 3
+        MatchDiagonalsLines: 3
+        WildBlockChance: 0.05
+        BlockSmiteChance: 0.005
+        RowSmiteChance: 0.005
+        FallSpeedNormalized: 2
+        FallSpeedupPerAction: 0.02
+        MatchesToModifySpawnedBlocksRange: 120
+        ModifyBlocksRangeType: 0
+        WrapSidesOnMatch: 1
+        WrapSidesOnMove: 1
+      GridRows: 9
+      GridColumns: 13
+      ShapeTemplates: []
+      StartGridWithPinnedBlocks: 0
+      StartGrid:
+        rid: -2
+      SkinOverrides: []
+    m_LevelAssets: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5506456835523608918
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 100
+        MatchesType: 7
+    - rid: 5506456835523608919
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608920
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 150
+        MatchesType: 7
+    - rid: 5506456835523608921
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608922
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 200
+        MatchesType: 7
+    - rid: 5506456835523608923
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608924
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 30
+        MatchesType: 1
+    - rid: 5506456835523608925
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608926
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 300
+        MatchesType: 7
+    - rid: 5506456835523608927
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608928
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 40
+        MatchesType: 2
+    - rid: 5506456835523608929
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608930
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 400
+        MatchesType: 7
+    - rid: 5506456835523608931
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608932
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 50
+        MatchesType: 4
+    - rid: 5506456835523608933
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608934
+      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        MatchesEndCount: 500
+        MatchesType: 7
+    - rid: 5506456835523608935
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 0
+    - rid: 5506456835523608937
+      type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
+      data:
+        PlacingOutsideIsWin: 1

@@ -38,6 +38,26 @@ namespace TetrisTower.HomeScreen
 			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
 		}
 
+		public void StartSequence(TowerLocationsSequenceController sequenceController)
+		{
+			var gameContext = GameManager.Instance.GameContext;
+
+			var allLevels = sequenceController.TargetPlaythroughTemplate.GetAllLevels().ToArray();
+			allLevels = Saves.SavesManager.Clone<LevelParamData[]>(allLevels, gameContext.GameConfig);
+			foreach (var levelParam in allLevels) {
+				ModifyParamDifficulty(levelParam, sequenceController.PickedDifficulty);
+			}
+
+			IPlaythroughData playthroughData = sequenceController.TargetPlaythroughTemplate.GeneratePlaythroughData(gameContext.GameConfig, allLevels);
+			playthroughData.SetupRandomGenerator(sequenceController.PickedSeed);
+
+			gameContext.SetCurrentPlaythrough(playthroughData);
+
+			HighScoresDatabase.StartTowerMode(sequenceController.TargetPlaythroughTemplate, sequenceController.PickedDifficulty, sequenceController.PickedSeed);
+
+			GameManager.Instance.SwitchLevelAsync(gameContext.CurrentPlaythrough.PrepareSupervisor());
+		}
+
 		public void StartPlayOnLocation(TowerLocationPickerController locationPicker)
 		{
 			var gameContext = GameManager.Instance.GameContext;

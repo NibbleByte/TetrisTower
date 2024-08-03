@@ -34,10 +34,21 @@ namespace TetrisTower.TowerLevels.Modes
 		[JsonIgnore]
 		private TowerHighScoreEntry m_CurrentEntry;
 
+		private const string c_AllLevelsID = "<AllLevels>";
+
+		public int GetHighScoreForMode(PlaythroughTemplateBase mode, TowerDifficulty difficulty, int seed)
+		{
+			return GetHighScoreForMode(mode, c_AllLevelsID, difficulty, seed);
+		}
 		public int GetHighScoreForMode(PlaythroughTemplateBase mode, string levelID, TowerDifficulty difficulty, int seed)
 		{
 			var entry = FindEntry(mode, levelID, difficulty, seed);
 			return entry != null ? entry.HighScore : 0;
+		}
+
+		public void StartTowerMode(PlaythroughTemplateBase mode, TowerDifficulty difficulty, int seed)
+		{
+			StartTowerMode(mode, c_AllLevelsID, difficulty, seed);
 		}
 
 		public void StartTowerMode(PlaythroughTemplateBase mode, string levelID, TowerDifficulty difficulty, int seed)
