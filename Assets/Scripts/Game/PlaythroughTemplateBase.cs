@@ -21,6 +21,7 @@ namespace TetrisTower.Game
 
 		public BlocksSkinSet BlocksSet { get; }
 
+		public bool CanRetryLevel { get; }
 		public bool QuitLevelCanResumePlaythrough { get; }
 		public bool HaveFinishedLevels { get; }
 

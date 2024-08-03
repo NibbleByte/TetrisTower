@@ -19,6 +19,9 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	[JsonObject(MemberSerialization.Fields)]
 	public class SeqPlaythroughData : PlaythroughDataBase
 	{
+		[SerializeField] private bool m_CanRetryLevel = true;
+		public override bool CanRetryLevel => m_CanRetryLevel;
+
 		public int CurrentLevelIndex = 0;
 
 		public LevelParamData[] Levels => m_Levels.Length > 0 ? m_Levels : m_LevelAssets.Select(la => la ? la.LevelParam : null).ToArray();

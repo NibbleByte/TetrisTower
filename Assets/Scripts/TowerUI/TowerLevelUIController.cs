@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using TetrisTower.Game;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TetrisTower.TowerUI
 {
@@ -43,6 +44,9 @@ namespace TetrisTower.TowerUI
 		[Tooltip("Elements needed only when game is playing (i.e. not won / lost animation).")]
 		public GameObject[] PlayingOnlyElements;
 
+		[Tooltip("All \"Retry Level\" buttons. They will remain active if the playthrough allows it.")]
+		public GameObject[] RetryButtons;
+
 		[Tooltip("All \"Quit Level\" buttons. They will remain active if the playthrough allows it.")]
 		public GameObject[] QuitButtons;
 
@@ -52,6 +56,11 @@ namespace TetrisTower.TowerUI
 		{
 			foreach (var bind in StatePanels.Concat(PVPStatePanels).Concat(ReplayStatePanels)) {
 				bind.Panel.SetActive(false);
+			}
+
+			bool canRetry = context.FindByType<IPlaythroughData>().CanRetryLevel;
+			foreach(GameObject button in RetryButtons) {
+				button.GetComponentInChildren<Selectable>().interactable = canRetry;
 			}
 
 			bool canQuit = context.FindByType<IPlaythroughData>().QuitLevelCanResumePlaythrough;
