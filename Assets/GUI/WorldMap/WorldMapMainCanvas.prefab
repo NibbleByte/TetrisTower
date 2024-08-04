@@ -1837,6 +1837,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5836640994497566368}
   - component: {fileID: 5836640994497566398}
+  - component: {fileID: 8812082699259056234}
   - component: {fileID: 2400510370270929200}
   m_Layer: 5
   m_Name: TotalScore
@@ -1872,6 +1873,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5836640994497566371}
   m_CullTransparentMesh: 1
+--- !u!114 &8812082699259056234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640994497566371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 0
+  Source: 1
+  DisplayFormat: 'Total: {VALUE}'
 --- !u!114 &2400510370270929200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1974,7 +1990,6 @@ GameObject:
   - component: {fileID: 5836640994713266300}
   - component: {fileID: 3998645915982916003}
   - component: {fileID: 6017886371565361656}
-  - component: {fileID: 5836640994713266301}
   m_Layer: 5
   m_Name: ProgressDisplay
   m_TagString: Untagged
@@ -2040,26 +2055,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 6
---- !u!114 &5836640994713266301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5836640994713266303}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3dcb93e8ed0e4b4296cf6ae36d5c72e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TotalScoreFormat: 'Total: {VALUE}'
-  CurrentScoreFormat: 'Score: {VALUE} ({BONUS_RATIO})'
-  BlocksClearedCountFormat: 'Blocks: {VALUE}'
-  BonusRatioFormat: 'Bonus Ratio: {VALUE}'
-  TotalScoreText: {fileID: 2400510370270929200}
-  CurrentScoreText: {fileID: 0}
-  BlocksClearedCountText: {fileID: 0}
-  BonusRatioText: {fileID: 0}
 --- !u!1 &5836640995107078602
 GameObject:
   m_ObjectHideFlags: 0

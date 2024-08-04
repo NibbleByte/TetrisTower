@@ -24,6 +24,7 @@ namespace TetrisTower.Game
 		public bool CanRetryLevel { get; }
 		public bool QuitLevelCanResumePlaythrough { get; }
 		public bool HaveFinishedLevels { get; }
+		public bool IsPlayingLastLevel { get; }
 
 		public float TotalPlayTime { get; }
 		public int TotalScore { get; }

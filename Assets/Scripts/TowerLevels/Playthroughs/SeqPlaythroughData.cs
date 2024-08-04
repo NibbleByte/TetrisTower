@@ -21,6 +21,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 	{
 		[SerializeField] private bool m_CanRetryLevel = true;
 		public override bool CanRetryLevel => m_CanRetryLevel;
+		public override bool IsPlayingLastLevel => CurrentLevelIndex == Levels.Length - 1;
 
 		public int CurrentLevelIndex = 0;
 

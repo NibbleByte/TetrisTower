@@ -231,6 +231,7 @@ GameObject:
   m_Component:
   - component: {fileID: 770406036287136019}
   - component: {fileID: 770406036287136013}
+  - component: {fileID: 7112463617827449925}
   - component: {fileID: 8871723257294182019}
   m_Layer: 5
   m_Name: TotalScore
@@ -266,6 +267,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 770406036287136016}
   m_CullTransparentMesh: 1
+--- !u!114 &7112463617827449925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 770406036287136016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 0
+  Source: 1
+  DisplayFormat: 'Total: {VALUE}'
 --- !u!114 &8871723257294182019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -445,7 +461,6 @@ GameObject:
   - component: {fileID: 770406036466655183}
   - component: {fileID: 7868045270344195600}
   - component: {fileID: 706275690418662987}
-  - component: {fileID: 770406036466655182}
   - component: {fileID: 518995608259649260}
   m_Layer: 5
   m_Name: ProgressDisplay
@@ -516,26 +531,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 6
---- !u!114 &770406036466655182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 770406036466655180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3dcb93e8ed0e4b4296cf6ae36d5c72e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TotalScoreFormat: 'Total: {VALUE}'
-  CurrentScoreFormat: 'Score: {VALUE}'
-  BlocksClearedCountFormat: 'Blocks Cleared: {VALUE}'
-  BonusRatioFormat: 'Bonus Ratio: {VALUE}'
-  TotalScoreText: {fileID: 8871723257294182019}
-  CurrentScoreText: {fileID: 6542068946652702932}
-  BlocksClearedCountText: {fileID: 0}
-  BonusRatioText: {fileID: 7250827997288298909}
 --- !u!114 &518995608259649260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -559,6 +554,7 @@ GameObject:
   m_Component:
   - component: {fileID: 770406036471409104}
   - component: {fileID: 770406036471409106}
+  - component: {fileID: 3448686942037371007}
   - component: {fileID: 6542068946652702932}
   m_Layer: 5
   m_Name: CurrentScore
@@ -594,6 +590,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 770406036471409105}
   m_CullTransparentMesh: 1
+--- !u!114 &3448686942037371007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 770406036471409105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 0
+  Source: 0
+  DisplayFormat: 'Score: {VALUE}'
 --- !u!114 &6542068946652702932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -983,6 +994,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1451990596170675236}
   - component: {fileID: 2977515680890393118}
+  - component: {fileID: 1364538443754045704}
   - component: {fileID: 7250827997288298909}
   m_Layer: 5
   m_Name: BonusRatioScore
@@ -1018,6 +1030,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5168130140334734504}
   m_CullTransparentMesh: 1
+--- !u!114 &1364538443754045704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5168130140334734504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 1
+  Source: 0
+  DisplayFormat: 'Bonus Ratio: {VALUE}'
 --- !u!114 &7250827997288298909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1119,7 +1146,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1010385755941018765}
   - component: {fileID: 9169519732128625838}
-  - component: {fileID: 8904592177390661836}
+  - component: {fileID: 3123257907592622532}
   - component: {fileID: 2646568530447271612}
   m_Layer: 5
   m_Name: LevelTime
@@ -1155,7 +1182,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6025413267863285608}
   m_CullTransparentMesh: 1
---- !u!114 &8904592177390661836
+--- !u!114 &3123257907592622532
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1164,12 +1191,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6025413267863285608}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c01bb951babc1c4dac2078ffe0c7a4e, type: 3}
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Stat: 3
+  Source: 0
   DisplayFormat: '''Time: ''mm\:ss'
-  PlaythroughTime: 0
-  DisplayText: {fileID: 2646568530447271612}
 --- !u!114 &2646568530447271612
 MonoBehaviour:
   m_ObjectHideFlags: 0

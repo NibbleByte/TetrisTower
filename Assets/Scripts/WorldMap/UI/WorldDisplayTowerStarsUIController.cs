@@ -22,7 +22,7 @@ namespace TetrisTower.WorldMap.UI
 
 		private GameConfig m_GameConfig;
 		private GridLevelData m_LevelData;
-		private WorldPlaythroughData m_PlaythroughData;
+		private IPlaythroughData m_PlaythroughData;
 
 		private TowerModesHighScoresDatabase HighScoresDatabase => GameManager.Instance.GetManager<TowerModesHighScoresDatabase>();
 
@@ -32,8 +32,8 @@ namespace TetrisTower.WorldMap.UI
 			context.SetByType(out m_LevelData);
 			context.TrySetByType(out m_PlaythroughData);
 
-			StarsPanelRoot.SetActive(m_PlaythroughData != null);
-			HighScore?.gameObject.SetActive(m_PlaythroughData != null || HighScoresDatabase.ModeStarted);
+			StarsPanelRoot.SetActive(m_PlaythroughData is WorldPlaythroughData);
+			HighScore?.gameObject.SetActive(m_PlaythroughData is WorldPlaythroughData || HighScoresDatabase.ModeStarted);
 		}
 
 		public void OnLevelUnloading()
@@ -52,10 +52,11 @@ namespace TetrisTower.WorldMap.UI
 			if (HighScoresDatabase.ModeStarted) {
 				if (HighScore) {
 					int highScore = HighScoresDatabase.StartedModeHighScore;
-					if (m_LevelData.Score.Score > highScore && m_LevelData.HasWon) {
-						highScore = m_LevelData.Score.Score;
+					int score = m_PlaythroughData.CanRetryLevel ? m_LevelData.Score.Score : m_PlaythroughData.TotalScore;
+					if (score > highScore && m_LevelData.HasWon && (m_PlaythroughData.IsPlayingLastLevel || m_PlaythroughData.CanRetryLevel)) {
+						highScore = score;
 
-						HighScoresDatabase.CheckTowerModeScore(m_LevelData.Score.Score, m_GameConfig);
+						HighScoresDatabase.CheckTowerModeScore(score, m_GameConfig);
 						// TODO: Celebrate.
 					}
 
@@ -64,10 +65,11 @@ namespace TetrisTower.WorldMap.UI
 				return;
 			}
 
-			if (m_PlaythroughData == null)
+			WorldPlaythroughData worldPlaythroughData = m_PlaythroughData as WorldPlaythroughData;
+			if (worldPlaythroughData == null)
 				return;
 
-			var levelParam = m_PlaythroughData.GetAllLevels().OfType<WorldMapLevelParamData>().First(lp => lp.LevelID == m_PlaythroughData.CurrentLevelID);
+			var levelParam = worldPlaythroughData.GetAllLevels().OfType<WorldMapLevelParamData>().First(lp => lp.LevelID == worldPlaythroughData.CurrentLevelID);
 
 			int earnedIndex = levelParam.CalculateStarsEarned(m_LevelData.Score.Score) - 1;
 			for(int i = 0; i < StarImages.Length; i++) {
@@ -76,7 +78,7 @@ namespace TetrisTower.WorldMap.UI
 			}
 
 			if (HighScore) {
-				int highScore = m_PlaythroughData.GetAccomplishment(levelParam.LevelID).HighestScore;
+				int highScore = worldPlaythroughData.GetAccomplishment(levelParam.LevelID).HighestScore;
 				if (m_LevelData.Score.Score > highScore) {
 					highScore = m_LevelData.Score.Score;
 					// TODO: Celebrate.

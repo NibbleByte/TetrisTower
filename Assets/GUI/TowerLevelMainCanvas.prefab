@@ -279,6 +279,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8193179718301796557}
   - component: {fileID: 909352613847410914}
+  - component: {fileID: 437091761879966870}
   - component: {fileID: 3655622494377558512}
   m_Layer: 5
   m_Name: BonusRatioScore
@@ -314,6 +315,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 458557552931344658}
   m_CullTransparentMesh: 1
+--- !u!114 &437091761879966870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458557552931344658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 1
+  Source: 2
+  DisplayFormat: ({VALUE})
 --- !u!114 &3655622494377558512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,7 +431,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7170947872265223466}
   - component: {fileID: 7517266950494529088}
-  - component: {fileID: 6584045552663827367}
+  - component: {fileID: 7789812482517779594}
   - component: {fileID: 2465803410445158786}
   m_Layer: 5
   m_Name: LevelTime
@@ -451,7 +467,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 485104919519073047}
   m_CullTransparentMesh: 1
---- !u!114 &6584045552663827367
+--- !u!114 &7789812482517779594
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -460,12 +476,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 485104919519073047}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c01bb951babc1c4dac2078ffe0c7a4e, type: 3}
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Stat: 3
+  Source: 2
   DisplayFormat: '''Time: ''mm\:ss'
-  PlaythroughTime: 0
-  DisplayText: {fileID: 2465803410445158786}
 --- !u!114 &2465803410445158786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -567,6 +583,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1874877877864532079}
   - component: {fileID: 2814451723613132941}
+  - component: {fileID: 8613524582149464621}
   - component: {fileID: 7705784320399410882}
   m_Layer: 5
   m_Name: BlocksClearedScore
@@ -602,6 +619,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 628141029120127010}
   m_CullTransparentMesh: 1
+--- !u!114 &8613524582149464621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628141029120127010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 2
+  Source: 0
+  DisplayFormat: 'Blocks: {VALUE}'
 --- !u!114 &7705784320399410882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1212,6 +1244,7 @@ GameObject:
   - component: {fileID: 8117250109752566647}
   - component: {fileID: 2046388607270146093}
   - component: {fileID: 6540635369320744898}
+  - component: {fileID: 3961063084533122451}
   m_Layer: 5
   m_Name: BonusRatioScore
   m_TagString: Untagged
@@ -1337,6 +1370,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3961063084533122451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551841646490704909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 1
+  Source: 0
+  DisplayFormat: ({VALUE})
 --- !u!1 &1555088025954029731
 GameObject:
   m_ObjectHideFlags: 0
@@ -1347,7 +1395,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7071321840398901071}
   - component: {fileID: 2780273390374710930}
-  - component: {fileID: 8259558614033775543}
+  - component: {fileID: 2177279163869588613}
   - component: {fileID: 7890419141419278523}
   m_Layer: 5
   m_Name: LevelTime
@@ -1383,7 +1431,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1555088025954029731}
   m_CullTransparentMesh: 1
---- !u!114 &8259558614033775543
+--- !u!114 &2177279163869588613
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1392,12 +1440,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1555088025954029731}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c01bb951babc1c4dac2078ffe0c7a4e, type: 3}
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Stat: 3
+  Source: 0
   DisplayFormat: '''Time: ''mm\:ss'
-  PlaythroughTime: 0
-  DisplayText: {fileID: 7890419141419278523}
 --- !u!114 &7890419141419278523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1499,6 +1547,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9136287600475450672}
   - component: {fileID: 1369718436551780298}
+  - component: {fileID: 8308041450307977080}
   - component: {fileID: 2229580550240529905}
   m_Layer: 5
   m_Name: BonusRatioScore
@@ -1534,6 +1583,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1622599916920860428}
   m_CullTransparentMesh: 1
+--- !u!114 &8308041450307977080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622599916920860428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 1
+  Source: 0
+  DisplayFormat: ({VALUE})
 --- !u!114 &2229580550240529905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2652,7 +2716,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2612725126129372082}
   - component: {fileID: 6590974780351676964}
-  - component: {fileID: 6630094435853169579}
+  - component: {fileID: 7779497851840586177}
   - component: {fileID: 1838918344112729547}
   m_Layer: 5
   m_Name: LevelTime
@@ -2688,7 +2752,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3055680282042432514}
   m_CullTransparentMesh: 1
---- !u!114 &6630094435853169579
+--- !u!114 &7779497851840586177
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2697,12 +2761,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 3055680282042432514}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c01bb951babc1c4dac2078ffe0c7a4e, type: 3}
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Stat: 3
+  Source: 0
   DisplayFormat: '''Time: ''mm\:ss'
-  PlaythroughTime: 0
-  DisplayText: {fileID: 1838918344112729547}
 --- !u!114 &1838918344112729547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3119,158 +3183,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &3944728152484706366
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5031692972308022337}
-  - component: {fileID: 3183535387265542562}
-  - component: {fileID: 3114598282067939912}
-  - component: {fileID: 7008894008941749828}
-  m_Layer: 5
-  m_Name: TotalTime
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &5031692972308022337
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3944728152484706366}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5498555922637675492}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 149.53, y: -505.30627}
-  m_SizeDelta: {x: 220.94, y: 27.596968}
-  m_Pivot: {x: 0, y: 1}
---- !u!222 &3183535387265542562
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3944728152484706366}
-  m_CullTransparentMesh: 1
---- !u!114 &3114598282067939912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3944728152484706366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c01bb951babc1c4dac2078ffe0c7a4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DisplayFormat: '''Total time: ''mm\:ss'
-  PlaythroughTime: 1
-  DisplayText: {fileID: 7008894008941749828}
---- !u!114 &7008894008941749828
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3944728152484706366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 0
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: 'Total time: 01:45'
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4279580235
-  m_fontColor: {r: 0.29411766, g: 0.21176471, b: 0.08235294, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 26
-  m_fontSizeBase: 26
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 1
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 1
-  m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &4270247428605199670
 GameObject:
   m_ObjectHideFlags: 0
@@ -3414,6 +3326,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1185423077843413440}
   - component: {fileID: 8948727093584097671}
+  - component: {fileID: 1392426597059925519}
   - component: {fileID: 2289702672063181923}
   m_Layer: 5
   m_Name: CurrentScore
@@ -3450,6 +3363,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4336658249382970235}
   m_CullTransparentMesh: 1
+--- !u!114 &1392426597059925519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4336658249382970235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 0
+  Source: 0
+  DisplayFormat: 'Score: {VALUE}'
 --- !u!114 &2289702672063181923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4024,6 +3952,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6865112295416218858}
   - component: {fileID: 2483050833893018651}
+  - component: {fileID: 6129663620696045458}
   - component: {fileID: 1216245282469165633}
   m_Layer: 5
   m_Name: BlocksClearedScore
@@ -4059,6 +3988,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4959361587138148807}
   m_CullTransparentMesh: 1
+--- !u!114 &6129663620696045458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4959361587138148807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 2
+  Source: 0
+  DisplayFormat: 'Blocks: {VALUE}'
 --- !u!114 &1216245282469165633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4718,6 +4662,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5836640994859363774}
   - component: {fileID: 5836640994859363772}
+  - component: {fileID: 6065390865828896133}
   - component: {fileID: 2435994265080968087}
   m_Layer: 5
   m_Name: TotalScore
@@ -4753,6 +4698,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5836640994859363745}
   m_CullTransparentMesh: 1
+--- !u!114 &6065390865828896133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640994859363745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 0
+  Source: 1
+  DisplayFormat: 'Total: {VALUE}'
 --- !u!114 &2435994265080968087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5200,6 +5160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5836640996040168337}
   - component: {fileID: 5836640996040168367}
+  - component: {fileID: 7804467817025794278}
   - component: {fileID: 9014822509807612511}
   m_Layer: 5
   m_Name: CurrentScore
@@ -5236,6 +5197,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5836640996040168336}
   m_CullTransparentMesh: 1
+--- !u!114 &7804467817025794278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5836640996040168336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 0
+  Source: 2
+  DisplayFormat: 'Score: {VALUE}'
 --- !u!114 &9014822509807612511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6423,6 +6399,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7190250920608065782}
   - component: {fileID: 5064019531756408342}
+  - component: {fileID: 3841187892468701838}
   - component: {fileID: 3003884164289871392}
   m_Layer: 5
   m_Name: BlocksClearedScore
@@ -6458,6 +6435,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6395044755611186002}
   m_CullTransparentMesh: 1
+--- !u!114 &3841187892468701838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6395044755611186002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 2
+  Source: 0
+  DisplayFormat: 'Blocks: {VALUE}'
 --- !u!114 &3003884164289871392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7175,6 +7167,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2017301848013784901}
   - component: {fileID: 3736691229026630058}
+  - component: {fileID: 7120935185757501161}
   - component: {fileID: 1246282198316867981}
   m_Layer: 5
   m_Name: CurrentScore
@@ -7211,6 +7204,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8205174906188440883}
   m_CullTransparentMesh: 1
+--- !u!114 &7120935185757501161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8205174906188440883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66dab6826e199d4cbb978eb604a7492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stat: 0
+  Source: 0
+  DisplayFormat: 'Score: {VALUE}'
 --- !u!114 &1246282198316867981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9852,9 +9860,6 @@ PrefabInstance:
       addedObject: {fileID: 7191860306809906022}
     - targetCorrespondingSourceObject: {fileID: 8903581239464798620, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5031692972308022337}
-    - targetCorrespondingSourceObject: {fileID: 8903581239464798620, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 7170947872265223466}
     - targetCorrespondingSourceObject: {fileID: 8903581239464798620, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
       insertIndex: -1
@@ -9874,9 +9879,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7443266541448190065, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6871269984720910583}
-    - targetCorrespondingSourceObject: {fileID: 7443266541448190065, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 4091938748444830475}
   m_SourcePrefab: {fileID: 100100000, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
 --- !u!224 &5498555922637675492 stripped
@@ -9889,26 +9891,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7443266541448190065, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
   m_PrefabInstance: {fileID: 4017514935953257080}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6871269984720910583
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5803697325373139465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3dcb93e8ed0e4b4296cf6ae36d5c72e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TotalScoreFormat: 'Total: {VALUE}'
-  CurrentScoreFormat: 'Score: {VALUE}'
-  BlocksClearedCountFormat: 'Blocks: {VALUE}'
-  BonusRatioFormat: ({VALUE})
-  TotalScoreText: {fileID: 2435994265080968087}
-  CurrentScoreText: {fileID: 9014822509807612511}
-  BlocksClearedCountText: {fileID: 1216245282469165633}
-  BonusRatioText: {fileID: 3655622494377558512}
 --- !u!114 &4091938748444830475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10061,41 +10043,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8903581239464798620, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4240082136827448715}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7443266541448190065, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5725412119945700179}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
 --- !u!224 &4785960148100493153 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8903581239464798620, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
   m_PrefabInstance: {fileID: 4171734664246265597}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6822726836146200204 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7443266541448190065, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
-  m_PrefabInstance: {fileID: 4171734664246265597}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5725412119945700179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6822726836146200204}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3dcb93e8ed0e4b4296cf6ae36d5c72e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TotalScoreFormat: 'Total: {VALUE}'
-  CurrentScoreFormat: 'Score: {VALUE}'
-  BlocksClearedCountFormat: 'Blocks: {VALUE}'
-  BonusRatioFormat: '{VALUE}'
-  TotalScoreText: {fileID: 0}
-  CurrentScoreText: {fileID: 2289702672063181923}
-  BlocksClearedCountText: {fileID: 3003884164289871392}
-  BonusRatioText: {fileID: 2229580550240529905}
 --- !u!1001 &4955856484900392821
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13046,41 +13000,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8903581239464798620, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 639349957850721377}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7443266541448190065, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6770262452756604845}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
 --- !u!224 &813607105362138905 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8903581239464798620, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
   m_PrefabInstance: {fileID: 8126002999869423237}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1697461061141686004 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7443266541448190065, guid: 5b036c2a09534b14b8587c42825029a5, type: 3}
-  m_PrefabInstance: {fileID: 8126002999869423237}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6770262452756604845
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1697461061141686004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3dcb93e8ed0e4b4296cf6ae36d5c72e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TotalScoreFormat: 'Total: {VALUE}'
-  CurrentScoreFormat: 'Score: {VALUE}'
-  BlocksClearedCountFormat: 'Blocks: {VALUE}'
-  BonusRatioFormat: '{VALUE}'
-  TotalScoreText: {fileID: 0}
-  CurrentScoreText: {fileID: 1246282198316867981}
-  BlocksClearedCountText: {fileID: 7705784320399410882}
-  BonusRatioText: {fileID: 6540635369320744898}
 --- !u!1001 &8276854887414761954
 PrefabInstance:
   m_ObjectHideFlags: 0

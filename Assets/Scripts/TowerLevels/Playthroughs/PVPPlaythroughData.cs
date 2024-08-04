@@ -37,6 +37,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		private LevelParamData m_OverrideLevelParam;
 
 		public override bool HaveFinishedLevels => true;
+		public override bool IsPlayingLastLevel => true;
 
 		public override ILevelSupervisor PrepareSupervisor()
 		{

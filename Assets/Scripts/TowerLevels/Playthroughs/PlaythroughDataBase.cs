@@ -25,7 +25,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		[JsonIgnore]
 		protected List<PlaythroughPlayer> m_Players = new List<PlaythroughPlayer>();
-		public IEnumerable<PlaythroughPlayer> ActivePlayers => (m_Players ?? (m_Players = new List<PlaythroughPlayer>())).Where(p => p != null);	// JSONIgnore overrides to null
+		public IEnumerable<PlaythroughPlayer> ActivePlayers => (m_Players ?? (m_Players = new List<PlaythroughPlayer>())).Where(p => p != null);    // JSONIgnore overrides to null
 		public bool IsSinglePlayer => ActivePlayers.Count() <= 1;
 		public bool IsMultiPlayer => ActivePlayers.Count() > 1;
 
@@ -54,6 +54,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 		public virtual bool CanRetryLevel => true;
 		public virtual bool QuitLevelCanResumePlaythrough => false;
 		public abstract bool HaveFinishedLevels { get; }
+		public abstract bool IsPlayingLastLevel { get; }
 
 		public abstract ILevelSupervisor PrepareSupervisor();
 

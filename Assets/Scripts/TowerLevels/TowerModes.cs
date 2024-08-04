@@ -53,6 +53,9 @@ namespace TetrisTower.TowerLevels.Modes
 
 		public void StartTowerMode(PlaythroughTemplateBase mode, string levelID, TowerDifficulty difficulty, int seed)
 		{
+			if (mode == null)
+				throw new ArgumentNullException(nameof(mode));
+
 			if (m_CurrentEntry != null)
 				throw new InvalidOperationException("Tower mode already started. Finish the last one first.");
 

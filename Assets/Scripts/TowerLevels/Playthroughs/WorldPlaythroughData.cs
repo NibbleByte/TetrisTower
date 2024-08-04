@@ -60,6 +60,7 @@ namespace TetrisTower.TowerLevels.Playthroughs
 
 		public override bool QuitLevelCanResumePlaythrough => true;
 		public override bool HaveFinishedLevels => m_Accomplishments.Where(a => a.State == WorldLocationState.Completed).Count() >= m_LevelsSet.LevelsCount;
+		public override bool IsPlayingLastLevel => false;
 
 		[JsonConstructor]
 		public WorldPlaythroughData()
