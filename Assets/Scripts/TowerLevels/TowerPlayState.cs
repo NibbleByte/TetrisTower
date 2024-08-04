@@ -250,7 +250,7 @@ namespace TetrisTower.TowerLevels
 
 
 				// Horizontal drag in progress - move
-				if (!float.IsNaN(m_LevelController.FallingColumnAnalogOffset)) {
+				if (!float.IsNaN(m_LevelController.FacingColumnAnalogOffset)) {
 					if (Mathf.Abs(dragLastDistance.x) > 0.01f) {
 						m_ReplayRecording.AddAndRun(ReplayActionType.OffsetMove, -dragLastDistance.x * m_GameConfig.AnalogMoveSpeed / InputMetrics.InputPrecision);
 					}

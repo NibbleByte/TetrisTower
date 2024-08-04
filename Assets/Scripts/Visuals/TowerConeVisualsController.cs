@@ -23,7 +23,9 @@ namespace TetrisTower.Visuals
 		private GridLevelData m_LevelData => m_TowerLevel?.LevelData;
 		private WiseTiming m_Timing => m_TowerLevel.Timing;
 
+		public Transform FacingVisualsContainer;
 		public Transform FallingVisualsContainer;
+		public Transform FallingEffectsVisualsContainer;	// Needed so effects can lag behind, while after next falling blocks change column.
 
 		public float ChangeColumnDuration = 0.1f;
 		public float ChangeRotationDuration = 0.25f;
@@ -39,12 +41,12 @@ namespace TetrisTower.Visuals
 		// For debug to be displayed by the Inspector!
 		[SerializeReference] private VisualsShape m_DebugFallingVisualsShape;
 
-		private int m_CurrentFallingColumn = 0;
-		private bool m_ChangingFallingColumn = false;
-		private bool m_ChangingFallingColumnByAnalog = false;
+		private int m_CurrentFacingColumn = 0;
+		private bool m_ChangingFacingColumn = false;
+		private bool m_ChangingFacingColumnByAnalog = false;
 
-		private float m_ChangingFallingColumnStarted;
-		private Quaternion m_ChangingFallingColumnStartedRotation;
+		private float m_ChangingFacingColumnStarted;
+		private Quaternion m_ChangingFacingColumnStartedRotation;
 
 
 		private bool m_RotatingFallingShape = false;
@@ -76,6 +78,9 @@ namespace TetrisTower.Visuals
 			if (FallTrailEffectsManager) FallTrailEffectsManager.BlocksLayer = blocksLayer;
 			if (WonFallTrailEffectsManager) WonFallTrailEffectsManager.BlocksLayer = blocksLayer;
 
+			FacingVisualsContainer.SetParent(transform);
+			FacingVisualsContainer.localPosition = Vector3.zero;
+
 			FallingVisualsContainer.SetParent(transform);
 			FallingVisualsContainer.localPosition = Vector3.zero;
 
@@ -84,8 +89,8 @@ namespace TetrisTower.Visuals
 
 			DestroyFallingVisuals();
 
-			FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_LevelData.FallingColumn);
-			m_CurrentFallingColumn = m_LevelData.FallingColumn;
+			FacingVisualsContainer.localRotation = FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_LevelData.FallingColumn);
+			m_CurrentFacingColumn = m_LevelData.FacingColumn;
 
 			OnFallingShapeSelected();
 		}
@@ -110,16 +115,21 @@ namespace TetrisTower.Visuals
 		{
 			FallSpeedUpSoundSound?.Play();
 
+			FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_LevelData.FallingColumn);
+
+			// Needed so effects can lag behind, while after next falling blocks change column.
+			FallingEffectsVisualsContainer.localRotation = FallingVisualsContainer.localRotation;
+
 			if (m_LevelData.HasWon) {
 				// Rotation happens for the next block, so shouldn't affect the last one.
 				if (WonFallTrailEffectsManager) {
-					WonFallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value), FallingVisualsContainer);
+					WonFallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value), FallingEffectsVisualsContainer);
 				}
 
 			} else {
 				// You can rotate the falling shape, the trail should follow.
 				if (FallTrailEffectsManager) {
-					FallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value), FallingVisualsContainer);
+					FallTrailEffectsManager.StartFallTrailEffect(FallingVisualsShape.ShapeCoords.Select(sc => sc.Value), FallingEffectsVisualsContainer);
 				}
 			}
 		}
@@ -164,6 +174,7 @@ namespace TetrisTower.Visuals
 			}
 
 			FallingVisualsShape.ShapeCoords = visualbinds.ToArray();
+			FallingVisualsContainer.localRotation = FacingVisualsContainer.localRotation;
 		}
 
 		private void DestroyFallingVisuals()
@@ -188,7 +199,7 @@ namespace TetrisTower.Visuals
 				return;
 
 #if UNITY_EDITOR
-			VisualsGrid.__GizmoUpdateFallingColumn(m_LevelData.FallingColumn);
+			VisualsGrid.__GizmoUpdateFacingColumn(m_LevelData.FacingColumn);
 #endif
 
 			UpdateFallingVisualsFacing();
@@ -199,41 +210,50 @@ namespace TetrisTower.Visuals
 		private void UpdateFallingVisualsFacing()
 		{
 			// Analog offset overrides other movement animations.
-			if (!float.IsNaN(m_TowerLevel.FallingColumnAnalogOffset)) {
-				m_CurrentFallingColumn = m_LevelData.FallingColumn;
+			if (!float.IsNaN(m_TowerLevel.FacingColumnAnalogOffset)) {
+				m_CurrentFacingColumn = m_LevelData.FacingColumn;
 
-				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
+				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFacingColumn);
 				var eulerAngles = endRotation.eulerAngles;
-				eulerAngles.y -= m_TowerLevel.FallingColumnAnalogOffset * VisualsGrid.ConeSectorEulerAngle;
+				eulerAngles.y -= m_TowerLevel.FacingColumnAnalogOffset * VisualsGrid.ConeSectorEulerAngle;
 				endRotation.eulerAngles = eulerAngles;
 
-				FallingVisualsContainer.localRotation = endRotation;
+				FacingVisualsContainer.localRotation = endRotation;
+				if (!m_TowerLevel.IsFallingSpeedUp) {
+					FallingVisualsContainer.localRotation = endRotation;
+				}
 
-				m_ChangingFallingColumn = false;
-				m_ChangingFallingColumnByAnalog = true;
+				m_ChangingFacingColumn = false;
+				m_ChangingFacingColumnByAnalog = true;
 
 				return;
 			}
 
-			if (m_CurrentFallingColumn != m_LevelData.FallingColumn || m_ChangingFallingColumnByAnalog) {
-				m_ChangingFallingColumnStarted = m_Timing.TimeElapsed;
-				m_ChangingFallingColumnStartedRotation = FallingVisualsContainer.localRotation;
-				m_ChangingFallingColumn = true;
-				m_ChangingFallingColumnByAnalog = false;
-				m_CurrentFallingColumn = m_LevelData.FallingColumn;
+			if (m_CurrentFacingColumn != m_LevelData.FacingColumn || m_ChangingFacingColumnByAnalog) {
+				m_ChangingFacingColumnStarted = m_Timing.TimeElapsed;
+				m_ChangingFacingColumnStartedRotation = FacingVisualsContainer.localRotation;
+				m_ChangingFacingColumn = true;
+				m_ChangingFacingColumnByAnalog = false;
+				m_CurrentFacingColumn = m_LevelData.FacingColumn;
 			}
 
-			if (m_ChangingFallingColumn && m_Timing.TimeElapsed - m_ChangingFallingColumnStarted > ChangeColumnDuration) {
-				m_ChangingFallingColumn = false;
+			if (m_ChangingFacingColumn && m_Timing.TimeElapsed - m_ChangingFacingColumnStarted > ChangeColumnDuration) {
+				m_ChangingFacingColumn = false;
 
-				FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
+				FacingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_CurrentFacingColumn);
+				if (!m_TowerLevel.IsFallingSpeedUp) {
+					FallingVisualsContainer.localRotation = FacingVisualsContainer.localRotation;
+				}
 			}
 
-			if (m_ChangingFallingColumn) {
-				float progress = (m_Timing.TimeElapsed - m_ChangingFallingColumnStarted) / ChangeColumnDuration;
-				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFallingColumn);
+			if (m_ChangingFacingColumn) {
+				float progress = (m_Timing.TimeElapsed - m_ChangingFacingColumnStarted) / ChangeColumnDuration;
+				Quaternion endRotation = VisualsGrid.GridColumnToRotation(m_CurrentFacingColumn);
 
-				FallingVisualsContainer.localRotation = Quaternion.Lerp(m_ChangingFallingColumnStartedRotation, endRotation, progress);
+				FacingVisualsContainer.localRotation = Quaternion.Lerp(m_ChangingFacingColumnStartedRotation, endRotation, progress);
+				if (!m_TowerLevel.IsFallingSpeedUp) {
+					FallingVisualsContainer.localRotation = FacingVisualsContainer.localRotation;
+				}
 			}
 		}
 

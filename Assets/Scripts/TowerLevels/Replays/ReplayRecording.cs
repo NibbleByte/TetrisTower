@@ -119,7 +119,7 @@ namespace TetrisTower.TowerLevels.Replays
 
 				ReplayActionType.Move => levelController.LevelData.FallingColumn,
 
-				ReplayActionType.OffsetMove => levelController.FallingColumnAnalogOffset,
+				ReplayActionType.OffsetMove => levelController.FacingColumnAnalogOffset,
 				ReplayActionType.OffsetRotate => levelController.FallingShapeAnalogRotateOffset,
 
 				ReplayActionType.ChargeAttack => levelController.LevelData.AttackCharge,

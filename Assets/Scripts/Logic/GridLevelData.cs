@@ -33,6 +33,7 @@ namespace TetrisTower.Logic
 
 
 		public int FallingColumn;                   // The first (leftest) column that the shape is falling at the moment.
+		public int FacingColumn;					// The column currently player is facing. May be different from the falling one.
 		public float FallDistanceNormalized = 0f;	// Normalized distance passed by the lowest block of the shape while falling. 1.0 is one tile distance.
 		public float FallSpeedNormalized = 2f;		// Speed of falling.
 		public float FallSpeedupPerAction = 0.01f;  // Added to the falling speed every placement.

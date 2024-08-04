@@ -774,11 +774,11 @@ namespace TetrisTower.Visuals
 		private bool m_GizmoShowOnlyFaced = true;
 		private bool m_GizmoPressed = false;
 
-		private int m_FallingColumn = 0;
+		private int m_FacingColumn = 0;
 
-		internal void __GizmoUpdateFallingColumn(int fallingColumn)
+		internal void __GizmoUpdateFacingColumn(int facingColumn)
 		{
-			m_FallingColumn = fallingColumn;
+			m_FacingColumn = facingColumn;
 		}
 
 		void OnDrawGizmos()
@@ -830,7 +830,7 @@ namespace TetrisTower.Visuals
 				coords.Row = 0;
 				for (coords.Column = 0; coords.Column < columns; ++coords.Column) {
 
-					if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
+					if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FacingColumn - coords.Column) % 11 > 2)
 						continue;
 
 					var position = GridToWorldFrontEdgeMidpoint(coords);
@@ -844,7 +844,7 @@ namespace TetrisTower.Visuals
 				for (coords.Row = 0; coords.Row < rows; ++coords.Row) {
 					for (coords.Column = 0; coords.Column < columns; ++coords.Column) {
 
-						if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FallingColumn - coords.Column) % 11 > 2)
+						if (m_GizmoShowOnlyFaced && Application.isPlaying && Mathf.Abs(m_FacingColumn - coords.Column) % 11 > 2)
 							continue;
 
 						var vertexStart = GridToWorldFrontVertex(coords);

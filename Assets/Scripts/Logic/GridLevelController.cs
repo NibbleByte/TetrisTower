@@ -37,10 +37,11 @@ namespace TetrisTower.Logic
 
 		public bool AreGridActionsRunning => m_FinishedRuns != m_NextRunId;
 
-		public float FallingColumnAnalogOffset { get; private set; } = float.NaN;
+		public float FacingColumnAnalogOffset { get; private set; } = float.NaN;
 		public float FallingShapeAnalogRotateOffset { get; private set; } = float.NaN;
-		public float FallingShapeAnalogRotateOffsetBeforeClear { get; private set; } = float.NaN;	// Hacky, I know.
+		public float FallingShapeAnalogRotateOffsetBeforeClear { get; private set; } = float.NaN;   // Hacky, I know.
 
+		public bool IsFallingSpeedUp => m_FallingSpeedup != 0;
 		private float m_FallingSpeedup = 0;
 
 		private HashSet<object> m_PauseRequests = new HashSet<object>();
@@ -78,7 +79,7 @@ namespace TetrisTower.Logic
 			// In case this instance is reused when loading the same scene.
 			StopAllCoroutines();	// Already done on LevelSupervisor unload method.
 			m_NextRunId = m_FinishedRuns = 0;
-			FallingColumnAnalogOffset = float.NaN;
+			FacingColumnAnalogOffset = float.NaN;
 			FallingShapeAnalogRotateOffset = float.NaN;
 			FallingShapeAnalogRotateOffsetBeforeClear = float.NaN;
 
@@ -255,10 +256,12 @@ namespace TetrisTower.Logic
 			if (!LevelData.Rules.WrapSidesOnMove) {
 				if (LevelData.FallingColumn + LevelData.FallingShape.MaxColumn > Grid.Columns) {
 					LevelData.FallingColumn = Grid.Columns - LevelData.FallingShape.MaxColumn - 1;
+					FallingColumnChanged?.Invoke();
 				}
 
 				if (LevelData.FallingColumn + LevelData.FallingShape.MinColumn < 0) {
 					LevelData.FallingColumn = 0 - LevelData.FallingShape.MinColumn;
+					FallingColumnChanged?.Invoke();
 				}
 			}
 
@@ -275,7 +278,7 @@ namespace TetrisTower.Logic
 
 		public bool RequestFallingShapeMove(int offsetColumns)
 		{
-			int requestedColumn = LevelData.FallingColumn + offsetColumns;
+			int requestedColumn = LevelData.FacingColumn + offsetColumns;
 			if (!LevelData.Rules.WrapSidesOnMove) {
 				requestedColumn = Mathf.Clamp(requestedColumn,
 					0 - (LevelData.FallingShape?.MinColumn ?? 0),
@@ -287,7 +290,7 @@ namespace TetrisTower.Logic
 			var fallCoords = LevelData.CalcFallShapeCoordsAt(requestedColumn);
 			fallCoords.WrapAround(Grid);
 
-			if (LevelData.FallingShape != null) {
+			if (LevelData.FallingShape != null && !IsFallingSpeedUp) {
 				foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
 					if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords] != BlockType.None)
@@ -295,30 +298,33 @@ namespace TetrisTower.Logic
 				}
 			}
 
-			LevelData.FallingColumn = Grid.WrappedColumn(requestedColumn);
+			LevelData.FacingColumn = Grid.WrappedColumn(requestedColumn);
 
-			FallingColumnChanged?.Invoke();
+			if (!IsFallingSpeedUp) {
+				LevelData.FallingColumn = LevelData.FacingColumn;
+				FallingColumnChanged?.Invoke();
+			}
 
 			return true;
 		}
 
 		public bool AddFallingShapeAnalogMoveOffset(float offset)
 		{
-			if (float.IsNaN(FallingColumnAnalogOffset)) {
-				FallingColumnAnalogOffset = 0;
+			if (float.IsNaN(FacingColumnAnalogOffset)) {
+				FacingColumnAnalogOffset = 0;
 			}
 
-			FallingColumnAnalogOffset += offset;
+			FacingColumnAnalogOffset += offset;
 
 			ValidateAnalogMoveOffset();
 
-			while (FallingColumnAnalogOffset > 0.5f) {
-				FallingColumnAnalogOffset -= 1f;
+			while (FacingColumnAnalogOffset > 0.5f) {
+				FacingColumnAnalogOffset -= 1f;
 				RequestFallingShapeMove(1);
 			}
 
-			while (FallingColumnAnalogOffset < -0.5f) {
-				FallingColumnAnalogOffset += 1f;
+			while (FacingColumnAnalogOffset < -0.5f) {
+				FacingColumnAnalogOffset += 1f;
 				RequestFallingShapeMove(-1);
 			}
 
@@ -327,12 +333,12 @@ namespace TetrisTower.Logic
 
 		public bool ClearFallingShapeAnalogMoveOffset()
 		{
-			if (float.IsNaN(FallingColumnAnalogOffset))
+			if (float.IsNaN(FacingColumnAnalogOffset))
 				return false;
 
-			int roundDirection = Mathf.RoundToInt(FallingColumnAnalogOffset);
+			int roundDirection = Mathf.RoundToInt(FacingColumnAnalogOffset);
 
-			FallingColumnAnalogOffset = float.NaN;
+			FacingColumnAnalogOffset = float.NaN;
 
 			// Snap to the closest.
 			if (roundDirection != 0) {
@@ -344,10 +350,10 @@ namespace TetrisTower.Logic
 
 		private void ValidateAnalogMoveOffset()
 		{
-			if (!float.IsNaN(FallingColumnAnalogOffset)) {
+			if (!float.IsNaN(FacingColumnAnalogOffset)) {
 
 				// Check if falling shape can move to the next column or there are other shapes.
-				int requestedColumn = LevelData.FallingColumn + (int)Mathf.Sign(FallingColumnAnalogOffset);
+				int requestedColumn = LevelData.FacingColumn + (int)Mathf.Sign(FacingColumnAnalogOffset);
 				if (!LevelData.Rules.WrapSidesOnMove) {
 					requestedColumn = Mathf.Clamp(requestedColumn,
 						0 - (LevelData.FallingShape?.MinColumn ?? 0),
@@ -363,7 +369,7 @@ namespace TetrisTower.Logic
 					foreach (var pair in LevelData.FallingShape.AddToCoordsWrapped(fallCoords, Grid)) {
 
 						if (pair.Coords.Row < Grid.Rows && Grid[pair.Coords] != BlockType.None) {
-							FallingColumnAnalogOffset = 0;
+							FacingColumnAnalogOffset = 0;
 							break;
 						}
 					}
@@ -663,7 +669,7 @@ namespace TetrisTower.Logic
 
 		private void UpdateFallShape()
 		{
-			if (LevelData.FallFrozen && m_FallingSpeedup == 0f)
+			if (LevelData.FallFrozen && !IsFallingSpeedUp)
 				return;
 
 			// Don't fall on it's own while player is preparing - waiting for them to start the level.
@@ -688,6 +694,10 @@ namespace TetrisTower.Logic
 					fallCoords.Row++;
 
 					m_FallingSpeedup = 0f;
+					if (LevelData.FallingColumn != LevelData.FacingColumn) {
+						LevelData.FallingColumn = LevelData.FacingColumn;
+						FallingColumnChanged?.Invoke();
+					}
 
 					var fallShape = LevelData.FallingShape;
 					LevelData.FallingShape = null;

@@ -166,7 +166,6 @@ MonoBehaviour:
       GreetMessage: 
       InitialSpawnBlockTypesCount: 5
       Objectives:
-      - rid: 5506456835523608926
       - rid: 5506456835523608927
       Rules:
         MatchHorizontalLines: 3
@@ -230,12 +229,7 @@ MonoBehaviour:
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
         PlacingOutsideIsWin: 0
-    - rid: 5506456835523608926
-      type: {class: MatchBlocksCount_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
-      data:
-        MatchesEndCount: 300
-        MatchesType: 7
     - rid: 5506456835523608927
       type: {class: PlaceOutside_Objective, ns: TetrisTower.TowerObjectives, asm: TetrisTower.TowerObjectives}
       data:
-        PlacingOutsideIsWin: 0
+        PlacingOutsideIsWin: 1
