@@ -118,7 +118,7 @@ namespace TetrisTower.TowerLevels
 			}
 
 			Debug.Log($"Starting {m_CurrentAnimation.GetType().Name} lost animation.", m_CurrentAnimation as Object);
-			yield return m_CurrentAnimation.Execute(m_VisualsGrid, m_VisualsController.FallingVisualsContainer, visualBlocks);
+			yield return m_CurrentAnimation.Execute(m_VisualsGrid, m_VisualsController.FacingVisualsContainer, visualBlocks);
 
 			if (m_Interrupted)
 				yield break;
