@@ -117,9 +117,6 @@ namespace TetrisTower.Visuals
 
 			FallingVisualsContainer.localRotation = VisualsGrid.GridColumnToRotation(m_LevelData.FallingColumn);
 
-			// Needed so effects can lag behind, while after next falling blocks change column.
-			FallingEffectsVisualsContainer.localRotation = FallingVisualsContainer.localRotation;
-
 			if (m_LevelData.HasWon) {
 				// Rotation happens for the next block, so shouldn't affect the last one.
 				if (WonFallTrailEffectsManager) {
